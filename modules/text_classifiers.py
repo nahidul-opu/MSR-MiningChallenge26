@@ -1,4 +1,8 @@
 import re
+from numpy import extract
+from sentence_transformers import SentenceTransformer
+from transformers import pipeline
+import torch, gc
 
 class TextClassifier:
     def __init__(self, *, case_sensitive=False):
@@ -48,33 +52,105 @@ class SimpleSubstringClassifier(TextClassifier):
     
 
 class LLMClassifier(TextClassifier):
-    def __init__(self,prompt_template, llm_model="gpt-oss-20b"):
+    def __init__(self, prompt, model_name="openai/gpt-oss-20b", pos_word = "performance"):
         super().__init__(case_sensitive=False)
-        self.prompt_template = prompt_template
-        self.llm_model = llm_model
+        self.prompt_template = prompt
+        self.model_name = model_name
+        self.prediction = "None"
+        self.pos_word = pos_word
 
+        self.pipe = pipeline(
+            "text-generation",
+            model=self.model_name,
+            dtype=torch.float16,
+        )
+
+        self.pipe.tokenizer.padding_side = "left"
+        if self.pipe.tokenizer.pad_token is None:
+            self.pipe.tokenizer.pad_token = self.pipe.tokenizer.eos_token
+        
+    def extract_result_for_gptoss(self, text):
+        first_word = text
+        if "assistantfinal" in text:
+            pattern = r"\bassistantfinal\w*"
+            first_word = re.findall(pattern, text)[0].replace("assistantfinal", "").lower()
+            return first_word
+        else:
+            return None
+    
     def classify(self, text):
-        # Placeholder implementation
-        # In a real scenario, this would involve calling the LLM with the text and keywords
-        self.matches = []  # Assume no matches found
-        return bool(self.matches)
+        prompt = self.prompt_template
+        prompt.append({
+            "role": "user",
+            "content": text
+        })
+        
+        output = self.pipe(prompt, max_new_tokens=100000, do_sample=False)
+        self.prediction = output[0]["generated_text"][-1]["content"]
+
+        result = False
+        if "gpt-oss" in self.llm_model:
+            verdict = self.extract_result_for_gptoss(self.prediction)
+            if verdict == None:
+                result = False
+            else:
+                result = self.pos_word in verdict
+        else:
+            result = self.pos_word in self.prediction   
+
+        return result
+    
+    def get_prediction(self):
+        if self.prediction == None:
+            raise ValueError("Call classify() first")
+        return self.prediction
     
     def get_matches(self):
         raise ModuleNotFoundError("This function is not available for LLMClassifier")
     
 
 class EmbeddingClassifier(TextClassifier):
-    def __init__(self, base_text, embedding_model="all-MiniLM-L6-v2", similarity_threshold=0.7):
+    def __init__(self, base_text, embedding_model="google/embeddinggemma-300m", similarity_threshold=0.7):
         super().__init__(case_sensitive=False)
         self.base_text = base_text
         self.embedding_model = embedding_model
         self.similarity_threshold = similarity_threshold
 
-    def classify(self, text):
-        # Placeholder implementation
-        # In a real scenario, this would involve computing embeddings and checking similarity
-        self.matches = []  # Assume no matches found
-        return bool(self.matches)
+        self.model = SentenceTransformer(embedding_model)
+        self.base_embeddings = self.model.encode_query(self.base_text)
+
+    def reset(self):
+        self.similarities = None
+        self.similarity_score = None
+
+    def classify_str(self, text):
+        text_embeddings = self.model.encode_document([text])
+        self.similarity_score = self.model.similarity(self.base_embeddings, text_embeddings).tolist()[0][0]
+
+        return self.similarity_score > self.similarity_threshold
     
+    def classify_docs(self, documents):
+        document_embeddings = self.model.encode_document(documents)
+        self.similarities = self.model.similarity(self.base_embeddings, document_embeddings).tolist()[0]
+
+        return [val > self.similarity_threshold for val in self.similarities]
+
+    def classify(self, data):
+        self.reset()
+        if isinstance(data, str):
+            return self.classify_str(data)
+        elif isinstance(data, list):
+            return self.classify_docs(data)
+        else:
+            raise ValueError("Data can be string of list of strings")
+
+    def get_score(self):
+        if self.similarity_score:
+            return self.similarity_score
+        elif self.similarities:
+            return self.similarities
+        else:
+            raise ValueError("Call classify() first")
+        
     def get_matches(self):
         raise ModuleNotFoundError("This function is not available for EmbeddingClassifier")
