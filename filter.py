@@ -45,7 +45,7 @@ def filter_performance_topics(filename, columns, preprocessor, classifier):
 
 # %%
 
-filename = FileName.POP_ISSUE
+filename = FileName.ALL_PULL_REQUEST
 columns = ["title", "body"]
 
 keywords = set(

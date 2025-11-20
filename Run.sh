@@ -18,18 +18,18 @@ set -euo pipefail
 echo "Job started on $(hostname) at $(date)"
 
 module load StdEnv/2023 cuda/12.2
-module load python/3.11
+module load python/3.12
 
 cd /home/opumni/projects/def-shaiful/opumni
 source venv/msr/bin/activate
 
-export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+export PYTORCH_ALLOC_CONF=expandable_segments:True
 export HF_TOKEN=<token>
 export HF_HOME=$SLURM_TMPDIR/hf_cache
 
 mkdir -p $HF_HOME
 
 
-cd Tangled
+cd MSR-MiningChallenge26
 srun python filter.py
 echo "Job finished at $(date)"

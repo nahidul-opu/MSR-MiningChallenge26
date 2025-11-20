@@ -62,7 +62,6 @@ class LLMClassifier(TextClassifier):
         self.pipe = pipeline(
             "text-generation",
             model=self.model_name,
-            dtype=torch.float16,
         )
 
         self.pipe.tokenizer.padding_side = "left"
