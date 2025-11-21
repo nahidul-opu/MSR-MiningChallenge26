@@ -100,7 +100,7 @@ class LLMClassifier(TextClassifier):
             self.prediction = output[0]["generated_text"][-1]["content"]
 
         result = False
-        if "gpt-oss" in self.llm_model:
+        if "gpt-oss" in self.model_name:
             verdict = self.extract_result_for_gptoss(self.prediction)
             if verdict == None:
                 result = False
