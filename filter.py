@@ -21,36 +21,40 @@ def filter_performance_topics(filename, columns, preprocessor, classifier, callb
     count = 0
 
     for _, row in tqdm(df.iterrows()):
+        count = count + 1
+        
         if count < skip:
             continue
         
-        count = count + 1
-        
         text = ""
-        for col in columns:
-            if isinstance(row[col], str):
-                if text != "":
-                    text += "\n"
 
-                val = row[col]
-                if preprocessor is not None:
-                    val = preprocessor.preprocess(val)
+        try:
+            for col in columns:
+                if isinstance(row[col], str):
+                    if text != "":
+                        text += "\n"
 
-                text += val
+                    val = row[col]
+                    if preprocessor is not None:
+                        val = preprocessor.preprocess(val)
 
-        if text and text != "" and classifier.classify(text):
-            row = row.copy()
+                    text += val
 
-            if isinstance(classifier, RegexClassifier) or isinstance(classifier, SimpleSubstringClassifier):
-                row["matched_words"] = classifier.get_matches()
-            elif isinstance(classifier, LLMClassifier):
-                row["llm_output"] = classifier.get_prediction()
-            elif isinstance(classifier, EmbeddingClassifier):
-                row["probability"] = classifier.get_score()
+            if text and text != "" and classifier.classify(text):
+                row = row.copy()
 
-            output_rows.append(row)
+                if isinstance(classifier, RegexClassifier) or isinstance(classifier, SimpleSubstringClassifier):
+                    row["matched_words"] = classifier.get_matches()
+                elif isinstance(classifier, LLMClassifier):
+                    row["llm_output"] = classifier.get_prediction()
+                elif isinstance(classifier, EmbeddingClassifier):
+                    row["probability"] = classifier.get_score()
+
+                output_rows.append(row)
             
-        callback(pd.DataFrame(output_rows))
+            callback(pd.DataFrame(output_rows))
+        except Exception as e:
+            print(f"Error on {count}th: " , e)
 
     output_df = pd.DataFrame(output_rows)
 
@@ -107,4 +111,4 @@ prompt = [
 classifier = LLMClassifier(prompt)
 preprocessor = None
 
-df = filter_performance_topics(filename, columns, preprocessor, classifier, save)
+df = filter_performance_topics(filename, columns, preprocessor, classifier, save, 96)
