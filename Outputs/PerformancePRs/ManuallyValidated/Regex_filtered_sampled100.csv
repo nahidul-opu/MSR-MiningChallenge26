@@ -1,0 +1,2093 @@
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,matched_words,_label
+3257882620,1096,Add TPU transfer benchmark script,"## Summary
+- refine `tpu_transfer_benchmark.py` to keep the large slice alive and coordinate broadcast/all-gather sync
+- small slices now shard transferred weights across their TPUs
+
+## Testing
+- `pre-commit run --files scripts/tpu_transfer_benchmark.py`
+- `pytest tests -m ""not entry and not slow and not ray"" -q` *(fails: cannot install `haliax` from GitHub due to network restrictions)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_687411015c9c83318a80bf1df99eb9a8",OpenAI_Codex,9633,dlwh,open,2025-07-23T22:25:39Z,,,496005961,https://api.github.com/repos/stanford-crfm/levanter,https://github.com/stanford-crfm/levanter/pull/1096,['slow'],NonPerformance
+3250695708,11666,Add YAML loading to Elixir transpiler,"## Summary
+- implement `LoadExpr` support in the Elixir transpiler
+- parse YAML files to maps with atom keys
+- mark `load_yaml` test as passing and update docs
+- regenerate `load_yaml` example output
+
+## Testing
+- `go test -tags slow ./transpiler/x/ex -run TestExTranspiler_VMValid_Golden/load_yaml -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_687eeebd183083208bf2157219cabdfb",OpenAI_Codex,1218621,tamnd,closed,2025-07-22T02:06:28Z,2025-07-22T02:06:49Z,2025-07-22T02:06:49Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/11666,['slow'],NonPerformance
+3163181756,76,Update docs for accuracy,"## Summary
+- update default timer limit docs
+- fix instructions referencing outdated API
+
+## Testing
+- `bun test` *(fails: Cannot find package 'quickjs-emscripten-core')*
+
+------
+https://chatgpt.com/codex/tasks/task_e_685552fe8bb88328ba348a48dd535e2f",OpenAI_Codex,6763983,sebastianwessel,closed,2025-06-20T12:34:43Z,2025-06-20T12:34:59Z,2025-06-20T12:34:59Z,822144221,https://api.github.com/repos/sebastianwessel/quickjs,https://github.com/sebastianwessel/quickjs/pull/76,['timer'],NonPerformance
+3159480794,2099,Expand Zig compiler tests,"## Summary
+- infer basic types for variables in Zig codegen
+- add `for_loop` and `while_loop` golden tests for the Zig backend
+
+## Testing
+- `go test -tags=slow ./compile/zig -run TestZigCompiler_SubsetPrograms -count=1 -v`
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6853ca3a16cc8320b787c7c249fda6c4",OpenAI_Codex,1218621,tamnd,closed,2025-06-19T08:39:59Z,2025-06-19T08:40:23Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2099,['slow'],NonPerformance
+3156542075,1777,Add zig compiler example test helper,"## Summary
+- add helper to compile and run LeetCode examples by id
+- update zig compiler test to use the helper
+
+## Testing
+- `go test ./compile/zig -tags slow -run TwoSum -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68529f11131083208b59a324b729a633",OpenAI_Codex,1218621,tamnd,closed,2025-06-18T11:40:09Z,2025-06-18T11:45:01Z,2025-06-18T11:45:01Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/1777,['slow'],NonPerformance
+3216928055,6992,Add join support for Prolog compiler,"## Summary
+- support map key quoting for atoms
+- improve print handling for multiple arguments
+- handle truthiness in `if` statements
+- inline query helpers for joins/where/select
+- regenerate Prolog outputs for join examples
+
+## Testing
+- `go test -run TestPrologCompiler/cross_join -tags slow`
+- `go test -run TestPrologCompiler/inner_join -tags slow`
+- `go test -run TestPrologCompiler/join_multi -tags slow`
+- `go test -run TestPrologCompiler/right_join -tags slow` *(fails: exit status 2)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_686ebde22498832085fc92e50654d761",OpenAI_Codex,1218621,tamnd,closed,2025-07-09T19:30:58Z,2025-07-09T19:31:12Z,2025-07-09T19:31:12Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/6992,"['slow', 'slow', 'slow', 'slow']",NonPerformance
+3269208110,14261,Update Dart converter,"## Summary
+- add unary negative and ternary handling in Dart converter
+- update Dart converter tests to cover new cases
+- include generated golden examples for `bool_chain` and `unary_neg`
+- refresh checklist
+
+## Testing
+- `go run -tags slow /tmp/gen_bool_chain.go`
+- `go run -tags slow /tmp/gen_unary.go`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_68874939e7f88320bc1dc600e538fc71",OpenAI_Codex,1218621,tamnd,closed,2025-07-28T10:15:12Z,2025-07-28T10:15:32Z,2025-07-28T10:15:32Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/14261,"['slow', 'slow']",NonPerformance
+3263427077,13156,Process first batch of C++ Rosetta programs,"## Summary
+- add transpiled C++ output for Rosetta programs 64–71
+- refresh benchmark table and tasks checklist
+
+## Testing
+- `ROSETTA_INDEX=65 go test -tags slow ./transpiler/x/cpp -run Rosetta -update-rosetta-cpp -v`
+- `MOCHI_BENCHMARK=1 ROSETTA_INDEX=65 go test -tags slow ./transpiler/x/cpp -run Rosetta -update-rosetta-cpp -v`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68838b5f2c888320a99e456ed9d52817",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T14:29:41Z,2025-07-25T14:30:07Z,2025-07-25T14:30:07Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/13156,"['slow', 'slow']",NonPerformance
+3108174467,2033,Refactor member_block to return list,"## Summary
+- update `member_block` parser rule to return a list instead of `SubNodeList`
+- adjust `archetype_decl` to consume this list using `extract_from_list` and `flat_cur_nodes`
+
+## Testing
+- `pre-commit run --files jac/jaclang/compiler/parser.py` *(fails: couldn't access network for hooks)*
+- `pytest -q` *(fails: missing dependencies such as dotenv and fastapi)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_683ceb62cab08322aa41424051b786af",OpenAI_Codex,8206008,marsninja,closed,2025-06-02T01:14:35Z,2025-06-02T01:52:59Z,2025-06-02T01:52:58Z,422711680,https://api.github.com/repos/jaseci-labs/jaseci,https://github.com/jaseci-labs/jaseci/pull/2033,['fastapi'],NonPerformance
+3130941497,1453,Add MCP server endpoints,"## Summary
+- add `rust-mcp-sdk` dependency
+- implement simple MCP server handler and startup
+- expose new `--mcp-port` option in server CLI
+
+## Testing
+- `cargo fmt --all`
+- `cargo clippy --workspace --tests --examples -- -D warnings`
+- `cargo test --workspace --quiet` *(fails: command cancelled)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_6847025b7ed4832291abb07ddd9d65cb
+
+<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
+## Summary by CodeRabbit
+
+- **New Features**
+  - Added support for serving the Model Communication Protocol (MCP) via a new optional server mode, configurable with a command-line port argument.
+  - Introduced a new MCP server handler that processes chat requests and returns responses using the MCP protocol.
+  - Enabled parallel serving of models over both HTTP API and MCP protocol.
+
+- **Chores**
+  - Added new dependencies and features to support MCP server functionality.
+  - Updated documentation to include MCP protocol usage, configuration, and examples.
+
+- **Bug Fixes**
+  - Improved type handling for server port arguments to enhance reliability.
+<!-- end of auto-generated comment: release notes by coderabbit.ai -->",OpenAI_Codex,65165915,EricLBuehler,closed,2025-06-09T17:25:00Z,2025-06-10T08:32:52Z,2025-06-10T08:32:52Z,763774926,https://api.github.com/repos/EricLBuehler/mistral.rs,https://github.com/EricLBuehler/mistral.rs/pull/1453,['responses'],NonPerformance
+3246413921,10849,Improve ts transpiler,"## Summary
+- add QueryExprJS Group support
+- infer group type
+- handle join emission correctly
+- document new progress
+
+## Testing
+- `go test -tags slow ./transpiler/x/ts -run TestMain -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_687cfa0865bc8320812e709a6a5103ee",OpenAI_Codex,1218621,tamnd,closed,2025-07-20T14:28:58Z,2025-07-20T14:34:20Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/10849,['slow'],NonPerformance
+3256121364,12392,Add builtins to TypeScript transpiler,"## Summary
+- handle `repeat` and `parseIntStr` builtins in TypeScript transpiler
+- generate helper functions for them
+- enable big rational arithmetic
+- update generated Rosetta outputs
+
+## Testing
+- `MOCHI_ROSETTA_INDEX=148 go test -tags slow -count=1 -run TestTSTranspiler_Rosetta_Golden -update ./transpiler/x/ts`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6880c5bb0a5883208c5044c14b9795b2",OpenAI_Codex,1218621,tamnd,closed,2025-07-23T12:09:35Z,2025-07-23T12:09:56Z,2025-07-23T12:09:56Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12392,['slow'],NonPerformance
+3219632526,7419,Add Mochi version of 24-game-solve,"## Summary
+- add 24-game-solve.mochi translated from Go version
+- ensure Rosetta Mochi tests pass
+
+## Testing
+- `go test ./tools/rosetta -tags slow`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_686fce8c05dc8320b94a3c84eafb4448",OpenAI_Codex,1218621,tamnd,closed,2025-07-10T14:40:13Z,2025-07-10T14:40:25Z,2025-07-10T14:40:24Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7419,['slow'],NonPerformance
+3273232501,14582,Improve Scala a2mochi converter,"## Summary
+- enhance Scala converter to drop class lines and support `match` expressions
+- regenerate progress README showing completed files
+
+## Testing
+- `go test -tags slow -run TestTransform_Golden -count=1 -v`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6888a32f5a3c83209faee130b5b3931b",OpenAI_Codex,1218621,tamnd,closed,2025-07-29T11:21:00Z,2025-07-29T11:21:13Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/14582,['slow'],NonPerformance
+3253476876,12168,Update Zig transpiler for Rosetta task 100-prisoners,"## Summary
+- implement deterministic `now()` and string conversion helpers in Zig transpiler
+- support string concatenation and index casting
+- mark `100-prisoners` as passing in Zig Rosetta checklist
+- regenerate Zig output for `100-prisoners`
+
+## Testing
+- `MOCHI_ROSETTA_INDEX=4 go test ./transpiler/x/zig -tags slow -run Rosetta -count=1 -v`
+
+------
+https://chatgpt.com/codex/tasks/task_e_687fc2319b8883209b38d222d3a85c4c",OpenAI_Codex,1218621,tamnd,closed,2025-07-22T17:19:16Z,2025-07-22T17:19:33Z,2025-07-22T17:19:33Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12168,['slow'],NonPerformance
+3266519812,13597,Add evolutionary algorithm Rosetta task,"## Summary
+- download Rosetta task #332 for Go via `DownloadTaskByNumber`
+- implement the same evolutionary algorithm in Mochi
+- record VM output for the new Mochi program
+
+## Testing
+- `MOCHI_ROSETTA_ONLY=evolutionary-algorithm go test ./runtime/vm -run Rosetta -tags slow`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68856a91ca0c8320a83900eeb4d565bb",OpenAI_Codex,1218621,tamnd,closed,2025-07-27T03:51:57Z,2025-07-27T03:52:25Z,2025-07-27T03:52:25Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/13597,['slow'],NonPerformance
+3096249565,695,Increase WebSocket reconnect wait time from 10 to 30 seconds,"## Description
+
+This PR increases the wait time between WebSocket reconnect attempts from 10 seconds to 30 seconds when handling the VIOLATED_POLICY (code 1008) closing code in the AgentWebSocketClient.
+
+## Changes Made
+
+1. Modified `AgentWebSocketClient.java` to increase the sleep duration between reconnect attempts from 10 seconds to 30 seconds
+2. Updated the related code comment to reflect this change
+3. Updated the log message to indicate 30 seconds sleep time instead of 10 seconds
+
+## Details
+
+Changes were made in the `onClose` method of the `AgentWebSocketClient` class where it handles the VIOLATED_POLICY case. The longer wait time will reduce reconnection frequency when agents encounter this specific closing code, potentially reducing network load and allowing more time for transient issues to resolve.
+
+```java
+// Before:
+// wait for 10 seconds and then retry
+try {
+    log.info(""onClose, code: {}, reason: {}, remote: {}, reconnectTime: {}, {} sleep 10 seconds"", code, reason, remote, reconnectTime, violatedReconnectTime);
+    Thread.sleep(10000);
+} catch (InterruptedException e) {
+    log.error(""onClose, sleep error"", e);
+}
+
+// After:
+// wait for 30 seconds and then retry
+try {
+    log.info(""onClose, code: {}, reason: {}, remote: {}, reconnectTime: {}, {} sleep 30 seconds"", code, reason, remote, reconnectTime, violatedReconnectTime);
+    Thread.sleep(30000);
+} catch (InterruptedException e) {
+    log.error(""onClose, sleep error"", e);
+}
+```
+
+## Testing
+
+This change makes only a timing modification and doesn't alter any logic or control flow.
+
+## Related Issue
+
+This addresses the need to increase sleep duration between reconnection attempts when encountering VIOLATED_POLICY WebSocket close codes.
+
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-05-28T06:52:39Z,,,486525050,https://api.github.com/repos/microsoft/HydraLab,https://github.com/microsoft/HydraLab/pull/695,"['wait', 'time', 'wait', 'time', 'time', 'wait', 'time', 'time', 'wait', 'wait', 'timing']",Performance
+3267939095,14026,Run rosetta case 300,"## Summary
+- implement helper functions in Pascal transpiler
+- begin support for local variables when transpiling functions
+- generate Pascal for `dice-game-probabilities-1`
+
+## Testing
+- `ROSETTA_INDEX=300 MOCHI_BENCHMARK=1 go test ./transpiler/x/pas -run Rosetta -tags slow -update-rosetta-pas -v`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6886e99066e08320b0638b27fe57a1ac",OpenAI_Codex,1218621,tamnd,closed,2025-07-28T03:40:20Z,2025-07-28T03:40:32Z,2025-07-28T03:40:32Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/14026,['slow'],NonPerformance
+3239748118,4407,Fix Python test timeouts in full matrix CI workflow,"## Problem
+
+Python tests were timing out in the full matrix CI workflow, causing build failures. The issue occurred because:
+
+1. **Full matrix mode runs tests with both async backends sequentially** - Tests run with both `--async-backend=asyncio` and `--async-backend=trio`, effectively doubling execution time
+2. **Insufficient timeout allowance** - The 60-minute timeout was inadequate for the expanded test matrix
+3. **Suboptimal client timeout configurations** - Default timeouts were not optimized for CI environments
+
+## Solution
+
+### 1. Increased CI Job Timeouts
+- Bumped timeout from 60 to 90 minutes for all Python test jobs in the full matrix workflow:
+  - `test-python`
+  - `test-pubsub-python` 
+  - `test-python-container`
+
+### 2. Optimized Test Client Configurations
+- Added standardized timeout constants for consistent behavior:
+  ```python
+  DEFAULT_CLIENT_TIMEOUT = 3000  # 3 seconds
+  DEFAULT_CONNECTION_TIMEOUT = 3000  # 3 seconds
+  ```
+- Updated client creation functions to use optimized defaults
+- Reduced teardown delays while maintaining reliability
+
+### 3. Bug Fix
+- Fixed malformed error message in cluster manager when server binaries are not found
+
+## Impact
+
+These changes provide:
+- **50% more execution time** (90 min vs 60 min) for full matrix tests
+- **More efficient client operations** through optimized timeouts
+- **Better error reporting** for debugging cluster setup issues
+
+The timeout increase accommodates the sequential execution of both asyncio and trio backends in full matrix mode, while the client optimizations help reduce overall test execution time.
+
+Fixes #4406.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `esm.ubuntu.com`
+>   - Triggering command: `/usr/lib/apt/methods/https` (dns block)
+> - `https://api.github.com/repos/valkey-io/valkey-glide/actions/runs/16335521905`
+>   - Triggering command: `curl -s REDACTED` (http block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-17T14:11:05Z,2025-07-20T15:51:12Z,2025-07-20T15:51:11Z,511141524,https://api.github.com/repos/valkey-io/valkey-glide,https://github.com/valkey-io/valkey-glide/pull/4407,"['timeouts', 'timing', 'time', 'timeout', 'timeout', 'timeout', 'timeouts', 'Timeouts', 'timeout', 'timeout', 'time', 'timeouts', 'timeout', 'optimizations', 'time']",NonPerformance
+3238780232,9282,Add VM golden tests for JOB dataset,"## Summary
+- add golden tests for JOB dataset programs under `runtime/vm`
+
+## Testing
+- `go test ./runtime/vm -run TestVM_JOB_Dataset/q1 -tags=slow -count=1` *(fails: expect condition failed)*
+- `go test ./runtime/vm -run TestVM_JOB -tags=slow -count=1` *(fails: expect condition failed)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_6878b907e890832092dd5cc4ee7d93b8",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T09:10:02Z,2025-07-18T11:51:29Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9282,"['slow', 'slow']",NonPerformance
+3231135043,1264,"chore: set extended translucency category to ""lighting""","Extended Translucency was defaulting to the ""Other"" category in the UI, but this feature is fundamentally about lighting - specifically how light transmits through translucent materials like fabric.
+
+The feature provides:
+- Realistic rendering of thin fabric and other translucent materials
+- Directional light transmission effects
+- Multiple material models (rim light, isotropic/anisotropic fabric)
+- Performance-optimized translucency calculations
+
+This change moves Extended Translucency to the ""Lighting"" category alongside other lighting features like:
+- Screen Space GI
+- Volumetric Lighting  
+- IBL (Image-Based Lighting)
+- Inverse Square Lighting
+- Screen Space Shadows
+
+**Change**: Added `GetCategory()` override to return ""Lighting"" instead of the default ""Other"".
+
+```cpp
+virtual std::string_view GetCategory() const override { return ""Lighting""; }
+```
+
+Fixes #1263.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-15T07:26:50Z,2025-07-15T13:15:36Z,2025-07-15T13:15:36Z,606527043,https://api.github.com/repos/doodlum/skyrim-community-shaders,https://github.com/doodlum/skyrim-community-shaders/pull/1264,['Performance'],Performance
+3070146158,45,Add outside event hook for select,"## Summary
+- add a new React hook `useOutsideEvent` that registers listeners on `document` and `window.parent.document`
+- use the hook in `StSelectOptions` to close the dropdown when clicking outside
+
+## Testing
+- `npm run lint` *(fails: ESLint couldn't find config)*
+- `npm run build` *(fails: missing dependencies)*
+- `pytest -q` *(fails: command not found)*",OpenAI_Codex,22167673,ObservedObserver,open,2025-05-17T01:26:45Z,,,698517452,https://api.github.com/repos/ObservedObserver/streamlit-shadcn-ui,https://github.com/ObservedObserver/streamlit-shadcn-ui/pull/45,['React'],NonPerformance
+3250803543,11697,Update ex transpiler with update stmt support,"## Summary
+- add update statement support for the Elixir transpiler
+- regenerate Elixir golden output for `update_stmt`
+- document progress and checklist updates
+
+## Testing
+- `go test ./transpiler/x/ex -run TestExTranspiler_VMValid_Golden/update_stmt -tags=slow -count=1`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_687ef774ef1883208091d64055dde46a",OpenAI_Codex,1218621,tamnd,closed,2025-07-22T02:58:50Z,2025-07-22T02:59:23Z,2025-07-22T02:59:23Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/11697,['slow'],NonPerformance
+3250983050,11763,Update Swift transpiler for FFI auto imports,"## Summary
+- enhance Swift transpiler with RawStmt support and FFI stubs
+- handle field/method calls and improve float literal formatting
+- generate Swift outputs for go_auto, python_auto and python_math
+- update README and TASKS progress for Swift transpiler
+
+## Testing
+- `go test -tags slow -run TestSwiftTranspiler_VMValid_Golden/go_auto$ -count=1`
+- `go test -tags slow -run TestSwiftTranspiler_VMValid_Golden/python_auto$ -count=1`
+- `go test -tags slow -run TestSwiftTranspiler_VMValid_Golden/python_math$ -count=1`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_687f0e913c7483208ed1b01019bc64e0",OpenAI_Codex,1218621,tamnd,closed,2025-07-22T04:24:33Z,2025-07-22T04:24:47Z,2025-07-22T04:24:46Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/11763,"['slow', 'slow', 'slow']",NonPerformance
+3230922085,2452,Migrate codesandbox to e2b equivalent,"%23%23 Description
+
+This PR migrates the entire codebase from using the CodeSandbox SDK to the E2B SDK. This involves updating dependencies, constants, and core components responsible for sandbox management, file operations, terminal sessions, and deployments.
+
+A key improvement in this migration is the adoption of E2B's native file watching API, replacing a previous polling-based solution for better performance and reliability.
+
+%23%23 Related Issues
+
+<!-- Link any related issues using GitHub keywords (e.g., ""closes %23123"", ""fixes %23456"", ""related to %23789"") -->
+
+%23%23 Type of Change
+
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Documentation update
+- [ ] Release
+- [x] Refactor
+- [ ] Other (please describe):
+
+%23%23 Testing
+
+This migration involves a fundamental change in the underlying sandbox provider. Comprehensive functional testing of all features relying on sandbox interactions (e.g., project creation, file editing, terminal usage, deployments, preview loading) is required.
+
+%23%23 Screenshots (if applicable)
+
+<!-- Add screenshots to help explain your changes -->
+
+%23%23 Additional Notes
+
+- **Environment Variable Update**: Users will need to update their `.env` file to replace `CSB_API_KEY` with `E2B_API_KEY`.
+- **Dependency Update**: Run `bun install` after pulling this PR.
+- **E2B API Key**: An E2B API key is required from [https://e2b.dev](https://e2b.dev).
+- **API Differences**: The E2B SDK has a different API structure for file operations and process management compared to CodeSandbox.
+- **File Watching**: Now leverages E2B's native `files.watchDir()` for real-time file change detection.
+<!-- ELLIPSIS_HIDDEN -->
+
+----
+
+> [!IMPORTANT]
+> Migrate codebase from CodeSandbox to E2B, updating dependencies, file operations, sandbox management, and documentation.
+> 
+>   - **Migration**:
+>     - Replace CodeSandbox SDK with E2B SDK across the codebase.
+>     - Update `package.json` dependencies to use `@e2b/sdk`.
+>     - Change environment variable from `CSB_API_KEY` to `E2B_API_KEY` in `env.ts`.
+>   - **File Operations**:
+>     - Use E2B's `filesystem` API for file operations in `file-operations.ts` and `index.ts`.
+>     - Implement `uploadToSandbox()` in `index.tsx` to handle file uploads to E2B.
+>   - **Sandbox Management**:
+>     - Refactor `SessionManager` in `session.ts` to manage E2B sessions.
+>     - Update `sandboxRouter` in `sandbox.ts` to handle E2B sandbox operations.
+>   - **File Watching**:
+>     - Use E2B's `files.watchDir()` for file watching in `file-watcher.ts`.
+>   - **Terminal Sessions**:
+>     - Refactor `CLISessionImpl` in `terminal.ts` to use E2B's `ProcessManager`.
+>   - **Documentation**:
+>     - Update documentation to reflect migration to E2B in `README.md` and other docs.
+>   - **Miscellaneous**:
+>     - Remove CodeSandbox-specific constants and replace with E2B equivalents in `e2b.ts`.
+>     - Update test cases in `path.test.ts` to reflect new file paths.
+> 
+> <sup>This description was created by </sup>[<img alt=""Ellipsis"" src=""https://img.shields.io/badge/Ellipsis-blue?color=175173"">](https://www.ellipsis.dev?ref=onlook-dev%2Fonlook&utm_source=github&utm_medium=referral)<sup> for 9c393d2375f629e937237bd879d9774572e23713. You can [customize](https://app.ellipsis.dev/onlook-dev/settings/summaries) this summary. It will automatically update as commits are pushed.</sup>
+
+<!-- ELLIPSIS_HIDDEN -->",Cursor,31864905,Kitenite,open,2025-07-15T06:10:01Z,,,820087727,https://api.github.com/repos/onlook-dev/onlook,https://github.com/onlook-dev/onlook/pull/2452,"['responsible', 'performance', 'time']",Performance
+3165622491,1654,"Fix MongoDB array, double, and null value handling with schemaless tests","## Summary
+- support bson arrays for schemaless tables
+- clarify unsupported BSON error messages
+- add MongoDB array integration test
+
+## Testing
+- `cargo clippy --all-targets -- -D warnings`
+- `cargo fmt --all`
+- `cargo test --test mongo_storage --features test-mongo -- --nocapture` *(fails: server selection timeout)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_68577041444c832a821646e88cf750c1",OpenAI_Codex,2025065,panarch,closed,2025-06-22T03:23:21Z,2025-06-23T00:44:45Z,2025-06-23T00:44:45Z,227265548,https://api.github.com/repos/gluesql/gluesql,https://github.com/gluesql/gluesql/pull/1654,['timeout'],NonPerformance
+3242480824,9572,Update Elixir rosetta checklist,"## Summary
+- add a checklist in `tests/rosetta/out/Elixir/README.md` to show which tasks compile and run
+
+## Testing
+- `go test ./compiler/x/ex -run TestExCompiler_Rosetta_Golden -tags=slow -count=1 -v`
+
+------
+https://chatgpt.com/codex/tasks/task_e_687a0905ad3c8320b75923ed6af46671",OpenAI_Codex,1218621,tamnd,closed,2025-07-18T09:01:26Z,2025-07-18T09:13:53Z,2025-07-18T09:13:53Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9572,['slow'],NonPerformance
+3248506897,11368,Improve Erlang transpiler type inference,"## Summary
+- enhance Erlang transpiler context with string variable tracking
+- propagate inferred string types in statements and loops
+- regenerate golden outputs for many Erlang transpiler tests
+
+## Testing
+- `go test -tags=slow -run TestTranspile -update` *(fails: signal interrupt)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_687e2feb7fac832093cfde3bfb387e09",OpenAI_Codex,1218621,tamnd,closed,2025-07-21T12:39:36Z,2025-07-21T12:39:50Z,2025-07-21T12:39:50Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/11368,['slow'],NonPerformance
+3242297528,9528,Improve OCaml compiler printing,"## Summary
+- enhance print handling to convert ints, floats and bools without runtime helper
+- detect string variables for `len` builtin
+- record recent progress in OCaml TASKS
+- regenerate OCaml machine README
+
+## Testing
+- `UPDATE=1 go test -tags slow ./compiler/x/ocaml -run VMValid_Golden -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6879f551443883208a3fba54671fd28b",OpenAI_Codex,1218621,tamnd,closed,2025-07-18T07:58:37Z,2025-07-18T07:59:01Z,2025-07-18T07:59:01Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9528,['slow'],NonPerformance
+3116173925,1530,[alpha_factory] disable archive without storage access,"## Summary
+- check for `document.hasStorageAccess()` when initializing the archive
+- fall back to in-memory archive if storage access is denied and show a toast
+- call `document.hasStorageAccess()` from `app.js` before opening the archive
+- add Playwright test ensuring the toast appears when storage is blocked
+
+## Testing
+- `python alpha_factory_v1/scripts/preflight.py` *(fails: docker missing)*
+- `python check_env.py --auto-install`
+- `pytest -q` *(fails: 1 error during collection)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_683fb60904288333b04df1edb990db82",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-04T03:08:42Z,2025-06-04T03:09:03Z,2025-06-04T03:09:03Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1530,['memory'],NonPerformance
+3266738288,13658,Update rosetta index and runtime/vm outputs,"## Summary
+- regenerate index.txt for rosetta programs
+- adjust `disarium-numbers` example to avoid long runtime
+- update IR and golden outputs for several rosetta programs
+- refresh progress checklist
+
+## Testing
+- `go test ./runtime/vm -tags slow -run TestVM_Rosetta_Golden -count=1` *(fails: output mismatch for 100-prisoners)*
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6885bf1a1e088320907e4c15f64fe71e",OpenAI_Codex,1218621,tamnd,closed,2025-07-27T06:13:30Z,2025-07-27T06:13:42Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/13658,['slow'],Performance
+3246012916,10625,Add list set ops constant folding to C transpiler,"## Summary
+- support constant list set operations in the C transpiler
+- run golden tests for `list_set_ops.mochi`
+- document progress and checklist updates
+
+## Testing
+- `go test ./transpiler/x/c -run TestTranspilerGolden -update -tags=slow`
+
+------
+https://chatgpt.com/codex/tasks/task_e_687c7e538f708320a9e9a074f18500a7",OpenAI_Codex,1218621,tamnd,closed,2025-07-20T05:38:05Z,2025-07-20T05:38:15Z,2025-07-20T05:38:15Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/10625,['slow'],NonPerformance
+3224827777,7897,Update C backend aggregates,"## Summary
+- improve `avg`, `sum`, `min` and `max` when the length of the input list is known
+- regenerate machine translations for affected examples
+
+## Testing
+- `go test ./compiler/x/c -run TestCCompiler_ValidPrograms/avg_builtin -tags slow`
+- `go test ./compiler/x/c -run TestCCompiler_ValidPrograms/sum_builtin -tags slow`
+- `go test ./compiler/x/c -run TestCCompiler_ValidPrograms/min_max_builtin -tags slow`
+- `go test ./compiler/x/c -run TestCCompiler_ValidPrograms/break_continue -tags slow`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6871e15148348320b39bf52e1e416e24",OpenAI_Codex,1218621,tamnd,closed,2025-07-12T04:52:02Z,2025-07-12T04:52:31Z,2025-07-12T04:52:31Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7897,"['slow', 'slow', 'slow', 'slow']",Performance
+3116156914,2408,Upgrade wagmi to 2.15.4,"## Summary
+- bump wagmi to 2.15.4 across workspace packages
+- regenerate lockfile
+
+## Testing
+- `pnpm test:unit`
+
+------
+https://chatgpt.com/codex/tasks/task_e_683fb43b7ff88325a0842ba9fbc7035b
+
+<!-- start pr-codex -->
+
+---
+
+## PR-Codex overview
+This PR updates the version of the `wagmi` package across multiple `package.json` files in the project, reflecting a shift from version `2.15.2` to `2.15.4`. This change ensures that all examples and dependencies use the latest version of `wagmi`.
+
+### Detailed summary
+- Updated `wagmi` from `^2.15.2` to `^2.15.4` in:
+  - `package.json`
+  - `packages/example/package.json`
+  - `site/package.json`
+  - `examples/with-create-react-app/package.json`
+  - `examples/with-next/package.json`
+  - `examples/with-vite/package.json`
+  - `examples/with-remix/package.json`
+  - `examples/with-next-app/package.json`
+  - `examples/with-next-app-i18n/package.json`
+  - `examples/with-next-mint-nft/package.json`
+  - `examples/with-react-router/package.json`
+  - `examples/with-next-custom-button/package.json`
+  - `examples/with-next-wallet-button/package.json`
+  - `examples/with-next-rainbow-button/package.json`
+  - `examples/with-next-siwe-next-auth/package.json`
+  - `packages/create-rainbowkit/generated-test-app/package.json`
+  - `packages/create-rainbowkit/templates/next-app/package.json`
+  - `examples/with-next-siwe-iron-session/package.json`
+- Updated `wagmi` version in `pnpm-lock.yaml` from `2.15.2` to `2.15.4`.
+- Updated `@wagmi/core` version from `2.17.1` to `2.17.2`.
+- Updated `@wagmi/connectors` version from `5.8.1` to `5.8.3`.
+
+> ✨ Ask PR-Codex anything about this PR by commenting with `/codex {your question}`
+
+<!-- end pr-codex -->",OpenAI_Codex,4412473,DanielSinclair,closed,2025-06-04T03:02:16Z,2025-06-04T06:01:03Z,,392610935,https://api.github.com/repos/rainbow-me/rainbowkit,https://github.com/rainbow-me/rainbowkit/pull/2408,"['react', 'react']",NonPerformance
+3218189587,1481,Remove reverse-compiler link from documentation,"
+# Rework HTML to Reflex conversion documentation
+
+## Summary
+This PR replaces the deprecated `https://reflex.build/reverse-compiler/` link with comprehensive instructions directing users to the AI-powered build tool at `build.reflex.dev`. The updated documentation includes a step-by-step guide on how to use the build tool while maintaining the existing Figma conversion section.
+
+## Review & Testing Checklist for Human
+- [ ] Verify that the documentation page at `/docs/components/html-to-reflex` renders correctly with the new content
+- [ ] Confirm that links to `build.reflex.dev` are working properly
+- [ ] Check that the page is still accessible through sidebar navigation
+- [ ] Ensure the whitelist.py file has been properly reset to its original empty state
+
+---
+
+### Diagram
+```mermaid
+%%{ init : { ""theme"" : ""default"" }}%%
+graph TD
+    subgraph Legend
+        L1[""Major Edit""]:::major-edit
+        L2[""Minor Edit""]:::minor-edit
+        L3[""Context/No Edit""]:::context
+    end
+
+    html_to_reflex[""docs/components/html_to_reflex.md""]:::major-edit
+    sidebar_items[""pcweb/components/docpage/sidebar/sidebar_items/learn.py""]:::context
+    whitelist[""pcweb/whitelist.py""]:::minor-edit
+    
+    sidebar_items -- ""references<br/>html_to_reflex"" --> html_to_reflex
+    html_to_reflex -- ""directs users to"" --> build_tool[""build.reflex.dev""]:::context
+
+    classDef major-edit fill:#d4f8d4,stroke:#5ca05c
+    classDef minor-edit fill:#d4e5f8,stroke:#5c7da0
+    classDef context fill:#ffffff,stroke:#666666
+```
+
+### Notes
+- Initially removed the reverse-compiler link as requested
+- After user feedback, expanded the scope to include comprehensive build.reflex.dev instructions
+- Added step-by-step guide on using the AI build tool
+- Maintained the existing Figma conversion section with the Notion doc link
+- Tested locally to confirm the documentation page renders correctly with the new content
+- The page structure is now more useful with explicit instructions for users
+
+Requested by Alek (@Alek99)  
+Link to Devin run: https://app.devin.ai/sessions/71b3bb596aa84a2fbbac3d9c162a0d44
+
+![Browser test showing the documentation page with build.reflex.dev instructions](https://devin-public-attachments.s3.dualstack.us-west-2.amazonaws.com/attachments_private/org_uvZMrXBpDIHXePDQ/935ab69f-9a94-4cbc-84d6-fd6c5809acbc?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAT64VHFT7XEHAP2XO%2F20250710%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20250710T071716Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Security-Token=IQoJb3JpZ2luX2VjELD%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJHMEUCIGBwQGyQ7RZTb1o%2FxGuAVWOWKdFbxizChNxkNnMVkh1FAiEA7eCCMIZAmXAKzRloaiLKBloY0uHkLmFmil82EDZjFuMqwAUIuP%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARABGgwyNzI1MDY0OTgzMDMiDHhcR9H4ZN5j%2Bfj3wCqUBR%2Bf%2BVGKk9yZcd9o7cX0l3%2Fqb9N0Mi7VjzwLn8dy9p4fDnyaR3Jk4We4eyFu5BI3uqm6YEz6kO%2BBBfAxHv35w%2B6DAQT8JC8DOcba8aWDUzJoxhj2rX6nxn3JkWLll3XJKM0gw%2F5iXsB3usSxZ6Lj9eAqp8U8Joz4M8ul%2BKlNmaK2MFGkbKCuXGR2oegf92fg64Hb1wkjGWmlN5C5MxQr32NddUuGbvRpHS74zRiOn4ddDqSnTzFdRMfMuIJCO8c6CeqHRLnxL%2F9FMrBuJRyfhpr7pMDujgUv31iPH9Vaum4YC3CPHcDFt%2FWzrym0BwyLzlwEgh6aMWrt%2Bq8bcLanfSzH3MR2AwR4GJjkAUhqaDTGqOXqqiipxuxSIpQ6ns1%2B2jh6JJeTbQjRPUbneyRNp5H%2BbXMiUY5cq01yr8x1LZVey7eSyh5%2FcrlAlDYvd2aL2uVzwB4xHjljQ5IthgNINAdFgAuOfQuZ91qb09eWpFVq6JClup%2BI126nWoihoHBeGbb4Em02t8mXxemAM0mfyJ3UqWk2QsEws8kqmTJYwJPT5wR3%2Fc%2B%2BzMu2QHxVbgw6lmQZ0kqsZhTR7rUdRWpCAN1UzjfPKBwZGpzrhkZKpNub8p4GTBEA34xErWMv32aQn%2BWXh58tiYlG7Bf0hdiqFiqln4qFd2jJYGGWAv%2BxQ1FTUfmqTucZZ1lADsc5Khgs0BWQm%2BBjYkPGyTkk62bJSoEYgDeGLa%2FIv6vAiEjHFa9Ub2%2BD%2B7WTMXbSS3XynB6%2BbDSIBtKgYhjF5rHQlLhlM87qR%2B86RYRMwNl3sLQ7j53Fa6TBOMOnntc4zISjz0nJp9kKEAO6SX3yedL%2FsVJxo8dFVBgoP%2FdXuSYz4qTQm%2FciI%2FLmJzC%2Fzb3DBjqYARbzbP8y0lxmnmEhSr8NdIWLlzWVQWc8l97wh0Tbzx5r1XVIBkqjUzN68D5BfKavyy70T83NvriKxuXbAQV8C0a%2FYEsy0jgbQEmFl2i%2BuaHFIn7xXCmIJ%2FPwP3%2BJULhUq8d2Z4xDR4Cqf%2BovRS990bwn%2BjTIO8nppK8%2BakMLBDiyxetua8ZL5R1%2F3h2hT%2FhQ8OWqA%2FpgbQ2l&X-Amz-Signature=7f716476d798d4f50f9c8028379d5b265b52f8e60bf3fb6ab31996d2915b9de6)
+",Devin,158243242,devin-ai-integration[bot],closed,2025-07-10T07:12:25Z,2025-07-10T18:21:23Z,2025-07-10T18:21:23Z,577975610,https://api.github.com/repos/reflex-dev/reflex-web,https://github.com/reflex-dev/reflex-web/pull/1481,"['Minor', 'minor', 'minor', 'minor']",NonPerformance
+3219644441,7422,Improve Scala compiler struct typing,"## Summary
+- handle selectors on `GroupType` in type inference
+- regenerate Scala translation for `group_by` example with typed `city` field
+
+## Testing
+- `go build -tags slow -o /tmp/build /tmp/build.go`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_686fcf4ccd048320a8b5a5090ae0bef1",OpenAI_Codex,1218621,tamnd,closed,2025-07-10T14:42:53Z,2025-07-10T14:43:05Z,2025-07-10T14:43:05Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7422,['slow'],NonPerformance
+3224532813,7737,Add clear diagnostic for unsupported float types in generic value parameters,"This PR improves the error reporting for generic value parameters that use unsupported types like `float` or `double`.
+
+## Problem
+
+Previously, when users tried to declare a generic value parameter with a float type:
+
+```slang
+struct ColorDefiner<let TMult : float>
+{
+    float4 get_color() { return color * TMult; }
+}
+```
+
+The compiler would allow the declaration but fail later during instantiation with a confusing error message:
+```
+error 39999: expression does not evaluate to a compile-time constant
+    ColorDefiner<1> definer = {};
+                 ^
+```
+
+This error message didn't clearly explain that float types aren't supported for generic value parameters.
+
+## Solution
+
+This PR adds proper validation during the declaration phase using the existing `isValidCompileTimeConstantType` utility function. Now users get a clear, actionable error message at the point of declaration:
+
+```
+error 30624: generic value parameter type 'float' is not supported; only integer and enum types are allowed
+struct ColorDefiner<let TMult : float>
+                        ^~~~~
+```
+
+## Changes
+
+- Added new diagnostic ID 30624 with clear error message explaining supported types
+- Modified `SemanticsDeclHeaderVisitor::visitGenericValueParamDecl` to validate parameter types
+- Added comprehensive test covering both invalid types (float, double) and valid types (int, enum)
+- Maintains backward compatibility - integer and enum generic parameters continue to work unchanged
+
+## Testing
+
+- Added test `tests/diagnostics/generic-value-parameter-float-type.slang` 
+- Verified existing generic parameter tests still pass
+- Tested edge cases with float, double, int, and enum types
+
+The fix provides much better developer experience by catching the error early with a clear explanation of what types are supported and why.
+
+Fixes #7248.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-12T00:11:14Z,2025-07-16T04:10:28Z,2025-07-16T04:10:28Z,93882897,https://api.github.com/repos/shader-slang/slang,https://github.com/shader-slang/slang/pull/7737,"['instantiation', 'time']",NonPerformance
+3036576130,698,fix: update packagist publishing script to handle new package registration,"# Fix Packagist publishing for new packages
+
+## Issue
+The PHP packagist publishing workflow was failing with a 404 error because the package doesn't exist on Packagist yet:
+```
+HTTP Response Code: 404
+Response: Array (
+    [status] => error
+    [message] => Could not find a package that matches this request (does user maintain the package?)
+)
+```
+
+## Fix
+- Updated the packagist-publish.php script to first check if the package exists on Packagist
+- If the package exists, use the update-package API endpoint (as before)
+- If the package doesn't exist, use the submit API endpoint to register the new package
+- Added more detailed logging to help with troubleshooting
+
+## Testing
+The fix should be verified when the workflow runs on the next push to main that affects the PHP SDK.
+
+Link to Devin run: https://app.devin.ai/sessions/b645cd58d26f45afb714a736ec4d758e
+User: Max Prilutskiy (max@lingo.dev)
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-02T18:15:52Z,2025-05-02T18:16:42Z,2025-05-02T18:16:41Z,771479895,https://api.github.com/repos/lingodotdev/lingo.dev,https://github.com/lingodotdev/lingo.dev/pull/698,"['Response', 'Response']",NonPerformance
+3253643080,6354,Migrate batch of components from Jest to Vitest,"This PR migrates four component test files from Jest to Vitest as part of the ongoing test suite migration:
+
+- `packages/react/src/__tests__/deprecated/ActionList.test.tsx`
+- `packages/react/src/__tests__/deprecated/FilteredSearch.test.tsx`
+- `packages/react/src/experimental/SelectPanel2/__tests__/SelectPanelLoading.test.tsx`
+- `packages/react/src/deprecated/UnderlineNav/UnderlineNavLink.test.tsx`
+
+## Changes Made
+
+### Configuration Updates
+- Added the migrated test files to the `include` config in `vitest.config.browser.mts`
+- Added the migrated test files to the `modulePathIgnorePatterns` config in `jest.config.js` to exclude them from Jest
+
+### Test File Migrations
+- Replaced Jest imports with Vitest equivalents (`describe`, `expect`, `it`, `vi`)
+- Updated `render` imports to use `@testing-library/react` instead of `utils/testing`
+- Removed `behavesAsComponent` usage as specified in migration guidelines
+- Removed `checkExports` usage as specified in migration guidelines
+- Removed axe accessibility tests with `toHaveNoViolations` as specified in migration guidelines
+- Replaced `jest.useFakeTimers()` and `jest.runAllTimers()` with `vi.useFakeTimers()` and `vi.runAllTimers()`
+
+All tests are now running successfully in the Vitest browser environment with 7 tests passing across the 4 migrated files.
+
+Fixes #6353.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-22T18:15:29Z,2025-07-24T21:50:54Z,2025-07-24T21:50:53Z,121814210,https://api.github.com/repos/primer/react,https://github.com/primer/react/pull/6354,"['react', 'react', 'react', 'react', 'react']",NonPerformance
+3169259751,15380,Document Deployments remediation process and behavior,"This PR adds comprehensive documentation for Pulumi Deployments remediation functionality, addressing the lack of detail about what happens when remediation runs.
+
+## Changes Made
+
+**Added new section: ""Understanding Drift Remediation""**
+- Explains the technical process (`pulumi up --refresh`)
+- Details the step-by-step remediation workflow:
+  1. Refresh the state
+  2. Compare with desired state
+  3. Generate execution plan
+  4. Apply changes
+- Clarifies that remediation treats IaC as the authoritative source of truth
+
+**Added new section: ""When Drift is Detected""**
+- Explains three response options when drift occurs:
+  1. Remediate drift (restore to IaC state)
+  2. Refresh (accept cloud changes)
+  3. Manual review
+- Provides guidance on choosing the appropriate approach
+
+**Enhanced existing content with cross-references**
+- Updated brief remediation mention to link to detailed documentation
+- Added reference from auto-remediation configuration step
+
+**Added guidance sections**
+- When to use remediation vs alternatives
+- Safety considerations and best practices
+- Clear comparison between remediation and refresh operations
+
+## Why This Matters
+
+Previously, the documentation only briefly mentioned that remediation ""will run a `pulumi up --refresh` to treat the Pulumi program as the source of truth,"" but didn't explain what this actually means for users or what they can expect to happen to their infrastructure.
+
+This documentation now provides:
+- Clear understanding of the remediation process
+- Guidance on when remediation is appropriate
+- Safety considerations for production environments
+- Technical details about the underlying operations
+
+Fixes #15379.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `cdn.cypress.io`
+>   - Triggering command: `/usr/local/bin/node index.js --exec install ` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-06-23T19:38:40Z,,,104365663,https://api.github.com/repos/pulumi/docs,https://github.com/pulumi/docs/pull/15380,['response'],NonPerformance
+3267296779,13916,Fix Dart map indexing defaults,"## Summary
+- handle map indexes without null assertions in the Dart transpiler
+- keep struct fields non-optional
+- regenerate Dart Rosetta outputs for programs 193-242 with benchmarks
+
+## Testing
+- `MOCHI_ROSETTA_INDEX=237 MOCHI_BENCHMARK=true go test ./transpiler/x/dart -tags slow -run TestDartTranspiler_Rosetta_Golden -count=1 -v`
+- `for idx in $(seq 238 242); do MOCHI_ROSETTA_INDEX=$idx MOCHI_BENCHMARK=true go test ./transpiler/x/dart -tags slow -run TestDartTranspiler_Rosetta_Golden -count=1; done`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68866294a2bc8320b2da13dde34b19bd",OpenAI_Codex,1218621,tamnd,closed,2025-07-27T17:52:19Z,2025-07-27T17:52:40Z,2025-07-27T17:52:40Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/13916,"['slow', 'slow']",NonPerformance
+3118107735,1541,[alpha_factory] convert keyval util to TypeScript,"## Summary
+- convert `keyval.js` module to TypeScript with generics
+- update imports after rename
+
+## Testing
+- `python check_env.py --auto-install`
+- `pytest -q` *(fails: ValueError: Duplicated timeseries in CollectorRegistry)*
+- `npm run build` *(fails: Cannot find package 'esbuild')*
+- `npm test` *(fails: Cannot find package 'esbuild')*
+
+------
+https://chatgpt.com/codex/tasks/task_e_6840590318e08333a76cc1eb3f839b42",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-04T14:41:45Z,2025-06-04T14:42:12Z,2025-06-04T14:42:12Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1541,['timeseries'],NonPerformance
+3236775414,9024,Add VM golden tests update,"## Summary
+- regenerate VM golden outputs
+- remove duplicate runtime tests from `tests/vm/vm_test.go`
+- document update in Go compiler TASKS
+
+## Testing
+- `go test ./runtime/vm -tags slow -run TestVMValidPrograms -count=1 -v`
+- `go test ./runtime/vm -tags slow -run TestVMIRGolden -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6877de7328908320a8d4d79782886cda",OpenAI_Codex,1218621,tamnd,closed,2025-07-16T17:33:16Z,2025-07-16T17:33:31Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9024,"['slow', 'slow']",NonPerformance
+3267784623,14002,Add GUI maximum window dimensions example,"## Summary
+- download Rosetta task #418 and add Mochi implementation
+- provide reference output
+
+## Testing
+- `MOCHI_ROSETTA_ONLY=gui-maximum-window-dimensions go test ./runtime/vm -run Rosetta -tags slow -count=1`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6886d9d38e708320888c36900ccea7eb",OpenAI_Codex,1218621,tamnd,closed,2025-07-28T02:24:46Z,2025-07-28T02:25:02Z,2025-07-28T02:25:02Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/14002,['slow'],NonPerformance
+3248792728,11438,Improve Zig transpiler arrays,"## Summary
+- improve constant list emission so Zig can infer array sizes
+- keep slice types for type inference
+- add timestamp to README updates
+- clean up duplicate progress entries
+
+## Testing
+- `go test ./transpiler/x/zig -run TestZigTranspiler_VMValid_Golden -tags slow -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_687e46006d94832087e41a3d7802d60a",OpenAI_Codex,1218621,tamnd,closed,2025-07-21T14:01:11Z,2025-07-21T14:01:36Z,2025-07-21T14:01:36Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/11438,"['timestamp', 'slow']",NonPerformance
+3273046452,14547,Improve Go a2mochi converter,"## Summary
+- handle Windows line endings and shebangs when parsing Go sources
+- add map membership detection via `map_in_operator` test
+- support `exists`-style loops in transformer
+- normalize CRLF in printing
+- update golden files and README
+
+## Testing
+- `go test ./tools/a2mochi/x/go -tags slow -run TestTransform_Golden -update`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6888845bc564832094c487e85218af26",OpenAI_Codex,1218621,tamnd,closed,2025-07-29T10:15:37Z,2025-07-29T10:24:40Z,2025-07-29T10:24:40Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/14547,['slow'],NonPerformance
+3215452112,6724,Improve OCaml compiler map membership,"## Summary
+- handle membership checks for maps in OCaml compiler
+- update README for OCaml machine output status
+
+## Testing
+- `go test ./compiler/x/ocaml -tags=slow -run TestPrograms -count=1 -v`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686e4136c5c083209fbd31a891d23ac9",OpenAI_Codex,1218621,tamnd,closed,2025-07-09T10:39:51Z,2025-07-09T10:41:52Z,2025-07-09T10:41:52Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/6724,['slow'],NonPerformance
+3242794608,9671,Fix failing Rosetta task,"## Summary
+- make `call-a-function-8.mochi` compile
+- remove its error file and add blank output file
+- update VM README checklist numbers
+
+## Testing
+- `MOCHI_ROSETTA_ONLY=call-a-function-8 go test ./runtime/vm -run Rosetta -tags slow`
+
+------
+https://chatgpt.com/codex/tasks/task_e_687a21cd8e188320b22741341973179f",OpenAI_Codex,1218621,tamnd,closed,2025-07-18T10:44:11Z,2025-07-18T10:44:40Z,2025-07-18T10:44:40Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9671,['slow'],NonPerformance
+3206262666,5535,Improve Dart converter typed vars,"## Summary
+- support typed variable declarations in Dart converter
+- extend dartast helper to emit Mochi types for typed variables
+- show line numbers in `unifiedDiff` for better .error context
+- update generated Dart conversion results
+
+## Testing
+- `go test ./tools/any2mochi/x/dart -tags slow -run TestConvertDart_Golden -update`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686a278422e48320a58f2b5dd83de9d6",OpenAI_Codex,1218621,tamnd,closed,2025-07-06T07:54:04Z,2025-07-06T07:56:55Z,2025-07-06T07:56:55Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/5535,['slow'],NonPerformance
+3197876992,1031,"Code style improvements: standardize formatting, comments, and Rust idioms","## 📋 Overview
+
+This PR performs comprehensive code style improvements across the `longbridge/gpui-component` repository to ensure consistent formatting, improve readability, and follow Rust best practices.
+
+## 🔧 Changes Made
+
+### Configuration Updates
+- **Added workspace-level `rustfmt.toml`** with stable Rust compatibility
+- **Updated crate-specific rustfmt configs** to remove nightly-only features that were causing warnings
+- **Standardized formatting rules** across all crates
+
+### Code Style Improvements
+- **Replaced `.len() > 0` with `!is_empty()`** (8 instances) for more idiomatic Rust:
+  ```rust
+  // Before
+  if children.len() > 0 {
+      // ...
+  }
+  
+  // After  
+  if !children.is_empty() {
+      // ...
+  }
+  ```
+
+- **Standardized parameter naming** for unused parameters:
+  ```rust
+  // Before
+  pub fn new(_: &mut Window, cx: &mut App) -> Self {
+  
+  // After
+  pub fn new(_window: &mut Window, cx: &mut App) -> Self {
+  ```
+
+### Documentation & Comments
+- **Fixed TODO/FIXME comments** for clarity and consistency:
+  ```rust
+  // Before
+  // FIXME: Failed to link to `cef_sandbox.a` on macOS/
+  
+  // After
+  // FIXME: Failed to link to `cef_sandbox.a` on macOS.
+  ```
+
+- **Improved grammar** in README.md and code documentation
+- **Standardized comment formatting** throughout the codebase
+
+## ✅ Quality Assurance
+
+- ✅ All changes compile successfully (`cargo check` passed)
+- ✅ Formatting compliance verified (`cargo fmt --check` passed)  
+- ✅ No breaking changes introduced
+- ✅ Maintained backward compatibility
+
+## 📊 Impact
+
+- **18 files modified** with focused, minimal changes
+- **Enhanced code readability** and consistency
+- **Better adherence to Rust conventions** and best practices
+- **Improved developer experience** with cleaner, more maintainable code
+
+## 🎯 Files Changed
+
+Core improvements across:
+- `crates/ui/src/` - Main UI components
+- `crates/wef/` - WebView functionality  
+- `crates/webview/` - WebView integration
+- `README.md` - Documentation improvements
+- Workspace configuration files
+
+All changes follow the principle of making the smallest possible modifications while achieving maximum consistency and readability improvements.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-03T03:35:36Z,2025-07-03T03:36:43Z,,814684486,https://api.github.com/repos/longbridge/gpui-component,https://github.com/longbridge/gpui-component/pull/1031,['performs'],NonPerformance
+3268954462,14189,Improve F# converter,"## Summary
+- extend F# parser to handle functions without return type and optional try blocks
+- convert more F# expressions including membership and string conversions
+- add golden `.mochi` and `.out` for new F# samples
+- enable new tests and update README checklist
+
+## Testing
+- `go test -c -tags slow ./tools/a2mochi/x/fs`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68873b7169688320bdba925d4dac0091",OpenAI_Codex,1218621,tamnd,closed,2025-07-28T09:18:33Z,2025-07-28T09:21:05Z,2025-07-28T09:21:05Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/14189,['slow'],NonPerformance
+3226325641,8394,Update C backend tasks,"## Summary
+- tweak YAML load parsing in C compiler
+- note experimental map literal grouping for TPC-H q1
+- note WIP TPC-H task in C machine README
+
+## Testing
+- `go build -tags slow ./compiler/x/c`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68737bde840c8320a929ad2d70a88806",OpenAI_Codex,1218621,tamnd,closed,2025-07-13T09:45:15Z,2025-07-13T09:45:28Z,2025-07-13T09:45:28Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/8394,['slow'],NonPerformance
+3246796582,391,Avoid special-casing diagonals in matrix calcs,"This change modifies `nancorrmatrix`, `move_nancorrmatrix`, and `move_exp_nancorrmatrix` to correctly return `NaN` for correlation values when the variance of a series is zero. Previously, the diagonal elements were explicitly set to 1.0, which is incorrect for constant data.
+
+Additionally, the test for correlation matrix properties was updated to allow for small floating-point deviations from -1.0 and 1.0, and the test for constant time series now correctly asserts `NaN` for diagonal correlation values.
+
+Co-authored-by: Claude <no-reply@anthropic.com>
+",Claude_Code,5635139,max-sixty,closed,2025-07-20T23:54:15Z,2025-07-20T23:57:18Z,2025-07-20T23:57:18Z,25501620,https://api.github.com/repos/numbagg/numbagg,https://github.com/numbagg/numbagg/pull/391,['time'],NonPerformance
+3130209120,872,fix(auth): increase worker probe timeout,"## Summary
+- extend authentik worker health probe timeouts to 5s
+- note the new timeout in the infrastructure docs
+
+## Testing
+- `kustomize build --enable-helm k8s/infrastructure/auth/authentik`
+- `npm install`
+- `npm run typecheck`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6846c72ec05c8322b8583a3cd436681e",OpenAI_Codex,39008574,theepicsaxguy,closed,2025-06-09T12:46:28Z,2025-06-09T12:48:49Z,2025-06-09T12:48:49Z,933720213,https://api.github.com/repos/theepicsaxguy/homelab,https://github.com/theepicsaxguy/homelab/pull/872,"['timeout', 'timeouts', 'timeout']",NonPerformance
+3226545226,8531,Extend Racket TPCH coverage,"## Summary
+- add runtime helper `_json-fix` to convert rationals
+- update `json` builtin to use runtime helper
+- handle group objects in `count` builtin
+- extend Racket TPCH test to q22
+- add generated Racket code and expected output for queries q16–q22
+
+## Testing
+- `go test ./compiler/x/racket -tags slow -run TPCH -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6873bdeb1b0c8320b124e9a5dcf980b7",OpenAI_Codex,1218621,tamnd,closed,2025-07-13T14:24:53Z,2025-07-13T14:25:17Z,2025-07-13T14:25:17Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/8531,['slow'],NonPerformance
+3150427698,5390,"Docs: New article ""Buying a video editor template""","Added a new documentation article ""Buy a video editor"" to the Building apps section as requested in the issue. The article is positioned as the last item in the Building apps section and provides comprehensive information about available video editor template options.
+
+## Features
+
+The article covers all the requested editor options:
+
+- **Editor Starter by Remotion** - The official template (coming soon at remotion.pro/editor-starter)
+- **Timeline by Remotion** - Minimal timeline interface following best practices (remotion.pro/timeline)  
+- **React Video Editor** - Full-featured, popular community option (reactvideoeditor.com)
+- **DesignCombo** - Third-party option used by existing products (designcombo.dev)
+
+## Content Structure
+
+- Clear overview of each option with URLs and key features
+- Guidance section to help users choose the right template
+- Related documentation links in ""See also"" section
+- Follows Remotion documentation style guidelines
+
+## Technical Changes
+
+- Added `buy-a-video-editor.mdx` to `packages/docs/docs/`
+- Updated `sidebars.js` to include the new article as the last item in ""Building apps""
+- Article automatically registered in `articles.ts` data structure
+- Includes proper frontmatter with image placeholder for future card generation
+
+Fixes #5389.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-06-16T15:27:40Z,2025-06-17T12:26:15Z,2025-06-17T12:26:15Z,274495425,https://api.github.com/repos/remotion-dev/remotion,https://github.com/remotion-dev/remotion/pull/5390,"['Timeline', 'timeline', 'timeline', 'React', 'reactvideoeditor']",NonPerformance
+3082471201,1398,Fix CTXSpend discount rounding issue,"## Summary
+- send fiat to listeners for EnterAmount input
+- store fiat amount in view model
+- compare purchase limits using fiat
+- show discount for the exact fiat amount entered
+
+## Testing
+- `./gradlew test --no-daemon` *(fails: No route to host)*
+
+<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
+
+## Summary by CodeRabbit
+
+- **New Features**
+  - Added support for tracking and displaying fiat currency amounts alongside Dash amounts when entering values.
+  - Users now receive real-time updates for both Dash and fiat values during amount entry.
+
+- **Bug Fixes**
+  - Improved app stability by preventing UI updates when the relevant screen is not visible or properly attached.
+
+- **Refactor**
+  - Updated internal logic to use fiat amounts for purchase limit checks and UI feedback.
+
+<!-- end of auto-generated comment: release notes by coderabbit.ai -->",OpenAI_Codex,7733989,Syn-McJ,closed,2025-05-22T08:12:26Z,2025-05-24T21:07:16Z,2025-05-24T21:07:16Z,20371637,https://api.github.com/repos/dashpay/dash-wallet,https://github.com/dashpay/dash-wallet/pull/1398,['time'],NonPerformance
+3121901648,1615,[alpha_factory] update business demo setup,"## Summary
+- update Colab notebook to install `requirements.txt`
+- mention same step in QUICK_START
+
+## Testing
+- `python check_env.py --auto-install`
+- `pytest -q` *(fails: ValueError: Duplicated timeseries in CollectorRegistry)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_6841c7e27cc88333b6a8cd7487629919",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-05T16:47:58Z,2025-06-05T16:48:12Z,2025-06-05T16:48:12Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1615,['timeseries'],NonPerformance
+3159634536,60,Update sync SSE test,"## Summary
+- expand test coverage for LangChainAdapter sync SSE mode
+
+## Testing
+- `pytest -q` *(fails: TimeoutError, network unreachable for ipywidgets/notebook)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_6853d649a668832dad4a3d875bf8a79a",OpenAI_Codex,1738060,grll,closed,2025-06-19T09:28:11Z,2025-06-19T09:30:03Z,2025-06-19T09:30:03Z,915470479,https://api.github.com/repos/grll/mcpadapt,https://github.com/grll/mcpadapt/pull/60,['TimeoutError'],NonPerformance
+3107864176,268,feat: implement lazy loading for Stripe SDK,"# Implement Lazy Loading for Stripe SDK
+
+This PR implements lazy loading for the Stripe SDK in the frontend to improve performance by only initializing Stripe when payment-related components are actually needed.
+
+## Changes Made
+
+- **Created `useStripe()` hook** in `apps/ui/src/lib/stripe.ts` that lazily initializes Stripe SDK
+- **Updated payment components** to use the new lazy loading pattern:
+  - `apps/ui/src/components/credits/payment-methods-management.tsx`
+  - `apps/ui/src/components/credits/top-up-credits-dialog.tsx` 
+  - `apps/ui/src/components/onboarding/onboarding-wizard.tsx`
+  - `apps/ui/src/components/onboarding/credits-step.tsx`
+- **Added loading states** to provide better UX during Stripe initialization
+- **Maintained backward compatibility** with existing `loadStripeNow()` function
+- **Fixed naming conflicts** by aliasing Stripe's `useStripe` hook as `useStripeElements`
+
+## Implementation Details
+
+### Before
+- Stripe SDK was initialized at module level when components were imported
+- This caused unnecessary network requests and bundle size increase for users not using payment features
+
+### After  
+- Stripe SDK only loads when payment components are actually mounted
+- Global caching prevents multiple initializations
+- Loading states inform users when payment forms are initializing
+- Same API surface maintained for existing functionality
+
+## Testing
+
+✅ **Manually tested locally:**
+- Logged in with test credentials (admin@example.com / admin@example.com1A)
+- Verified Stripe only loads when accessing payment functionality
+- Tested Top Up Credits dialog - payment form loads correctly with Stripe Elements
+- Confirmed lazy loading works as expected via browser console
+- Payment functionality remains fully operational
+
+✅ **Code quality:**
+- All files formatted with `pnpm format`
+- ESLint and Prettier checks passed via lint-staged
+
+## Performance Impact
+
+- **Reduced initial bundle size** for users not accessing payment features
+- **Faster page loads** by eliminating unnecessary Stripe SDK requests
+- **Maintained functionality** - no breaking changes to existing payment flows
+
+## Link to Devin run
+https://app.devin.ai/sessions/9936166ff66f4890a0a30483093c1379
+
+**Requested by:** Luca (contact@luca-steeb.com)
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-01T21:15:43Z,2025-06-01T23:07:27Z,2025-06-01T23:07:27Z,965250949,https://api.github.com/repos/theopenco/llmgateway,https://github.com/theopenco/llmgateway/pull/268,"['performance', 'Performance', 'Faster']",Performance
+3246340194,10819,Improve C# transpiler struct inference,"## Summary
+- infer simple structs from list data in the C# transpiler
+- regenerate typed output for `cross_join.mochi`
+- log progress for the C# transpiler tasks
+
+## Testing
+- `go test -tags slow ./transpiler/x/cs -run VMValid -count=1` *(fails: `dotnet` not installed)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_687cc8a79f9c8320a5f0e0a4f082c797",OpenAI_Codex,1218621,tamnd,closed,2025-07-20T13:01:53Z,2025-07-20T13:02:11Z,2025-07-20T13:02:11Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/10819,['slow'],NonPerformance
+3248287585,11316,Regenerate C# golden tests,"## Summary
+- regenerate golden outputs for the C# transpiler
+- update C# transpiler tasks and progress
+- tweak C# formatter to trim lines using Go strings
+
+## Testing
+- `go test ./transpiler/x/cs -run NONEXISTENT -tags slow`
+
+------
+https://chatgpt.com/codex/tasks/task_e_687e215db5e8832097c42394281fad71",OpenAI_Codex,1218621,tamnd,closed,2025-07-21T11:33:06Z,2025-07-21T11:33:18Z,2025-07-21T11:33:18Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/11316,['slow'],NonPerformance
+3086912526,2441,Add SQLite memory default for quick start,"## Summary
+- default the database to in-memory SQLite
+- load optional `.env` in library and run migrations automatically
+- update CLI defaults and example env
+- document new quick start and clarify Postgres is optional
+
+## Testing
+- `pre-commit run --files skyvern/config.py skyvern/library/skyvern.py README.md .env.example skyvern/cli/llm_setup.py alembic.ini` *(fails: command not found)*
+- `bash run_alembic_check.sh` *(fails: alembic not found)*
+<!-- ELLIPSIS_HIDDEN -->
+
+----
+
+> [!IMPORTANT]
+> Set in-memory SQLite as the default database for quick start and update related documentation and configurations.
+> 
+>   - **Behavior**:
+>     - Default database set to in-memory SQLite in `.env.example`, `alembic.ini`, `skyvern/config.py`, and `skyvern/cli/llm_setup.py`.
+>     - Automatic loading of `.env` and running of migrations in `Skyvern.__init__()` in `skyvern/library/skyvern.py`.
+>   - **Documentation**:
+>     - Updated `README.md` to reflect SQLite as the default database and clarify Postgres is optional.
+>     - Added quick start instructions using the default SQLite configuration.
+>   - **Misc**:
+>     - Updated CLI defaults in `skyvern/cli/llm_setup.py` to use SQLite.
+> 
+> <sup>This description was created by </sup>[<img alt=""Ellipsis"" src=""https://img.shields.io/badge/Ellipsis-blue?color=175173"">](https://www.ellipsis.dev?ref=Skyvern-AI%2Fskyvern&utm_source=github&utm_medium=referral)<sup> for 3740520323095ad3fbd897f90242bd750a1b3327. You can [customize](https://app.ellipsis.dev/Skyvern-AI/settings/summaries) this summary. It will automatically update as commits are pushed.</sup>
+
+<!-- ELLIPSIS_HIDDEN -->",OpenAI_Codex,5225702,wintonzheng,closed,2025-05-23T16:30:07Z,2025-05-27T01:26:42Z,,764723738,https://api.github.com/repos/Skyvern-AI/skyvern,https://github.com/Skyvern-AI/skyvern/pull/2441,"['memory', 'memory', 'memory', 'memory']",NonPerformance
+3138074043,516,Refactor step outputs with Output structure,"## Summary
+* Takes our current `Output` class and renames it to `OutputDataValue`
+* Creates a new `Output` class that contains the value and also the step number + output name
+* Adds a new `for_step` method so you can do plan_run.outputs.for_step(2) and get the output of the second step.
+
+This all works when running locally with a local storage class, but there are issues when running against the cloud. Specifically, it's a change to the schema of a plan_run, which means it breaks when you try to send it to the cloud. This is tricky and needs a bit of thought.
+
+Also, it would be a backwards incompatible change to `Output` as a class. I think that's ok we'd just merge it at a time when we're doing a version bump of the SDK.",OpenAI_Codex,198574046,robbie-portia,open,2025-06-11T20:49:36Z,,,902291246,https://api.github.com/repos/portiaAI/portia-sdk-python,https://github.com/portiaAI/portia-sdk-python/pull/516,['time'],NonPerformance
+3272256929,14482,Update Prolog a2mochi support,"## Summary
+- fix Prolog parser conversion of `=` so comparison operators work
+- add transformation support for `values_builtin`
+- refresh golden outputs for Prolog a2mochi
+- update progress checklist for Prolog
+
+## Testing
+- `go test ./tools/a2mochi/x/prolog -tags slow -run TestTransform -count=1`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_688861f0b9408320b623b6291dc0896f",OpenAI_Codex,1218621,tamnd,closed,2025-07-29T06:15:05Z,2025-07-29T06:15:18Z,2025-07-29T06:15:17Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/14482,['slow'],NonPerformance
+3253289231,12121,Add index filter for Java Rosetta tests,"## Summary
+- allow running a specific Rosetta program by index or name in Java transpiler tests
+- auto-update the Java Rosetta checklist
+- update checklist marking program 2 as passing
+
+## Testing
+- `MOCHI_ROSETTA_INDEX=2 go test -tags slow ./transpiler/x/java -run Rosetta -count=1 -v`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_687fb3ebf5e483209d2f2851aaae6296",OpenAI_Codex,1218621,tamnd,open,2025-07-22T16:14:12Z,,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12121,['slow'],NonPerformance
+3176443941,2415,"Fix validation to accept lowercase status code ranges (4xx, 5xx) in OpenAPI responses","The OpenAPI validation was incorrectly rejecting lowercase status code ranges like ""4xx"" and ""5xx"" in response definitions. The regex pattern only accepted uppercase ""XX"" variants.
+
+## Problem
+When defining OpenAPI responses with lowercase status code ranges, validation would fail:
+
+```csharp
+var responses = new OpenApiResponses
+{
+    [""4xx""] = new OpenApiResponse { Description = ""Client error"" },  // ❌ Failed validation
+    [""5xx""] = new OpenApiResponse { Description = ""Server error"" }   // ❌ Failed validation
+};
+```
+
+Error: `Responses key must be 'default', an HTTP status code, or one of the following strings representing a range of HTTP status codes: '1XX', '2XX', '3XX', '4XX', '5XX'`
+
+## Solution
+- **Fixed regex pattern**: Changed from `^[1-5](?>[0-9]{2}|XX)$` to `^[1-5](?>[0-9]{2}|[xX]{2})$` to accept both cases
+- **Added GeneratedRegex support**: Implemented `[GeneratedRegex]` attribute for .NET 8+ targets for improved performance
+- **Maintained backward compatibility**: Used conditional compilation to support netstandard2.0
+- **Updated error message**: Now mentions ""(case insensitive)"" to clarify accepted formats
+
+## Changes Made
+1. **OpenApiResponsesRules.cs**: 
+   - Made class `partial` to support GeneratedRegex
+   - Added case-insensitive regex pattern with conditional compilation
+   - Updated validation error message
+2. **Added comprehensive tests**: Created `OpenApiResponsesValidationTests.cs` with test cases for:
+   - All valid status code formats (uppercase, lowercase, numeric)
+   - Mixed case scenarios
+   - Backward compatibility verification
+3. **Fixed compilation issues**: Resolved ambiguous `string.Split` calls in BaseOpenApiReference.cs, OpenApiDocument.cs, and OpenApiWorkspace.cs
+
+## Test Results
+All tests pass, confirming the fix works correctly:
+- ✅ Lowercase ""4xx"", ""5xx"" now accepted
+- ✅ Uppercase ""4XX"", ""5XX"" continue to work  
+- ✅ Mixed case scenarios work as expected
+- ✅ Existing functionality preserved
+
+Now both formats work seamlessly:
+```csharp
+var responses = new OpenApiResponses
+{
+    [""4xx""] = new OpenApiResponse { Description = ""Client error"" },  // ✅ Now works
+    [""4XX""] = new OpenApiResponse { Description = ""Client error"" },  // ✅ Still works
+    [""200""] = new OpenApiResponse { Description = ""Success"" }        // ✅ Still works
+};
+```
+
+Fixes #2414.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-06-25T17:33:51Z,2025-06-25T18:22:56Z,2025-06-25T18:22:56Z,97175798,https://api.github.com/repos/microsoft/OpenAPI.NET,https://github.com/microsoft/OpenAPI.NET/pull/2415,"['responses', 'response', 'responses', 'responses', 'Responses', 'performance', 'responses']",Performance
+3270787997,699,"Add search bar to admin purchases page with product name, date range, and status filters","# Add search bar to admin purchases page with product name, date range, and status filters
+
+## Summary
+
+Added a comprehensive search bar to the admin purchases page that allows filtering purchases by:
+- **Product name** (partial text matching)
+- **Date range** (from/to date inputs) 
+- **Purchase status** (dropdown with common states)
+
+The search bar is positioned directly below the ""Purchase results"" title as requested, with a clean form layout that includes a ""Search"" button and ""Clear filters"" link when filters are active.
+
+**Key Changes:**
+- Extended `AdminSearchService` with new filtering parameters and database queries
+- Updated admin search controller to handle and pass new search parameters  
+- Added search form UI to the purchases view template
+- Maintains backward compatibility with existing query parameter
+
+## Review & Testing Checklist for Human
+
+**⚠️ Critical Items (5 items - requires thorough testing since changes were not tested locally):**
+
+- [ ] **Manual end-to-end testing**: Test all search filters individually and in combination to ensure they work correctly
+- [ ] **Performance testing**: Verify that product name search performs acceptably with realistic data volumes (the ILIKE query could be slow)
+- [ ] **UI/UX review**: Check that the search bar styling matches existing admin interface patterns and is responsive
+- [ ] **Status dropdown validation**: Confirm that all status options in the dropdown match actual purchase states in the database
+- [ ] **Error handling**: Test edge cases like invalid dates, special characters in product names, and empty results
+
+**Recommended Test Plan:**
+1. Navigate to admin purchases page and verify search bar appears below ""Purchase results"" title
+2. Test product name search with partial matches and special characters
+3. Test date range filtering with various date combinations
+4. Test status filtering with each dropdown option
+5. Test clearing filters functionality
+6. Verify pagination still works with active filters
+7. Check performance with large datasets
+
+---
+
+### Diagram
+
+```mermaid
+%%{ init : { ""theme"" : ""default"" }}%%
+graph TD
+    User[""👤 Admin User""] --> PurchasesView[""app/views/admin/search/<br/>purchases.html.erb""]:::major-edit
+    PurchasesView --> SearchController[""app/controllers/admin/<br/>search_controller.rb""]:::minor-edit
+    SearchController --> AdminSearchService[""app/services/<br/>admin_search_service.rb""]:::major-edit
+    AdminSearchService --> PurchaseModel[""Purchase Model""]:::context
+    AdminSearchService --> LinkModel[""Link Model<br/>(for product name)""]:::context
+    
+    PurchasesView -.->|""form params:<br/>product_name, date_from,<br/>date_to, status""| SearchController
+    SearchController -.->|""passes search<br/>parameters""| AdminSearchService
+    AdminSearchService -.->|""SQL queries with<br/>JOINs and WHERE clauses""| PurchaseModel
+    
+    subgraph Legend
+        L1[""Major Edit""]:::major-edit
+        L2[""Minor Edit""]:::minor-edit  
+        L3[""Context/No Edit""]:::context
+    end
+
+    classDef major-edit fill:#90EE90
+    classDef minor-edit fill:#87CEEB  
+    classDef context fill:#FFFFFF
+```
+
+### Notes
+
+- **Environment Issue**: Local testing was not possible due to missing foreman gem in development environment, so this PR requires careful manual testing
+- **Database Considerations**: The product name search uses ILIKE with wildcards which may need indexing optimization for large datasets
+- **Backward Compatibility**: Existing query parameter functionality is preserved
+- **Session Info**: Requested by @camila-taunay in session https://app.devin.ai/sessions/a65286a8c0774fa0a5e0fbc97f2f8cb5",Devin,158243242,devin-ai-integration[bot],closed,2025-07-28T17:35:09Z,2025-07-29T15:58:16Z,,959682770,https://api.github.com/repos/antiwork/gumroad,https://github.com/antiwork/gumroad/pull/699,"['Performance', 'performs', 'slow', 'responsive', 'performance', 'minor', 'Minor', 'minor', 'minor', 'optimization']",NonPerformance
+3206791474,5831,Update Haskell roundtrip error report,"## Summary
+- rerun `vm_roundtrip` to refresh the roundtrip error listing
+
+## Testing
+- `go test ./compile/x/hs -run TestHSCompiler_GoldenSubset -count=1 -tags slow` *(fails: couldn't match type `AnyValue` with `[Char]`)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_686aab7fb01c83209e27a845b28feb40",OpenAI_Codex,1218621,tamnd,closed,2025-07-06T17:11:41Z,2025-07-06T17:11:58Z,2025-07-06T17:11:58Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/5831,['slow'],NonPerformance
+3268954671,14192,Enhance OCaml a2mochi converter,"## Summary
+- support additional OCaml examples in the a2mochi converter
+- update README checklist
+- add tree-sitter deps
+- store generated `.mochi` and `.out` results for len examples
+
+## Testing
+- `go test -tags slow ./tools/a2mochi/x/ocaml -run TestConvert_Golden`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_68873b7f957483208cab91652a1baa46",OpenAI_Codex,1218621,tamnd,closed,2025-07-28T09:18:38Z,2025-07-28T09:21:30Z,2025-07-28T09:21:30Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/14192,['slow'],NonPerformance
+2883335237,3985,chore(js-ts): Convert api-context to TypeScript,"# chore(js-ts): Convert api-context to TypeScript
+
+This PR converts the components in `src/elements/common/api-context` from JavaScript to TypeScript:
+
+- `APIContext.js` → `APIContext.ts`
+- `index.js` → `index.ts`
+- `withAPIContext.js` → `withAPIContext.tsx`
+
+## Changes
+
+- Removed Flow annotations
+- Converted Flow's optional type syntax `?API()` to TypeScript's union type `API | null`
+- Added a default value of `null` to the React.createContext call
+- Created a proper interface `WithAPIProps` for components that receive the API context
+- Made the HOC generic with proper type annotations for the forwardRef
+
+## Testing
+
+- Verified that TypeScript compilation passes
+- Verified that all tests pass
+- Verified that linting passes
+
+Link to Devin run: https://app.devin.ai/sessions/47431fa2f3294a16a0f9f680e9f9a7b5
+
+Co-Authored-By: Joseph Gross <joseph@cognition.ai>
+",Devin,158243242,devin-ai-integration[bot],closed,2025-02-27T03:46:43Z,2025-03-08T01:10:48Z,,95743138,https://api.github.com/repos/box/box-ui-elements,https://github.com/box/box-ui-elements/pull/3985,['React'],NonPerformance
+3184590998,7139,Add Ctrl/Cmd+click support to open PR changes and session logs in second editor group,"## Summary
+
+This PR adds support for Ctrl/Cmd+click functionality to the ""Open Changes"" and ""View Session Log"" buttons in the PR detail webview. When users hold Ctrl (Windows/Linux) or Cmd (macOS) while clicking these buttons, the views will open in the second editor group instead of the current one.
+
+## Changes Made
+
+### Frontend (Webviews)
+- **`webviews/components/header.tsx`**: Added click handler for ""Open Changes"" button to detect modifier keys and updated tooltip
+- **`webviews/components/timeline.tsx`**: Enhanced session log buttons in Copilot events to support modifier key detection
+- **`webviews/common/context.tsx`**: Updated `openChanges()` and `openSessionLog()` methods to accept optional `inSecondEditorGroup` parameter
+
+### Backend
+- **`src/github/pullRequestOverview.ts`**: Modified message handlers to process the new `inSecondEditorGroup` parameter
+- **`src/github/pullRequestModel.ts`**: Enhanced `openChanges()` to automatically split editor and focus second group when requested
+- **`src/view/sessionLogView.ts`**: Updated session log viewer to open in `ViewColumn.Two` when requested
+
+### Testing
+- **`src/test/github/pullRequestOverview.test.ts`**: Added focused unit tests to verify both features work correctly with the second editor group functionality
+
+## User Experience
+
+### Before
+- Clicking ""Open Changes"" or ""View Session"" always opened in the current editor group
+- No way to open these views in a different editor group without manual splitting
+
+### After
+- **Regular click**: Maintains existing behavior (opens in current editor group)
+- **Ctrl/Cmd+click**: Opens in second editor group, automatically creating it if needed
+- **Tooltips**: Updated to inform users about the Ctrl/Cmd+click functionality
+
+## Implementation Details
+
+- Uses React's standard mouse event properties (`e.ctrlKey || e.metaKey`) for cross-platform modifier key detection
+- For multi-diff views: Leverages VS Code's `workbench.action.splitEditor` and `workbench.action.focusSecondEditorGroup` commands
+- For session logs: Uses `vscode.ViewColumn.Two` parameter in `createWebviewPanel()`
+- Maintains full backward compatibility with existing functionality
+- Minimal, surgical changes that follow VS Code extension best practices
+
+## Testing
+
+The implementation includes comprehensive unit tests and has been designed to be easily testable in a live VS Code environment with PRs that have file changes and Copilot session events.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-28T05:09:17Z,2025-06-30T06:03:27Z,2025-06-30T06:03:27Z,134777298,https://api.github.com/repos/microsoft/vscode-pull-request-github,https://github.com/microsoft/vscode-pull-request-github/pull/7139,"['timeline', 'React']",NonPerformance
+3107597235,1364,[alpha_factory] update CSP and CI,"## Summary
+- restrict CSP default and connect sources
+- compute integrity for bundle.esm.min.js and pyodide.js
+- audit production deps during CI
+
+## Testing
+- `python check_env.py --auto-install`
+- `pre-commit run --files .github/workflows/ci.yml alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/build.js alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/dist/index.html alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/index.html alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/manual_build.py` *(failed: Couldn't connect to server)*
+- `pytest -q` *(failed: ValueError: Duplicated timeseries in CollectorRegistry)*
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_683c8f2f6f408333bc6f9de90059c626",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-01T17:43:58Z,2025-06-01T17:44:07Z,2025-06-01T17:44:07Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1364,['timeseries'],NonPerformance
+3235313514,4,Fix Set-EnvVar line break issues in PowerShell script,"## Problem
+
+The `Set-EnvVar` function in `Claude_code_proxy.ps1` had line break issues when adding new environment variables to .env files. The problem occurred because:
+
+1. **String concatenation instead of array append**: When `Get-Content` reads a single-line file, it returns a string instead of an array. Subsequent `+=` operations performed string concatenation rather than array append, causing variables to be merged without line breaks.
+
+2. **Inconsistent file handling**: Using `Set-Content` instead of the more reliable `Out-File` for writing array content.
+
+## Example of the Issue
+
+Before the fix:
+```powershell
+# Adding multiple variables resulted in concatenated content
+Set-EnvVar ""API_KEY"" ""test-key"" "".env""
+Set-EnvVar ""PORT"" ""8080"" "".env""
+# Result: API_KEY=""test-key""PORT=""8080""  (no line break!)
+```
+
+After the fix:
+```powershell
+# Variables are properly separated on different lines
+Set-EnvVar ""API_KEY"" ""test-key"" "".env"" 
+Set-EnvVar ""PORT"" ""8080"" "".env""
+# Result:
+# API_KEY=""test-key""
+# PORT=""8080""
+```
+
+## Solution
+
+**Minimal surgical changes** to fix the core issue:
+
+1. **Ensure array handling**: Added `@($content)` wrapper to force content to be treated as an array, preventing string concatenation
+2. **Use reliable file output**: Replaced `Set-Content` with `Out-File` for consistent UTF8 encoding and line break handling
+
+## Changes Made
+
+```powershell
+# Before
+$content = Get-Content $FilePath -ErrorAction SilentlyContinue
+if (-not $content) {
+    $content = @()
+}
+
+# After  
+$content = Get-Content $FilePath -ErrorAction SilentlyContinue
+if (-not $content) {
+    $content = @()
+} else {
+    # Ensure content is always treated as an array to prevent string concatenation
+    $content = @($content)
+}
+```
+
+```powershell
+# Before
+$content | Set-Content $FilePath -Encoding UTF8
+
+# After
+# Use Out-File instead of Set-Content for better line break handling
+$content | Out-File -FilePath $FilePath -Encoding UTF8 -Force
+```
+
+## Validation
+
+✅ **Progressive addition**: Multiple variables added sequentially maintain proper line breaks  
+✅ **External files**: Files created externally without proper line endings are handled correctly  
+✅ **Variable updates**: Existing variables are updated without duplication or formatting issues  
+✅ **UTF8 encoding**: Consistent encoding maintained throughout all operations  
+✅ **Edge cases**: Empty files, single-line files, and files without trailing newlines all work correctly
+
+## Requirements Addressed
+
+- ✅ Proper line breaks between environment variables
+- ✅ Reliable file content handling 
+- ✅ Consistent UTF8 encoding using `Out-File`
+- ✅ All comments and messages in English only
+- ✅ Proper .env file formatting maintained
+
+This fix ensures that .env files generated by the script maintain proper formatting with each environment variable on its own line, preventing configuration parsing issues in applications that depend on these files.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `astral.sh`
+>   - Triggering command: `pwsh /tmp/test_actual_fix.ps1` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+
+*This pull request was created as a result of the following prompt from Copilot chat.*
+> The current `Set-EnvVar` function in the PowerShell script has potential line break issues when adding new environment variables to the .env file. The problem occurs at line 107:
+> 
+> ```powershell
+> $content += ""$Key=`""$Value`""""
+> ```
+> 
+> This approach may cause new environment variables to be added without proper line breaks, especially when the file doesn't end with a newline character.
+> 
+> **Issues to fix:**
+> 1. Ensure proper line breaks between environment variables
+> 2. Handle file content more reliably to prevent formatting issues
+> 3. Use consistent encoding (UTF8) for the .env file
+> 4. Ensure no Chinese characters or comments are included in the code
+> 
+> **Requirements:**
+> - Modify the `Set-EnvVar` function to handle line breaks correctly
+> - Check if the file content needs a separator before adding new variables
+> - Use `Out-File` instead of `Set-Content` for better line break handling
+> - All code comments and output messages must be in English only
+> - Ensure the .env file maintains proper formatting
+> 
+> **Expected behavior:**
+> - When adding a new environment variable, it should be on a new line
+> - Existing variables should be properly updated without affecting formatting
+> - The file should maintain UTF8 encoding consistently
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-16T10:10:48Z,2025-07-16T10:27:24Z,,1016586214,https://api.github.com/repos/sylearn/AICode,https://github.com/sylearn/AICode/pull/4,['performed'],NonPerformance
+3244946090,9992,Enhance Elixir transpiler golden tests,"## Summary
+- track 10 Elixir golden test programs
+- record progress with timestamp from Git
+- support builtins `len`, `sum`, `avg` and integer division
+- update golden tests for new programs
+
+## Testing
+- `go test ./transpiler/x/ex -run TestTranspile_Golden -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_687b251aa620832096e254d32f4cded4",OpenAI_Codex,1218621,tamnd,closed,2025-07-19T05:34:27Z,2025-07-19T05:34:40Z,2025-07-19T05:34:40Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9992,['timestamp'],NonPerformance
+3189033738,4289,Update VM grouping constants,"## Summary
+- reuse empty list constants when building group data structures
+- refresh TPC-H q18 IR output
+
+## Testing
+- `go test -tags slow ./tests/vm -run TestVM_TPCH/q18.mochi -v`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6862af34c50c8320b8fb26ae74c49017",OpenAI_Codex,1218621,tamnd,closed,2025-06-30T15:59:20Z,2025-06-30T16:02:36Z,2025-06-30T16:02:36Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4289,['slow'],NonPerformance
+3195510189,41866,Upgrade marshmallow from 3.x.x to 4.x.x in azure-ai-ml,"## Summary
+
+This PR upgrades the `azure-ai-ml` package to support marshmallow 4.x.x while maintaining backward compatibility with marshmallow 3.x.x. The upgrade addresses all breaking changes introduced in marshmallow 4.0 as outlined in the [migration guide](https://marshmallow.readthedocs.io/en/latest/upgrading.html#upgrading-to-4-0).
+
+## Issues Fixed
+
+This PR resolves the following marshmallow 4.x compatibility errors:
+
+1. **ImportError: cannot import name 'FieldInstanceResolutionError' from 'marshmallow.utils'**
+2. **ImportError: cannot import name 'from_iso_datetime' from 'marshmallow.utils'**
+3. **ImportError: cannot import name 'resolve_field_instance' from 'marshmallow.utils'**
+4. **ModuleNotFoundError: No module named 'marshmallow.base'**
+5. **ImportError: cannot import name 'Field' from 'marshmallow'**
+6. **TypeError: Field.__init__() got an unexpected keyword argument 'default'**
+7. **TypeError: Field.init() got an unexpected keyword argument 'unknown'**
+8. **TypeError: Field.__init__() got an unexpected keyword argument 'allowed_values'**
+
+## Changes Made
+
+### 1. Import Updates (`azure/ai/ml/_schema/core/fields.py`)
+
+- **FieldInstanceResolutionError**: Now imported from `marshmallow.exceptions` instead of `marshmallow.utils`
+- **resolve_field_instance**: Added compatibility pattern with fallback:
+  ```python
+  try:
+      # marshmallow 4.x
+      from marshmallow.class_registry import resolve_field_instance
+  except ImportError:
+      # marshmallow 3.x
+      from marshmallow.utils import resolve_field_instance
+  ```
+- **from_iso_datetime**: Replaced with custom implementation that handles ISO8601 datetime strings including the 'Z' suffix:
+  ```python
+  def from_iso_datetime(value):
+      """"""Parse an ISO8601 datetime string, handling the 'Z' suffix.""""""
+      from datetime import datetime
+      if isinstance(value, str):
+          if value.endswith('Z'):
+              value = value[:-1] + '+00:00'
+          return datetime.fromisoformat(value)
+      return value
+  ```
+
+### 2. Reference Updates
+
+- Removed all references to `marshmallow.base.FieldABC` and updated error messages to use generic ""marshmallow fields"" terminology
+
+### 3. Field Parameter Updates
+
+- **setup.py**: Updated marshmallow constraint from `>=3.5,<4.0.0` to `>=3.5,<5.0.0`
+- **azure/ai/ml/_schema/assets/index.py**: Changed `default=""Development""` to `load_default=""Development""` to use the new marshmallow 4.x parameter name
+
+### 4. Parameter Handling Verification
+
+- Confirmed that custom parameters like `allowed_values` are properly handled using `kwargs.pop()` pattern
+- Verified that `unknown` parameter usage is compatible with marshmallow 4.x
+
+## Backward Compatibility
+
+All changes maintain full backward compatibility with marshmallow 3.x.x:
+- Import fallbacks ensure the code works with both versions
+- Parameter changes use the new marshmallow 4.x names that are also supported in recent 3.x versions
+- Custom `from_iso_datetime` implementation provides the same functionality as the removed utility
+
+## Testing
+
+- All syntax and import compatibility verified
+- Custom datetime parsing tested with various ISO8601 formats
+- Field constructor parameter compatibility validated
+- Code formatting applied with black
+
+## Migration Impact
+
+This upgrade enables:
+- Support for marshmallow 4.x.x security and performance improvements
+- Future-proofing the codebase for marshmallow evolution
+- Continued support for existing marshmallow 3.x.x installations
+
+No breaking changes are introduced for consumers of the azure-ai-ml package.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,open,2025-07-02T11:03:33Z,,,4127088,https://api.github.com/repos/Azure/azure-sdk-for-python,https://github.com/Azure/azure-sdk-for-python/pull/41866,['performance'],Performance
+3156381675,172,Implement rpsl.str function to convert parsed RPSL objects back to text format,"This PR implements the `rpsl.str` function that performs the reverse operation of `rpsl.parse`, converting parsed RPSL objects back to their original text format.
+
+## Changes
+
+### Core Implementation
+- **Added `rpsl.str` function** in `lib/rpsl.ch` that takes a list of [key, value] pairs (as returned by `rpsl.parse`) and converts them back to RPSL text format
+- The function properly formats each pair as ""key: value"" and joins them with newlines
+- Handles edge cases including empty lists and single elements
+- Uses string conversion to ensure compatibility with various input types
+
+### Example Usage
+```charity
+rpsl import
+
+# Create RPSL data structure (as returned by rpsl.parse)
+((""inetnum"" ""192.0.2.0 - 192.0.2.255"") (""netname"" ""TEST-NET"") (""descr"" ""Test network"")) 3 mlist;
+
+# Convert back to RPSL text format
+rpsl.str;
+println;
+```
+
+Output:
+```
+inetnum: 192.0.2.0 - 192.0.2.255
+netname: TEST-NET
+descr: Test network
+```
+
+### Testing
+- Added comprehensive tests covering normal usage, empty lists, and single elements
+- All tests pass and integrate with the existing test framework
+- Verified the function produces correct RPSL format when printed
+
+### Documentation
+- Updated `doc/rpsl.md` with complete function description
+- Documents the relationship to `rpsl.parse` as the reverse operation
+
+## Implementation Details
+
+The function uses a simple loop-based approach that:
+1. Iterates through each [key, value] pair in the input list
+2. Formats each pair as ""key: value"" 
+3. Concatenates all pairs with newlines
+4. Returns the resulting RPSL text string
+
+The implementation is minimal (28 lines of code), robust, and follows existing codebase patterns.
+
+Fixes #158.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-18T10:45:59Z,2025-06-18T11:47:18Z,2025-06-18T11:47:18Z,445862991,https://api.github.com/repos/tomhrr/cosh,https://github.com/tomhrr/cosh/pull/172,['performs'],NonPerformance
+3209727238,2254,Fix unhandled exception when double-clicking in scroll bar area with no selected nodes,"## Problem
+
+Double-clicking in the right scroll bar area of the StackWindow causes an unhandled exception crash with the error ""Sequence contains no elements"". This occurs when clicking rapidly on scroll arrows to navigate upwards and reaching the end, or when double-clicking on the scroll bar when no nodes are selected.
+
+The issue stems from the `ByName_MouseDoubleClick` event handler directly calling `DoViewInCallers`, which then calls `GetSelectedNodes().Single()` without checking if any nodes are actually selected.
+
+## Root Cause
+
+The stack trace shows:
+```
+System.InvalidOperationException: Sequence contains no elements
+   at System.Linq.Enumerable.Single[TSource](IEnumerable`1 source)
+   at PerfView.StackWindow.DoViewInCallers(Object sender, ExecutedRoutedEventArgs e)
+```
+
+When a user double-clicks on the scroll bar area, the mouse event bypasses the command system's `CanExecute` checks that would normally prevent execution when no nodes are selected. The `ByName_MouseDoubleClick` method directly calls `DoViewInCallers(sender, null)`, which then attempts to call `.Single()` on an empty collection returned by `GetSelectedNodes()`.
+
+## Solution
+
+Added defensive check in `ByName_MouseDoubleClick`.
+
+Fixes #2253.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-07T17:08:29Z,2025-07-10T22:45:24Z,2025-07-10T22:45:24Z,33010673,https://api.github.com/repos/microsoft/perfview,https://github.com/microsoft/perfview/pull/2254,['PerfView'],NonPerformance
+3236724524,9017,Add VM valid Java golden tests,"## Summary
+- drop duplicate compile tests and add helper functions for other tests
+- only check runtime output in Java golden tests
+- record test update in TASKS.md
+
+## Testing
+- `go test ./compiler/x/java -tags slow -run TestJavaCompiler_VMValidPrograms -v`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6877d72cd8648320b96a8f9b6501cc82",OpenAI_Codex,1218621,tamnd,closed,2025-07-16T17:13:32Z,2025-07-16T17:13:45Z,2025-07-16T17:13:45Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9017,['slow'],NonPerformance
+3076717205,4662,Fix bats test flakiness,"## Summary
+- guard port cleanup in bats tests
+- improve timing in dev-command tests
+
+## Testing
+- `./run_all_bats.sh` *(fails: 'bats' not found)*",OpenAI_Codex,82053242,wtfsayo,closed,2025-05-20T11:43:09Z,2025-05-20T11:45:39Z,,826170402,https://api.github.com/repos/elizaOS/eliza,https://github.com/elizaOS/eliza/pull/4662,['timing'],NonPerformance
+3248107524,11290,Improve Haskell transpiler type inference,"## Summary
+- add basic int/float inference for recorded variables
+- track local variable types in blocks
+- handle float literals when transpiling
+- document new progress for the Haskell backend
+
+## Testing
+- `go test ./transpiler/x/hs -run TestTranspile_PrintHello -tags slow -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_687e16173aa48320a9af60dba7cf2117",OpenAI_Codex,1218621,tamnd,closed,2025-07-21T10:40:28Z,2025-07-21T10:40:57Z,2025-07-21T10:40:57Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/11290,['slow'],NonPerformance
+3242782597,9659,Run rosetta go tests,"## Summary
+- improve logical AND/OR codegen for bool option values
+- update generated Go output for `2048`
+
+## Testing
+- `ROSETTA_MAX=30 go test ./compiler/x/go -run Rosetta -tags slow -v`
+
+------
+https://chatgpt.com/codex/tasks/task_e_687a20fdb34483208cca1f67d5f76079",OpenAI_Codex,1218621,tamnd,closed,2025-07-18T10:40:30Z,2025-07-18T10:40:48Z,2025-07-18T10:40:48Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9659,['slow'],NonPerformance
+3246277050,622,Fix Tab key changing filters twice on first window open,"This PR fixes an issue where pressing the Tab key would change filters multiple times instead of just once when the EverythingToolbar search window is first opened.
+
+## Problem
+When clicking on the EverythingToolbar search icon and immediately pressing Tab:
+- Filters would change by 2+ positions instead of 1
+- The filter would continue changing while the Tab key was held down
+- After clicking on a filter button first, Tab worked correctly (single change)
+
+## Root Cause
+The issue was caused by splitting Tab key handling between two events:
+- `PreviewKeyDown` - marked the Tab key as handled
+- `PreviewKeyUp` - performed the actual filter cycling
+
+This split approach caused timing issues where the Tab key event would be processed repeatedly when the search window first opened, before the UI was fully synchronized.
+
+## Solution
+**Consolidated Tab key handling into a single event:**
+- Moved all Tab key processing to `PreviewKeyDown` to eliminate timing issues
+- Added safety checks in `CycleFilters()` to handle edge cases during initialization
+- Removed the original workaround comment about ""inconsistent down stroke""
+
+## Changes Made
+1. **SearchBox.xaml.cs**: Consolidated Tab key logic into `OnPreviewKeyDown` method
+2. **SearchState.cs**: Added defensive checks in `CycleFilters()` for robustness
+
+## Testing
+Manual testing should verify that:
+- Tab key advances filter by exactly 1 position when window first opens
+- Shift+Tab moves filter backward by exactly 1 position  
+- Behavior remains consistent after clicking filter buttons
+- No regression in other keyboard shortcuts
+
+Fixes #618.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-20T11:22:19Z,2025-07-22T16:44:18Z,,295200728,https://api.github.com/repos/srwi/EverythingToolbar,https://github.com/srwi/EverythingToolbar/pull/622,"['times', 'performed', 'timing', 'timing']",NonPerformance
+3163701378,12050,[WIP] [Flaky test] Microsoft.Build.UnitTests.BackEnd.TaskBuilder_Tests.CanceledTasksDoNotLogMSB4181,"- [ ] Analyze current test implementation and failure pattern
+- [ ] Design MSBuild hang detection system with minimal changes
+- [ ] Implement process monitoring infrastructure
+- [ ] Add intelligent timeout strategy with multi-phase detection
+- [ ] Implement hang pattern detection algorithms
+- [ ] Add comprehensive diagnostic data collection (thread analysis, process dumps)
+- [ ] Create enhanced failure analysis and logging
+- [ ] Replace failing WaitOne call with hang detection system
+- [ ] Test the implementation with various scenarios
+- [ ] Validate that original test logic (MSB4181/MSB5021 validation) still works
+- [ ] Add cross-platform support considerations
+- [ ] Document the diagnostic artifacts and interpretation guide
+
+Fixes #9638.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-20T15:27:07Z,2025-06-23T13:03:22Z,,32051890,https://api.github.com/repos/dotnet/msbuild,https://github.com/dotnet/msbuild/pull/12050,"['hang', 'timeout', 'hang', 'WaitOne', 'hang']",NonPerformance
+3216148946,6834,Add map field tracking for Swift compiler,"## Summary
+- enhance Swift compiler with field type inference for map literals
+- keep track of map field types for loop variables and queries
+- generate casts on map selections when possible
+
+## Testing
+- `go test ./compiler/x/swift -tags=slow -run TestCompileValidPrograms -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686e5e0d50848320bb94f94d55b40bdb",OpenAI_Codex,1218621,tamnd,closed,2025-07-09T14:27:31Z,2025-07-09T16:01:01Z,2025-07-09T16:01:01Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/6834,['slow'],NonPerformance
+3110917030,1441,[alpha_factory] Add Safari fallback test,"## Summary
+- add Safari Playwright test to verify Pyodide fallback message and rendering
+- install WebKit in CI for headless Safari tests
+
+## Testing
+- `python check_env.py --auto-install`
+- `pytest -q` *(fails: Duplicated timeseries in CollectorRegistry)*
+- `pytest -q alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/tests/test_safari_pyodide.py` *(skipped: Playwright browser not installed)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_683dd4e90a708333a3aa09124b872c49",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-02T16:50:44Z,2025-06-02T16:53:19Z,2025-06-02T16:53:19Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1441,['timeseries'],NonPerformance
+3276057419,14875,Refactor Lua AST node structure,"## Summary
+- simplify Lua AST nodes under `tools/json-ast`
+- store text only on leaves via new `Node.Text`
+- regenerate `cross_join.lua.json` with new format
+
+## Testing
+- `go test ./tools/json-ast/x/lua -tags slow` *(fails: golden mismatch)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_6889cc3dc7148320ba43581a06efb6ff",OpenAI_Codex,1218621,tamnd,closed,2025-07-30T07:56:18Z,2025-07-30T07:56:31Z,2025-07-30T07:56:31Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/14875,['slow'],NonPerformance
+3118447192,1546,[alpha_factory] Add disclaimer to browser README,"## Summary
+- add legal disclaimer to the browser-only Insight demo README
+
+## Testing
+- `python check_env.py --auto-install`
+- `pytest -q` *(fails: Duplicated timeseries in CollectorRegistry)*
+- `pre-commit run --files alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/README.md` *(failed: Verify requirements.lock step)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_68406fdf65b48333a2a1a7d93d7541a2",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-04T16:41:31Z,2025-06-04T16:41:39Z,2025-06-04T16:41:39Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1546,['timeseries'],NonPerformance
+2852623041,53688,connectors: enable cloud registry for 20 connectors,"## What
+Enable cloud registry for 20 connectors that were previously disabled for cloud.
+
+## List of Updated Connectors
+- source-younium
+- source-newsdata
+- source-serpstat
+- source-hellobaton
+- source-captain-data
+- source-alpha-vantage
+- source-merge
+- source-breezometer
+- source-everhour
+- source-toggl
+- source-tmdb
+- source-ringcentral
+- source-rocket-chat
+- source-fastbill
+- source-intruder
+- source-babelforce
+- source-mailersend
+- source-tyntec-sms
+- source-fullstory
+- source-coingecko-coins
+
+## Changes
+- Set `registryOverrides.cloud` to `true` in metadata.yaml for each connector
+- No version bumps or changelog entries were added as requested
+
+## Testing
+- Verified all connectors have been updated correctly
+- No functional changes, only metadata updates
+
+Link to Devin run: https://app.devin.ai/sessions/4cf1e702402547b094791b8cc010a799
+Requested by: natik@airbyte.io",Devin,158243242,devin-ai-integration[bot],closed,2025-02-14T04:09:42Z,2025-02-22T15:46:21Z,,283046497,https://api.github.com/repos/airbytehq/airbyte,https://github.com/airbytehq/airbyte/pull/53688,['fastbill'],NonPerformance
+3226217613,8357,Add F# TPCH q6-q10 support,"## Summary
+- compile TPCH queries q6–q10 to F# and add them to golden data
+- update F# TPCH test helper to strip compiler header
+- run F# TPCH tests for queries q1–q10
+
+## Testing
+- `go test ./compiler/x/fs -run TPCH -tags slow -count=1` *(fails: fsharpc error)*
+- `go test ./...` *(fails: build constraints exclude all Go files in compiler/x/php)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_68735923d17c8320821abe5fcebfa0ce",OpenAI_Codex,1218621,tamnd,closed,2025-07-13T07:15:09Z,2025-07-13T07:15:23Z,2025-07-13T07:15:22Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/8357,['slow'],NonPerformance
+3238386235,9161,Add Erlang FFI auto import support,"## Summary
+- support builtin aliases for Go and Python FFIs in the Erlang compiler
+- compile go_auto, python_auto and python_math Mochi programs
+- mark passing programs in Erlang machine README
+- document progress in Erlang TASKS
+
+## Testing
+- `go run -tags slow /tmp/compile_erlang.go tests/vm/valid/go_auto.mochi tests/machine/x/erlang/go_auto.erl`
+- `escript tests/machine/x/erlang/go_auto.erl 2>/dev/null | tail -n 3 > tests/machine/x/erlang/go_auto.out`
+- `go run -tags slow /tmp/compile_erlang.go tests/vm/valid/python_auto.mochi tests/machine/x/erlang/python_auto.erl`
+- `escript tests/machine/x/erlang/python_auto.erl 2>/dev/null | tail -n 2 > tests/machine/x/erlang/python_auto.out`
+- `go run -tags slow /tmp/compile_erlang.go tests/vm/valid/python_math.mochi tests/machine/x/erlang/python_math.erl`
+- `escript tests/machine/x/erlang/python_math.erl 2>/dev/null | tail -n 4 > tests/machine/x/erlang/python_math.out`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6878993b40c48320bb5254b82199dc70",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T06:59:27Z,2025-07-17T07:01:24Z,2025-07-17T07:01:24Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9161,"['slow', 'slow', 'slow']",NonPerformance
+3252662612,11964,Enhance Rust transpiler for rosetta,"## Summary
+- support `null` literals in the Rust transpiler
+- sanitize crate names in rosetta tests
+- store output for `100-doors-2` example
+
+## Testing
+- `MOCHI_ROSETTA_ONLY=100-doors-2 go test -tags=slow ./transpiler/x/rs -run Rosetta -count=1 -v`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_687f731e83148320a477557eb6767e16",OpenAI_Codex,1218621,tamnd,closed,2025-07-22T13:17:01Z,2025-07-22T13:17:19Z,2025-07-22T13:17:19Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/11964,['slow'],NonPerformance
+3154623896,43,Fix early stopping arg usage,"## Summary
+- fix misuse of `early_stop` and `validation` engine arguments in boosting specs
+
+## Testing
+- `R CMD build .`
+- `R CMD check fastml_0.6.1.tar.gz --no-manual` *(fails: cannot open URL 'https://cloud.r-project.org/src/contrib/PACKAGES')*
+
+------
+https://chatgpt.com/codex/tasks/task_e_6851c8b55f60832aab8fe479f992983a",OpenAI_Codex,6230704,selcukorkmaz,closed,2025-06-17T20:02:29Z,2025-06-17T20:02:51Z,2025-06-17T20:02:51Z,883593929,https://api.github.com/repos/selcukorkmaz/fastml,https://github.com/selcukorkmaz/fastml/pull/43,['fastml_0'],NonPerformance
+3183195813,3870,Improve TPCH query compilation,"## Summary
+- add `_hash_combine` runtime helper for hashing struct keys
+- track element types for query variables when compiling
+- generate struct keys for grouped queries when the key is a map literal
+
+## Testing
+- `go test ./... -tags=slow` *(fails: signal interrupt)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_685eaef2a7948320bb16d7ecb29e4d9a",OpenAI_Codex,1218621,tamnd,closed,2025-06-27T15:20:18Z,2025-06-27T15:24:55Z,2025-06-27T15:24:55Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3870,['slow'],NonPerformance
+3081226179,21449,feat: upgrade typescript to 5.8.3,"# Upgrade TypeScript to 5.8.3
+
+This PR upgrades TypeScript from various versions (4.9.4, 5.8.2, etc.) to version 5.8.3 across the monorepo to enable the use of Zod 4.
+
+## Changes
+
+- Updated TypeScript to version 5.8.3 in all package.json files
+- Fixed TypeScript compatibility issues:
+  - Added null check in a test file
+  - Created declaration file for next-i18next.config
+  - Fixed nullish coalescing operator usage
+  - Modified regex to not use named capturing groups
+  - Temporarily disabled image optimization code with type incompatibility
+
+## Breaking Changes
+
+TypeScript 5.8.3 introduces stricter type checking in several areas:
+- More strict handling of Buffer types
+- Changes to how nullish values are handled
+- Named capturing groups in regex require ES2018 or later target
+
+## Testing
+
+- Verified with `yarn type-check:ci` - all tests pass
+
+Link to Devin run: https://app.devin.ai/sessions/80a6268f73f9423b83a3fc73dc7fbf64
+Requested by: joe@cal.com
+
+    
+<!-- This is an auto-generated description by cubic. -->
+---
+
+## Summary by cubic
+Upgraded TypeScript to 5.8.3 across the monorepo to support Zod 4 and improve type safety.
+
+- **Bug Fixes**
+  - Fixed type errors by adding null checks and updating regex usage.
+  - Added a type declaration for next-i18next.config.
+  - Temporarily disabled image optimization code due to type incompatibility.
+
+<!-- End of auto-generated description by cubic. -->
+
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-21T19:32:29Z,2025-05-23T12:57:37Z,2025-05-23T12:57:37Z,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/21449,"['optimization', 'optimization']",NonPerformance
+3254640388,12209,Improve Scala transpiler index handling,"## Summary
+- extend `IndexExpr` with container type field
+- cast Any containers when indexing
+- plumb env to `applyIndexOps`
+
+## Testing
+- `MOCHI_ROSETTA_INDEX=7 go test -tags slow ./transpiler/x/scala -run Rosetta -count=1 -failfast -v` *(fails: compile error on 2048.scala)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_688043fc6ae48320b0d9588e58fdd697",OpenAI_Codex,1218621,tamnd,closed,2025-07-23T02:47:15Z,2025-07-23T02:47:28Z,2025-07-23T02:47:28Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12209,['slow'],NonPerformance
+3156145049,1692,Add Rust cross join support,"## Summary
+- add cross join compiler support for Rust
+- generate golden tests for cross join output
+- run cross join in Rust compiler tests
+
+## Testing
+- `go test -tags=slow ./compile/rust -run TestRustCompiler_SubsetPrograms -count=1`
+- `go test -tags=slow ./compile/rust -run TestRustCompiler_GoldenOutput -count=1`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_68528279680883209b490afac4d146be",OpenAI_Codex,1218621,tamnd,closed,2025-06-18T09:27:58Z,2025-06-18T09:32:09Z,2025-06-18T09:32:09Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/1692,"['slow', 'slow']",NonPerformance
+3247657317,11146,Improve C transpiler,"## Summary
+- support simple map literals with identifier keys when evaluating constants
+- add json_builtin to C transpiler golden test suite
+- update generated golden files and docs
+
+## Testing
+- `go test -tags=slow ./transpiler/x/c -run TestTranspilerGolden -update`
+
+------
+https://chatgpt.com/codex/tasks/task_e_687df09b9e8483209da46affe310d493",OpenAI_Codex,1218621,tamnd,closed,2025-07-21T08:13:54Z,2025-07-21T08:14:07Z,2025-07-21T08:14:07Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/11146,['slow'],NonPerformance
+3187725364,17,Add frontend linting and test workflow,"## Summary
+- enable `npm` linting and tests in CI
+- add vitest configuration for React Testing Library
+- fix unused variable in `authStore`
+- create a simple Navbar test
+
+## Testing
+- `ruff check .`
+- `pytest`
+- `npm run lint` in `no-ocr-ui`
+- `npm test` in `no-ocr-ui`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_68625072c10c8328956f1993fffb31b1",OpenAI_Codex,7893705,truskovskiyk,open,2025-06-30T09:07:26Z,,,844305953,https://api.github.com/repos/kyryl-opens-ml/no-ocr,https://github.com/kyryl-opens-ml/no-ocr/pull/17,['React'],NonPerformance
