@@ -3,6 +3,8 @@ OUTPUT_DIR = "Outputs/"
 
 PREFER_ORDER = ["Human", "OpenAI_Codex", "Devin", "Copilot", "Cursor", "Claude_Code"]
 
+AGENTS = ["OpenAI_Codex", "Codex", "OpenAI", "OpenAi Codex", "Devin", "Copilot", "Cursor", "Claude", "Claude Code", "Claude_Code"]
+
 class FileName:
     ALL_PULL_REQUEST = "all_pull_request"
     ALL_REPOSITORY = "all_repository"
