@@ -1,0 +1,148 @@
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
+3261933492,12958,Fix swift rosetta benchmark runtime,"## Summary
+- improve `_now` handling in the Swift transpiler
+- seed PRNG when running benchmarks to keep rosetta programs fast
+- regenerate Swift code for `100-prisoners`
+- update benchmark data and docs
+
+## Testing
+- `ROSETTA_INDEX=4 MOCHI_BENCHMARK=1 go test ./transpiler/x/swift -run TestSwiftTranspiler_Rosetta_Golden -tags=slow -count=1 -v`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68830247f8488320a30927cad865dc2b",OpenAI_Codex,1218621,tamnd,open,2025-07-25T04:20:51Z,,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12958,"analysisWe need to classify as performance or non-performance. The PR title: ""Fix swift rosetta benchmark runtime"". Summary: improve _now handling, seed PRNG when running benchmarks to keep rosetta programs fast, regenerate Swift code for 100-prisoners, update benchmark data and docs. This is about benchmarks, runtime, performance. Keywords: ""benchmark"", ""fast"", ""runtime"", ""seed PRNG"", ""improve _now handling"". It's performance improvement. So classify as 'performance'.assistantfinalperformance",28,1.0,False
+3198202667,4811,Update SLT generator and refresh select1 outputs,"## Summary
+- speed up SLT generator execution timeout
+- regenerate select1 cases 1-1000
+- remove old `.error` files for cases that now pass
+
+## Testing
+- `go run ./cmd/mochi-slt gen --cases case1-case1000 --files select1.test --out tests/dataset/slt/out --run`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6866211786248320be1e23404d7a316d",OpenAI_Codex,1218621,tamnd,closed,2025-07-03T06:29:32Z,2025-07-03T06:30:32Z,2025-07-03T06:30:32Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4811,"analysisWe need to classify as performance or non-performance. The PR title: ""Update SLT generator and refresh select1 outputs"". Summary: ""- speed up SLT generator execution timeout"". That indicates performance improvement. Also ""speed up SLT generator execution timeout"" is a performance keyword. So classification: performance.assistantfinalperformance",28,1.0,False
+3262865664,13059,Optimize VM append,"## Summary
+- improve `OpAppend` to use Go's built-in slice growth
+- regenerate Rosetta artifacts for program 4 after optimization
+
+## Testing
+- `MOCHI_ROSETTA_INDEX=4 MOCHI_BENCHMARK=1 go test ./runtime/vm -tags slow -run Rosetta_Golden -update -count=1`
+- `MOCHI_ROSETTA_INDEX=4 go test ./runtime/vm -tags slow -run Rosetta_Golden -update -count=1`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_68835a9aebb883208f28f70ced15e7aa",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T11:10:16Z,2025-07-25T11:10:36Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/13059,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize VM append"". Summary: improve OpAppend to use Go's built-in slice growth. That is performance optimization. So label 'performance'.assistantfinalperformance",28,1.0,False
+3206779215,5817,Update hs vm roundtrip tool,"## Summary
+- limit vm roundtrip checks with a LIMIT env var so they can run quicker
+- regenerate `compile/x/hs/ERRORS.md` via the updated tool
+
+## Testing
+- `go test ./compile/x/hs -run TestHSCompiler_GoldenOutput -tags slow -update`
+- `go test ./compile/x/hs -run TestHSCompiler_GoldenSubset -tags slow -update` *(fails: couldn't match type `AnyValue` with `[Char]`)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_686aa8215ed08320b2b6a20ee13c3bb5",OpenAI_Codex,1218621,tamnd,closed,2025-07-06T16:59:24Z,2025-07-06T16:59:35Z,2025-07-06T16:59:35Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/5817,"analysisWe need to classify as performance or non-performance. The PR title: ""Update hs vm roundtrip tool"". Summary: limit vm roundtrip checks with a LIMIT env var so they can run quicker. That is about performance: making tests run quicker. Also regenerate errors. So it's performance. So output ""performance"".assistantfinalperformance",28,1.0,False
+3261727113,12867,Enable Swift benchmarking,"## Summary
+- support benchmark mode in Swift transpiler and tests
+- record memory usage via `/proc/self/status`
+- update Rosetta checklist with table format and benchmark data
+- regenerate Swift code and outputs for program `100-doors-2` with benchmarking
+
+## Testing
+- `go test ./transpiler/x/swift -run TestSwiftTranspiler_Rosetta_Golden -tags slow -count=1`
+- `ROSETTA_INDEX=1 MOCHI_BENCHMARK=1 go test ./transpiler/x/swift -run TestSwiftTranspiler_Rosetta_Golden -tags slow -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6882de6f57608320a602f807f40eb9c2",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T02:00:18Z,2025-07-25T02:00:39Z,2025-07-25T02:00:39Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12867,"analysisWe need to classify as performance or non-performance. The PR title: ""Enable Swift benchmarking"". Body: mentions support benchmark mode, record memory usage, update checklist with benchmark data, regenerate Swift code and outputs for program with benchmarking. This is about benchmarking, memory usage, performance. So it's performance.assistantfinalperformance",28,1.0,True
+3259957129,12696,"Fix TS append, pass arithmetic-numbers","## Summary
+- optimize TypeScript transpiler `append` to mutate the array
+- emit helper `_append` when needed
+- update Rosetta TS progress
+- add generated code and output for `arithmetic-numbers`
+
+## Testing
+- `MOCHI_ROSETTA_INDEX=72 go test ./transpiler/x/ts -run Rosetta -count=1 -tags=slow -timeout=120s -failfast`
+- `MOCHI_ROSETTA_INDEX=73 go test ./transpiler/x/ts -run Rosetta -count=1 -tags=slow -timeout=120s -failfast`
+- `MOCHI_ROSETTA_INDEX=77 go test ./transpiler/x/ts -run Rosetta -count=1 -tags=slow -timeout=120s -failfast`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_68822e6ba6d48320bac581180210bb9b",OpenAI_Codex,1218621,tamnd,closed,2025-07-24T13:42:58Z,2025-07-24T13:43:23Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12696,"analysisWe need to classify the pull request as performance or non-performance. The title: ""Fix TS append, pass arithmetic-numbers"". Summary: ""- optimize TypeScript transpiler `append` to mutate the array - emit helper `_append` when needed - update Rosetta TS progress - add generated code and output for `arithmetic-numbers`"". The summary explicitly says ""optimize TypeScript transpiler `append` to mutate the array"". That is a performance optimization. Also ""emit helper `_append` when needed"" might be performance. So it's performance. So label 'performance'.assistantfinalperformance",28,1.0,False
+3197592817,4722,Regenerate select1 case6,"## Summary
+- regenerate select1 case6 using tools/slt
+- case6 still times out during execution
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6865d1e36a68832087877e57c0847376",OpenAI_Codex,1218621,tamnd,closed,2025-07-03T00:58:38Z,2025-07-03T03:17:28Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4722,"analysisWe need to classify whether the primary purpose of the pull request is to improve performance. The PR title: ""Regenerate select1 case6"". Summary: ""regenerate select1 case6 using tools/slt; case6 still times out during execution"". The issue: case6 times out. So the PR is addressing a timeout, likely performance issue. The body: ""go test./..."" indicates tests. The PR is about regenerating select1 case6, which still times out. So it's about performance? The title ""Regenerate select1 case6"" doesn't explicitly mention performance. But the summary says ""case6 still times out during execution"". That indicates a performance issue. The PR likely addresses a timeout, which is a performance problem. So classification: performance.assistantfinalperformance",28,1.0,False
+3263823691,13194,Update VM rosetta benchmarks,"## Summary
+- refresh VM rosetta benchmarks for first 10 tasks
+- skip interactive puzzle game (index 5)
+
+## Testing
+- `MOCHI_BENCHMARK=1 MOCHI_ROSETTA_INDEX=11 go test ./runtime/vm -tags=slow -run TestVM_Rosetta_Golden -update`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_68839b17641c8320aff1ff20f10e2c5d",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T16:55:15Z,2025-07-25T16:55:40Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/13194,"analysisWe need to classify as performance or non-performance. The PR title: ""Update VM rosetta benchmarks"". The body: refresh VM rosetta benchmarks for first 10 tasks, skip interactive puzzle game. It's about updating benchmarks. That is performance related? Benchmarks are about measuring performance. The PR is updating benchmark data. That is performance. So classify as 'performance'.assistantfinalperformance",28,1.0,False
+3262707090,13030,Update rosetta bench for 100‑prisoners,"## Summary
+- fix skipping of main() during compilation
+- avoid negative memory usage in rosetta benchmarks
+- regenerate benchmark for program 4 (100-prisoners)
+- update Rosetta progress checklist
+
+## Testing
+- `MOCHI_ROSETTA_INDEX=4 MOCHI_BENCHMARK=1 go test ./runtime/vm -tags=slow -run TestVM_Rosetta_Golden -count=1 -v`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6883521928e88320aa6bf001c4bdf718",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T10:10:12Z,2025-07-25T10:10:24Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/13030,"analysisWe need to classify as performance or non-performance. The PR title: ""Update rosetta bench for 100‑prisoners"". Body: mentions fix skipping of main() during compilation, avoid negative memory usage in rosetta benchmarks, regenerate benchmark for program 4 (100-prisoners), update Rosetta progress checklist. The changes mention memory usage, benchmarks, performance. Keywords: memory, benchmark, negative memory usage. That suggests performance improvement. So classify as 'performance'.assistantfinalperformance",28,1.0,False
+3262757781,13039,Fix VM main execution and update Rosetta outputs,"## Summary
+- ensure rosetta tests use deterministic `now()` by seeding the VM
+- speed up the `Append` instruction by preallocating slices
+- refresh IR outputs for the `100-prisoners` task
+- update benchmark and checklist entries
+
+## Testing
+- `MOCHI_ROSETTA_INDEX=4 MOCHI_BENCHMARK=1 go test ./runtime/vm -tags slow -run TestVM_Rosetta_Golden -v`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_688358317d688320ae15f6e91e6fa043",OpenAI_Codex,1218621,tamnd,open,2025-07-25T10:29:54Z,,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/13039,"analysisWe need to classify as performance or non-performance. The PR title: ""Fix VM main execution and update Rosetta outputs"". Body: includes ""speed up the Append instruction by preallocating slices"". That is a performance improvement. Also ""ensure rosetta tests use deterministic now() by seeding the VM"" is more about determinism. But the performance part is explicit. So classification: performance.assistantfinalperformance",28,1.0,True
+3262887238,13066,Update rosetta artifacts for 100-prisoners,"## Summary
+- speed up `now()` builtin by avoiding system calls and using `math/rand`
+- emit call to user `main` when compiling top level program
+- regenerate IR, output and bench data for `100-prisoners`
+- refresh Rosetta progress checklist
+
+## Testing
+- `MOCHI_ROSETTA_INDEX=4 MOCHI_NOW_SEED=1 go test ./runtime/vm -run TestVM_Rosetta_Golden -tags slow -count=1 -update`
+- `MOCHI_ROSETTA_INDEX=4 MOCHI_BENCHMARK=1 MOCHI_NOW_SEED=1 go test ./runtime/vm -run TestVM_Rosetta_Golden -tags slow -count=1 -update`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6883636054b48320a4b6e5736c3d22b6",OpenAI_Codex,1218621,tamnd,open,2025-07-25T11:19:21Z,,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/13066,"analysisWe need to classify as performance or non-performance. The PR title: ""Update rosetta artifacts for 100-prisoners"". Summary includes ""speed up `now()` builtin by avoiding system calls and using `math/rand`"". That is a performance improvement. So classification: performance.assistantfinalperformance",28,1.0,False
+3262845265,13057,Accelerate now() and update Rosetta artifacts,"## Summary
+- speed up OpNow with xorshift PRNG
+- regenerate program 4 outputs with deterministic seed
+- update benchmark data and checklist
+
+## Testing
+- `MOCHI_NOW_SEED=1 MOCHI_ROSETTA_INDEX=4 go test ./runtime/vm -run TestVM_Rosetta_Golden -update -v -tags slow`
+- `MOCHI_NOW_SEED=1 MOCHI_ROSETTA_INDEX=4 MOCHI_BENCHMARK=1 go test ./runtime/vm -run TestVM_Rosetta_Golden -update -v -tags slow`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_68835ebfe1188320b1afcb083715ac75",OpenAI_Codex,1218621,tamnd,open,2025-07-25T11:02:34Z,,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/13057,"analysisWe need to classify as performance or non-performance. The PR title: ""Accelerate now() and update Rosetta artifacts"". Summary: ""speed up OpNow with xorshift PRNG"", ""regenerate program 4 outputs with deterministic seed"", ""update benchmark data and checklist"". This is clearly performance improvement: speed up, benchmark data. So classification: performance.assistantfinalperformance",28,1.0,True
+3177404139,3321,Switch MCP server to VM runtime,"## Summary
+- use `runtime/vm` instead of the interpreter when MCP executes source code
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_685c9f81300883208f1983dbc49b04c0",OpenAI_Codex,1218621,tamnd,closed,2025-06-26T01:22:20Z,2025-06-26T01:23:37Z,2025-06-26T01:23:37Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3321,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Switch MCP server to VM runtime"". Summary: use runtime/vm instead of interpreter when MCP executes source code. This likely improves performance by using VM runtime instead of interpreter. So it's performance. No other context. So classification: performance.assistantfinalperformance",28,0.18207756494277105,False
+3205879151,400,Support VM Reuse with Different Compiled Code,"Add `RunCode` method to `vm.VirtualMachine` to enable running multiple compiled code objects on a single VM, improving performance and state management for sequential script execution.
+
+Relates to: https://github.com/risor-io/risor/issues/374",Cursor,1389638,myzie,closed,2025-07-06T01:14:37Z,2025-07-06T13:35:23Z,2025-07-06T13:35:23Z,561389689,https://api.github.com/repos/deepnoodle-ai/risor,https://github.com/deepnoodle-ai/risor/pull/400,"analysisWe need to classify as performance or non-performance. The PR title: ""Support VM Reuse with Different Compiled Code"". Body: ""Add RunCode method to vm.VirtualMachine to enable running multiple compiled code objects on a single VM, improving performance and state management for sequential script execution."" This is clearly about performance improvement. So label 'performance'.assistantfinalperformance",28,0.1429025530876729,False

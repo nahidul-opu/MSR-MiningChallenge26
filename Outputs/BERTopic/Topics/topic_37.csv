@@ -1,0 +1,415 @@
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
+3271747658,5001,Update hufilter URLs to jsDelivr CDN and add missing EF migration,"Updated hufilter filter list URLs from deprecated raw GitHub URLs to the new jsDelivr CDN URLs as requested in [hufilter/hufilter-dev#461](https://github.com/hufilter/hufilter-dev/issues/461).
+
+The hufilter maintainers have migrated their repository structure and are now serving filter lists through GitHub Pages with jsDelivr CDN for better reliability and performance. The old raw GitHub URLs are no longer functional (returning HTTP 404).
+
+## Changes Made
+
+### URL Updates (FilterListViewUrl.json)
+- **hufilter (ID 96, filterListId 72)**: 
+  - From: `https://raw.githubusercontent.com/hufilter/hufilter/master/hufilter.txt`
+  - To: `https://cdn.jsdelivr.net/gh/hufilter/hufilter@gh-pages/hufilter.txt`
+
+- **hufilter (Domains with wildcards) (ID 2570, filterListId 2392)**:
+  - From: `https://raw.githubusercontent.com/hufilter/hufilter/master/hufilter-dns.txt` 
+  - To: `https://cdn.jsdelivr.net/gh/hufilter/hufilter@gh-pages/hufilter-dns.txt`
+
+### Database Migration
+Added EF Core migration `20250729024745_UpdateHufilterUrlsToJsDelivr` to capture URL changes in the database schema. The migration includes both Up and Down methods for proper rollback support.
+
+### Documentation Updates
+Enhanced `.github/copilot-instructions.md` to emphasize that EF migrations are always required for data changes, with explicit warnings to prevent future oversights.
+
+## Validation
+
+- ✅ New jsDelivr URLs are accessible and serving content (HTTP 200)
+- ✅ Old GitHub raw URLs are no longer working (HTTP 404) 
+- ✅ JSON formatting validated with `lint.sh`
+- ✅ Only primary URLs (primariness: 1) were updated as requested
+- ✅ EF migration generated and validates correctly
+
+This ensures continued availability of the Hungarian regional ad and tracker blocking lists for FilterLists users while maintaining proper database schema consistency.
+
+Fixes #4442.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-29T02:32:34Z,2025-07-29T02:55:00Z,2025-07-29T02:55:00Z,76135941,https://api.github.com/repos/collinbarrett/FilterLists,https://github.com/collinbarrett/FilterLists/pull/5001,"analysisWe need to classify as performance or non-performance. The PR updates URLs to jsDelivr CDN and adds EF migration. The main purpose is to update URLs for reliability and performance. The description says ""new jsDelivr CDN URLs for better reliability and performance."" But is this a performance improvement? The change is to use CDN for better reliability and performance. The keywords: performance, latency, optimization, etc. The PR includes ""performance"" in the description. It says ""better reliability and performance."" So it's performance-related. The classification: 'performance'.assistantfinalperformance",37,1.0,False
+3196281528,250,Optimize more layout hooks,"## Summary
+- cache sidebar badge views in `AWEHPTopBarCTAItemView`
+- cache alpha subviews in `AWEAwemeDetailNaviBarContainerView`
+- cache avatar subviews in `AWEPlayInteractionUserAvatarView`
+- cache button subviews for fullscreen hide in `IESLiveButton`
+- retain prior cached views in tab bar hooks
+- cache search indicator subviews in `AWESearchEntranceView`
+- cache slide components in `AWEStoryProgressSlideView`
+- cache comment container subview in `CommentInputContainerView`
+
+## Testing
+- `make` *(fails: No rule to make target '/tweak.mk')*
+- `make test` *(fails: No rule to make target '/tweak.mk')*
+- `pytest -q`
+
+------
+https://chatgpt.com/codex/tasks/task_b_68654716d28c832a999640a560148747",OpenAI_Codex,30235198,Wtrwx,closed,2025-07-02T15:17:32Z,2025-07-02T15:21:21Z,,949348116,https://api.github.com/repos/Wtrwx/DYYY,https://github.com/Wtrwx/DYYY/pull/250,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize more layout hooks"". Body: caching subviews, caching views, etc. This is about performance optimization: caching views to reduce layout overhead. So classification: performance.assistantfinalperformance",37,1.0,False
+3198797332,297,Integrate trigger.dev functions for plaid and gocardless,"## Description
+Integrates `trigger.dev` for Plaid and GoCardless operations to enable asynchronous processing and scheduled data synchronization. This improves UI responsiveness, reliability with retries, and provides flexible update frequency management for financial data.
+
+Fixes # (issue number)
+
+## Type of Change
+- [x] New feature (non-breaking change which adds functionality)
+- [x] Refactoring (no functional changes)
+
+## Changes Made
+- [x] Created `src/trigger/plaid-tasks.ts` for Plaid-related `trigger.dev` tasks (e.g., `exchangePlaidPublicToken`, `importPlaidTransactions`, `syncPlaidBalances`).
+- [x] Created `src/trigger/gocardless-tasks.ts` for GoCardless-related `trigger.dev` tasks (e.g., `completeGoCardlessConnection`, `importGoCardlessTransactions`, `syncGoCardlessBalances`).
+- [x] Added scheduled tasks for daily balance sync and transaction import for both providers.
+- [x] Created `src/trigger/index.ts` to export all `trigger.dev` tasks.
+- [x] Added `TRIGGER_INTEGRATION.md` with comprehensive documentation on usage, configuration, and integration steps.
+- [x] Removed `src/trigger/example.ts`.
+
+## Testing
+Please describe the tests that you ran to verify your changes:
+
+- [ ] Unit tests pass
+- [ ] Integration tests pass
+- [x] Manual testing completed
+
+## Screenshots (if applicable)
+Please add screenshots of any UI changes:
+
+**Before:**
+<!-- Add screenshot -->
+
+**After:**
+<!-- Add screenshot -->
+
+## Database Changes
+- [ ] No database changes
+- [ ] Database migration required (include migration details)
+- [x] New Prisma schema changes (run `pnpm db:generate` and `pnpm db:push` to ensure generated client is up-to-date with new imports like `Prisma`)
+
+## Checklist
+- [x] My code follows the project's style guidelines
+- [x] I have performed a self-review of my code
+- [x] I have commented my code, particularly in hard-to-understand areas
+- [x] I have made corresponding changes to the documentation
+- [x] My changes generate no new warnings
+- [ ] I have added tests that prove my fix is effective or that my feature works
+- [ ] New and existing unit tests pass locally with my changes
+- [ ] Any dependent changes have been merged and published
+
+## Additional Notes
+This PR introduces `trigger.dev` to handle financial data operations (Plaid and GoCardless) asynchronously and with scheduled tasks. This significantly improves:
+- **UI Responsiveness**: Long-running imports/syncs now run in the background.
+- **Reliability**: Built-in retries and error handling for external API calls.
+- **Maintainability**: Centralized logic for financial data processing.
+- **Scalability**: Background tasks can scale independently.
+
+**Next Steps for Reviewer/User**:
+1.  Run `pnpm db:generate` and `pnpm db:push` to ensure Prisma client is updated.
+2.  Update existing synchronous calls in your application (e.g., in `src/actions/plaid-actions.ts`) to use the new `trigger.dev` tasks as detailed in `TRIGGER_INTEGRATION.md`.
+3.  Deploy the `trigger.dev` functions (`npx trigger.dev@latest deploy`).
+4.  Review `TRIGGER_INTEGRATION.md` for detailed usage and configuration.",Cursor,24507211,Codehagen,open,2025-07-03T09:57:34Z,,,737550719,https://api.github.com/repos/Codehagen/Badget,https://github.com/Codehagen/Badget/pull/297,"analysisWe need to classify whether the primary purpose is to improve performance. The PR adds trigger.dev functions for Plaid and GoCardless, asynchronous processing, scheduled tasks, UI responsiveness, reliability, etc. The description says ""This significantly improves UI Responsiveness, Reliability, Maintainability, Scalability."" The primary purpose is to improve performance? It mentions UI responsiveness, background tasks, etc. The keywords: ""improves UI responsiveness"" and ""background tasks"" but not explicitly about speed or memory. However, the description says ""This significantly improves UI Responsiveness"" which is a performance improvement. The classification: performance. The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. The PR contains ""UI Responsiveness"" and ""responsive"" and ""performance"" in the description. So it's performance. So label 'performance'.assistantfinalperformance",37,1.0,True
+3046430027,21162,perf: optimize event type query by using team IDs instead of complex join,"# Optimize Event Type Query by Using Team IDs Instead of Complex Join
+
+## Description
+This PR optimizes the query in `EventTypeRepository.findById` by first fetching user team IDs and then using an ""in"" query instead of a complex join with the Team table. This approach is more efficient as it avoids the complex join and subquery in the SQL.
+
+## Changes
+- Added a new method `findUserTeamIds` to `MembershipRepository` to fetch all team IDs that a user is a member of
+- Modified the `findById` method in `EventTypeRepository` to use the team IDs in an ""in"" query
+- Added explicit handling for edge cases:
+  - When the user has no memberships (empty array in ""in"" query)
+  - When the event type has a null teamId (added a not null check)
+
+## Testing
+- Ran type checking with `yarn type-check:ci` to ensure no type errors
+- The functionality remains the same while improving query performance
+
+## Link to Devin run
+https://app.devin.ai/sessions/2c94e6bcf53d4924b368ecd2bc41d410
+
+Requested by: morgan@cal.com
+
+    
+<!-- This is an auto-generated description by mrge. -->
+---
+
+## Summary by mrge
+Optimized the event type query by fetching user team IDs first and using an ""in"" query, removing the need for a complex join. This improves query performance without changing functionality.
+
+- **Refactors**
+  - Added a method to get all team IDs for a user.
+  - Updated the event type query to use team IDs directly.
+  - Handled cases where users have no team memberships or event types have a null teamId.
+
+<!-- End of auto-generated description by mrge. -->
+
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-07T15:43:58Z,2025-05-07T20:00:49Z,2025-05-07T20:00:49Z,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/21162,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""perf: optimize event type query by using team IDs instead of complex join"". The description says it's optimizing query, improving performance. So classification: 'performance'.assistantfinalperformance",37,1.0,False
+3095471248,21556,refactor: Replace trpc calls with direct repository calls and implement caching,"# Replace trpc calls with direct repository calls and implement caching
+
+## Description
+
+This PR replaces trpc server calls in `apps/web/app/(use-page-wrapper)/availability/[schedule]/page.tsx` with direct repository calls to `ScheduleRepository.findDetailedScheduleById` and `TravelScheduleRepository.findTravelSchedulesByUserId`. It also implements `unstable_cache` with a 1-hour revalidation period for both repository calls to improve performance.
+
+## Changes
+
+- Removed trpc router imports and calls
+- Added direct repository imports and calls
+- Implemented session management using `getServerSession` and `buildLegacyRequest`
+- Added `unstable_cache` with 1-hour revalidation for both repository calls
+- Created tests to verify caching functionality
+
+## Testing
+
+- Verified the implementation works by running the app locally
+- Added unit tests to verify caching behavior
+
+## Link to Devin run
+https://app.devin.ai/sessions/b0622743ad7a42ee92c7dc0d4540ac2a
+
+Requested by: benny@cal.com
+
+    
+<!-- This is an auto-generated description by cubic. -->
+---
+
+## Summary by cubic
+Replaced trpc server calls with direct repository calls and added 1-hour caching for schedule and travel schedule data to improve performance.
+
+- **Refactors**
+  - Removed trpc router usage and switched to direct repository methods.
+  - Added caching with unstable_cache for both repository calls.
+
+- **Testing**
+  - Added unit tests to verify caching behavior.
+
+<!-- End of auto-generated description by cubic. -->
+
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-27T23:11:50Z,2025-06-05T16:58:35Z,,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/21556,"analysisWe need to classify as performance or non-performance. The PR description says ""implement caching"" and ""improve performance"". Keywords: caching, performance, speed, etc. So it's performance.assistantfinalperformance",37,1.0,False
+3164482877,21949,perf: optimize AttributeToUser query with single Prisma join,"# Optimize AttributeToUser Query Performance
+
+## Summary
+Refactored the `_queryAllData` function in `getAttributes.ts` to replace the inefficient two-step database query process with a single optimized Prisma query using a join.
+
+## Changes Made
+- **Added new method** `findManyByOrgAndTeamIds` to `AttributeToUserRepository` that uses a single Prisma query with member relation join
+- **Refactored** `_queryAllData` function to use the new repository method instead of the previous two-step approach
+- **Removed** the TODO comment about query optimization since this addresses the performance issue
+- **Maintained** identical filtering logic for team memberships (`accepted=true`, `teamId IN [orgId, teamId]`)
+
+## Performance Impact
+- **Before**: Two separate database queries - first get member IDs, then query AttributeToUser
+- **After**: Single Prisma query with join, reducing database round trips
+- **Result**: Improved performance for attribute assignment operations, especially beneficial for high-frequency usage
+
+## Technical Details
+The new implementation uses `prisma.attributeToUser.findMany()` with a nested `member` condition:
+```typescript
+where: {
+  member: {
+    teamId: { in: teamIds },
+    accepted: true,
+  },
+}
+```
+
+This replaces the previous pattern of:
+1. `_getOrgMembershipToUserIdForTeam()` to get membership IDs
+2. `AttributeToUserRepository.findManyByOrgMembershipIds()` to query attributes
+
+## Testing
+- ✅ All existing tests pass (`TZ=UTC yarn test packages/lib/service/attribute/server/getAttributes.test.ts`)
+- ✅ TypeScript compilation successful (`yarn type-check:ci`)
+- ✅ No breaking changes to data structure or behavior
+- ✅ Maintains identical filtering and result format
+
+## Link to Devin run
+https://app.devin.ai/sessions/8b3f522e2c23401e82dc99173dd3c782
+
+## Requested by
+morgan@cal.com
+
+    
+<!-- This is an auto-generated description by cubic. -->
+---
+
+## Summary by cubic
+Replaced a slow two-step query in getAttributes with a single optimized Prisma join to improve performance when fetching attribute assignments.
+
+- **Refactors**
+  - Added findManyByOrgAndTeamIds to AttributeToUserRepository for efficient querying.
+  - Updated _queryAllData to use the new method, reducing database round trips.
+
+<!-- End of auto-generated description by cubic. -->
+
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-20T22:26:16Z,2025-06-29T15:51:14Z,,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/21949,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""perf: optimize AttributeToUser query with single Prisma join"". The body describes performance improvement. So classification: 'performance'.assistantfinalperformance",37,1.0,True
+3095454351,21552,perf: migrate listHandler to AttributeRepository + cache attributes fetching in RSCs,"# Migrate listHandler to AttributeRepository
+
+## Description
+This PR migrates the database query logic from `listHandler` in `packages/trpc/server/routers/viewer/attributes/list.handler.ts` to a new method in the `AttributeRepository` class in `packages/lib/server/repository/attribute.ts`, then updates the handler to use the new repository method.
+
+## Changes
+- Added new static method `findAllByOrgIdWithOptions` to the `AttributeRepository` class
+- Updated list.handler.ts to use the new repository method
+- Removed direct prisma import from list.handler.ts
+
+## Testing
+- Type checking passes with `yarn type-check:ci`
+
+## Link to Devin run
+https://app.devin.ai/sessions/8c230847356946a9abd62a3c07227512
+
+Requested by: benny@cal.com
+
+    
+<!-- This is an auto-generated description by cubic. -->
+---
+
+## Summary by cubic
+Moved the database query logic from listHandler to a new method in AttributeRepository for better code organization.
+
+- **Refactors**
+  - Added findAllByOrgIdWithOptions to AttributeRepository.
+  - Updated listHandler to use the new repository method and removed direct prisma usage.
+
+<!-- End of auto-generated description by cubic. -->
+
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-27T23:02:20Z,2025-05-29T19:01:45Z,2025-05-29T19:01:45Z,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/21552,"analysisWe need to classify as performance or non-performance. The PR title: ""perf: migrate listHandler to AttributeRepository + cache attributes fetching in RSCs"". The title includes ""perf:"" prefix. The body describes migrating logic to repository, removing direct prisma import. It doesn't mention performance improvements, caching? Wait title says ""cache attributes fetching in RSCs"". But body doesn't mention caching. The title indicates performance. The body is about refactoring. But the title includes ""perf:"" and mentions caching. So likely performance. According to instructions, performance-related PRs may contain keywords like memory, optimization, leak, speed, perf, etc. Title has ""perf:"" and ""cache"". So classify as performance.assistantfinalperformance",37,1.0,False
+3072374938,538,Refactor PR #531 attribute filtering feature,"# Refactor PR #531: Attribute Filtering Feature
+
+## 変更の概要
+PR #531 で実装された属性フィルタリング機能のリファクタリングを行いました。具体的には以下の改善を行っています：
+
+1. TypeScript型の安全性向上
+   - 暗黙的な `any` 型の排除
+   - イベントハンドラーの型付け
+   - コンポーネントプロップスの型定義の強化
+
+2. コンポーネントの一貫性
+   - `AttributeColumnsSelector` で生の HTML 要素の代わりに Chakra UI コンポーネントを使用
+   - 一貫したコンポーネントパターンの適用
+
+3. コード整理
+   - 大きなコンポーネントを小さなサブコンポーネントに分割（`AttributeFilterDialog`）
+   - ユーティリティ関数の最適化
+
+4. Python 型の問題修正
+   - `hierarchical_aggregation.py` の TypedDict 実装の修正
+   - 型アノテーションの追加・修正
+
+5. パフォーマンス最適化
+   - React コンポーネントでの計算のメモ化
+   - フィルタリング関数の最適化
+
+## 関連 PR
+#531
+
+## 動作確認の結果
+リファクタリング前後で機能が同じように動作することを確認しました。
+
+## マージ前のチェックリスト（レビュアーがマージ前に確認してください）
+- [ ] CIが全て通過している
+- [ ] 単体テストが実装されているか
+- [ ] 今回実装した機能および影響を受けると思われる機能について、適切な動作確認が行われているかを確認する。
+
+## CLAへの同意
+- [x] CLAの内容を読み、同意しました
+
+Link to Devin run: https://app.devin.ai/sessions/93027cff3d3f48ffa8b62fcb1497a49b
+Requested by: shinta.nakayama@gmail.com
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-19T03:24:34Z,2025-05-19T08:21:09Z,,934897158,https://api.github.com/repos/digitaldemocracy2030/kouchou-ai,https://github.com/digitaldemocracy2030/kouchou-ai/pull/538,"analysisWe need to classify as performance or non-performance. The PR includes ""パフォーマンス最適化"" (performance optimization) and ""React コンポーネントでの計算のメモ化"" and ""フィルタリング関数の最適化"". So it's performance. The classification: 'performance'.assistantfinalperformance",37,1.0,False
+3171974887,22009,feat: optimize avatar flashing during sidebar navigation,"# Avatar Flashing Optimization
+
+## Problem
+User avatar image was flashing during sidebar navigation due to multiple components independently calling `useMeQuery()`, causing unnecessary re-renders and API refetches.
+
+## Root Cause Analysis
+- Multiple components (`UserDropdown`, `useAppTheme`, `useBanners`) were calling `useMeQuery()` independently
+- Each navigation triggered fresh API calls and component re-renders
+- Avatar image source was being re-fetched unnecessarily during navigation
+
+## Solution
+Implemented three key optimizations:
+
+### 1. React.memo for UserDropdown Component
+- Added `React.memo()` to prevent unnecessary re-renders
+- Reduces component re-rendering when props haven't changed
+
+### 2. tRPC Query Caching Configuration
+- Added `staleTime: 5 * 60 * 1000` (5 minutes) to prevent refetching during navigation
+- Added `refetchOnWindowFocus: false` to prevent refetch on window focus
+- Leverages existing data instead of making redundant API calls
+
+### 3. Shared User Context (UserProvider)
+- Created centralized `UserProvider` context to manage user data
+- Eliminates redundant `useMeQuery()` calls across components
+- Single source of truth for user data throughout the application
+
+## Technical Implementation
+- **UserProvider Context**: New context provider that wraps the Shell component
+- **Modified Components**: Updated `UserDropdown`, `useAppTheme` to use shared context
+- **Component Hierarchy**: Restructured Shell component to resolve circular dependency
+
+## Testing
+- ✅ Application loads successfully without errors
+- ✅ Avatar displays consistently during navigation
+- ✅ All lint checks pass
+- ✅ User authentication and dashboard functionality verified
+
+## Files Modified
+- `packages/features/shell/context/UserProvider.tsx` (new)
+- `packages/features/shell/Shell.tsx`
+- `packages/features/shell/user-dropdown/UserDropdown.tsx`
+- `packages/features/shell/useAppTheme.ts`
+- `packages/trpc/react/hooks/useMeQuery.ts`
+
+## Performance Impact
+- Reduced API calls during navigation
+- Eliminated avatar image flashing
+- Improved sidebar navigation performance
+- Better user experience with smoother transitions
+
+---
+
+**Link to Devin run**: https://app.devin.ai/sessions/a1ff4d4e253347258b15b0ef1cd8cd5b
+**Requested by**: eunjae@cal.com
+
+    
+<!-- This is an auto-generated description by cubic. -->
+---
+
+## Summary by cubic
+Optimized avatar rendering during sidebar navigation by reducing unnecessary API calls and re-renders, eliminating avatar flashing and improving navigation smoothness.
+
+- **Refactors**
+  - Added a shared UserProvider context to centralize user data and remove redundant useMeQuery calls.
+  - Updated UserDropdown and useAppTheme to use the shared context.
+  - Applied React.memo to UserDropdown to prevent extra re-renders.
+  - Configured useMeQuery to cache data for 5 minutes and avoid refetching on window focus.
+
+<!-- End of auto-generated description by cubic. -->
+
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-24T13:16:42Z,2025-06-25T12:34:58Z,,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/22009,"analysisWe need to classify as 'performance' or 'non-performance'. The PR is about optimizing avatar flashing during sidebar navigation, reducing API calls, re-renders, caching, etc. This is clearly performance improvement. So label 'performance'.assistantfinalperformance",37,1.0,True
+3087295315,21497,perf: replace tRPC caller with direct call to getEventTypeById,"# Replace tRPC caller with direct call to getEventTypeById
+
+## Description
+This PR replaces the tRPC caller in `getCachedEventType` function with a direct call to `getEventTypeById` from ""@calcom/lib/event-types/getEventTypeById"" in the file `apps/web/app/(use-page-wrapper)/event-types/[type]/page.tsx"".
+
+## Changes
+- Added import for `getEventTypeById` from ""@calcom/lib/event-types/getEventTypeById""
+- Replaced tRPC caller with direct function call
+- Ensured proper parameter mapping between the two functions
+
+## Testing
+- Ran type checking to verify no TypeScript errors related to our changes
+
+## Link to Devin run
+https://app.devin.ai/sessions/97bffd5e18e14d7880640863f64d8aed
+
+## Requested by
+benny@cal.com
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-23T19:11:13Z,2025-06-05T16:58:46Z,,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/21497,"analysisWe need to classify as performance or non-performance. The PR title starts with ""perf:"" which indicates performance. The description: replacing tRPC caller with direct call to getEventTypeById. That likely improves performance by reducing network overhead. So it's performance. So label 'performance'.assistantfinalperformance",37,1.0,False

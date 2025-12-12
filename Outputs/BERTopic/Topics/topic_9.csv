@@ -1,0 +1,333 @@
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
+3185679015,3924,Improve join optimization,"## Summary
+- detect more equality cases in join condition, handling `+0`/`-0`
+- benchmark join with `+0` arithmetic to verify optimization
+
+## Testing
+- `go test ./... -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_685f6f460e188320906298a7c44ae3ad",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T02:43:12Z,2025-07-01T03:05:49Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3924,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve join optimization"". Summary: detect more equality cases in join condition, handling +0/-0, benchmark join with +0 arithmetic to verify optimization. This is about join optimization, likely performance improvement. Keywords: optimization, benchmark. So classify as 'performance'.assistantfinalperformance",9,1.0,False
+3241710800,9455,Improve PHP join compilation,"## Summary
+- compile left_join_multi/right_join/outer_join queries without `_query`
+- note PHP join improvements in README
+
+## Testing
+- `go test ./compiler/x/php -run TestPHPCompiler_VMValid_Golden -count=1 -tags=slow`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6879bc3a2b708320b51e0b494bd2c734",OpenAI_Codex,1218621,tamnd,closed,2025-07-18T03:24:48Z,2025-07-18T03:25:09Z,2025-07-18T03:25:09Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9455,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve PHP join compilation"". Summary: compile left_join_multi/right_join/outer_join queries without `_query`. Note PHP join improvements in README. This seems to be about compilation of PHP join queries, maybe performance improvement? The description: compile left_join_multi/right_join/outer_join queries without `_query`. That might be a performance improvement? It might be about compilation speed or runtime performance. But the title ""Improve PHP join compilation"" could be about performance of compilation. The summary says compile left_join_multi/right_join/outer_join queries without `_query`. That might reduce compile time or memory usage. But is it about performance? The PR might be about improving compilation of PHP join queries, which could be performance improvement. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The PR is about improving PHP join compilation. That likely is a performance improvement. There's no mention of memory, speed, latency, etc. But ""Improve PHP join compilation"" could be about making the compiler faster or more efficient. That is a performance improvement. So classify as 'performance'.
+
+Thus answer: performance.assistantfinalperformance",9,1.0,False
+3186409173,4004,Optimize inner joins,"## Summary
+- improve `compileJoinQuery` to pick smaller side for non-equality inner joins
+
+## Testing
+- `go test -tags slow ./... -update` *(fails: go run error: exit status 1)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_686177eacff08320b33533ff0f3ed0c7",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T17:47:36Z,2025-07-01T12:01:39Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4004,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize inner joins"". Summary: ""improve compileJoinQuery to pick smaller side for non-equality inner joins"". This is about performance optimization. So classification: performance.assistantfinalperformance",9,1.0,False
+3241758610,9484,Improve Clojure join compilation,"## Summary
+- optimize Clojure compiler by translating simple left/right/outer joins to direct comprehensions
+- regenerate outer_join machine translation without `_query` helper
+- update machine README checklist
+- note progress in Clojure TASKS
+
+## Testing
+- `go test -tags slow ./compiler/x/clj -run TestClojureCompiler_VMValid_Golden/outer_join -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6879c147cdfc832088f453a112e75963",OpenAI_Codex,1218621,tamnd,closed,2025-07-18T03:54:44Z,2025-07-18T03:55:13Z,2025-07-18T03:55:13Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9484,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Clojure join compilation"". Summary: optimize Clojure compiler by translating simple left/right/outer joins to direct comprehensions. That is a performance optimization. Keywords: optimize, performance. So classification: performance.assistantfinalperformance",9,1.0,False
+3186037018,3948,Optimize inner join in VM,"## Summary
+- tune inner join code generation
+- regenerate benchmark results
+- update join benchmark documentation
+
+## Testing
+- `go test ./...`
+- `go run cmd/mochi-bench/main.go`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_68611419206083209e3be1b1abf8c6b2",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T10:40:41Z,2025-07-01T03:06:08Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3948,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize inner join in VM"". Summary: tune inner join code generation, regenerate benchmark results, update join benchmark documentation. This is clearly performance optimization. So label 'performance'.assistantfinalperformance",9,1.0,False
+3184544966,3893,Improve VM join performance,"## Summary
+- optimize OpAppend to mutate lists in place when safe
+- update query compilation to use in-place append for joins
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_685f6a8120fc83208b4b3d7a0559b324",OpenAI_Codex,1218621,tamnd,closed,2025-06-28T04:16:33Z,2025-06-30T15:09:50Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3893,"analysisWe need to classify as 'performance' or 'non-performance'. The title: ""Improve VM join performance"". The body mentions optimizing OpAppend, update query compilation to use in-place append for joins. This is clearly performance improvement. So label 'performance'.assistantfinalperformance",9,1.0,False
+3240935078,280,Resolve db self-join memory bug,"Add comprehensive self-join tests to verify correct behavior and investigate a reported cartesian product bug.
+
+The bug report described self-joins causing memory exhaustion and cartesian products. These new tests, including scenarios with larger datasets and `limit`, demonstrate that the core `db` join logic correctly handles self-joins without producing cartesian products. This suggests the reported issue might stem from the `useLiveQuery` integration or an environment-specific factor, as the underlying join mechanism appears to be working as expected.",Cursor,31130,samwillis,closed,2025-07-17T21:15:07Z,2025-07-18T10:18:19Z,,946895816,https://api.github.com/repos/TanStack/db,https://github.com/TanStack/db/pull/280,"analysisWe need to classify as performance or non-performance. The PR title: ""Resolve db self-join memory bug"". Body: adding tests, investigating memory exhaustion, cartesian product bug. It's about memory bug, memory exhaustion. That is performance-related? Memory usage is a performance aspect. The description says memory exhaustion. That is a performance issue. So classify as 'performance'.assistantfinalperformance",9,1.0,True
+3216916039,6987,Optimize Clojure query helpers,"## Summary
+- add helpers for extracting join key expressions
+- emit join key functions in Clojure query compiler
+- speed up `_group_by` using transients
+- use hash join when key functions are provided in `_query`
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686ebd073530832087825b793466ef82",OpenAI_Codex,1218621,tamnd,closed,2025-07-09T19:25:09Z,2025-07-09T19:25:21Z,2025-07-09T19:25:21Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/6987,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize Clojure query helpers"". Summary: add helpers for extracting join key expressions, emit join key functions in Clojure query compiler, speed up `_group_by` using transients, use hash join when key functions are provided in `_query`. This is clearly performance improvements: speed up group_by, use hash join, etc. So classification: performance.assistantfinalperformance",9,1.0,False
+3227161026,8628,Add map-based left join in Go compiler,"## Summary
+- implement `eqJoinKeysTyped` helper for join key types
+- generate optimized map-based left join queries in the Go backend
+- regenerate Go machine output for left join programs
+- mark left join task complete
+- regenerate TPCH q1 Go code
+
+## Testing
+- `go test ./compiler/x/go -tags slow -run TPCH -update -count=1`
+- `go test ./compiler/x/go -tags slow -run ValidPrograms/left_join -update -count=1`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_687463f509e8832092aeadb4bfabfc56",OpenAI_Codex,1218621,tamnd,closed,2025-07-14T02:31:21Z,2025-07-14T02:31:42Z,2025-07-14T02:31:42Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/8628,"analysisWe need to classify whether the primary purpose of the pull request is to improve performance. The PR title: ""Add map-based left join in Go compiler"". The body describes implementing eqJoinKeysTyped helper, generating optimized map-based left join queries in Go backend, regenerating Go machine output for left join programs, marking left join task complete, regenerating TPCH q1 Go code. This is about adding map-based left join, which is an optimization for join queries. It likely improves performance of left join queries. The description mentions ""optimized map-based left join queries"". That is a performance improvement. So classification: 'performance'.
+
+Check if any other aspects: It's about adding map-based left join, which is a performance optimization. So yes, performance.assistantfinalperformance",9,1.0,True
+3227169343,8629,Enhance Go backend left join,"## Summary
+- improve Go compiler to special case left join with map lookup
+- regenerate machine output for left_join
+- regenerate tpch/q1 Go output
+- document update in TASKS
+
+## Testing
+- `go test ./compiler/x/go -run ValidPrograms/left_join -tags slow`
+- `go test ./compiler/x/go -run TestGoCompiler_TPCH/q1 -tags slow -update`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_68746832daa88320bfd1e0b391d558cb",OpenAI_Codex,1218621,tamnd,closed,2025-07-14T02:37:50Z,2025-07-14T02:38:21Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/8629,"analysisWe need to classify as performance or non-performance. The PR title: ""Enhance Go backend left join"". Summary: ""improve Go compiler to special case left join with map lookup"". That sounds like a performance optimization: special case left join with map lookup likely improves speed. Also ""regenerate machine output for left_join"" etc. So it's performance. So label 'performance'.assistantfinalperformance",9,1.0,False
+3186037439,3949,Optimize hash join code generation,"## Summary
+- reduce bytecode size for simple inner joins
+- add constant list length detection to skip unused branch
+
+## Testing
+- `go fmt ./...`
+- `go test ./...`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_686113de63cc8320a8cae6b023442f01",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T10:41:21Z,2025-06-29T10:41:37Z,2025-06-29T10:41:37Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3949,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize hash join code generation"". Summary: reduce bytecode size for simple inner joins, add constant list length detection to skip unused branch. This is about code generation optimization, likely performance improvement. Keywords: optimize, reduce bytecode size, skip unused branch. It's performance. So label 'performance'.assistantfinalperformance",9,1.0,False
+3216964251,7004,Optimize joins in Go backend,"## Summary
+- improve join logic in `compiler/x/go` runtime
+
+## Testing
+- `go test ./compiler/x/go -tags slow` *(fails: cannot use _ as value or type)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_686ec3cf542483208262312e9f190dbb",OpenAI_Codex,1218621,tamnd,closed,2025-07-09T19:48:47Z,2025-07-09T19:48:58Z,2025-07-09T19:48:58Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7004,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize joins in Go backend"". Summary: ""improve join logic in compiler/x/go runtime"". That sounds like performance improvement. Keywords: optimize, improve join logic. So it's performance. So output 'performance'.assistantfinalperformance",9,1.0,False
+3214278956,6520,Improve Go join compilation,"## Summary
+- improve go query compiler: detect simple left joins so helper is skipped
+- regenerate `left_join.go`
+- note new join behaviour in Go machine README
+
+## Testing
+- `go test ./compiler/x/go -tags slow`
+- `go test ./compiler/x/go -tags slow -run TestGoCompiler_ValidPrograms/left_join`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_686dc2fa08ac8320bece11662d1b2a58",OpenAI_Codex,1218621,tamnd,closed,2025-07-09T02:26:08Z,2025-07-09T02:26:26Z,2025-07-09T02:26:26Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/6520,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Go join compilation"". Summary: ""improve go query compiler: detect simple left joins so helper is skipped, regenerate left_join.go, note new join behaviour in Go machine README"". This is about compiler optimization: detect simple left joins so helper is skipped. That is a performance improvement: skipping helper likely speeds up compilation or runtime. So classify as 'performance'.assistantfinalperformance",9,1.0,False
+3214280822,6521,Improve Python join code generation,"## Summary
+- improve the Python backend to emit list comprehensions for inner joins
+- regenerate golden machine outputs for inner join programs
+- document new join handling in the Python machine README
+
+## Testing
+- `go test -tags slow ./compiler/x/python -run TestCompilePrograms -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686dc30703a883208c194f20cb79ae02",OpenAI_Codex,1218621,tamnd,closed,2025-07-09T02:27:09Z,2025-07-09T02:28:52Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/6521,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Improve Python join code generation"". Summary: improve Python backend to emit list comprehensions for inner joins, regenerate golden machine outputs, document new join handling. This is about code generation for Python backend, using list comprehensions for inner joins. That likely improves performance? List comprehensions are faster than loops? The PR is about generating more efficient code. But is it explicitly about performance? The description: ""improve the Python backend to emit list comprehensions for inner joins"". That is a performance improvement. The summary also mentions ""regenerate golden machine outputs for inner join programs"" and ""document new join handling"". The primary purpose is to improve performance of join code generation. So classification: performance.assistantfinalperformance",9,1.0,True
+3214281732,6522,Improve Elixir compiler join handling,"## Summary
+- generate joins without runtime helper when possible
+- print using `inspect` for better map handling
+- update Elixir machine outputs
+
+## Testing
+- `go test -tags slow ./compiler/x/ex`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686dc356b9d88320b85caae44d3a9d14",OpenAI_Codex,1218621,tamnd,closed,2025-07-09T02:27:47Z,2025-07-09T02:29:05Z,2025-07-09T02:29:05Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/6522,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Elixir compiler join handling"". Summary: generate joins without runtime helper when possible, print using inspect for better map handling, update Elixir machine outputs. This seems about compiler optimization, generating joins without runtime helper. That is a performance improvement? It might be about code generation, but not necessarily performance. The summary: ""generate joins without runtime helper when possible"" could reduce runtime overhead, thus performance. But is it about performance? The title ""Improve Elixir compiler join handling"" could be about correctness or code generation. The summary mentions ""print using inspect for better map handling"" which is about debugging output. ""update Elixir machine outputs"" maybe about output formatting. The key is ""generate joins without runtime helper when possible"" - that could reduce runtime overhead, thus performance. But the rest is about printing and outputs. The question: ""primary purpose of the pull request is to improve performance."" The PR seems to be about improving compiler join handling, which might be performance. But the summary also includes printing improvements. The primary purpose might be to improve performance by generating joins without runtime helper. That seems like a performance improvement. So classify as 'performance'.
+
+Check keywords: ""performance"" not present. But ""runtime helper"" might reduce runtime overhead. ""generate joins without runtime helper when possible"" is a performance improvement. So classification: performance.assistantfinalperformance",9,1.0,False
+3216930805,6993,Add hash join optimization for Go backend,"## Summary
+- extend Go runtime `_query` helper with optional hash join support
+- detect simple equality joins and emit `leftKey`/`rightKey` functions
+- new `eqJoinKeys` helper to recognise equality join predicates
+
+## Testing
+- `go test ./compiler/x/go -tags slow -run TestGoCompiler_ValidPrograms -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686ebcd8ecfc8320a0253441d3a464f9",OpenAI_Codex,1218621,tamnd,closed,2025-07-09T19:32:09Z,2025-07-09T19:32:24Z,2025-07-09T19:32:23Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/6993,"analysisWe need to classify as performance or non-performance. The PR title: ""Add hash join optimization for Go backend"". That is an optimization for query execution, likely performance improvement. The body mentions ""hash join optimization"", ""detect simple equality joins"", ""emit leftKey/rightKey functions"". This is about improving performance of query execution. So classification: performance.assistantfinalperformance",9,0.513956531217495,False
+3216962602,7003,Improve TS query compile,"## Summary
+- add hash-based join helper in TS runtime
+- detect simple equality joins to use hashed join
+- expose joinEqFields helper
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686ebcf0eeb88320848cda5d4534bc8c",OpenAI_Codex,1218621,tamnd,closed,2025-07-09T19:48:00Z,2025-07-09T19:48:11Z,2025-07-09T19:48:11Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7003,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Improve TS query compile"". Body: adds hash-based join helper, detect simple equality joins to use hashed join, expose joinEqFields helper. This is about query compile, likely performance improvement. Keywords: ""hash-based join helper"" suggests optimization. So classify as 'performance'.assistantfinalperformance",9,0.4741821479742636,False
+3183195813,3870,Improve TPCH query compilation,"## Summary
+- add `_hash_combine` runtime helper for hashing struct keys
+- track element types for query variables when compiling
+- generate struct keys for grouped queries when the key is a map literal
+
+## Testing
+- `go test ./... -tags=slow` *(fails: signal interrupt)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_685eaef2a7948320bb16d7ecb29e4d9a",OpenAI_Codex,1218621,tamnd,closed,2025-06-27T15:20:18Z,2025-06-27T15:24:55Z,2025-06-27T15:24:55Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3870,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve TPCH query compilation"". Body: mentions adding runtime helper for hashing struct keys, track element types for query variables when compiling, generate struct keys for grouped queries when key is a map literal. This seems about compilation improvements, maybe performance? It might be about query compilation speed or memory usage? The description doesn't mention speed, latency, optimization explicitly. It's about query compilation improvements, maybe to reduce compile time or memory usage. But the classification guidelines: performance-related PRs may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs.
+
+The body does not contain those keywords. It mentions ""Improve TPCH query compilation"" which could be about performance of query compilation. But no explicit performance keyword. The guidelines say performance-related PRs may contain keywords such as... or any other terms referring to how faster and efficiently software runs. The phrase ""Improve TPCH query compilation"" could be considered performance improvement. But it's ambiguous. The guidelines: ""Performance-related pull requests may contain keywords such as... or any other terms referring to how faster and efficiently software runs."" So if the PR is about improving compilation, that is a performance improvement. But the guidelines also say ""or any other terms referring to how faster and efficiently software runs."" The phrase ""Improve TPCH query compilation"" is indeed about improving compilation, which is a performance aspect. But the guidelines might want explicit mention of performance. However, the phrase ""Improve TPCH query compilation"" is a direct statement of improvement. It might be considered performance. But the guidelines mention ""or any other terms referring to how faster and efficiently software runs."" So ""Improve TPCH query compilation"" is indeed a term referring to performance. So likely classify as performance.
+
+But let's consider if it's about correctness or feature addition. The changes: add runtime helper for hashing struct keys, track element types for query variables when compiling, generate struct keys for grouped queries when key is a map literal. This is about query compilation, maybe to reduce compile time or memory usage. It's not about adding new features or bug fixes. It's about improving compilation. That is a performance improvement. So classification: performance.
+
+Thus answer: performance.assistantfinalperformance",9,0.46613416462693796,False
+3202763859,5067,Improve Python compiler list operations,"## Summary
+- reduce use of runtime helpers for `union`, `union_all`, `except` and `intersect`
+- infer resulting list element type when possible
+
+## Testing
+- `go test ./... --vet=off -run TestPyCompiler_SubsetPrograms -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6867d5cdcb3c8320b49589ac64cc4233",OpenAI_Codex,1218621,tamnd,closed,2025-07-04T13:31:50Z,2025-07-04T13:32:03Z,2025-07-04T13:32:03Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/5067,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Python compiler list operations"". Summary: reduce use of runtime helpers for union, union_all, except and intersect; infer resulting list element type when possible. This seems to be about compiler optimization, reducing runtime overhead, improving performance. Keywords: reduce use of runtime helpers, infer type. This is performance improvement. So label 'performance'.assistantfinalperformance",9,0.4054907258713435,False
+3242128024,9492,Improve Python compiler list set ops,"## Summary
+- optimize list set operations by unwrapping optional types before deciding whether helpers are needed
+- update compiler test helper indentation
+- regenerate Python machine outputs
+- document recent compiler changes
+
+## Testing
+- `go test -tags slow ./compiler/x/python -run TestPythonCompiler_VMValid_Golden -count=1` *(fails: golden mismatch for several programs)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_6879c6469d8c83208026d01713bd6f9b",OpenAI_Codex,1218621,tamnd,closed,2025-07-18T06:49:11Z,2025-07-18T06:49:28Z,2025-07-18T06:49:28Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9492,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Python compiler list set ops"". Summary: ""optimize list set operations by unwrapping optional types before deciding whether helpers are needed"". That is about optimization, performance. Also mentions ""regenerate Python machine outputs"" maybe not performance. But the main change is optimizing list set operations. So it's performance. So label 'performance'.assistantfinalperformance",9,0.39078868206669765,False
+3186007005,3945,Improve join performance with hashed left join,"## Summary
+- add hash-based optimization for left joins
+- regenerate left join IR after optimization
+- update join benchmarks to reflect faster joins
+
+## Testing
+- `go run ./cmd/mochi run tests/vm/valid/inner_join.mochi --ir` *(fails: unknown flag)*
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_68610e47c0148320adf72b2fe8c94159",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T10:11:15Z,2025-06-29T10:23:01Z,2025-06-29T10:23:01Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3945,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve join performance with hashed left join"". Summary: add hash-based optimization for left joins, regenerate left join IR after optimization, update join benchmarks to reflect faster joins. This is clearly performance improvement. So label 'performance'.assistantfinalperformance",9,0.2644608294825942,False
+3186315425,3985,Add hashed outer join optimization,"## Summary
+- optimize join handling by adding `compileHashOuterJoin`
+- regenerate IR outputs for dataset JOB and VM tests
+
+## Testing
+- `go test -tags slow ./tests/vm -run TestVM_IR -update`
+- `go run ./tools/update_job/main.go`
+- `go run ./tools/update_tpch/main.go` *(fails: index out of range)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_686163e02c688320885f98c03e2e9e81",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T16:14:00Z,2025-07-01T12:01:57Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3985,"analysisWe need to classify as performance or non-performance. The PR title: ""Add hashed outer join optimization"". Summary: ""optimize join handling by adding compileHashOuterJoin"". That is a performance optimization. So label 'performance'.assistantfinalperformance",9,0.23396824650954662,False
+3186381329,4002,Optimize outer join in VM,"## Summary
+- implement compileHashOuterJoin for hashed full outer join
+- wire outer join optimization into compileJoinQuery
+- document benchmark update for outer joins
+- regenerate `outer_join.ir.out`
+
+## Testing
+- `go build ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6861722f141883208bff79fcb7c95f04",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T17:25:32Z,2025-06-29T17:26:25Z,2025-06-29T17:26:25Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4002,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize outer join in VM"". Summary: implement compileHashOuterJoin for hashed full outer join, wire outer join optimization into compileJoinQuery, document benchmark update for outer joins, regenerate outer_join.ir.out. This is about optimizing outer join, likely performance improvement. Keywords: optimize, performance, compileHashOuterJoin, benchmark update. So classification: performance.assistantfinalperformance",9,0.22585460969210946,False
+3186305026,3979,Improve VM join optimizer,"## Summary
+- add hashed right join implementation
+- regenerate IR golden for right join query
+
+## Testing
+- `go test ./tests/vm -tags slow -run '^TestVM_IR/right_join$' -update`
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6861603fabc083208abf08472e70a251",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T16:01:05Z,2025-06-29T16:01:18Z,2025-06-29T16:01:18Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3979,"analysisWe need to classify whether the primary purpose is performance. The title: ""Improve VM join optimizer"". Summary: add hashed right join implementation, regenerate IR golden for right join query. This seems to be about adding a new join implementation, likely for performance. The description: ""Improve VM join optimizer"" suggests performance improvement. The keywords: ""hash"" join is usually for performance. The test mentions ""slow"" tag. But the primary purpose is to improve performance of join optimizer. So classification: performance.assistantfinalperformance",9,0.2061467861590623,False
+3142771614,2267,Improve SortedSet union,"## Summary
+- optimize `union` in SortedSet
+- avoid re-counting elements by tracking size during tree copy/merge
+
+## Testing
+- `moon fmt`
+- `moon info`
+- `moon test`
+
+------
+https://chatgpt.com/codex/tasks/task_e_684bd59b9ccc8320b5e9a44429fe1b2b",OpenAI_Codex,747051,bobzhang,open,2025-06-13T08:46:02Z,,,749681472,https://api.github.com/repos/moonbitlang/core,https://github.com/moonbitlang/core/pull/2267,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve SortedSet union"". Summary: ""optimize `union` in SortedSet avoid re-counting elements by tracking size during tree copy/merge"". This is about performance optimization. So classification: performance.assistantfinalperformance",9,0.1384423249836212,False
+3186433660,4011,Improve VM join compilation,"## Summary
+- add constant-empty checks before join compilation
+- generate simple nil-right loops for constant empty right side in left join
+- update golden IR outputs
+
+## Testing
+- `go test ./tests/vm -tags slow -run TestVM_IR -update`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6861820b3bfc8320989233ffc16bf14b",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T18:19:28Z,2025-07-01T12:01:37Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4011,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve VM join compilation"". Body: adds constant-empty checks before join compilation, generate simple nil-right loops for constant empty right side in left join, update golden IR outputs. This seems to be about improving compilation of join operations in VM. Is that performance? It might be about improving compilation speed or runtime performance? The description: ""add constant-empty checks before join compilation"" and ""generate simple nil-right loops for constant empty right side in left join"". This likely improves runtime performance of join operations by generating simpler loops when right side is empty. That is a performance improvement. The PR is about improving VM join compilation, which likely reduces runtime overhead. So classify as 'performance'.
+
+Check keywords: ""performance"" not present but ""join compilation"" might be compile-time optimization. But the description indicates runtime improvement. So classification: performance.assistantfinalperformance",9,0.13164627816088822,False
+3185988908,3943,Optimize VM join loops,"## Summary
+- optimize join loops in `runtime/vm` with `OpLessInt` and cached null constants
+- update join benchmarks
+- regenerate IR golden files for VM tests
+- fold VM constant expressions without importing the interpreter
+
+## Testing
+- `go test ./tests/vm -tags slow -run TestVM_IR -update`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6860fd4253048320b7a9b041def55989",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T09:57:37Z,2025-06-29T09:58:13Z,2025-06-29T09:58:13Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3943,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize VM join loops"". Summary: optimize join loops in runtime/vm with OpLessInt and cached null constants, update join benchmarks, regenerate IR golden files, fold VM constant expressions. This is about performance optimization. Keywords: optimize, benchmarks, performance. So classification: performance.assistantfinalperformance",9,0.1311181758343889,False
+3186235764,3969,Optimize set operations in VM,"## Summary
+- improve runtime performance of `Union`, `Except`, and `Intersect` opcodes by using map-based lookups
+- regenerate VM IR golden files
+
+## Testing
+- `go test ./...`
+- `go test -tags slow ./tests/vm -run TestVM_IR -update --vet=off`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_686141e352588320961acbdd4321c4fa",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T14:41:31Z,2025-06-29T14:41:46Z,2025-06-29T14:41:46Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3969,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize set operations in VM"". Summary: improve runtime performance of Union, Except, Intersect opcodes by using map-based lookups. That is clearly performance improvement. So label 'performance'.assistantfinalperformance",9,0.11801277430494664,False
+3186289712,3974,Implement jump threading optimization,"## Summary
+- add `foldJumpChains` to collapse chains of jumps in the VM optimizer
+- update a few IR goldens affected by the new optimization
+
+## Testing
+- `go test ./...`
+- `go test ./tests/vm -tags slow -run TestVM_IR -update`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_68615b6441988320883c603ef962eaa3",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T15:42:14Z,2025-06-29T15:42:30Z,2025-06-29T15:42:30Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3974,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Implement jump threading optimization"". That sounds like an optimization to improve performance. The body: ""add foldJumpChains to collapse chains of jumps in the VM optimizer update a few IR goldens affected by the new optimization"". This is about optimizing VM jumps, likely performance. So classification: performance.assistantfinalperformance",9,0.10124097205995089,False
+3276217466,14939,Refactor json-ast go nodes,"## Summary
+- make Go json-ast nodes omit positions unless `IncludePositions` is enabled
+- regenerate Go cross_join AST without position info
+
+## Testing
+- `go test -tags slow ./tools/json-ast/x/go`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6889d82efa60832099ae07638fcec6bf",OpenAI_Codex,1218621,tamnd,closed,2025-07-30T08:52:21Z,2025-07-30T08:52:32Z,2025-07-30T08:52:32Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/14939,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Refactor json-ast go nodes"". Summary: ""make Go json-ast nodes omit positions unless IncludePositions is enabled; regenerate Go cross_join AST without position info"". This seems to be about reducing memory usage or performance? Omit positions reduces memory footprint, maybe performance. But is it performance? The description: ""omit positions unless IncludePositions is enabled"" - that could be a performance optimization, but also a feature change. The cross_join AST regeneration without position info also reduces memory. The question: is the primary purpose to improve performance? It seems like a refactor to reduce memory usage and maybe speed. But is it explicitly about performance? The keywords: ""omit positions"" might reduce memory usage, but not necessarily speed. The PR might be about reducing memory usage, but that is a performance improvement. The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, etc. This PR does not contain those keywords. But the content indicates memory usage reduction. But the guidelines say ""or any other terms referring to how faster and efficiently software runs."" The PR is about omitting positions, which reduces memory usage, but not necessarily speed. But memory usage is a performance aspect. The guidelines mention memory. So this could be considered performance. However, the PR is more about refactoring and feature change. The primary purpose might be to reduce memory usage, which is a performance improvement. So classification: performance.assistantfinalperformance",9,0.07022380130721669,False
+3275629277,14800,Lowercase tags; drop method body,"## Summary
+- remove the `body` slice from `Method` in the C# AST inspector
+- regenerate all C# golden AST files without the `body` field
+
+## Testing
+- `go test ./tools/json-ast/x/cs -tags slow -update`
+- `go test ./tools/json-ast/x/cs -tags slow`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_688986924e308320940d6a32f3905abf",OpenAI_Codex,1218621,tamnd,closed,2025-07-30T04:29:48Z,2025-07-30T04:30:23Z,2025-07-30T04:30:23Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/14800,"analysisWe need to classify whether the primary purpose is performance. The PR removes the body slice from Method in C# AST inspector, and regenerates golden AST files. This is about reducing memory usage? Removing body slice might reduce memory footprint, but is it performance? The description: ""Lowercase tags; drop method body"". The body slice likely contains method body AST nodes. Removing it reduces memory usage and maybe speed of parsing/generation. But is it about performance? The tags mention ""slow"" tests. They are updating golden AST files. The change is to drop method body to reduce memory usage? The description: ""remove the body slice from Method in the C# AST inspector"". That is a structural change. It might be to reduce memory usage or speed up AST generation. But the primary purpose? The PR is about dropping method body to reduce memory usage? The tags: ""slow"" tests. They are updating golden AST files. The change is not explicitly about performance, but about memory usage. The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, etc. The title: ""Lowercase tags; drop method body"". The body: ""remove the body slice from Method in the C# AST inspector"". That is a memory optimization. The guidelines mention memory as a keyword. So this is performance. So classify as 'performance'.assistantfinalperformance",9,0.057160297833114784,False

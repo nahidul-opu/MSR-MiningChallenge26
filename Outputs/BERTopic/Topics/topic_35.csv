@@ -1,0 +1,336 @@
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
+3168705723,1636,Implement retry-after header handling for improved throttling in fetch requests,"Currently, genaiscript handles throttling situations but does not respect the `retry-after` header returned by services. This leads to unnecessary load on throttled services and suboptimal user experience with exponential backoff delays that may be longer than needed.
+
+## Changes Made
+
+This PR implements proper `retry-after` header handling in the fetch retry logic:
+
+### 1. Added `parseRetryAfter()` function
+- Supports both integer seconds format: `retry-after: 120` 
+- Supports HTTP date format: `retry-after: Fri, 31 Dec 1999 23:59:59 GMT`
+- Handles edge cases: negative values, invalid inputs, past dates, whitespace
+- Returns `null` for invalid inputs to fallback to exponential backoff
+
+### 2. Enhanced retry logic in `createFetch()`
+- Checks for `retry-after` header in HTTP responses during retries
+- Uses server-specified delay instead of calculated exponential backoff when available
+- Falls back to existing exponential backoff when no `retry-after` header is present
+- Respects `maxDelay` configuration to prevent excessive waits
+
+### 3. Improved user transparency
+- Displays retry-after information in log messages
+- Format: `retry #1 in 120.0s (retry-after: 120s)` vs `retry #1 in 2.0s`
+- Users can now see the actual reason and duration for delays
+
+## Example Behavior
+
+**Before:**
+```
+retry #1 in 2.0s 429 Too Many Requests
+retry #2 in 3.0s 429 Too Many Requests  
+retry #3 in 4.5s 429 Too Many Requests
+```
+
+**After (with retry-after: 60):**
+```
+retry #1 in 60.0s (retry-after: 60s) 429 Too Many Requests
+```
+
+## Benefits
+
+- ✅ Reduces unnecessary load on throttled services by respecting server timing
+- ✅ Provides transparency to users about wait times and reasons
+- ✅ Maintains full backward compatibility with existing retry behavior
+- ✅ Handles common throttling scenarios (HTTP 429, 503, etc.)
+- ✅ RFC 7231 compliant retry-after header parsing
+
+## Testing
+
+Added comprehensive unit tests covering:
+- Integer seconds parsing (`""120""` → 120 seconds)
+- HTTP date parsing (future dates with proper time calculation)
+- Edge cases (negative values, invalid strings, past dates)
+- Whitespace handling and input validation
+
+Fixes #1629.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `cdn.sheetjs.com`
+>   - Triggering command: `node /usr/local/bin/yarn install ` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-23T16:02:38Z,2025-06-23T16:41:07Z,2025-06-23T16:41:07Z,679784368,https://api.github.com/repos/microsoft/genaiscript,https://github.com/microsoft/genaiscript/pull/1636,"analysisWe need to classify whether the primary purpose of the pull request is to improve performance. The PR adds retry-after header handling for throttling. Does that improve performance? It reduces unnecessary load and improves user experience. It's about throttling, not directly performance optimization. But it could be considered performance improvement: it reduces load, reduces wait times, improves throughput. The description says ""improved throttling"" and ""reduces unnecessary load"" and ""provides transparency"". It's about handling server-specified delays. It's not about optimizing code speed or memory usage. But it's about network performance. The classification guidelines: performance-related PRs may contain keywords like latency, optimization, slow, memory, speed, etc. This PR mentions ""retry-after header handling for improved throttling"" and ""reduces unnecessary load"" and ""suboptimal user experience with exponential backoff delays"". It is about improving performance by respecting server delays. It might be considered performance. The guidelines say performance-related PRs may contain keywords such as latency, optimization, slow, memory, speed, etc. This PR does not contain those keywords. But it does mention ""performance"" in the benefits: ""Maintains full backward compatibility with existing retry behavior"". It says ""Fixes #1629"". The title: ""Implement retry-after header handling for improved throttling in fetch requests"". That is about throttling, not performance. But it could be considered performance improvement. The guidelines: ""Performance-related pull requests may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs."" The PR contains ""performance"" in the benefits. But the main focus is throttling. It's not about speed or memory. But it does reduce wait times. The guidelines are ambiguous. I'd lean that it's a performance improvement because it reduces wait times and load. But the title doesn't mention performance. The body mentions ""improved throttling"" and ""suboptimal user experience with exponential backoff delays"". That is about performance. I'd classify as 'performance'.assistantfinalperformance",35,1.0,True
+3242174192,6617,feat: implement async timeout for segments with cache support,"## Overview
+
+This PR implements asynchronous segment execution with caching support to address performance issues in large repositories, specifically targeting issue #6094. The feature allows segments to execute with configurable timeouts, using cached data when operations exceed the threshold while updating the cache in the background.
+
+## Problem
+
+Users working with large monorepos experience slow prompt rendering due to expensive operations like `git status` that can take several seconds. Current workarounds involve disabling status checks, which sacrifices important information in the prompt.
+
+## Solution
+
+### Core Features
+
+1. **Async Timeout Configuration**: New `async_timeout` field for segments
+2. **Intelligent Caching**: Cached segment data with background refresh
+3. **Graceful Fallback**: Use cached data when operations exceed timeout
+4. **Background Updates**: Non-blocking cache refresh for next prompt
+
+### Implementation Details
+
+- **Configuration**: Added `async_timeout` field to segment configuration (in nanoseconds)
+- **Cache Management**: New `AsyncSegmentCache` system for persistent segment data
+- **Background Processes**: Automatic cache refresh without blocking prompt rendering
+- **CLI Support**: Cache management commands for debugging and maintenance
+
+### Usage Example
+
+```json
+{
+  ""type"": ""git"",
+  ""style"": ""plain"",
+  ""async_timeout"": 100,
+  ""properties"": {
+    ""fetch_status"": true
+  }
+}
+```
+
+## How It Works
+
+1. **First Run**: Segment executes normally, result is cached
+2. **Subsequent Runs**: 
+   - If execution completes within timeout → use fresh data, update cache
+   - If execution exceeds timeout → use cached data, start background refresh
+3. **Background Refresh**: Cache is updated asynchronously for next prompt
+
+## Benefits
+
+- **Instant Prompts**: Cached data provides immediate rendering
+- **Fresh Data**: Background updates ensure information stays current
+- **Configurable**: Per-segment timeout configuration
+- **Backward Compatible**: Existing configurations work unchanged
+
+## Testing
+
+- ✅ Unit tests for async timeout configuration
+- ✅ Cache management functionality tests
+- ✅ Integration tests with git segments
+- ✅ CLI command validation
+- ✅ Configuration loading from JSON/YAML
+
+## Files Changed
+
+- `src/config/segment.go` - Core async execution logic
+- `src/cache/async.go` - Async cache management system
+- `src/cli/cache.go` - CLI cache refresh commands
+- `src/config/async_test.go` - Comprehensive test suite
+- `src/config/async_config_test.go` - Configuration loading tests
+
+## Migration
+
+No breaking changes. The feature is opt-in via the new `async_timeout` configuration field.
+
+## Future Enhancements
+
+This implementation provides the foundation for the full async prompt system mentioned in #6094. Future work could include:
+- Shell-specific async prompt integration
+- Advanced cache invalidation strategies
+- Performance monitoring and metrics
+
+Closes #6094
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `ohmyposh.dev`
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-07-18T07:09:18Z,,,175405157,https://api.github.com/repos/JanDeDobbeleer/oh-my-posh,https://github.com/JanDeDobbeleer/oh-my-posh/pull/6617,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""feat: implement async timeout for segments with cache support"". The body describes async timeout, caching, to address performance issues, slow prompt rendering, etc. Keywords: performance, slow, async, caching, instant prompts, etc. So it's performance. So output 'performance'.assistantfinalperformance",35,1.0,True
+3228266614,7288,Implement exponential backoff for Copilot refresh after commenting on Padawan PRs,"When commenting on Copilot-assigned PRs, the timeline refresh now uses exponential backoff with early exit detection to show newly launched Copilot sessions more responsively.
+
+## Problem
+
+Previously, when a user commented on a Copilot-assigned PR, the extension would wait a fixed 1 second before refreshing the timeline to show the newly launched Copilot session. This caused delays since it takes time to determine and launch the session on GitHub.com.
+
+## Solution
+
+Implemented exponential backoff with retry intervals of 500ms, 1s, 2s, and 5s that:
+
+- **Captures initial timeline state** before starting retries
+- **Polls for new `CopilotStarted` events** on each retry
+- **Exits early** when a new Copilot session is detected
+- **Gracefully handles errors** during timeline fetching
+- **Falls back to single refresh** if no new events are found
+
+## Key Benefits
+
+- **Faster response** when Copilot sessions start quickly (500ms vs 1s minimum)
+- **Better user experience** by showing sessions immediately when available
+- **Server-friendly** with reasonable retry intervals that avoid excessive load
+- **Maintains reliability** with fallback behavior
+- **Backwards compatible** with existing functionality
+
+## Implementation Details
+
+The `tryScheduleCopilotRefresh` method in `src/github/issueOverview.ts` now:
+
+```typescript
+// Before: Fixed 1-second wait
+await new Promise(resolve => setTimeout(resolve, 1000));
+if (!this._isDisposed) {
+    this.refreshPanel();
+}
+
+// After: Exponential backoff with early exit
+const delays = [500, 1000, 2000, 5000];
+for (const delay of delays) {
+    await new Promise(resolve => setTimeout(resolve, delay));
+    
+    const currentTimeline = await this._getTimeline();
+    const currentCopilotStartedEvents = currentTimeline.filter(event => 
+        event.event === EventType.CopilotStarted);
+    
+    if (currentCopilotStartedEvents.length > initialCopilotStartedEvents.length) {
+        this.refreshPanel();
+        return; // Early exit when new event found
+    }
+}
+```
+
+## Testing
+
+- Added comprehensive unit tests covering edge cases
+- Verified exponential backoff timing and early exit logic
+- Confirmed backwards compatibility with existing behavior
+- All existing tests continue to pass
+
+Fixes #7231.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-14T10:36:18Z,2025-07-14T18:47:52Z,2025-07-14T18:47:52Z,134777298,https://api.github.com/repos/microsoft/vscode-pull-request-github,https://github.com/microsoft/vscode-pull-request-github/pull/7288,"analysisWe need to classify the pull request as 'performance' or 'non-performance'. The PR implements exponential backoff for Copilot refresh after commenting on Padawan PRs. The key benefit: faster response, better user experience. It's about improving responsiveness, reducing delay. That is a performance improvement. The description mentions ""Faster response"" and ""Better user experience"" and ""Server-friendly"". It's about reducing wait times. So it's performance. So label 'performance'.assistantfinalperformance",35,1.0,True
+3088454350,694,[alpha_factory] add LRU cache size limit,"## Summary
+- implement size-capped OrderedDict cache in `llm_provider`
+- document `AF_LLM_CACHE_SIZE` in code and README
+- verify LRU eviction via new unit test
+
+## Testing
+- `python check_env.py --auto-install`
+- `pytest -q`",OpenAI_Codex,24208299,MontrealAI,closed,2025-05-24T13:17:35Z,2025-05-24T13:17:45Z,2025-05-24T13:17:45Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/694,"analysisWe need to classify as performance or non-performance. The PR adds LRU cache size limit, which is about memory usage and eviction policy. It's about limiting cache size, which is a performance improvement? It might be about memory usage, but also about performance. The instruction says performance-related PRs may contain keywords like memory, optimization, leak, speed, perf, etc. This PR mentions LRU cache size limit, which is about memory usage. That is a performance improvement. So classify as 'performance'.assistantfinalperformance",35,1.0,False
+3104683212,1245,[alpha_factory] optimize rate limiter,"## Summary
+- use TTLCache+deque for SimpleRateLimiter
+- adjust demos and tests
+- add regression test for throttling
+
+## Testing
+- `python check_env.py --auto-install`
+- `pre-commit run --files src/interface/api_server.py alpha_factory_v1/demos/alpha_agi_insight_v1/src/interface/api_server.py tests/test_rate_limiter_eviction.py tests/test_api_server_static.py` *(fails: could not fetch black)*
+- `mypy --config-file mypy.ini src/interface/api_server.py alpha_factory_v1/demos/alpha_agi_insight_v1/src/interface/api_server.py tests/test_rate_limiter_eviction.py tests/test_api_server_static.py` *(fails: many errors)*
+- `pytest -q tests/test_rate_limiter_eviction.py tests/test_api_server_static.py`
+
+------
+https://chatgpt.com/codex/tasks/task_e_683a659fc3748333bf8a6dbe3a466de4",OpenAI_Codex,24208299,MontrealAI,closed,2025-05-31T02:23:30Z,2025-05-31T02:23:59Z,2025-05-31T02:23:59Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1245,"analysisWe need to classify as performance or non-performance. The PR title: ""[alpha_factory] optimize rate limiter"". Summary: use TTLCache+deque for SimpleRateLimiter, adjust demos and tests, add regression test for throttling. This is about optimizing rate limiter, likely performance improvement. Keywords: optimize, rate limiter, TTLCache, deque. It's about performance. So classification: performance.assistantfinalperformance",35,1.0,False
+3253128073,95,Modify exit to throttle on bandwidth exhaustion,"## Summary
+- add fallback mode without exposing governor types
+- create fallback limiter via `with_fallback`
+- throttle using fallback rate when paid bandwidth is exhausted
+
+## Testing
+- `cargo check -p geph5-exit`
+- `cargo test -p geph5-exit -- --help`
+
+
+------
+https://chatgpt.com/codex/tasks/task_b_687fa69770b8833381b6d4afa2c42b46",OpenAI_Codex,20490891,nullchinchilla,closed,2025-07-22T15:22:31Z,2025-07-22T15:23:40Z,2025-07-22T15:23:40Z,758681331,https://api.github.com/repos/geph-official/geph5,https://github.com/geph-official/geph5/pull/95,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Modify exit to throttle on bandwidth exhaustion"". Summary: add fallback mode, create fallback limiter via with_fallback, throttle using fallback rate when paid bandwidth is exhausted. This is about throttling bandwidth, controlling rate, fallback limiter. It's about performance? It's about controlling bandwidth usage, maybe to avoid overuse. It's about throttling, which is a performance-related change? It might be about resource usage, but it's not necessarily performance improvement. It's more about bandwidth management, maybe to avoid hitting limits. The keywords: throttle, bandwidth, fallback, limiter. The classification: performance or non-performance. The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. This PR is about throttling on bandwidth exhaustion. It's about limiting bandwidth usage, not necessarily improving performance. It's more about resource management. It might be considered performance? The guidelines say performance-related PRs may contain keywords such as throughput. Throughput is a keyword. The PR mentions ""throttle using fallback rate when paid bandwidth is exhausted"". That is about throughput. So it might be considered performance. But is it about improving performance? It's about controlling bandwidth usage to avoid hitting limits. It's more about resource usage, not necessarily performance improvement. But the guidelines say performance-related PRs may contain keywords such as throughput. So we should classify as performance. The primary purpose: throttle on bandwidth exhaustion. That is about controlling throughput. So likely performance. I'll classify as 'performance'.assistantfinalperformance",35,1.0,False
+3243098553,300,Add cache size limit support,"## Summary
+- implement `cache_size_limit` and `replacement_policy` parameters
+- default to LRU policy and enforce limit in memory core
+- document cache size limiting in README
+- test LRU eviction behaviour
+- update default params test
+
+## Testing
+- `ruff check .`
+- `mypy src/cachier`
+- `pytest -m ""memory or pickle"" --cov=cachier --cov-report=term`
+- `./scripts/test-local.sh all` *(fails: Docker is not installed)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_687a30b9d6dc8323931ef5c545e0c3bb",OpenAI_Codex,917954,shaypal5,open,2025-07-18T12:37:46Z,,,66466789,https://api.github.com/repos/python-cachier/cachier,https://github.com/python-cachier/cachier/pull/300,"analysisWe need to classify whether the primary purpose of the pull request is to improve performance. The PR adds cache size limit support, LRU policy, eviction behavior, etc. This is about memory usage and eviction policy. It might be considered performance improvement? The description: ""implement cache_size_limit and replacement_policy parameters, default to LRU policy and enforce limit in memory core, document cache size limiting, test LRU eviction behaviour, update default params test."" This is about memory usage and eviction, which is performance-related. The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. The PR mentions memory, cache size limit, LRU eviction. That is about memory usage and performance. So classify as 'performance'.
+
+Thus output: performance.assistantfinalperformance",35,1.0,False
+3274990408,410,Add runtime rate target config,"## Summary
+- add `RuntimeConfig` with `rate_target_hz`
+- propagate runtime config in `CuConfig`
+- store runtime config in `CuRuntime`
+- enforce rate target in generated `run` loop
+- showcase rate target in new `cu_rate_target` example
+
+## Testing
+- `cargo check -p cu-rate-target`
+- `cargo test -p cu29-runtime --no-run`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_688933dc67cc8330b6bb6971073465c6",OpenAI_Codex,975564,gbin,closed,2025-07-29T21:06:22Z,2025-07-30T02:12:42Z,2025-07-30T02:12:42Z,290790298,https://api.github.com/repos/copper-project/copper-rs,https://github.com/copper-project/copper-rs/pull/410,"analysisWe need to classify whether the primary purpose is performance. The PR adds runtime rate target config, enforce rate target in run loop. This is about controlling rate, likely performance tuning. It mentions rate target, enforce rate target, showcase example. This is about performance? It's about controlling runtime rate, maybe to improve performance or to enforce a target. The keywords: ""rate target"", ""enforce"", ""runtime config"". The classification: performance. The PR is about adding a config to enforce a rate target, which is a performance-related change. So label 'performance'.assistantfinalperformance",35,1.0,False
+3089612967,892,Use LRU cache for preprocess,"## Summary
+- speed up token preprocessing with `functools.lru_cache`
+- add `PREPROCESS_CACHE_SIZE` setting
+
+## Testing
+- `pytest -q`",OpenAI_Codex,1231232,jdesboeufs,closed,2025-05-25T22:20:49Z,2025-06-01T21:24:58Z,,28606501,https://api.github.com/repos/addok/addok,https://github.com/addok/addok/pull/892,"analysisWe need to classify as performance or non-performance. The PR title: ""Use LRU cache for preprocess"". Summary: ""speed up token preprocessing with functools.lru_cache"". That is clearly performance improvement. So label 'performance'.assistantfinalperformance",35,1.0,False
+3228424652,2437,Limit wait action to 10 seconds,"Cap the wait action at a maximum of 10 seconds to prevent excessively long waits.
+
+---
+
+[Slack Thread](https://browser-use.slack.com/archives/D092QUQDC56/p1752492155090079?thread_ts=1752492155.090079&cid=D092QUQDC56)
+    
+<!-- This is an auto-generated description by cubic. -->
+---
+
+## Summary by cubic
+Limited the wait action to a maximum of 10 seconds to prevent long delays and updated the action description to show this cap.
+
+- **Bug Fixes**
+  - Capped wait time at 10 seconds, with clear logging when the limit is applied.
+
+<!-- End of auto-generated description by cubic. -->
+
+",Cursor,22038471,mertunsall,closed,2025-07-14T11:27:13Z,2025-07-14T11:40:38Z,2025-07-14T11:40:37Z,881458615,https://api.github.com/repos/browser-use/browser-use,https://github.com/browser-use/browser-use/pull/2437,"analysisWe need to classify as performance or non-performance. The PR is about limiting wait action to 10 seconds to prevent excessively long waits. This is about performance? It's about preventing long delays, but it's more about limiting wait time, which is a bug fix to avoid long waits. It could be considered performance improvement? The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs.
+
+The PR includes ""wait"" and ""long delays"" and ""prevent excessively long waits"". That is about performance. So classify as 'performance'.assistantfinalperformance",35,1.0,False

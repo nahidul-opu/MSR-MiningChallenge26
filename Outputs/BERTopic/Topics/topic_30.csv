@@ -1,0 +1,549 @@
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
+3239748118,4407,Fix Python test timeouts in full matrix CI workflow,"## Problem
+
+Python tests were timing out in the full matrix CI workflow, causing build failures. The issue occurred because:
+
+1. **Full matrix mode runs tests with both async backends sequentially** - Tests run with both `--async-backend=asyncio` and `--async-backend=trio`, effectively doubling execution time
+2. **Insufficient timeout allowance** - The 60-minute timeout was inadequate for the expanded test matrix
+3. **Suboptimal client timeout configurations** - Default timeouts were not optimized for CI environments
+
+## Solution
+
+### 1. Increased CI Job Timeouts
+- Bumped timeout from 60 to 90 minutes for all Python test jobs in the full matrix workflow:
+  - `test-python`
+  - `test-pubsub-python` 
+  - `test-python-container`
+
+### 2. Optimized Test Client Configurations
+- Added standardized timeout constants for consistent behavior:
+  ```python
+  DEFAULT_CLIENT_TIMEOUT = 3000  # 3 seconds
+  DEFAULT_CONNECTION_TIMEOUT = 3000  # 3 seconds
+  ```
+- Updated client creation functions to use optimized defaults
+- Reduced teardown delays while maintaining reliability
+
+### 3. Bug Fix
+- Fixed malformed error message in cluster manager when server binaries are not found
+
+## Impact
+
+These changes provide:
+- **50% more execution time** (90 min vs 60 min) for full matrix tests
+- **More efficient client operations** through optimized timeouts
+- **Better error reporting** for debugging cluster setup issues
+
+The timeout increase accommodates the sequential execution of both asyncio and trio backends in full matrix mode, while the client optimizations help reduce overall test execution time.
+
+Fixes #4406.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `esm.ubuntu.com`
+>   - Triggering command: `/usr/lib/apt/methods/https` (dns block)
+> - `https://api.github.com/repos/valkey-io/valkey-glide/actions/runs/16335521905`
+>   - Triggering command: `curl -s REDACTED` (http block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-17T14:11:05Z,2025-07-20T15:51:12Z,2025-07-20T15:51:11Z,511141524,https://api.github.com/repos/valkey-io/valkey-glide,https://github.com/valkey-io/valkey-glide/pull/4407,"analysisWe need to classify the pull request as 'performance' or 'non-performance'. The PR title: ""Fix Python test timeouts in full matrix CI workflow"". The body describes increasing timeouts, optimizing client timeouts, bug fix. The primary purpose is to fix timeouts, which is about performance? The keywords: ""timeout"", ""performance"", ""speed"", ""throughput"". The PR is about increasing timeouts to avoid failures, not necessarily improving performance. But it does mention ""more efficient client operations"" and ""optimized timeouts"". The primary purpose is to fix test timeouts, which is more about reliability than performance. However, the description includes ""more efficient client operations"" and ""optimized timeouts"" which could be considered performance improvements. But the main goal is to fix timeouts, not to speed up. The classification: performance or non-performance. The guidelines: performance-related PRs may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs. This PR includes ""performance"" in the impact section: ""More efficient client operations"". But the main issue is timeouts. I'd lean towards 'performance' because it addresses performance issues (timeouts, speed). But is it a performance improvement? It increases timeouts, not reduce runtime. But it also optimizes client timeouts to reduce overall test execution time. So it's a performance improvement. So classify as 'performance'.assistantfinalperformance",30,1.0,False
+3163189958,5445,@remotion/google-fonts: Add AbortController support to loadFont() method,"This PR adds cancellation support to the `loadFont()` method in `@remotion/google-fonts` by introducing an optional `controller` property that accepts an `AbortController` instance.
+
+## Problem
+
+When building font pickers with virtualized lists, users scrolling quickly through fonts would trigger multiple concurrent font loading requests. There was no way to cancel previous requests that were no longer relevant, leading to:
+
+- Unnecessary network requests
+- Potential race conditions where older fonts would load after newer ones
+- Poor performance in font picker UIs
+
+## Solution
+
+Added an optional `controller?: AbortController` property to the font loading options. When provided:
+
+- Font loading requests can be cancelled by calling `controller.abort()`
+- Pre-aborted signals are rejected immediately
+- Cancellation errors bypass retry logic (unlike regular loading errors)
+- Timeouts are properly cleaned up when requests are cancelled
+
+## Usage
+
+```tsx
+import {loadFont} from '@remotion/google-fonts/Inter';
+
+const controller = new AbortController();
+
+const fontResult = loadFont('normal', {
+  weights: ['400'],
+  subsets: ['latin'],
+  controller: controller // 🆕 Makes the request cancellable
+});
+
+// Cancel if needed (e.g., when user scrolls to different font)
+controller.abort();
+
+try {
+  await fontResult.waitUntilDone();
+} catch (error) {
+  if (error.message === 'Font loading was cancelled') {
+    // Handle cancellation gracefully
+  }
+}
+```
+
+## Implementation Details
+
+- **Non-breaking change**: The `controller` option is optional and fully backward compatible
+- **Universal support**: Added to all 1700+ individual font files in the package
+- **Proper error handling**: Cancellation errors are distinguished from loading failures
+- **Resource cleanup**: Timeouts are cleared when requests are cancelled
+- **Comprehensive testing**: Added tests for cancellation logic and compatibility
+
+## Perfect for Font Pickers
+
+This is especially useful for building responsive font pickers:
+
+```tsx
+const FontPreview = ({ fontName }) => {
+  const controllerRef = useRef();
+
+  useEffect(() => {
+    // Cancel previous font loading when switching fonts
+    if (controllerRef.current) {
+      controllerRef.current.abort();
+    }
+
+    controllerRef.current = new AbortController();
+    
+    const fontResult = loadFont('normal', {
+      weights: ['400'],
+      subsets: ['latin'],
+      controller: controllerRef.current
+    });
+
+    // Cleanup on unmount
+    return () => controllerRef.current?.abort();
+  }, [fontName]);
+};
+```
+
+Fixes #5444.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-06-20T12:37:37Z,2025-06-20T14:29:12Z,,274495425,https://api.github.com/repos/remotion-dev/remotion,https://github.com/remotion-dev/remotion/pull/5445,"analysisWe need to classify as performance or non-performance. The PR adds AbortController support to loadFont to cancel requests, improving performance by reducing unnecessary network requests, race conditions, and UI performance. It's about performance improvement. So label 'performance'.assistantfinalperformance",30,1.0,True
+3196955896,4290,Fix flaky test_cluster_scan_non_covered_slots by replacing inefficient loop with mset,"The test `test_cluster_scan_non_covered_slots` was failing intermittently with timeout errors due to an inefficient approach to setting up test data. The test was using a loop to perform 1000 individual `set` operations, which caused performance issues and timeout failures under load.
+
+## Problem
+```python
+# Before: 1000 individual network operations
+for i in range(1000):
+    await glide_client_scoped.set(f""{key}{i}"", ""value"")
+```
+
+This approach:
+- Performs 1000 separate network round-trips
+- Has high serialization overhead
+- Is prone to timeout errors under load
+- Takes significantly longer than necessary
+
+## Solution
+```python
+# After: Single bulk operation
+await glide_client_scoped.mset({f""{key}{i}"": ""value"" for i in range(1000)})
+```
+
+This change:
+- ✅ Reduces network operations from 1000 to 1
+- ✅ Eliminates 999 unnecessary round-trip calls
+- ✅ Significantly reduces timeout probability
+- ✅ Maintains identical test behavior and key generation
+- ✅ Follows existing patterns used by other tests in the same file (lines 200, 486, 489)
+
+## Impact
+- **Performance**: Much faster execution time
+- **Reliability**: Eliminates timeout-related flakiness
+- **Consistency**: Aligns with patterns used by other tests in `test_scan.py`
+- **Maintainability**: Simpler, more readable code
+
+The fix is minimal and surgical - only changing the inefficient data setup while preserving all test logic and assertions.
+
+Fixes #4191.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-02T19:23:11Z,2025-07-03T08:14:23Z,2025-07-03T08:14:23Z,511141524,https://api.github.com/repos/valkey-io/valkey-glide,https://github.com/valkey-io/valkey-glide/pull/4290,"analysisWe need to classify the pull request as 'performance' or 'non-performance'. The PR title: ""Fix flaky test_cluster_scan_non_covered_slots by replacing inefficient loop with mset"". The body describes replacing a loop of 1000 set operations with a single mset bulk operation. This is a performance improvement: reducing network round-trips, improving speed, reducing flakiness. So classification: 'performance'.assistantfinalperformance",30,1.0,False
+3076655992,3058,Create short version of the crypto_get_random_values tests for faster CI runs,"## Summary
+
+This PR optimizes the crypto_get_random_values tests to drastically reduce test execution time in CI environments. The test previously took around 20 minutes to run because it tested all supported JavaScript typed arrays. This change makes the test only run on Uint8Array in certain CI environments, while maintaining full coverage in release environments.
+
+## Implementation
+
+- Added a `shouldRunShortTest()` function that checks for specific CI environment variables:
+  ```typescript
+  function shouldRunShortTest(): boolean {
+      return (
+          process.env.AZLE_IS_FEATURE_BRANCH_PR === 'true' ||
+          process.env.AZLE_IS_FEATURE_BRANCH_DRAFT_PR === 'true' ||
+          process.env.AZLE_IS_MAIN_BRANCH_PUSH_FROM_FEATURE_MERGE === 'true'
+      );
+  }
+  ```
+
+- Modified the test to conditionally select which typed arrays to test:
+  ```typescript
+  const typedArrays = shouldRunShortTest()
+      ? [{ name: 'Uint8Array', bytesPerElement: 1 }]
+      : [
+          { name: 'Int8Array', bytesPerElement: 1 },
+          { name: 'Uint8Array', bytesPerElement: 1 },
+          { name: 'Uint8ClampedArray', bytesPerElement: 1 },
+          { name: 'Int16Array', bytesPerElement: 2 },
+          { name: 'Uint16Array', bytesPerElement: 2 },
+          { name: 'Int32Array', bytesPerElement: 4 },
+          { name: 'Uint32Array', bytesPerElement: 4 },
+          { name: 'BigInt64Array', bytesPerElement: 8 },
+          { name: 'BigUint64Array', bytesPerElement: 8 }
+      ];
+  ```
+
+## Testing
+
+Verified that the changes work as expected in all environments:
+
+- ✅ With `AZLE_IS_FEATURE_BRANCH_PR=true`: Only tests Uint8Array
+- ✅ With `AZLE_IS_FEATURE_BRANCH_DRAFT_PR=true`: Only tests Uint8Array
+- ✅ With `AZLE_IS_MAIN_BRANCH_PUSH_FROM_FEATURE_MERGE=true`: Only tests Uint8Array
+- ✅ With `AZLE_EXPERIMENTAL=true` and any of the above: Only tests Uint8Array in experimental mode
+- ✅ Without any of the environment flags: Tests all typed arrays (full coverage)
+
+## Impact
+
+- Significantly reduces CI test time from ~20 minutes to less than 1 minute for feature branch PRs
+- Maintains thorough testing in release environments
+- No changes to existing functionality or behavior
+
+Fixes #3048.
+
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-05-20T11:21:12Z,2025-05-20T19:23:37Z,2025-05-20T19:23:37Z,460125865,https://api.github.com/repos/demergent-labs/azle,https://github.com/demergent-labs/azle/pull/3058,"analysisWe need to classify as 'performance' or 'non-performance'. The PR is about optimizing test execution time, reducing CI run time. That is performance improvement. So label 'performance'.assistantfinalperformance",30,1.0,False
+3193460822,3213,Fix chunk test failures on CI/CD environments,"The chunk tests were failing on CI/CD environments with three classes of errors:
+
+1. **Request timeouts**: ""Request timed out after 300000 msec"" 
+2. **GitHub Actions timeouts**: Tests running longer than GitHub's action limits
+3. **Global state failures**: ""Expected true, received false"" in state cleanup checks
+
+## Root Causes
+
+The chunk tests are designed to validate instruction limit chunking by running intensive loops (20+ million iterations). While this works locally, CI environments have different performance characteristics that cause:
+
+- HTTP agent timeouts (5-minute default too short)
+- Excessive computation times due to slower CI performance  
+- Inadequate cleanup time for canister global state
+
+## Changes Made
+
+### 1. Increased HTTP Agent Timeout for CI
+```typescript
+// src/stable/test/get_canister_actor.ts
+const isCI = process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
+const ingressExpiryInMinutes = isCI ? 20 : 5; // 20 minutes for CI, 5 minutes default
+```
+
+### 2. Reduced Computation Load for CI
+```typescript
+// examples/stable/test/property/ic_api/chunk/test/tests.ts
+const baseLoops = isCI ? 10_000_000 : 20_000_000;        // 50% reduction for CI
+const loopMultiplier = isCI ? 500_000 : 1_000_000;       // 50% reduction for CI
+```
+
+### 3. More Frequent Chunking
+```typescript
+// examples/stable/test/property/ic_api/chunk/src/index.ts
+if (shouldChunk && i % 7_000_000 === 0) {  // Reduced from 14M to 7M iterations
+    await chunk();
+}
+```
+
+### 4. Extended Global State Cleanup Timeout
+```typescript
+// src/stable/test/global_state.ts
+const maxWaitTimePower = isCI ? 10 : 8;  // 1024s for CI vs 256s local
+```
+
+## Expected Results
+
+- ✅ Faster test completion due to reduced computation
+- ✅ Fewer timeout errors (5min → 20min HTTP timeout)
+- ✅ Better chunking prevents long-running requests
+- ✅ More time for global state cleanup in CI
+
+The changes are minimal (22 lines added, 6 removed) and preserve test effectiveness while making them CI-friendly.
+
+Fixes #3186.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-01T18:36:39Z,2025-07-11T00:27:53Z,,460125865,https://api.github.com/repos/demergent-labs/azle,https://github.com/demergent-labs/azle/pull/3213,"analysisWe need to classify the pull request as 'performance' or 'non-performance'. The PR title: ""Fix chunk test failures on CI/CD environments"". The body describes changes to increase timeouts, reduce computation load, more frequent chunking, extended cleanup timeout. These are performance-related changes to reduce timeouts and improve test performance. The keywords: ""performance"", ""timeout"", ""reduced computation load"", ""faster test completion"". So it's performance. So label 'performance'.assistantfinalperformance",30,1.0,False
+3258971322,4469,Fix socket exhaustion in GlideClusterClient tests by optimizing connection management,"## Problem
+
+The CI Full Matrix tests were failing with socket address exhaustion errors:
+```
+ClosingError: Connection error: Cluster(Failed to create initial connections - IoError: Failed to refresh both connections - IoError: Node: ""127.0.0.1:41752"" received errors: `Can't assign requested address (os error 49)`
+```
+
+Jest was also reporting open handles that prevented graceful worker shutdown, indicating resource leaks in the test infrastructure.
+
+## Root Cause
+
+1. **Excessive connection creation**: The `testTeardown` function was creating new client connections for every test cleanup, even when existing healthy connections were available
+2. **Socket contention**: Multiple cluster instances (`cluster` and `azCluster`) were being created, cleaned up, and torn down simultaneously without coordination
+3. **No resource release delays**: Tests didn't wait for sockets to be fully released before starting new operations
+
+## Solution
+
+### 1. Client Connection Reuse
+Modified `testTeardown` in `TestUtilities.ts` to reuse existing healthy client connections:
+
+```typescript
+// Before: Always created new client
+client = cluster_mode 
+    ? await GlideClusterClient.createClient(option)
+    : await GlideClient.createClient(option);
+
+// After: Reuse existing healthy client when possible
+if (existingClient) {
+    try {
+        client = existingClient;
+        await client.ping(); // Health check
+        // Reuse successful - no new connection needed
+    } catch {
+        // Create new client only if existing one failed
+        client = cluster_mode 
+            ? await GlideClusterClient.createClient(option)
+            : await GlideClient.createClient(option);
+        clientCreated = true;
+    }
+}
+```
+
+### 2. Strategic Resource Release Delays
+Added coordinated delays to prevent socket contention:
+- **10ms delay** after client cleanup to allow socket release
+- **5ms delay** between dual cluster cleanups in `afterEach`
+- **100ms delay** between cluster creation/initialization in `beforeAll`
+- **50ms delay** between cluster closures in `afterAll`
+
+### 3. Improved Error Handling
+- Reduced `requestTimeout` from 2000ms to 1500ms for faster failure detection when sockets are exhausted
+- Better fallback logic when existing clients fail health checks
+
+## Impact
+
+- **~50% reduction** in new socket connections through client reuse
+- **Eliminates socket contention** through coordinated resource management
+- **Maintains test reliability** while reducing resource usage
+- **Faster failure detection** when resources are truly exhausted
+
+## Files Changed
+
+- `node/tests/TestUtilities.ts` - Core client reuse logic and cleanup delays
+- `node/tests/GlideClusterClient.test.ts` - Added delays between cluster operations
+- `node/tests/GlideClient.test.ts` - Added delays between cluster operations
+
+## Testing
+
+Created mock validation that confirmed:
+- Healthy client reuse works correctly
+- Fallback to new client creation on health check failure
+- Proper cleanup of newly created clients only
+- Resource release delays function as expected
+
+Fixes #4468.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-24T08:18:16Z,2025-07-29T12:46:40Z,2025-07-29T12:46:40Z,511141524,https://api.github.com/repos/valkey-io/valkey-glide,https://github.com/valkey-io/valkey-glide/pull/4469,"analysisWe need to classify the pull request as 'performance' or 'non-performance'. The PR title: ""Fix socket exhaustion in GlideClusterClient tests by optimizing connection management"". The body describes reducing socket exhaustion, reusing connections, adding delays, etc. This is about resource usage, performance optimization. It mentions reducing new socket connections, improving test reliability, faster failure detection. This is definitely performance-related. So classification: 'performance'.assistantfinalperformance",30,1.0,True
+3231937509,4385,Fix flaky Java scan tests by reducing dataset size and increasing timeout,"The Java scan tests (`hscan`, `sscan`, `zscan` and their binary variants) were experiencing flaky timeout failures, particularly in standalone RESP2 configurations. Tests were timing out after 20 seconds when they should typically complete in 1-2 seconds.
+
+## Root Cause
+The tests used large datasets (1000 entries) to force iterative cursor behavior, but this caused performance degradation in certain configurations, especially standalone RESP2 where each scan operation took longer than expected.
+
+## Solution
+Applied a two-pronged approach to improve test reliability:
+
+### 1. Reduced dataset size by 90%
+Changed from 1000 to 100 entries across all scan tests:
+- **sscan/sscan_binary**: String array reduced from 1000→100 entries
+- **zscan/zscan_binary**: Map with Double values reduced from 1000→100 entries  
+- **hscan/hscan_binary**: Map with String values reduced from 1000→100 entries
+
+### 2. Increased timeout by 50%
+Changed from 20 to 30 seconds for consistency across all scan tests:
+- `hscan`, `hscan_binary`, `sscan`, `sscan_binary`, `zscan`: 20s → 30s
+- `zscan_binary`: 30s (unchanged)
+
+## Impact
+- **Performance**: 90% reduction in dataset size significantly reduces computation time, memory usage, and network traffic
+- **Reliability**: 50% timeout increase provides better buffer for performance variations
+- **Test Coverage**: 100 entries still sufficient to force iterative cursor behavior and test all scan functionality
+- **Consistency**: All scan tests now have uniform 30-second timeouts
+
+## Tests Affected
+- `hscan(BaseClient)` 
+- `hscan_binary(BaseClient)`
+- `sscan(BaseClient)`
+- `sscan_binary(BaseClient)`
+- `zscan(BaseClient)`
+- `zscan_binary(BaseClient)`
+
+This change directly addresses the performance degradation issue shown in the CI logs where RESP2 scan operations were taking 0.005s longer per operation, causing cumulative delays that exceeded the 20-second timeout.
+
+Fixes #3597.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `archive.archlinux.org`
+>   - Triggering command: `wget REDACTED -O zig.tar.xz` (dns block)
+> - `canonical-bos01.cdn.snapcraftcontent.com`
+>   - Triggering command: `/usr/lib/snapd/snapd` (dns block)
+> - `esm.ubuntu.com`
+>   - Triggering command: `/usr/lib/apt/methods/https` (dns block)
+> - `https://api.github.com/repos/ziglang/zig/releases`
+>   - Triggering command: `curl -s REDACTED` (http block)
+> - `https://api.github.com/repos/ziglang/zig/releases/latest`
+>   - Triggering command: `curl -s REDACTED` (http block)
+> - `https://storage.googleapis.com/mirror.archlinux.org/extra/os/x86_64/zig-0.13.0-1-x86_64.pkg.tar.xz`
+>   - Triggering command: `wget REDACTED -O zig.tar.xz` (http block)
+> - `mirrors.kernel.org`
+>   - Triggering command: `wget REDACTED -O zig.deb` (dns block)
+> - `web.archive.org`
+>   - Triggering command: `wget --no-check-certificate REDACTED -O zig.tar.xz` (dns block)
+> - `ziglang.org`
+>   - Triggering command: `wget REDACTED` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-15T11:42:30Z,2025-07-15T13:46:45Z,,511141524,https://api.github.com/repos/valkey-io/valkey-glide,https://github.com/valkey-io/valkey-glide/pull/4385,"analysisWe need to classify as performance or non-performance. The PR title: ""Fix flaky Java scan tests by reducing dataset size and increasing timeout"". The body describes reducing dataset size and increasing timeout to improve test reliability. It mentions performance degradation, dataset size reduction, memory usage, network traffic. This is a performance improvement. So classification: performance.assistantfinalperformance",30,1.0,True
+3189851555,13464,Test suite: eliminate real time waits,digital garage and consent management utils both had realtime waits in the test suite,OpenAI_Codex,1683175,patmmccann,closed,2025-06-30T21:02:58Z,2025-06-30T22:02:14Z,2025-06-30T22:02:14Z,39321023,https://api.github.com/repos/prebid/Prebid.js,https://github.com/prebid/Prebid.js/pull/13464,"analysisWe need to classify the pull request as performance or non-performance. The title: ""Test suite: eliminate real time waits"". Body: ""digital garage and consent management utils both had realtime waits in the test suite"". This is about eliminating real time waits in tests. That is about test suite performance? It's about removing real time waits, which likely improves test speed. It's a performance improvement. So classify as 'performance'.assistantfinalperformance",30,1.0,False
+3087466454,13158,Karma: break test suite into chunks,trying to avoid circleci timeouts and flakiness,OpenAI_Codex,1683175,patmmccann,closed,2025-05-23T20:29:00Z,2025-05-28T16:50:31Z,2025-05-28T16:50:31Z,39321023,https://api.github.com/repos/prebid/Prebid.js,https://github.com/prebid/Prebid.js/pull/13158,"analysisWe need to classify whether the primary purpose is to improve performance. The PR title: ""Karma: break test suite into chunks trying to avoid circleci timeouts and flakiness"". This is about splitting test suite into chunks to avoid timeouts and flakiness. That is about performance? It's about test suite runtime, but it's more about reliability and CI stability. The keywords: ""timeouts"" ""flakiness"" ""avoid circleci timeouts"". This is about performance? It might be about test suite performance, but the primary purpose is to avoid timeouts and flakiness, which is more about reliability. But the guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. The PR mentions ""timeouts"" and ""flakiness"" but not explicitly performance. However, ""timeouts"" could be considered performance. But the primary purpose is to avoid timeouts and flakiness, which is more about reliability. The guidelines say performance-related PRs may contain keywords such as... ""tim"" (maybe time). ""timeouts"" includes ""tim"". But the main goal is to avoid timeouts, which is about performance. But the PR is about breaking test suite into chunks to avoid timeouts. That is a performance improvement: reducing test runtime or making it more efficient. But is it about performance? It's about test suite runtime. The guidelines: ""performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" ""tim"" is included. ""timeouts"" includes ""tim"". So it might be considered performance. But the primary purpose is to avoid timeouts and flakiness. Flakiness is reliability. But the question: ""determine whether the primary purpose of the pull request is to improve performance."" The primary purpose is to avoid timeouts and flakiness. That is more about reliability. But the test suite is broken into chunks to avoid timeouts, which is a performance improvement. But the main goal is to avoid timeouts, which is a performance issue. I'd lean that it's performance. But the guidelines: ""performance-related pull requests may contain keywords such as... or any other terms referring to how faster and efficiently software runs."" The PR mentions ""timeouts"" which is about performance. So classification: performance.assistantfinalperformance",30,1.0,False
+3098901968,19979,Fix net server noDelay handling,"## Summary
+- add Node.js test `test-net-server-nodelay`
+- call `Socket.setNoDelay()` when server `noDelay` option is enabled
+
+## Testing
+- `bun bd --silent node:test test-net-server-nodelay` *(fails: missing webkit build files)*",OpenAI_Codex,709451,Jarred-Sumner,closed,2025-05-29T01:22:52Z,2025-05-29T05:14:57Z,,357728969,https://api.github.com/repos/oven-sh/bun,https://github.com/oven-sh/bun/pull/19979,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Fix net server noDelay handling"". Body: adds test, calls Socket.setNoDelay() when server noDelay option is enabled. This is about network performance? Setting noDelay disables Nagle's algorithm, improving latency. It's a performance improvement. The keywords: noDelay, Socket.setNoDelay, network. It's about performance. So classify as 'performance'.assistantfinalperformance",30,1.0,False
+3209206554,416,Optimize unit test timeouts,Reduce mock `setTimeout` delays in `timeout.test.ts` to optimize unit test execution.,Cursor,70931746,dallinbentley,closed,2025-07-07T14:13:06Z,2025-07-07T14:23:34Z,2025-07-07T14:23:34Z,855264010,https://api.github.com/repos/buster-so/buster,https://github.com/buster-so/buster/pull/416,"analysisWe need to classify whether the primary purpose is to improve performance. The PR title: ""Optimize unit test timeouts"". Body: ""Reduce mock setTimeout delays in timeout.test.ts to optimize unit test execution."" This is about reducing delays in unit tests to speed up test execution. That is a performance improvement. So classification: 'performance'.assistantfinalperformance",30,1.0,False
+3161761469,4542,feat: conditionally import fonts only when custom font family is not provided,"# Remove unnecessary third-party font imports when custom fonts are provided
+
+## Summary
+This PR fixes issue #4475 by conditionally importing external fonts only when no custom font family is provided via the `--w3m-font-family` CSS variable. This optimization improves performance by avoiding unnecessary font downloads when developers provide their own custom fonts.
+
+## Changes Made
+
+### packages/ui/src/utils/ThemeUtil.ts
+- Modified the Google Fonts import on line 47 to be conditional
+- Only imports `Inter` font when `--w3m-font-family` is not set
+- Uses empty CSS template when custom font is provided
+
+### packages/ui-new/src/utils/ThemeUtil.ts  
+- Modified the KHTeka font-face declarations (lines 87-113) to be conditional
+- Only includes KHTeka and KHTekaMono font-face definitions when `--w3m-font-family` is not set
+- Uses empty CSS template when custom font is provided
+
+## Technical Implementation
+- Uses conditional logic: `themeVariables?.['--w3m-font-family'] ? css`` : css`...``
+- Maintains backward compatibility - default behavior unchanged when no custom font provided
+- Leverages existing `themeVariables` parameter in `createRootStyles` function
+- Uses lit's `css` template literals for type-safe CSS generation
+
+## Testing
+- ✅ `pnpm build` passes successfully
+- ✅ `pnpm run prettier:format` passes successfully
+- ✅ TypeScript compilation without errors
+- ✅ Maintains existing functionality when no custom font is provided
+
+## Performance Impact
+- Reduces unnecessary network requests when custom fonts are used
+- Eliminates redundant font downloads that would be overridden by custom fonts
+- No performance impact when using default fonts (existing behavior preserved)
+
+## Backward Compatibility
+- ✅ Fully backward compatible
+- ✅ Default behavior remains identical when `--w3m-font-family` is not provided
+- ✅ Existing implementations continue to work without changes
+
+---
+
+**Link to Devin run:** https://app.devin.ai/sessions/d0165cd1abce471badaf6c04fe7bafd7
+
+**Requested by:** TomTom (tomas.rawski@reown.com)
+
+Fixes #4475
+",Devin,158243242,devin-ai-integration[bot],open,2025-06-20T02:48:30Z,,,127246132,https://api.github.com/repos/reown-com/appkit,https://github.com/reown-com/appkit/pull/4542,"analysisWe need to classify as performance or non-performance. The PR is about conditionally importing fonts only when custom font family is not provided, to avoid unnecessary font downloads. This is a performance improvement. So label 'performance'.assistantfinalperformance",30,1.0,False
+2855302194,711,Optimize Font Loading Performance in Tests,"# Optimize Font Loading Performance in Tests
+
+This PR optimizes font loading performance in the generator package's integration tests by implementing font caching and preventing cache mutations.
+
+## Changes
+- Added font caching to avoid repeated file reads
+- Implemented deep cloning of font objects to prevent cache mutations
+- Maintained existing test assertions and timeouts
+
+## Performance Improvements
+Before:
+- fontSubset template test: 10.7s (timing out at 10s)
+- snapshot 宛名8面 test: timing out at 5s
+- Full test suite: ~21s
+
+After:
+- fontSubset template test: 4.2s
+- snapshot 宛名8面 test: 3.1s
+- Full test suite: ~18.3s
+
+## Notes
+- No test timeouts were modified
+- All test functionality remains unchanged
+- Font loading API remains backward compatible
+
+Fixes issue with generator package generate integrate test performance.
+
+Requested by: Kyohei
+Link to Devin run: https://app.devin.ai/sessions/cb72ff9acf96451cb287daf306a9c6b0
+",Devin,158243242,devin-ai-integration[bot],closed,2025-02-15T07:23:53Z,2025-02-15T07:40:30Z,,398753576,https://api.github.com/repos/pdfme/pdfme,https://github.com/pdfme/pdfme/pull/711,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize Font Loading Performance in Tests"". Body mentions performance improvements, speed, caching, etc. So it's performance. So output 'performance'.assistantfinalperformance",30,1.0,False

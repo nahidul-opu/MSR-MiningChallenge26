@@ -1,0 +1,270 @@
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
+3250634096,14069,Speed up fast retail autocomplete,"## Summary
+- add `StockDTO` for lighter stock queries
+- autocomplete uses `StockDTO` results
+- assign selected stock using DTO id
+
+## Testing
+- `mvn -q -DskipTests package` *(fails: command not found)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_687ee62ebc20832fb7194755a6c2dde2",OpenAI_Codex,1226946,buddhika75,closed,2025-07-22T01:39:53Z,2025-07-22T01:40:14Z,2025-07-22T01:40:14Z,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/14069,"analysisWe need to classify as performance or non-performance. The title: ""Speed up fast retail autocomplete"". That indicates performance improvement. The body mentions adding StockDTO for lighter stock queries, using DTO results, assign selected stock using DTO id. So it's about speeding up autocomplete. So classification: performance.assistantfinalperformance",16,1.0,False
+3261340058,14153,Refactor payment creation for fast retail sales,"## Summary
+- delegate payment creation to `PaymentProcessingService`
+
+## Testing
+- `mvn clean compile` *(fails: Could not transfer artifact maven-clean-plugin from https://repo.maven.apache.org)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_6882a636a6d8832f9138cb33f66ba543",OpenAI_Codex,1226946,buddhika75,closed,2025-07-24T21:38:26Z,2025-07-24T21:38:49Z,2025-07-24T21:38:48Z,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/14153,"analysisWe need to classify as performance or non-performance. The title: ""Refactor payment creation for fast retail sales"". The summary: delegate payment creation to PaymentProcessingService. The phrase ""fast retail sales"" might hint at performance? But it's about refactoring for fast retail sales. The content: ""Refactor payment creation for fast retail sales"". The phrase ""fast"" could be ambiguous. But the description: ""delegate payment creation to PaymentProcessingService"". That is a refactor, not necessarily performance. The phrase ""fast retail sales"" might be about speed, but it's not explicitly about performance improvement. The guidelines: performance-related PRs may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs. The word ""fast"" is included. But is that enough? The guidelines say ""or any other terms referring to how faster and efficiently software runs."" ""Fast"" is a term. But the context: ""fast retail sales"" might refer to the sales process being fast, not necessarily performance improvement. But it's ambiguous. The PR is about refactoring payment creation to a service. That might improve performance? Possibly, but the description doesn't explicitly mention performance. The guidelines: performance-related PRs may contain keywords such as... fast. So ""fast"" is a keyword. But we need to decide. The title: ""Refactor payment creation for fast retail sales"". That suggests the goal is to make payment creation faster for retail sales. That is performance. So likely performance. The summary: ""delegate payment creation to PaymentProcessingService"". That might be a refactor to improve performance. So classification: performance.assistantfinalperformance",16,1.0,False
+3248859844,14047,Implement optimized pharmacy retail sale page,"## Summary
+- add `PharmacySaleFastRetailSaleController` extending the existing sale controller
+- introduce `PharmacySaleQuick` privilege
+- create new page `pharmacy_fast_retail_sale.xhtml` without other sale buttons
+- link the new page from menu as *Sale (Fast)*
+
+## Testing
+- `mvn -v` *(fails: command not found)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_687e464da218832f9591a3a1672e8439",OpenAI_Codex,1226946,buddhika75,closed,2025-07-21T14:18:10Z,2025-07-21T14:30:35Z,2025-07-21T14:30:35Z,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/14047,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Implement optimized pharmacy retail sale page"". The body: adding a new controller, privilege, new page, link. The description says ""optimized"". But is it about performance? The keywords: ""optimized"" but not necessarily performance. The new page is ""pharmacy_fast_retail_sale.xhtml"" and menu link ""Sale (Fast)"". The term ""Fast"" might refer to speed. But is the primary purpose to improve performance? It might be to provide a faster UI for pharmacy retail sale. The description: ""Implement optimized pharmacy retail sale page"". That suggests performance improvement. The body: ""add PharmacySaleFastRetailSaleController extending the existing sale controller"" - maybe to speed up. ""create new page pharmacy_fast_retail_sale.xhtml without other sale buttons"" - maybe to reduce load. ""link the new page from menu as Sale (Fast)"". So yes, it's performance. The keywords: ""fast"" is a performance keyword. So classify as 'performance'.assistantfinalperformance",16,1.0,False
+3184427385,13447,Consolidate pharmacy sales queries,"## Summary
+- add `calDepartmentSalesAllInstitutions` to fetch sales for all institutions in one query
+- refactor `createInstitutionSale` to use the new aggregated result
+
+## Testing
+- `mvn -q test` *(fails: command not found)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_685f46a08b94832fb4535898a2b1a94d",OpenAI_Codex,1226946,buddhika75,closed,2025-06-28T01:38:26Z,2025-06-28T01:38:41Z,2025-06-28T01:38:41Z,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/13447,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Consolidate pharmacy sales queries"". Summary: add a new query to fetch sales for all institutions in one query, refactor createInstitutionSale to use aggregated result. This is about consolidating queries, likely to reduce number of queries, improving performance. The description mentions adding a query to fetch sales for all institutions in one query, refactor to use aggregated result. That is a performance improvement: reducing number of queries, likely faster. So classification: performance.assistantfinalperformance",16,1.0,False
+3253577106,14092,Switch fast retail autocomplete to StockDTO,"## Summary
+- update `PharmacyFastRetailSaleController` to store a StockDTO object and keep a cache of autocomplete results
+- update the StockDTO converter to resolve values from the cached list
+- adjust `pharmacy_fast_retail_sale.xhtml` autocomplete to use StockDTO
+
+## Testing
+- `mvn -q test` *(fails: Plugin org.apache.maven.plugins:maven-resources-plugin:2.6 could not be resolved)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_687fcc65df74832f97b0d2461b286737",OpenAI_Codex,1226946,buddhika75,closed,2025-07-22T17:52:43Z,2025-07-22T17:53:06Z,2025-07-22T17:53:06Z,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/14092,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Switch fast retail autocomplete to StockDTO"". Summary: update controller to store a StockDTO object and keep a cache of autocomplete results; update converter to resolve values from cached list; adjust xhtml. This seems to be about caching autocomplete results, likely to improve performance. The description mentions ""keep a cache of autocomplete results"". That is a performance improvement. So classify as 'performance'.assistantfinalperformance",16,1.0,False
+3155206359,13180,Implement bill item DTO for pharmacy income report,"## Summary
+- optimize pharmacy income & cost report by bill item
+- add `PharmacyIncomeCostBillItemDTO`
+- fetch bill item DTOs in `BillService`
+- support DTO rows in `IncomeBundle` and `IncomeRow`
+- adjust report controller and JSF view
+- allow loading bill by id in bill search
+
+## Testing
+- `mvn test` *(fails: mvn not installed)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_68521947c2f8832fb41575f65e61c6d2",OpenAI_Codex,1226946,buddhika75,closed,2025-06-18T01:59:36Z,2025-06-18T02:00:01Z,2025-06-18T02:00:01Z,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/13180,"analysisWe need to classify whether the primary purpose of the pull request is to improve performance. The PR title: ""Implement bill item DTO for pharmacy income report"". Summary: ""optimize pharmacy income & cost report by bill item"". That suggests performance optimization. The body mentions adding DTO, fetching DTOs, support DTO rows, adjust controller and view, allow loading bill by id. The summary explicitly says ""optimize pharmacy income & cost report by bill item"". That is a performance improvement. So classification: 'performance'.assistantfinalperformance",16,1.0,True
+3265223442,14186,14185 optimize stock deduction,"## Summary
+- add `OptimizedPharmacyBean` with batch stock deduction logic
+- integrate fast sale controller with optional optimized mode
+- test optimized stock deduction
+
+Closes #14185
+
+------
+https://chatgpt.com/codex/tasks/task_e_6884761bf160832fada627f2e07b525e",OpenAI_Codex,1226946,buddhika75,closed,2025-07-26T06:40:50Z,2025-07-26T06:51:01Z,2025-07-26T06:51:01Z,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/14186,"analysisWe need to classify as performance or non-performance. The PR title: ""14185 optimize stock deduction"". Body: adds optimized logic, batch stock deduction, fast sale controller, optional optimized mode, test optimized stock deduction. The keywords: optimize, fast, optimized. This is performance improvement. So label 'performance'.assistantfinalperformance",16,1.0,False
+3155232556,13181,Implement bill item DTO for pharmacy income report,"## Summary
+- optimize pharmacy income & cost report by bill item
+- add `PharmacyIncomeCostBillItemDTO`
+- fetch bill item DTOs in `BillService`
+- support DTO rows in `IncomeBundle` and `IncomeRow`
+- adjust report controller and JSF view
+- allow loading bill by id in bill search
+- fix constructor clash and missing import
+
+Closes #13176
+
+## Testing
+- `mvn test` *(fails: mvn not installed)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_68521947c2f8832fb41575f65e61c6d2",OpenAI_Codex,1226946,buddhika75,closed,2025-06-18T02:17:13Z,2025-06-18T02:19:34Z,2025-06-18T02:19:34Z,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/13181,"analysisWe need to classify whether the primary purpose of the pull request is to improve performance. The PR title: ""Implement bill item DTO for pharmacy income report"". The body: ""optimize pharmacy income & cost report by bill item"". That suggests optimization. But is it performance? The description: ""optimize pharmacy income & cost report by bill item"" - could be performance improvement. The body mentions adding DTO, fetching DTOs, support DTO rows, adjust controller and view, allow loading bill by id, fix constructor clash and missing import. The main change is adding DTOs for bill items to optimize the report. That likely improves performance by reducing data load or processing. The keywords: optimize, performance. The classification: performance. So output 'performance'.assistantfinalperformance",16,1.0,True
+3265736885,14205,14196 performance bottleneck fix,"## Summary
+- cache ItemBatch and Stock references on Pharmacy fast retail sale operations
+
+Closes #14196
+
+------
+https://chatgpt.com/codex/tasks/task_e_6884e0c4a494832f815c86b1f675cc78",OpenAI_Codex,1226946,buddhika75,closed,2025-07-26T14:22:12Z,2025-07-26T15:42:31Z,,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/14205,"analysisWe need to classify as performance or non-performance. The title: ""14196 performance bottleneck fix"". That clearly indicates performance. Body: ""cache ItemBatch and Stock references on Pharmacy fast retail sale operations"". That is performance improvement. So classification: performance.assistantfinalperformance",16,1.0,False
+3267689271,14269,Implement fast sale for cashier page and controller,"## Summary
+- add PharmacyFastRetailSaleForCashierController for optimized cashier flow
+- create `pharmacy_fast_retail_sale_for_cashier.xhtml` page
+- expose new menu item ""Sale for Cashier - By Item""
+- document new navigation path
+
+## Testing
+- `./detect-maven.sh test` *(failed: Plugin resolution error)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_6886bc70fc44832fa2011054b9c30d38",OpenAI_Codex,1226946,buddhika75,closed,2025-07-28T01:44:21Z,2025-07-28T01:44:37Z,2025-07-28T01:44:37Z,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/14269,"analysisWe need to classify as performance or non-performance. The PR title: ""Implement fast sale for cashier page and controller"". The summary mentions ""optimized cashier flow"". The page is ""fast sale"". The description: ""add PharmacyFastRetailSaleForCashierController for optimized cashier flow"". That suggests performance improvement. Keywords: fast, optimized. So it's performance. So output: performance.assistantfinalperformance",16,1.0,False
+3153919447,13158,Add PharmacyIncomeRow DTO and use it for cost report,"## Summary
+- introduce `PharmacyIncomeRow` lightweight DTO
+- fetch only selected fields in `BillService.fetchPharmacyIncomeRows`
+- update `IncomeBundle` and `IncomeRow` to support the DTO
+- use the lightweight DTO in pharmacy income & cost report
+- adjust report page to reference new DTO fields
+- expose helper to fetch bills by id for view actions
+
+## Testing
+- `mvn -version` *(fails: command not found)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_68518673d000832f8c0b0b987ac16be5",OpenAI_Codex,1226946,buddhika75,closed,2025-06-17T15:28:28Z,2025-06-17T15:28:55Z,2025-06-17T15:28:55Z,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/13158,"analysisWe need to classify whether the primary purpose of the PR is to improve performance. The PR adds a lightweight DTO for pharmacy income rows, fetches only selected fields, updates IncomeBundle and IncomeRow to support DTO, uses DTO in pharmacy income & cost report, adjusts report page, exposes helper to fetch bills by id. This seems to be about reducing data fetched, making DTO lightweight, likely for performance improvement. The description: ""introduce PharmacyIncomeRow lightweight DTO"" and ""fetch only selected fields"" suggests performance optimization. So classification: 'performance'.assistantfinalperformance",16,1.0,False
+3266988027,14257,14221 optimize opd itemized sale summary report using dtos,"## Summary
+- add OpdSaleSummaryDTO and BillService query for OPD sale summaries
+- add controller methods and navigation to new DTO-based summary
+- expose config options for report optimization
+- create itemized_sale_summary_dto.xhtml for optimized view
+
+Closes #14221
+
+------
+https://chatgpt.com/codex/tasks/task_e_6885fadd9f08832fbc441cd0cf4eb548",OpenAI_Codex,1226946,buddhika75,closed,2025-07-27T10:50:29Z,2025-07-27T10:50:48Z,2025-07-27T10:50:48Z,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/14257,"analysisWe need to classify as performance or non-performance. The title: ""14221 optimize opd itemized sale summary report using dtos"". The body: mentions adding DTOs, query, controller methods, config options for report optimization, create view. The keyword ""optimize"" suggests performance. Also ""report optimization"". So likely performance. So label 'performance'.assistantfinalperformance",16,0.24615032148494245,False
+3267205179,14263,Optimize OPD Income Report with DTO queries,"## Summary
+- add `OpdIncomeReportDTO` with basic and detailed constructors
+- extend `IncomeRow` and `IncomeBundle` for new DTO
+- implement `BillService.fetchOpdIncomeReportDTOs`
+- support optimized navigation in `OpdReportController`
+- add DTO-based page `opd_income_report_dto.xhtml`
+- include navigation toggle on legacy page
+- add unit tests for DTO query method
+
+Navigation Path for QA Testing:
+1. OPD → Analytics → Summary Reports → **OPD Income Report**
+2. Toggle between Legacy/Optimized pages using buttons
+3. Configuration key `OPD Income Report - Optimized Method` enables optimized page by default
+
+Closes #0
+
+------
+https://chatgpt.com/codex/tasks/task_e_68863a3d9138832f81b137eb92008883",OpenAI_Codex,1226946,buddhika75,closed,2025-07-27T15:35:45Z,2025-07-27T15:36:08Z,2025-07-27T15:36:08Z,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/14263,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize OPD Income Report with DTO queries"". The body describes adding DTO queries, optimizing navigation, adding DTO-based page, unit tests. The keywords: ""Optimize"", ""DTO queries"", ""optimized navigation"", ""performance"". The description mentions ""Optimize OPD Income Report"". So it's performance. So classification: performance.assistantfinalperformance",16,0.17608758322603757,False
+3266987057,14255,14220 optimize laboratory income report using dtos,"## Summary
+- add configuration defaults for lab income report
+- implement LabIncomeReportDTO and service method
+- update Lab report controller with DTO generation and navigation methods
+- add optimized DTO page and navigation toggle
+
+Navigation Path for QA Testing:
+1. Navigate to Reports → Lab → Income Reports
+2. Select ""Laboratory Income Report""
+3. Use navigation buttons to switch between Legacy and Optimized methods
+
+Closes #14220
+
+------
+https://chatgpt.com/codex/tasks/task_e_6885fa8ebe38832fac4647a4d6442a92",OpenAI_Codex,1226946,buddhika75,closed,2025-07-27T10:48:48Z,2025-07-27T10:49:11Z,2025-07-27T10:49:11Z,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/14255,"analysisWe need to classify as performance or non-performance. The PR title: ""14220 optimize laboratory income report using dtos"". The body: mentions adding configuration defaults, implementing DTO, service method, updating controller, adding optimized DTO page and navigation toggle. The focus is on optimization, but is it performance? The description says ""optimize laboratory income report using dtos"". That suggests performance improvement. The keywords: optimize, DTOs, maybe performance. The body doesn't mention memory, speed, latency, etc. But ""optimize"" is a strong indicator. The instruction says performance-related PR may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. ""optimize"" is included. So classify as 'performance'.
+
+Thus answer: performance.assistantfinalperformance",16,0.15218597491250088,True
+3266989317,14259,14219 optimize test wise count report using dto,"## Summary
+- add TestCountDTO for DTO-based lab test count results
+- configure report method defaults
+- support optimized Test Wise Count report in `LaborataryReportController`
+- add navigation buttons for optimized/legacy Test Wise Count reports
+- create `test_wise_count_dto.xhtml` with DTO logic
+
+Navigation Path for QA Testing:
+1. Reports → Lab → Test Reports → Test Wise Count
+2. Use navigation buttons to switch between Legacy and Optimized methods
+
+Closes #14219
+
+------
+https://chatgpt.com/codex/tasks/task_e_6885f999d6b4832fb69bbaf5196941e4",OpenAI_Codex,1226946,buddhika75,closed,2025-07-27T10:52:42Z,2025-07-27T10:53:06Z,2025-07-27T10:53:06Z,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/14259,"analysisWe need to classify as performance or non-performance. The PR title: ""14219 optimize test wise count report using dto"". The body: adding DTO, configure report method defaults, support optimized Test Wise Count report, navigation buttons, create xhtml with DTO logic. The focus is on optimizing test wise count report using DTO. This is about performance optimization. The keywords: optimize, DTO, report, but not explicitly performance. But ""optimize"" indicates performance improvement. The guidelines: performance-related PR may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. ""optimize"" is a keyword. So classify as 'performance'.assistantfinalperformance",16,0.14996926764722635,False
+3151769530,282,Fix unsupported conversion caching,"## Summary
+- cache missing conversions inside `Converter.convert`
+- document caching behavior in `changelog.md`
+
+## Testing
+- `mvn -q test` *(fails: mvn not found)*
+
+------
+https://chatgpt.com/codex/tasks/task_b_6850c71728cc832a94d5dc3ec0829fc8",OpenAI_Codex,5373774,jdereg,closed,2025-06-17T01:41:48Z,2025-06-17T01:41:57Z,2025-06-17T01:41:57Z,12670630,https://api.github.com/repos/jdereg/java-util,https://github.com/jdereg/java-util/pull/282,"analysisWe need to classify the pull request as performance or non-performance. The PR title: ""Fix unsupported conversion caching"". Summary: ""cache missing conversions inside Converter.convert - document caching behavior in changelog.md"". This is about caching missing conversions. That is a performance improvement? Caching can improve performance by avoiding repeated work. But the description says ""Fix unsupported conversion caching"". It might be about caching missing conversions to avoid repeated errors? The change is about caching missing conversions inside Converter.convert. That likely improves performance by caching missing conversions to avoid repeated expensive operations. But is it primarily performance? It might be a bug fix: caching missing conversions to avoid repeated errors. But caching is a performance improvement. The description: ""cache missing conversions inside Converter.convert"". That is a performance improvement. The PR is about caching missing conversions. That is a performance improvement. So classify as 'performance'.
+
+Check if any other context: The PR is about caching missing conversions. That is a performance improvement. So answer: performance.assistantfinalperformance",16,0.1356499156533608,False
+3253681594,1131,Fix repeated cache misses for nonexistent options,"## Summary
+- prevent redundant remote lookups when `get_option()` queries missing options by checking `notoptions` first
+
+## Testing
+- `composer install`
+- `./vendor/bin/phpunit` *(fails: require_once(/tmp/wordpress-tests-lib/includes/functions.php): No such file or directory)*
+
+------
+https://chatgpt.com/codex/tasks/task_b_687fd6a72e188328986f67952dce65fe",OpenAI_Codex,49331357,jamesros161,closed,2025-07-22T18:30:26Z,2025-07-22T18:41:58Z,2025-07-22T18:41:58Z,125211182,https://api.github.com/repos/BoldGrid/w3-total-cache,https://github.com/BoldGrid/w3-total-cache/pull/1131,"analysisWe need to classify the pull request as performance or non-performance. The title: ""Fix repeated cache misses for nonexistent options"". Summary: ""prevent redundant remote lookups when get_option() queries missing options by checking notoptions first"". This is about caching and reducing remote lookups, which is a performance improvement. It reduces repeated cache misses, which is a performance optimization. So classification: performance.assistantfinalperformance",16,0.13551365781454983,False
+3242428313,23,Fix support check caching,"## Summary
+- optimize IsSupported by caching the computed result in `PassthroughCameraUtils`
+
+## Testing
+- `true`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68795b28463c8322add25fad6a55a179",OpenAI_Codex,88709627,xrdevrob,closed,2025-07-18T08:44:15Z,2025-07-18T21:24:10Z,2025-07-18T21:24:10Z,939922153,https://api.github.com/repos/xrdevrob/QuestCameraKit,https://github.com/xrdevrob/QuestCameraKit/pull/23,"analysisWe need to classify as performance or non-performance. The PR title: ""Fix support check caching"". Summary: ""optimize IsSupported by caching the computed result in PassthroughCameraUtils"". This is about caching to avoid recomputation, improving performance. So classification: performance.assistantfinalperformance",16,0.12552220055206947,False
+3161574503,335,Add cache-backed type support checks,"## Summary
+- speed up `Converter` type checks
+- add single-argument support methods with caching
+- document new APIs in the user guide
+- note addition in the changelog
+- test single-argument support methods
+
+## Testing
+- `mvn -q test` *(fails: `mvn: command not found`)*
+
+------
+https://chatgpt.com/codex/tasks/task_b_68549f930b84832a909f2e48937ae7e8",OpenAI_Codex,5373774,jdereg,closed,2025-06-20T00:11:18Z,2025-06-20T00:11:27Z,2025-06-20T00:11:27Z,12670630,https://api.github.com/repos/jdereg/java-util,https://github.com/jdereg/java-util/pull/335,"analysisWe need to classify as performance or non-performance. The PR title: ""Add cache-backed type support checks"". Summary: ""speed up Converter type checks"", ""add single-argument support methods with caching"". So it's about performance improvement. So classification: performance.assistantfinalperformance",16,0.12338336882019603,False
+3158264753,316,Delay class resolution during parsing,"## Summary
+- store `@type` and `@enum` strings without resolving classes
+- resolve classes later in `Resolver` and `JsonReader`
+- add helper methods for late class resolution
+- note change in changelog
+
+## Testing
+- `mvn -q test` *(fails: command not found)*
+
+------
+https://chatgpt.com/codex/tasks/task_b_6853302cdb60832aacef154c70e283fa",OpenAI_Codex,5373774,jdereg,closed,2025-06-18T21:49:25Z,2025-06-18T21:49:33Z,2025-06-18T21:49:33Z,12594924,https://api.github.com/repos/jdereg/json-io,https://github.com/jdereg/json-io/pull/316,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Delay class resolution during parsing"". Summary: store @type and @enum strings without resolving classes, resolve later in Resolver and JsonReader, add helper methods for late class resolution, note change in changelog. This seems to be about deferring class resolution to improve parsing speed? The change is about delaying class resolution during parsing. That could be a performance improvement: by not resolving classes during parsing, you might speed up parsing. But is the primary purpose performance? The description: ""store @type and @enum strings without resolving classes"" - that is a change to parsing logic. It might be to improve performance or to fix a bug. The title ""Delay class resolution during parsing"" suggests a performance optimization. The summary doesn't mention performance explicitly, but the change is about deferring resolution. That likely improves performance. The guidelines: performance-related PRs may contain keywords like latency, optimization, slow, etc. The title doesn't contain those, but the content indicates a performance improvement. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The PR is about delaying class resolution during parsing. That is likely a performance improvement. So classify as 'performance'.
+
+Thus answer: performance.assistantfinalperformance",16,0.10589343017250165,False
+3091989106,309,Defer class resolution in parser,"## Summary
+- add `typeName` to `JsonValue` for unresolved type strings
+- modify `JsonParser` to store type names instead of loading classes
+- resolve type names later in `Resolver`
+- update MapResolver/ObjectResolver to handle pending types
+- add unit test verifying parser keeps type names
+
+## Testing
+- `mvn -q test` *(fails: `mvn` not found)*",OpenAI_Codex,5373774,jdereg,closed,2025-05-26T20:10:52Z,2025-05-26T20:11:13Z,2025-05-26T20:11:13Z,12594924,https://api.github.com/repos/jdereg/json-io,https://github.com/jdereg/json-io/pull/309,"analysisWe need to classify whether the primary purpose is performance. The PR description: ""Defer class resolution in parser"" - adding typeName to JsonValue for unresolved type strings, modify JsonParser to store type names instead of loading classes, resolve type names later in Resolver, update MapResolver/ObjectResolver to handle pending types, add unit test verifying parser keeps type names. This seems to be about deferring class resolution to later, which might improve performance by avoiding class loading during parsing. The description mentions performance? It doesn't explicitly mention performance, but deferring class resolution could reduce overhead during parsing, potentially improving performance. However, the classification requires keywords like memory, optimization, speed, perf, etc. The description doesn't contain those keywords. But the intent is performance improvement. The instructions: ""Performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" The description doesn't contain any of those. But the content indicates a performance improvement. The classification might still be 'performance' because the primary purpose is to improve performance. The guidelines: ""Given a text combining the title and body of a pull request, determine whether the primary purpose of the pull request is to improve performance."" So we need to decide. The title: ""Defer class resolution in parser"". That is a performance improvement. So likely 'performance'. The description: ""add typeName to JsonValue for unresolved type strings, modify JsonParser to store type names instead of loading classes, resolve type names later in Resolver, update MapResolver/ObjectResolver to handle pending types, add unit test verifying parser keeps type names"". This is about deferring class resolution, which is a performance optimization. So classification: 'performance'.assistantfinalperformance",16,0.1001339510804643,False
+3166859797,347,Use cached reflection APIs,"## Summary
+- leverage `ReflectionUtils` caching for Java version queries
+- use `ReflectionUtils` in `Unsafe`
+- load OSGi classes with correct loader and cached reflection
+- document reflection improvements in changelog
+
+## Testing
+- `mvn -q test` *(failed: mvn not found)*
+
+------
+https://chatgpt.com/codex/tasks/task_b_6858e6750b64832abc6979f1e5574a10",OpenAI_Codex,5373774,jdereg,closed,2025-06-23T05:48:42Z,2025-06-23T05:49:02Z,2025-06-23T05:49:02Z,12670630,https://api.github.com/repos/jdereg/java-util,https://github.com/jdereg/java-util/pull/347,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Use cached reflection APIs"". Summary: leverage ReflectionUtils caching for Java version queries, use ReflectionUtils in Unsafe, load OSGi classes with correct loader and cached reflection, document reflection improvements in changelog. This is about caching reflection APIs, which can improve performance by reducing overhead of reflection. So it's performance improvement. So label 'performance'.assistantfinalperformance",16,0.0966124052066799,False
+3147123418,189,Improve ReflectionUtils caches,"## Summary
+- allow ReflectionUtils cache size via system property
+- ensure custom caches use ConcurrentHashMapNullSafe
+- log failures in ClassUtilities.trySetAccessible
+- generate parameter keys using fully qualified names
+- document cache size tuning
+
+## Testing
+- `mvn -q test` *(failed: command not found)*
+
+------
+https://chatgpt.com/codex/tasks/task_b_684e4790fa68832ab576ed66f6335c72",OpenAI_Codex,5373774,jdereg,closed,2025-06-15T05:26:31Z,2025-06-15T05:26:43Z,2025-06-15T05:26:43Z,12670630,https://api.github.com/repos/jdereg/java-util,https://github.com/jdereg/java-util/pull/189,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve ReflectionUtils caches"". The body: mentions allow cache size via system property, ensure custom caches use ConcurrentHashMapNullSafe, log failures, generate parameter keys using fully qualified names, document cache size tuning. This is about caching, which is performance improvement. So classify as 'performance'.assistantfinalperformance",16,0.0949930955719442,False
+3071077630,78,Optimize reflection,"## Summary
+- reduce reflection with property and type caching in `ChangePropertyAction`
+- compile property setters with expressions
+- compile method calls for `CallMethodAction`
+
+## Testing
+- `./build.sh -t Test` *(failed: `dotnet` not found)*",OpenAI_Codex,2297442,wieslawsoltes,closed,2025-05-17T21:30:50Z,2025-05-19T10:55:55Z,,792160692,https://api.github.com/repos/wieslawsoltes/Xaml.Behaviors,https://github.com/wieslawsoltes/Xaml.Behaviors/pull/78,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Optimize reflection"". Summary: reduce reflection with property and type caching, compile property setters with expressions, compile method calls for CallMethodAction. This is about performance optimization of reflection usage. So classification: 'performance'.assistantfinalperformance",16,0.0921938137827638,False

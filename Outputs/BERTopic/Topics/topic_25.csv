@@ -1,0 +1,303 @@
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
+3128534413,7,Implement Salsa-based incremental compilation,"## Summary
+This PR implements Salsa-based incremental compilation infrastructure for the rue compiler, enabling IDE-friendly incremental updates.
+
+## Changes
+- **Salsa Database Setup**: Added basic `RueDatabase` type alias using Salsa's `DatabaseImpl`
+- **Incremental File Parsing**: Implemented `parse_file` as a Salsa tracked function that automatically caches results
+- **Comprehensive Testing**: Added tests to verify incremental behavior works correctly (caching unchanged results)
+- **API Fixes**: Updated example file to use current API and added `PartialEq` to `ParseError` for Salsa compatibility
+
+## Key Benefits
+- **Fast Recompilation**: Only recomputes changed files and their dependents
+- **IDE Support**: Foundation for Language Server Protocol implementation
+- **Memory Efficient**: Automatic result caching and invalidation
+- **Expression-level Granularity**: Future support for fine-grained incremental computation
+
+## Testing
+- All existing tests continue to pass
+- New incremental compilation tests verify caching behavior
+- Both Buck2 and Cargo builds work correctly
+
+## Architecture
+```rust
+// Salsa input (can be modified)
+#[salsa::input]
+pub struct SourceFile { /* path, text */ }
+
+// Salsa tracked function (automatically cached)
+#[salsa::tracked]
+pub fn parse_file(db: &dyn Database, file: SourceFile) -> Result<Arc<CstRoot>, Arc<ParseError>>
+
+// Usage - Salsa handles caching automatically
+let result = parse_file(&db, file);
+file.set_text(&mut db).to(new_content); // Invalidates cache
+let new_result = parse_file(&db, file); // Recomputes only if needed
+```
+
+## Next Steps
+This establishes the foundation for:
+- Semantic analysis queries
+- Type checking
+- Name resolution
+- Code generation
+- LSP implementation
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,27786,steveklabnik,closed,2025-06-08T17:00:06Z,2025-06-08T17:20:43Z,2025-06-08T17:20:43Z,996507585,https://api.github.com/repos/steveklabnik/rue,https://github.com/steveklabnik/rue/pull/7,"analysisWe need to classify as performance or non-performance. The PR is about implementing Salsa-based incremental compilation infrastructure. It mentions ""Fast Recompilation"", ""Only recomputes changed files"", ""Memory Efficient"", ""Automatic result caching"". This is about performance improvements. The keywords: ""Fast"", ""Memory Efficient"", ""incremental"", ""caching"", ""recompilation"". The classification: performance.assistantfinalperformance",25,1.0,True
+3159661875,183,Refactor REPL to eliminate temporary file usage,"The REPL implementation was using a ""huge hack"" of creating temporary files to conform with the existing compilation interface that expects a `BufRead` object. This approach was inefficient and unnecessary.
+
+## Changes Made
+
+This PR replaces the temporary file usage with `std::io::Cursor<Vec<u8>>` which implements `BufRead` and can be created directly from string content:
+
+**Before:**
+```rust
+// Create temporary file
+let file_res = tempfile();
+let mut file = file_res.unwrap();
+file.write_all(line.as_bytes());
+file.seek(SeekFrom::Start(0));
+let mut bufread: Box<dyn BufRead> = Box::new(BufReader::new(file));
+```
+
+**After:**
+```rust
+// Create in-memory buffer
+let mut bufread: Box<dyn BufRead> = Box::new(Cursor::new(line.into_bytes()));
+```
+
+## Impact
+
+- **REPL input processing**: No longer creates temporary files for each command
+- **Expression evaluation (`-e` option)**: No longer creates temporary files for expressions
+- **Code reduction**: Removed 43 lines of error-prone file I/O code, added only 6 lines
+- **Performance**: Eliminates filesystem operations for every REPL interaction
+- **Reliability**: Removes potential issues with temporary file creation/cleanup
+
+## Testing
+
+Verified that:
+- REPL functionality works identically to before
+- Expression evaluation with `-e` flag works correctly
+- Error handling remains functional
+- No temporary files are created during operation
+- Edge cases (empty input, whitespace) are handled properly
+
+The refactoring successfully maintains compatibility with the existing compilation interface while eliminating the temporary file dependency.
+
+Fixes #8.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-06-19T09:36:55Z,2025-06-19T10:33:14Z,2025-06-19T10:33:14Z,445862991,https://api.github.com/repos/tomhrr/cosh,https://github.com/tomhrr/cosh/pull/183,"analysisWe need to classify as performance or non-performance. The PR is about refactoring REPL to eliminate temporary file usage, improving performance by removing filesystem ops. It explicitly mentions performance improvement. So classification: performance.assistantfinalperformance",25,1.0,True
+3186250011,3970,Add constant folding for more builtins,"## Summary
+- add compile-time evaluation for count/exists/avg/sum/min/max/values
+- regenerate IR golden files
+
+## Testing
+- `go test ./tests/vm -tags slow -run TestVM_IR -update`
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6861503b541c83209690a71f5e732c14",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T15:00:53Z,2025-06-29T15:01:24Z,2025-06-29T15:01:24Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3970,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Add constant folding for more builtins"". Summary: add compile-time evaluation for count/exists/avg/sum/min/max/values, regenerate IR golden files. This is about constant folding, which is a compile-time optimization. That improves performance by reducing runtime work. So it's a performance improvement. The keywords: ""compile-time evaluation"" is optimization. So classification: 'performance'.assistantfinalperformance",25,1.0,False
+3240409748,9390,Improve Zig backend constant folding,"## Summary
+- optimize `sum` and `avg` when invoked on list literals
+- regenerate machine output for updated programs
+- track new Zig programs `fun_three_args` and `sum_builtin`
+- document progress in TASKS and README
+
+## Testing
+- `go test ./compiler/x/zig -tags slow -run TestZigCompiler_VMValid_Golden/fun_three_args -count=1`
+- `go test ./compiler/x/zig -tags slow -run TestZigCompiler_VMValid_Golden/sum_builtin -count=1`
+- `go test ./compiler/x/zig -tags slow -run TestZigCompiler_VMValid_Golden/avg_builtin -count=1`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6879323c90d88320857033f8f80b3127",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T17:46:29Z,2025-07-17T17:46:47Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9390,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Zig backend constant folding"". The body: optimize sum and avg when invoked on list literals, regenerate machine output, track new Zig programs, document progress. This is about constant folding optimization, which is a performance improvement. So classify as 'performance'.assistantfinalperformance",25,1.0,False
+3240460340,9410,Improve Scheme backend count builtin,"## Summary
+- optimize `count` builtin generation in Scheme compiler
+- regenerate Scheme machine outputs with streamlined helper usage
+- update Scheme TASKS notes
+
+## Testing
+- `go test -tags slow ./compiler/x/scheme -run TestVMValidPrograms -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_687939f1e730832088c47209fc98e48f",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T18:07:28Z,2025-07-17T18:07:43Z,2025-07-17T18:07:43Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9410,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Scheme backend count builtin"". Summary: ""optimize `count` builtin generation in Scheme compiler"". That is about optimization, performance. So classification: performance.assistantfinalperformance",25,1.0,False
+3217766297,7119,Improve F# compiler loop handling,"## Summary
+- enhance fs compiler so Break/Continue exceptions are only emitted when used
+- skip `try..with` wrapping around loops without `break` or `continue`
+- update generated F# machine code to use simpler loops
+- mark improved loop formatting in machine README
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686f32dceed083208e81817be96856af",OpenAI_Codex,1218621,tamnd,closed,2025-07-10T03:40:02Z,2025-07-10T03:40:27Z,2025-07-10T03:40:26Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7119,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve F# compiler loop handling"". Body: mentions enhancing compiler so Break/Continue exceptions are only emitted when used, skip try..with wrapping around loops without break or continue, update generated F# machine code to use simpler loops, mark improved loop formatting in machine README. This is about compiler optimization, removing unnecessary exception handling, simplifying loops. That likely improves performance. Keywords: ""performance"" not explicitly but ""simpler loops"" and ""skip try..with"" suggests performance improvement. So classify as 'performance'.assistantfinalperformance",25,1.0,False
+3202402474,5003,Improve count & exists generation,"## Summary
+- improve Go backend count/exists to avoid runtime helper when types known
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6867ad99e06083209067507b263eab3e",OpenAI_Codex,1218621,tamnd,closed,2025-07-04T11:39:19Z,2025-07-04T11:39:54Z,2025-07-04T11:39:54Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/5003,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Improve count & exists generation"". Summary: ""improve Go backend count/exists to avoid runtime helper when types known"". This seems to be about generating code for count and exists queries, avoiding runtime helper when types known. That likely improves performance by avoiding runtime overhead. The description mentions ""avoid runtime helper when types known"". That is a performance improvement. So classify as 'performance'.assistantfinalperformance",25,1.0,False
+3224827777,7897,Update C backend aggregates,"## Summary
+- improve `avg`, `sum`, `min` and `max` when the length of the input list is known
+- regenerate machine translations for affected examples
+
+## Testing
+- `go test ./compiler/x/c -run TestCCompiler_ValidPrograms/avg_builtin -tags slow`
+- `go test ./compiler/x/c -run TestCCompiler_ValidPrograms/sum_builtin -tags slow`
+- `go test ./compiler/x/c -run TestCCompiler_ValidPrograms/min_max_builtin -tags slow`
+- `go test ./compiler/x/c -run TestCCompiler_ValidPrograms/break_continue -tags slow`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6871e15148348320b39bf52e1e416e24",OpenAI_Codex,1218621,tamnd,closed,2025-07-12T04:52:02Z,2025-07-12T04:52:31Z,2025-07-12T04:52:31Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7897,"analysisWe need to classify as performance or non-performance. The PR title: ""Update C backend aggregates"". Summary: ""improve avg, sum, min and max when the length of the input list is known"". That sounds like optimization: improving aggregate functions when length known. That is performance improvement. So label 'performance'.assistantfinalperformance",25,1.0,False
+3216588034,6900,Improve Go 'exists' builtin generation,"## Summary
+- improve `exists` built‑in compilation to avoid runtime helper when types are known
+- add tests for `exists` built‑in
+
+## Testing
+- `go test ./... --vet=off -run TestGoCompiler_ValidPrograms -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686e9dd079b083208f090227e35162fb",OpenAI_Codex,1218621,tamnd,closed,2025-07-09T17:04:28Z,2025-07-09T17:04:40Z,2025-07-09T17:04:40Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/6900,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Improve Go 'exists' builtin generation"". Summary: improve exists built-in compilation to avoid runtime helper when types are known. That is a performance improvement: avoid runtime helper, compile-time optimization. Also tests. So classification: performance.assistantfinalperformance",25,1.0,False
+3238805416,9296,Improve Scheme backend numeric inference,"## Summary
+- optimize Scheme backend by using primitives for numeric list aggregates
+- add `isNumericListExpr` helper for better inference
+- adjust compile script to avoid duplicate headers
+- regenerate Scheme machine outputs for `min_max_builtin` and `load_yaml`
+- mark all programs as successfully compiled
+
+## Testing
+- `go run -tags=archive ./scripts/update_scheme_readme.go`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6878bc62b81c83209adcb49d13a84e0f",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T09:18:01Z,2025-07-17T09:19:06Z,2025-07-17T09:19:06Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9296,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Scheme backend numeric inference"". Summary: ""optimize Scheme backend by using primitives for numeric list aggregates"". That is optimization. Also ""add isNumericListExpr helper for better inference"". ""adjust compile script to avoid duplicate headers"". ""regenerate Scheme machine outputs for min_max_builtin and load_yaml"". ""mark all programs as successfully compiled"". The summary mentions ""optimize Scheme backend by using primitives for numeric list aggregates"". That is performance improvement. So classification: performance.assistantfinalperformance",25,1.0,False
+3239326081,9314,Improve PHP avg builtin,"## Summary
+- inline avg builtin when the argument is a numeric list or group
+- support detection of numeric list literals
+- regenerate PHP machine output for avg_builtin
+- log progress in TASKS
+
+## Testing
+- `go test -tags slow -run Valid -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6878e46c94a883209614fc311d1b6bfd",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T12:03:54Z,2025-07-17T12:04:06Z,2025-07-17T12:04:06Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9314,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve PHP avg builtin"". The body: inline avg builtin when the argument is a numeric list or group, support detection of numeric list literals, regenerate PHP machine output for avg_builtin, log progress in TASKS. This seems to be about improving the avg builtin, likely performance improvement. The keywords: ""inline"", ""regenerate PHP machine output"", ""log progress"". The description: ""Improve PHP avg builtin"" - likely performance improvement. There's no explicit mention of memory, speed, etc. But ""inline avg builtin"" suggests optimization. The instruction says performance-related PR may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. The PR mentions ""inline avg builtin"" which is an optimization. It might be considered performance. The title ""Improve PHP avg builtin"" could be performance. There's no mention of bug fix or feature. So classify as performance.assistantfinalperformance",25,1.0,False
+3212056037,6457,Improve Rust compiler query loops,"## Summary
+- adjust Rust compiler to iterate over values not refs in query expressions
+- regenerate machine outputs for `exists_builtin` and `in_operator_extended`
+- update machine README progress (50/97)
+
+## Testing
+- `go test ./compiler/x/rust -tags slow -run TestCompilePrograms -count=1`
+- `go test ./... -tags slow` *(fails: package not in std)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_686cf5fa0f4883208298c19221e8a6e8",OpenAI_Codex,1218621,tamnd,closed,2025-07-08T10:58:57Z,2025-07-08T10:59:40Z,2025-07-08T10:59:40Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/6457,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Rust compiler query loops"". Summary: adjust compiler to iterate over values not refs in query expressions, regenerate machine outputs, update README. This seems like a performance improvement: iterating over values instead of references could improve speed. The description mentions ""query loops"" and ""performance"" maybe. There's no explicit performance keyword but the change is about query loops, likely to improve performance. The instruction says performance-related PR may contain keywords like memory, optimization, leak, speed, perf, etc. But not required; we can still classify as performance if the primary purpose is to improve performance. The PR is about improving query loops, likely to speed up compiler. So classify as 'performance'.assistantfinalperformance",25,1.0,False
+3238726709,9255,Improve Ruby compiler builtins,"## Summary
+- support string expression detection in the Ruby compiler
+- inline list-based builtin implementations for sum/avg/min/max/first
+- regenerate affected machine outputs
+
+## Testing
+- `go test -tags=slow ./compiler/x/rb -run TestRBCompiler_VMValid_Golden -update -count=1`
+- `go test -tags=slow ./compiler/x/rb -run TestRBCompiler_VMValid_Golden -count=1`
+- `go test -tags=slow ./compiler/x/rb -run TestRBCompiler_TPCHQueries -count=1`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6878b74f42848320a60ad3379bbefc83",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T08:52:47Z,2025-07-17T08:53:02Z,2025-07-17T08:53:02Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9255,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Ruby compiler builtins"". Summary: support string expression detection, inline list-based builtin implementations for sum/avg/min/max/first, regenerate affected machine outputs. This seems to be about compiler builtins, maybe performance improvements? The changes include inline list-based builtin implementations for sum/avg/min/max/first. That could be performance improvement: inlining builtins may speed up execution. But is the primary purpose performance? The title ""Improve Ruby compiler builtins"" could be about correctness or performance. The summary: support string expression detection, inline list-based builtin implementations. Inlining could be performance. But also could be correctness. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The presence of ""inline"" suggests performance. But no explicit mention of speed, optimization, etc. However, inlining builtins is a performance optimization. The PR might be about improving the compiler's builtins for better performance. The summary doesn't mention memory, speed, etc. But the developer instruction says performance-related PR may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. The text doesn't contain those keywords. But the content ""inline list-based builtin implementations"" could be considered performance. But the instruction says ""may contain keywords such as... or any other terms referring to how faster and efficiently software runs."" So if the PR is about performance, it might contain such terms. But it's not guaranteed. The classification is based on the primary purpose. The PR is about improving Ruby compiler builtins, which could be about performance. But the summary doesn't mention performance explicitly. It mentions ""inline list-based builtin implementations"" which is a performance optimization. But is that the primary purpose? It might be to improve performance of builtins. The title ""Improve Ruby compiler builtins"" could be ambiguous. But the summary: support string expression detection, inline list-based builtin implementations for sum/avg/min/max/first, regenerate affected machine outputs. That seems like a performance improvement: inlining builtins reduces overhead. So I'd classify as performance. There's no mention of correctness or bug fix. So performance.assistantfinalperformance",25,1.0,False
+3210698120,6242,Inline simple cs builtins,"## Summary
+- remove runtime helper calls for count, append, values, exists, avg, sum, min, max
+- inline these operations in the C# compiler
+- update golden outputs for append and avg programs
+
+## Testing
+- `go test ./compiler/x/cs -tags slow -run TestCompileValidPrograms/append_builtin -v`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686c6fe777288320b8038ed07f92839f",OpenAI_Codex,1218621,tamnd,closed,2025-07-08T01:26:38Z,2025-07-08T01:26:56Z,2025-07-08T01:26:56Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/6242,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Inline simple cs builtins"". Summary: remove runtime helper calls for count, append, values, exists, avg, sum, min, max; inline these operations in the C# compiler; update golden outputs for append and avg programs. This is about inlining builtins to avoid runtime helper calls. That is a performance improvement: reducing overhead, faster execution. So classification: performance.assistantfinalperformance",25,1.0,False
+3221072168,7714,Replace [KnownBuiltin] string-based comparisons with enum-based system,"This PR replaces the inefficient string-based `[KnownBuiltin]` identification system with a fast enum-based approach, addressing performance issues and improving type safety throughout the Slang compiler.
+
+## Problem
+
+The current `KnownBuiltin` attribute system uses string comparisons to identify intrinsic functions:
+
+```cpp
+// Before: Inefficient string comparison
+if (getBuiltinFuncName(callee) != UnownedStringSlice::fromLiteral(""GeometryStreamAppend""))
+```
+
+This approach has several issues:
+- **Performance**: O(n) string comparisons vs O(1) integer comparisons
+- **Type Safety**: No compile-time validation of builtin names
+- **Maintainability**: Magic strings scattered throughout codebase
+
+## Solution
+
+Implemented a centralized enum-based system:
+
+```cpp
+// After: Fast enum comparison  
+if (getBuiltinFuncEnum(callee) != KnownBuiltinDeclName::GeometryStreamAppend)
+```
+
+### Key Changes
+
+1. **Added `KnownBuiltinDeclName` enum** in `slang-ast-support-types.h` covering all 10 known builtins:
+   - Geometry shaders: `GeometryStreamAppend`, `GeometryStreamRestart`
+   - Vertex processing: `GetAttributeAtVertex`, `DispatchMesh`  
+   - CUDA cooperation: `saturated_cooperation`, `saturated_cooperation_using`
+   - Autodiff: `IDifferentiable`, `IDifferentiablePtr`, `IDifferentiablePtrType`, `NullDifferential`
+
+2. **Updated `IRKnownBuiltinDecoration`** to store `IRIntLit` (enum value) instead of `IRStringLit`
+
+3. **Dual API approach**:
+   - New `getBuiltinFuncEnum()` for performance-critical code
+   - Legacy `getBuiltinFuncName()` maintained for backward compatibility
+
+4. **Updated all comparison sites** across 6 IR processing files to use enum comparisons
+
+### Benefits
+
+- **Performance**: Enum comparisons are significantly faster than string comparisons
+- **Type Safety**: Compile-time validation prevents typos in builtin names
+- **Maintainability**: Centralized enum definition makes adding new builtins easier
+
+## Testing
+
+- ✅ All 284 language-feature tests pass
+- ✅ IR processing and geometry shader tests validated
+- ✅ Added specific test for KnownBuiltin attribute processing
+- ✅ Maintains 100% backward compatibility
+
+The implementation provides substantial performance improvements while preserving all existing functionality.
+
+Fixes #7667.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-11T00:30:43Z,2025-07-15T12:08:53Z,2025-07-15T12:08:53Z,93882897,https://api.github.com/repos/shader-slang/slang,https://github.com/shader-slang/slang/pull/7714,"analysisWe need to classify the pull request as 'performance' or 'non-performance'. The PR title: ""Replace [KnownBuiltin] string-based comparisons with enum-based system"". The body describes replacing string comparisons with enum-based approach, improving performance, type safety, maintainability. It explicitly mentions performance improvements. So classification: 'performance'.assistantfinalperformance",25,0.2628929233858469,True
+3202406874,5004,Optimize case builtins in Go backend,"## Summary
+- avoid runtime helpers for `lower` and `upper` when argument type is known
+- add regression tests covering the new optimization
+
+## Testing
+- `go test ./compile/go -run TestGoCompiler_SubsetPrograms/upper_builtin -update -tags slow`
+- `go test ./compile/go -run TestGoCompiler_SubsetPrograms/lower_builtin -update -tags slow`
+- `go test ./compile/go -run TestGoCompiler_GoldenOutput/upper_builtin -update -tags slow`
+- `go test ./compile/go -run TestGoCompiler_GoldenOutput/lower_builtin -update -tags slow`
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6867add12a708320a34fd1f46ed469b0",OpenAI_Codex,1218621,tamnd,closed,2025-07-04T11:40:22Z,2025-07-04T11:40:38Z,2025-07-04T11:40:38Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/5004,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize case builtins in Go backend"". Summary: avoid runtime helpers for lower and upper when argument type is known. Add regression tests. This is about optimization, likely performance improvement. Keywords: optimize, avoid runtime helpers, performance. So classification: performance.assistantfinalperformance",25,0.23397484708974786,False

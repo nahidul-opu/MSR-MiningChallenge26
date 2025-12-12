@@ -1,0 +1,379 @@
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
+3217089921,7040,Add conditional runtime emission to OCaml compiler,"## Summary
+- enhance OCaml backend with feature scanning
+- emit runtime helpers only when required by a program
+
+## Testing
+- `go vet ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686ed0a11314832096a2c9d827d6effa",OpenAI_Codex,1218621,tamnd,closed,2025-07-09T20:42:41Z,2025-07-09T20:42:56Z,2025-07-09T20:42:56Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7040,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Add conditional runtime emission to OCaml compiler"". Summary: ""enhance OCaml backend with feature scanning, emit runtime helpers only when required by a program"". This is about reducing code size or runtime overhead by only emitting helpers when needed. That is a performance optimization: reducing runtime overhead, memory usage, maybe compile time. The keywords: ""runtime helpers only when required"" suggests optimization. So classify as 'performance'.assistantfinalperformance",20,1.0,False
+3226153576,8307,Improve Racket backend,"## Summary
+- specialize Racket `len` builtin for string literals
+- add TODO tracker in `compiler/x/racket/TASKS.md`
+- document outstanding work in the Racket machine README
+
+## Testing
+- `go test ./compiler/x/racket -run TestRacketCompiler -tags slow -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68733d25ef408320bd11e095d3b480bf",OpenAI_Codex,1218621,tamnd,closed,2025-07-13T05:31:35Z,2025-07-13T05:31:48Z,2025-07-13T05:31:48Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/8307,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Improve Racket backend"". Body: ""specialize Racket `len` builtin for string literals"" etc. This is about optimizing the len builtin for string literals. That is a performance improvement. So classify as 'performance'.assistantfinalperformance",20,1.0,False
+3127297110,154,Enable async stream handlers,"## Prompt
+```
+Now, careful review this:
+
+case s.Emit != nil:
+		ev := map[string]any{}
+		for _, f := range s.Emit.Fields {
+			v, err := i.evalExpr(f.Value)
+			if err != nil {
+				return err
+			}
+			ev[f.Name] = v
+		}
+		strm, ok := i.streams[s.Emit.Stream]
+		if !ok {
+			return fmt.Errorf(""undefined stream: %s"", s.Emit.Stream)
+		}
+		if _, err := strm.Append(context.Background(), ev); err != nil {
+			return err
+		}
+		for _, h := range i.handlers[s.Emit.Stream] {
+			child := types.NewEnv(i.env)
+			child.SetValue(h.alias, ev, true)
+			interp := &Interpreter{prog: i.prog, env: child, types: i.types, streams: i.streams, handlers: i.handlers}
+			for _, stmt := range h.body {
+				if err := interp.evalStmt(stmt); err != nil {
+					return err
+				}
+			}
+		}
+		return nil
+
+Is this for loop through i.handlers will block if one handler is slow?
+How to enhance and make it independence? Learn from Subscriber in runtime/stream, could we use this?
+```
+and
+```
+Now, enhance the code, use Subscriber, and make sure all are closed when the program is done.
+```
+## Summary
+- make `Interpreter` manage subscribers via `runtime/stream`
+- register watchers for `on` handlers and process events concurrently
+- simplify `emit` logic
+- add cleanup of handlers and streams when interpretation completes
+
+## Testing
+- `go vet ./...`
+- `go test ./...`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6844740f3e848320a101af48ecde6989",OpenAI_Codex,1218621,tamnd,closed,2025-06-07T17:30:32Z,2025-06-07T17:31:12Z,2025-06-07T17:31:12Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/154,"analysisWe need to classify the pull request as performance or non-performance. The PR description: ""Enable async stream handlers"" and ""Is this for loop through i.handlers will block if one handler is slow? How to enhance and make it independence? Learn from Subscriber in runtime/stream, could we use this?"" Then ""Now, enhance the code, use Subscriber, and make sure all are closed when the program is done."" The summary: ""make Interpreter manage subscribers via runtime/stream, register watchers for on handlers and process events concurrently, simplify emit logic, add cleanup of handlers and streams when interpretation completes."" This is about concurrency, async handling, not necessarily performance improvement. But it might improve performance by making handlers non-blocking. The keywords: ""async"", ""concurrent"", ""performance"" not explicitly. But the PR is about making handlers independent, so it might improve performance by not blocking. The classification: performance? The guidelines: performance-related PRs may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs. The PR mentions ""slow"" and ""block"" and ""independence"". It might be considered performance. But the primary purpose is to enable async stream handlers, not necessarily performance. But it addresses blocking and concurrency, which can improve performance. The guidelines: if it contains keywords like slow, block, etc. It does mention ""slow"" in the question: ""Is this for loop through i.handlers will block if one handler is slow?"" So it references slow. So likely performance. The classification: performance.assistantfinalperformance",20,1.0,True
+3164722645,2457,Optimize Erlang runtime helpers,"## Summary
+- minimize Erlang runtime output by tracking which helper functions are used
+- generate helper code only when required
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_685627d9c8e48320996deb5d08c4a2f8",OpenAI_Codex,1218621,tamnd,closed,2025-06-21T03:48:31Z,2025-06-21T03:52:33Z,2025-06-21T03:52:33Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2457,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize Erlang runtime helpers"". Summary: minimize Erlang runtime output by tracking which helper functions are used, generate helper code only when required. This is about reducing runtime output, generating code only when needed. That is a performance optimization: reducing runtime overhead, code size, maybe memory. The keywords: optimize, minimize, runtime output, generate helper code only when required. This is performance. So classification: performance.assistantfinalperformance",20,1.0,False
+3164738704,2463,Improve Java compiler runtime emission,"## Summary
+- only emit Java runtime helpers when they are actually required
+
+## Testing
+- `go test ./... --vet=off`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68562cdb3f908320af3140f85aad43f3",OpenAI_Codex,1218621,tamnd,closed,2025-06-21T04:15:30Z,2025-06-21T04:17:57Z,2025-06-21T04:17:57Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2463,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Java compiler runtime emission"". Summary: ""only emit Java runtime helpers when they are actually required"". This is about reducing emitted code, likely improving performance by reducing runtime overhead. The description: ""only emit Java runtime helpers when they are actually required"". That is a performance improvement: reducing code size, maybe compile time? It's about runtime emission, so it's about code generation. It's a performance improvement. So classify as 'performance'.assistantfinalperformance",20,1.0,False
+3217758395,7113,Improve C++ compiler runtime handling,"## Summary
+- make C++ compiler emit JSON helpers only when needed
+- automatically select standard library includes based on generated code
+
+## Testing
+- `go vet ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686f2f4e9c74832096d9d0143dbd512a",OpenAI_Codex,1218621,tamnd,closed,2025-07-10T03:34:50Z,2025-07-10T08:54:39Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7113,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve C++ compiler runtime handling"". Summary: ""make C++ compiler emit JSON helpers only when needed"" and ""automatically select standard library includes based on generated code"". This seems to be about reducing runtime overhead, maybe performance improvement. The keywords: ""runtime handling"", ""emit JSON helpers only when needed"" could reduce code size or runtime. ""automatically select standard library includes"" might reduce compile time or runtime. The classification: performance. There's no explicit mention of memory, speed, etc. But ""runtime handling"" and ""emit JSON helpers only when needed"" suggests performance improvement. So classify as 'performance'.assistantfinalperformance",20,1.0,False
+3128735694,206,Skip async runtime when no streams,"## Summary
+- detect stream/agent usage in Python and TypeScript compilers
+- generate synchronous `main` function and omit `_waitAll` when not needed
+- update golden outputs for Python and TypeScript compilers
+
+## Testing
+- `go test ./compile/...`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_684609e02b748320a2e6ddaa40659b23",OpenAI_Codex,1218621,tamnd,closed,2025-06-08T22:17:58Z,2025-06-08T22:20:29Z,2025-06-08T22:20:29Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/206,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Skip async runtime when no streams"". Summary: detect stream/agent usage in Python and TypeScript compilers, generate synchronous main function and omit _waitAll when not needed, update golden outputs. This seems to be about removing async runtime overhead when no streams. That is a performance improvement: skipping async runtime, generating synchronous main, omitting waitAll. So it's performance. So label 'performance'.assistantfinalperformance",20,1.0,False
+3088785176,19894,Enable reloc info for BOLT,"## Summary
+- allow `--emit-relocs -q` on Linux release builds so BOLT can post-process Bun
+
+## Testing
+- `ld.lld --help | head`",OpenAI_Codex,709451,Jarred-Sumner,closed,2025-05-24T21:56:16Z,2025-05-29T06:01:05Z,,357728969,https://api.github.com/repos/oven-sh/bun,https://github.com/oven-sh/bun/pull/19894,"analysisWe need to classify whether the primary purpose of the PR is to improve performance. The PR title: ""Enable reloc info for BOLT"". Summary: allow `--emit-relocs -q` on Linux release builds so BOLT can post-process Bun. BOLT is a binary optimizer that can improve performance. The change is enabling reloc info for BOLT. This is likely to improve performance by allowing BOLT to post-process. So it's performance-related. The classification: 'performance'.assistantfinalperformance",20,1.0,False
+3146221157,759,Set release LTO to thin,"FatLTO takes a lot of time and it's annoyingly slow when I am trying multiple variants of some code. I tasked codex to check different options, and it gave me this:
+
+<img width=""994"" alt=""Screenshot 2025-06-14 at 16 24 21"" src=""https://github.com/user-attachments/assets/5002c702-091e-4425-8335-a893e6b3e80c"" />
+
+I double checked the results and it seems to confirm this[^1]:
+
+[^1]: tested on the Keccak example by changing something in binius_field and rebuilding.
+
+1. ThinLTO reduces time ≈2x. From 1m 12s with FatLTO to 35s with ThinLTO.
+2. The data suggests consistent perf improvement in FatLTO case. The improvement is very modest. [^2].
+ 
+That makes me think that it's better to assign thin LTO for the release profile by default. In case somebody needs to squeeze extra juice, they can add extra rustc flags.
+
+[^2]: IPC is better by 0.5%, 0.7% less instruction executed. 0.8% faster wallclock time.",OpenAI_Codex,2205845,pepyakin,closed,2025-06-14T14:20:29Z,2025-06-15T14:52:32Z,,742623962,https://api.github.com/repos/IrreducibleOSS/binius,https://github.com/IrreducibleOSS/binius/pull/759,"analysisWe need to classify as performance or non-performance. The PR title: ""Set release LTO to thin"". Body: discusses ThinLTO vs FatLTO, performance improvements, time reduction, etc. It's clearly about performance improvement. So classification: performance.assistantfinalperformance",20,1.0,False
+3250286583,11614,Optimize runtime helpers,"## Summary
+- avoid emitting unused runtime helpers in Go compiler
+- avoid emitting unused runtime helpers in TS compiler
+- update golden compiler outputs
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6840473ca678832093db7cec285df3e4",OpenAI_Codex,1218621,tamnd,closed,2025-07-21T23:05:59Z,2025-07-21T23:17:40Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/11614,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize runtime helpers"". Summary: avoid emitting unused runtime helpers in Go compiler, TS compiler, update golden outputs. This is about reducing emitted code, likely improving performance (runtime size, compile time). Keywords: optimize, runtime helpers, avoid emitting unused helpers. This is performance improvement. So classify as 'performance'.assistantfinalperformance",20,1.0,False
+3143046392,486,Remove helperIndex/Len from TS runtime,"## Summary
+- remove `helperIndex` and `helperLen` helpers
+- infer indexing and length directly in the TypeScript compiler
+
+## Testing
+- `make test`
+
+------
+https://chatgpt.com/codex/tasks/task_e_684bf6b5bfb48320bf5f0f73ca171995",OpenAI_Codex,1218621,tamnd,closed,2025-06-13T10:09:54Z,2025-06-13T10:20:37Z,2025-06-13T10:20:37Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/486,"analysisWe need to classify whether the primary purpose is performance improvement. The PR removes helperIndex/Len from TS runtime, infers indexing and length directly in the TypeScript compiler. This seems like a performance improvement: removing runtime helpers reduces overhead, compile-time optimization. The description: ""remove helperIndex/Len from TS runtime"" and ""infer indexing and length directly in the TypeScript compiler"". That is a performance improvement. So classify as 'performance'.assistantfinalperformance",20,1.0,False
+3117839444,41,Optimize runtime helpers,"## Prompt
+
+Now, update Mochi to Go and Typescript compiler, only include runtime functions if it is used.
+
+## Summary
+- add a helper usage tracker to both Go and TypeScript compilers
+- emit runtime helper functions only when they are referenced
+- update golden outputs for compilers
+
+## Testing
+- `go test ./...`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_684046acbe508320bf04b4aa052d4872",OpenAI_Codex,1218621,tamnd,closed,2025-06-04T13:25:31Z,2025-06-04T13:25:50Z,2025-06-04T13:25:49Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/41,"analysisWe need to classify the pull request as performance or non-performance. The title: ""Optimize runtime helpers"". The body: ""Now, update Mochi to Go and Typescript compiler, only include runtime functions if it is used."" Summary: add helper usage tracker, emit runtime helper functions only when referenced, update golden outputs. This is about reducing code size or compile time? It's about including runtime functions only when used, which could improve performance by reducing overhead, but it's more about code size and compile time. The keywords: ""Optimize runtime helpers"" suggests performance improvement. The description: ""only include runtime functions if it is used"" - that reduces runtime overhead, memory usage, maybe compile time. It's a performance improvement. So classify as 'performance'.assistantfinalperformance",20,1.0,False
+3238796960,9291,Improve Racket backend runtime helper selection,"## Summary
+- split runtime helper code into individual constants
+- track runtime helpers used during compilation and emit only those
+- add simple expression type inference so `str` results are known
+- update print, min/max, json and yaml helpers to use runtimeFuncs
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6878bafa04448320affda9aaa96e2031",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T09:15:15Z,2025-07-17T09:16:00Z,2025-07-17T09:16:00Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9291,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Improve Racket backend runtime helper selection"". Summary: split runtime helper code into individual constants, track runtime helpers used during compilation and emit only those, add simple expression type inference so str results are known, update print, min/max, json and yaml helpers to use runtimeFuncs. This seems to be about reducing runtime helper usage, maybe performance improvement. But is it primarily performance? It says ""Improve Racket backend runtime helper selection"". That could be about code size or runtime overhead. The summary: track runtime helpers used during compilation and emit only those. That could reduce code size and maybe performance. But the main focus is to emit only used helpers, which is a compile-time optimization. It might reduce runtime overhead. Also adding simple expression type inference so str results are known. That might reduce runtime overhead. So it's performance improvement. The keywords: ""runtime helper selection"", ""emit only those"", ""type inference"". There's no explicit mention of speed, latency, etc. But the description indicates optimization. The instruction says performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. The PR does not contain those keywords. But the content indicates optimization. The instruction says ""Performance-related pull requests may contain keywords such as... or any other terms referring to how faster and efficiently software runs."" It doesn't say that if they don't contain those keywords, it's not performance. But the instruction says ""may contain keywords such as... or any other terms referring to how faster and efficiently software runs."" So we need to decide if it's performance. The description is about reducing runtime helper usage, which is a performance improvement. So classify as 'performance'.assistantfinalperformance",20,1.0,False
+3158765147,2027,Elixir runtime helpers emitted as needed,"## Summary
+- track helper usage in the Elixir compiler
+- emit `_input`, `_count`, and `_avg` helper functions only when referenced
+- document helper behaviour in Elixir compiler README
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68537eb637a48320831ba047f4963969",OpenAI_Codex,1218621,tamnd,closed,2025-06-19T03:17:37Z,2025-06-19T03:20:42Z,2025-06-19T03:20:42Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2027,"analysisWe need to classify as performance or non-performance. The PR is about Elixir runtime helpers emitted as needed. It tracks helper usage and emits functions only when referenced. This is about code generation optimization, reducing emitted code. That is a performance improvement: reducing code size, maybe compile-time. It's about optimization. So classify as 'performance'.assistantfinalperformance",20,1.0,False
+3217761016,7115,Improve Haskell compiler runtime,"## Summary
+- update Haskell compiler to avoid importing Aeson unless JSON features are used
+- split AnyValue runtime from JSON loader runtime
+- regenerate machine Haskell outputs with the lighter runtime
+- note missing `.out` files in checklist
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686f30dd4a388320913ab7cc1a7310a0",OpenAI_Codex,1218621,tamnd,closed,2025-07-10T03:36:30Z,2025-07-10T03:36:48Z,2025-07-10T03:36:48Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7115,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Haskell compiler runtime"". Body: update compiler to avoid importing Aeson unless JSON features used, split AnyValue runtime from JSON loader runtime, regenerate machine Haskell outputs with lighter runtime, note missing.out files. This seems about reducing runtime size, maybe performance improvement? It mentions avoiding importing Aeson unless needed, splitting runtime, lighter runtime. That could be performance improvement (runtime size, memory). But is it about performance? The description: ""Improve Haskell compiler runtime"" could be about performance. Keywords: ""runtime"", ""lighter runtime"". No explicit performance keywords like latency, speed. But the intent is to improve runtime efficiency. The guidelines: performance-related PRs may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs. This PR does not contain those keywords. But the content indicates improvement of runtime, maybe memory usage. But no explicit mention of performance. The guidelines say ""or any other terms referring to how faster and efficiently software runs."" The PR mentions ""lighter runtime"" which implies less memory usage. That could be considered performance improvement. But is it explicitly about performance? The title ""Improve Haskell compiler runtime"" could be about performance. But the guidelines: performance-related PRs may contain keywords such as... or any other terms referring to how faster and efficiently software runs. ""lighter runtime"" is a term referring to efficiency. So likely performance. But we need to decide. The PR is about avoiding importing Aeson unless needed, splitting runtime, lighter runtime. That reduces memory usage, maybe performance. I'd classify as performance.assistantfinalperformance",20,0.2317345668792421,False
+3116850813,741,Switch JSON floats to lexical-core,"## Summary
+- swap in lexical-core for floating point formatting/parsing
+- document change in changelog
+- use cargo-nextest for tests
+- address review comments about imports
+
+## Testing
+- `cargo nextest run -p facet-json --lib --test-threads=1`
+- `cargo nextest run -p facet-json --tests --test-threads=1`
+
+
+------
+https://chatgpt.com/codex/tasks/task_b_683ff63d33a483329f82d69507ea5db8",OpenAI_Codex,7998310,fasterthanlime,closed,2025-06-04T07:47:14Z,2025-06-04T09:44:36Z,,945896114,https://api.github.com/repos/facet-rs/facet,https://github.com/facet-rs/facet/pull/741,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Switch JSON floats to lexical-core"". Summary: swap in lexical-core for floating point formatting/parsing, document change, use cargo-nextest, address review comments about imports. This is about using lexical-core for floating point formatting/parsing. Lexical-core is a library for parsing numbers quickly. So this is a performance improvement: using lexical-core likely speeds up parsing/formatting of floats. The summary doesn't explicitly mention performance, but the change is to use lexical-core, which is known for performance. The instruction says performance-related PRs may contain keywords like performance, speed, etc. But the content doesn't contain those words. However, the content indicates a change to use lexical-core for floating point formatting/parsing. That is a performance improvement. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The primary purpose is to switch to lexical-core for floats. That is likely a performance improvement. So classify as 'performance'.
+
+Thus answer: performance.assistantfinalperformance",20,0.20077074298497147,False
+3083186670,18592,Auto-generate ILLink.Substitutions.xml to Remove F# Metadata Resources,"# Auto-generate ILLink.Substitutions.xml to Remove F# Metadata Resources
+
+## 🎯 Problem Statement
+
+F# assemblies contain embedded metadata resources (signature and optimization data) that significantly increase assembly size during .NET trimming scenarios. These resources, while useful for F# development tools and cross-assembly optimizations, are unnecessary in final trimmed applications and can add substantial bloat to the final binary.
+
+The F# compiler generates multiple embedded resources with names like:
+- `FSharpSignatureData.{AssemblyName}` / `FSharpSignatureDataB.{AssemblyName}`
+- `FSharpOptimizationData.{AssemblyName}` / `FSharpOptimizationDataB.{AssemblyName}`
+- Compressed variants of the above
+- `FSharpSignatureInfo.{AssemblyName}` / `FSharpOptimizationInfo.{AssemblyName}`
+
+Previously, developers had to manually create `ILLink.Substitutions.xml` files to remove these resources during trimming, which was error-prone and required maintenance when assembly names changed.
+
+## 🤖 Development Journey & Human Collaboration
+
+This implementation was initially attempted by GitHub Copilot coding agent, but required significant human intervention to complete successfully:
+
+**Copilot's Contributions:**
+- ✅ Created the basic MSBuild task structure in `GenerateILLinkSubstitutions.fs`
+- ✅ Implemented XML generation logic for ILLink substitution format
+- ✅ Added MSBuild target integration in `Microsoft.FSharp.NetSdk.targets`
+- ✅ Created test project structure
+
+**Human Intervention Required:**
+- 🔧 **Fixed build errors**: Copilot introduced syntax errors (`[<o>]` instead of `[<Output>]`) that caused compilation failures
+- 🔧 **Corrected resource embedding**: The generated XML file wasn't being properly embedded as a resource - required fixing target timing and MSBuild integration
+- 🔧 **Enhanced test infrastructure**: Improved the test validation script to properly report actual vs expected file sizes for easier maintenance
+- 🔧 **Build system expertise**: Ensured the test project correctly uses locally-built F# tools rather than SDK-shipped versions
+
+This highlights both the potential and current limitations of AI coding agents - while Copilot could handle the core implementation patterns, it required human expertise for build system integration, debugging compilation errors, and ensuring proper MSBuild target execution order.
+
+## 🔧 Technical Implementation
+
+### Core Components
+
+**1. MSBuild Task (`GenerateILLinkSubstitutions.fs`)**
+```fsharp
+type GenerateILLinkSubstitutions() =
+    inherit Task()
+    
+    [<Required>]
+    member val AssemblyName = """" with get, set
+    
+    [<Output>]
+    member val GeneratedItems = [| |] : ITaskItem[] with get, set
+```
+
+The task systematically generates all F# metadata resource combinations:
+- **Signature/Optimization** × **Data/DataB** × **Compressed/Uncompressed** variants
+- Plus **Info** variants for both signature and optimization data
+
+**2. Build Integration (`Microsoft.FSharp.NetSdk.targets`)**
+```xml
+<Target Name=""GenerateFSharpILLinkSubstitutions"" BeforeTargets=""AssignTargetPaths"">
+  <GenerateILLinkSubstitutions AssemblyName=""$(AssemblyName)"" 
+                               IntermediateOutputPath=""$(IntermediateOutputPath)"">
+    <Output TaskParameter=""GeneratedItems"" ItemName=""EmbeddedResource"" />
+  </GenerateILLinkSubstitutions>
+</Target>
+```
+
+**3. Generated Output Example**
+```xml
+<?xml version=""1.0"" encoding=""utf-8""?>
+<linker>
+  <assembly fullname=""MyProject"">
+    <resource name=""FSharpSignatureData.MyProject"" action=""remove""></resource>
+    <resource name=""FSharpOptimizationData.MyProject"" action=""remove""></resource>
+    <!-- ... all other variants ... -->
+  </assembly>
+</linker>
+```
+
+### Key Technical Decisions
+
+- **Automatic Generation**: No manual maintenance required - assembly name is injected automatically
+- **Embedded Resource**: The substitution file is embedded directly in the assembly, following .NET conventions
+- **Build Timing**: Runs before `AssignTargetPaths` to ensure proper MSBuild item processing
+- **Comprehensive Coverage**: Handles all current and historical F# metadata resource patterns
+
+## 🧪 Testing & Validation
+
+Added comprehensive test coverage in `tests/AheadOfTime/Trimming/FSharpMetadataResource_Trimming_Test/`:
+
+- **Integration Test**: Verifies the MSBuild task runs correctly during compilation
+- **Size Validation**: Confirms trimmed assemblies are actually smaller (validates that resources are removed)
+- **Build System Test**: Ensures locally-built F# tools are used rather than SDK versions
+
+Enhanced the test infrastructure (`check.ps1`) to provide better feedback when assembly sizes change, making maintenance easier for future developers.
+
+## 📊 Impact & Benefits
+
+- **Zero Configuration**: Works automatically for all F# projects with trimming enabled
+- **Significant Size Reduction**: Removes potentially large metadata resources from final binaries
+- **Maintenance-Free**: No manual XML file creation or updates required
+- **Backward Compatible**: Doesn't affect existing projects or development workflows
+
+## 🔗 Related Issues
+
+Fixes #18591
+
+---
+
+*This PR demonstrates the collaborative potential between AI coding agents and human developers - where AI can handle routine implementation patterns while humans provide the critical expertise for build systems, debugging, and ensuring production-quality integration.*",Copilot,198982749,Copilot,closed,2025-05-22T12:20:07Z,2025-07-29T06:15:39Z,2025-07-29T06:15:39Z,29048891,https://api.github.com/repos/dotnet/fsharp,https://github.com/dotnet/fsharp/pull/18592,"analysisWe need to classify whether the primary purpose of the pull request is to improve performance. The PR is about auto-generating ILLink.Substitutions.xml to remove F# metadata resources, which reduces assembly size during trimming. This is a performance improvement: reducing binary size, trimming resources, improving performance of trimming? It's about reducing size, which is a performance improvement. The description mentions ""Significant Size Reduction"" and ""Performance"". So classification: 'performance'.assistantfinalperformance",20,0.12698945820057367,True
+3218234090,7196,Refine Kotlin compiler output,"## Summary
+- trim Kotlin runtime to only include helper functions that are actually used
+- regenerate Kotlin machine translations with the reduced runtime
+- note runtime trimming in machine README
+
+## Testing
+- `go test -tags slow ./compiler/x/kotlin -run TestKotlinPrograms -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686f678220188320955e458315242746",OpenAI_Codex,1218621,tamnd,closed,2025-07-10T07:30:04Z,2025-07-10T07:30:19Z,2025-07-10T07:30:19Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7196,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Refine Kotlin compiler output"". Summary: trim Kotlin runtime to only include helper functions that are actually used, regenerate translations, note runtime trimming in README. This is about reducing runtime size, which is a performance improvement (memory usage, compile time?). It's about trimming runtime, which reduces size and potentially performance. The keywords: ""trim"", ""runtime"", ""helper functions"", ""used"". It's about reducing runtime size, which is a performance improvement. So classify as 'performance'.assistantfinalperformance",20,0.12660819953976596,False
+3217742863,247,Optimize HTMLHelper file,"Optimize `HtmlCleaner.kt` for improved performance, memory usage, and code readability.
+
+This PR refactors `HtmlCleaner.kt` by introducing cached constants and regex patterns, utilizing more efficient data structures (Sets), implementing lazy initialization for selectors, and extracting CSS generation into dedicated functions. These changes reduce redundant operations, improve lookup times, and enhance overall code maintainability and efficiency.",Cursor,5333537,gmathi,open,2025-07-10T03:23:25Z,,,92864511,https://api.github.com/repos/gmathi/NovelLibrary,https://github.com/gmathi/NovelLibrary/pull/247,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Optimize HTMLHelper file"". Body: ""Optimize `HtmlCleaner.kt` for improved performance, memory usage, and code readability."" It mentions performance improvements. So classification: 'performance'.assistantfinalperformance",20,0.125772063051551,False
+3211203822,115,Add SlimFaasMcp project with .NET IL Linker trimming support,"## Summary
+
+This PR adds a new `SlimFaasMcp` project to the SlimFaas ecosystem with full .NET IL Linker trimming support for optimized publish-time builds.
+
+## Changes
+
+- **New Project**: Created `src/SlimFaasMcp/` with a basic ASP.NET Core web application structure
+- **Trimming Configuration**: Added `<PublishTrimmed>true</PublishTrimmed>` to the main PropertyGroup in `SlimFaasMcp.csproj` to activate the .NET IL Linker
+- **AOT Support**: Included comprehensive ahead-of-time compilation settings:
+  - `<TrimMode>full</TrimMode>` - Enables aggressive trimming
+  - `<TrimmerRemoveSymbols>true</TrimmerRemoveSymbols>` - Removes debug symbols during trimming
+  - `<StripSymbols>true</StripSymbols>` - Strips symbols from the final binary
+  - `<PublishAot>true</PublishAot>` - Enables native AOT compilation
+- **Solution Integration**: Added the project to `SlimFaas.sln` with proper build configurations
+
+## Benefits
+
+- **Reduced Binary Size**: IL Linker removes unused code at publish time, significantly reducing the final application size
+- **Improved Performance**: Native AOT compilation produces optimized native binaries with faster startup times
+- **Consistency**: Follows the same trimming patterns used in other SlimFaas projects (`SlimFaas` and `SlimData`)
+
+## Testing
+
+- ✅ Solution builds successfully with no errors
+- ✅ All existing tests continue to pass
+- ✅ New project publishes correctly with trimming and AOT enabled
+- ✅ Generated native binary runs without issues
+
+## Notes
+
+The project includes a basic health endpoint at `/health` and uses minimal MVC controller support. Some warnings about MVC trimming compatibility are expected and don't affect the core trimming functionality.
+
+*This pull request was created as a result of the following prompt from Copilot chat.*
+> Update the src/SlimFaasMcp/SlimFaasMcp.csproj file to enable trimming by adding <PublishTrimmed>true</PublishTrimmed> to the main <PropertyGroup>.
+> 
+> Reference: This is needed to activate the .NET IL Linker for publish-time trimming, reducing unused code in the final build.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-08T06:24:33Z,2025-07-08T16:19:24Z,,610307777,https://api.github.com/repos/SlimPlanet/SlimFaas,https://github.com/SlimPlanet/SlimFaas/pull/115,"analysisWe need to classify as performance or non-performance. The PR adds trimming and AOT, which improves performance (startup times, binary size). The description explicitly says ""Improved Performance: Native AOT compilation produces optimized native binaries with faster startup times"". So it's performance.assistantfinalperformance",20,0.12332980742291631,True
+3222837614,7790,Add tailrec detection for Kotlin compiler,"## Summary
+- detect simple tail recursion in Kotlin compiler and emit `tailrec`
+- update Kotlin machine README progress and tasks
+
+## Testing
+- `go vet ./...`
+- `go test ./compiler/x/kotlin -tags slow`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_687107680470832093d43b142321e900",OpenAI_Codex,1218621,tamnd,closed,2025-07-11T12:59:03Z,2025-07-11T12:59:14Z,2025-07-11T12:59:14Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7790,"analysisWe need to classify whether the primary purpose of the PR is to improve performance. The PR adds tailrec detection for Kotlin compiler. That is a compiler optimization to detect tail recursion and emit tailrec. This is a performance improvement? Tail recursion optimization can improve performance by eliminating recursion overhead, but it's more about correctness and optimization. The description: ""detect simple tail recursion in Kotlin compiler and emit `tailrec`"". That is a compiler optimization. It might improve performance by enabling tail recursion elimination. But is the primary purpose performance? It could be correctness or language feature. But tailrec is a language feature that allows the compiler to optimize recursion. The PR is about adding detection and emitting tailrec. That is a performance optimization. The guidelines: performance-related PRs may contain keywords like optimization, speed, etc. This PR mentions ""tailrec detection"" which is an optimization. So likely performance. The classification: 'performance'.assistantfinalperformance",20,0.09780245219057274,False

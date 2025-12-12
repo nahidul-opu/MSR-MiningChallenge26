@@ -1,0 +1,569 @@
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
+2986072834,202,Add customizable PostgreSQL connection pool settings,"- Create explicit connection pool with configurable settings
+- Use settings for min_size, max_size, and max_idle
+- Update documentation with examples
+- Add to README feature list
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,8251002,JoshuaC215,closed,2025-04-10T15:28:26Z,2025-04-11T05:02:46Z,2025-04-11T05:02:46Z,838093526,https://api.github.com/repos/JoshuaC215/agent-service-toolkit,https://github.com/JoshuaC215/agent-service-toolkit/pull/202,"analysisWe need to classify whether the primary purpose is performance. The PR adds customizable PostgreSQL connection pool settings: min_size, max_size, max_idle. This is about connection pooling, which can affect performance. But is the primary purpose performance? It is about adding configuration for connection pool, which can improve performance by tuning. The description: ""Add customizable PostgreSQL connection pool settings"" - that is about performance tuning. The keywords: ""performance"" not explicitly present, but ""connection pool"" is a performance optimization. The instruction says performance-related PR may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs. The PR does not contain those keywords, but the content is about connection pool settings, which is a performance improvement. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The PR is about adding customizable connection pool settings. That is a performance improvement. So classify as 'performance'.
+
+Thus answer: performance.assistantfinalperformance",17,1.0,False
+3184703163,499,Implement debounce and smooth updates for share search,"## Summary
+- debounce search requests in share sidebar tab
+- update share search list in-place to prevent flashing
+- log change in CHANGELOG
+
+## Testing
+- `vendor/bin/phpunit --configuration phpunit.xml` *(fails: file not found)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_685f9cf48c8c8333ba3a6f90633f6a72",OpenAI_Codex,13385119,Rello,closed,2025-06-28T07:49:13Z,2025-06-28T07:50:55Z,2025-06-28T07:50:55Z,213728552,https://api.github.com/repos/Rello/analytics,https://github.com/Rello/analytics/pull/499,"analysisWe need to classify the pull request as performance or non-performance. The PR title: ""Implement debounce and smooth updates for share search"". Summary: debounce search requests, update share search list in-place to prevent flashing. Debounce is about reducing frequency of requests, improving performance. Also smooth updates to prevent flashing. This is performance improvement. So label 'performance'.assistantfinalperformance",17,1.0,False
+2920955200,1065,feat(dashboard): add improved app filtering with bundle ID support,"# Add search and filtering functionality to the dashboard for apps
+
+## Changes
+- Enhanced search algorithm to support multi-term filtering
+- Added special syntax for bundle ID filtering (`bundle:` or `id:` prefix)
+- Optimized MAU number loading to only fetch data for visible/filtered apps
+- Adjusted debounce timing for better performance with large datasets
+- Updated search placeholder to indicate bundle ID filtering capability
+
+## Performance Improvements
+1. **Search Algorithm Enhancement**
+   - Split search terms by spaces to allow searching for multiple terms
+   - Implemented AND logic for better filtering precision
+   - Added special syntax for bundle ID filtering
+
+2. **MAU Loading Optimization**
+   - Implemented caching to avoid redundant API calls
+   - Only load MAU numbers for filtered/visible apps
+   - Reduced unnecessary data fetching
+
+3. **Debounce Timing Adjustment**
+   - Increased from 500ms to 800ms for smoother experience with large datasets
+
+## Testing
+- Tested locally with the development server
+- Verified search functionality works for both app name and bundle ID filtering
+- Confirmed performance improvements with large datasets
+
+## Related Issue
+Fixes #1056
+
+Link to Devin run: https://app.devin.ai/sessions/82f2233b49da4015a0dc8cb4c717b243
+",Devin,158243242,devin-ai-integration[bot],closed,2025-03-14T18:08:42Z,2025-03-15T05:37:21Z,,442321089,https://api.github.com/repos/Cap-go/capgo,https://github.com/Cap-go/capgo/pull/1065,"analysisWe need to classify as performance or non-performance. The PR title: ""feat(dashboard): add improved app filtering with bundle ID support"". Body includes performance improvements: search algorithm enhancement, MAU loading optimization, debounce timing adjustment. Contains keywords: ""performance"", ""optimization"", ""speed""? It mentions ""performance improvements"". So it's performance. So label 'performance'.assistantfinalperformance",17,1.0,False
+3078353736,4104,feat: enable WAL mode for SQLite,"Enables SQLite WAL mode to reduce locking. 
+
+Need to test before merging. 
+",OpenAI_Codex,7235481,mldangelo,closed,2025-05-20T22:19:23Z,2025-06-30T23:07:41Z,2025-06-30T23:07:41Z,633927609,https://api.github.com/repos/promptfoo/promptfoo,https://github.com/promptfoo/promptfoo/pull/4104,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""feat: enable WAL mode for SQLite"". Body: ""Enables SQLite WAL mode to reduce locking. Need to test before merging."" WAL mode reduces locking, which can improve performance. It's a performance improvement. So classification: performance.assistantfinalperformance",17,1.0,False
+3071076936,4054,"feat: Server-side pagination, filtering and search for eval results table","## Summary
+In order to support large evals we're updating the Results View to do server side filtering, pagination and search.
+
+- Introduced a new endpoint `eval/table/:id` since this is a new results format
+- Eval comparisons are done server side too
+- Added indicies to support search and filtering
+- Added filtering dropdown for named scores
+- Created a single hook to fetch eval data
+
+
+
+<!-- ELLIPSIS_HIDDEN -->
+
+----
+
+> [!IMPORTANT]
+> This pull request implements server-side pagination for evaluation results, adds a new API endpoint, and updates the frontend to support dynamic data loading and filtering.
+> 
+>   - **Behavior**:
+>     - Implements server-side pagination for evaluation results in `Eval` model.
+>     - Adds `/api/eval/:id/table` endpoint to fetch paginated data.
+>     - Supports filtering by errors, failures, passes, highlights, and specific metrics.
+>     - Allows search queries across multiple fields.
+>     - Handles SQL injection attempts safely.
+>   - **Frontend**:
+>     - Updates `ResultsTable` to load pages dynamically.
+>     - Introduces `useEvalData` hook for fetching evaluation data.
+>     - Adds metric filtering and search functionality in `ResultsView`.
+>   - **Database**:
+>     - Adds indices to `eval_results` table for improved query performance.
+>     - Updates `evals` table schema to include `vars` column.
+>   - **Tests**:
+>     - Comprehensive tests for pagination, filtering, and search functionalities in `eval.test.ts`.
+>     - Tests for `EvalFactory` to create varied evaluation results for testing.
+> 
+> <sup>This description was created by </sup>[<img alt=""Ellipsis"" src=""https://img.shields.io/badge/Ellipsis-blue?color=175173"">](https://www.ellipsis.dev?ref=promptfoo%2Fpromptfoo&utm_source=github&utm_medium=referral)<sup> for eaf8c2c7eb7e99ff7edbd895c7992da8fa92723b. You can [customize](https://app.ellipsis.dev/promptfoo/settings/summaries) this summary. It will automatically update as commits are pushed.</sup>
+
+<!-- ELLIPSIS_HIDDEN -->",OpenAI_Codex,1080611,sklein12,closed,2025-05-17T21:29:21Z,2025-05-24T21:08:39Z,2025-05-24T21:08:39Z,633927609,https://api.github.com/repos/promptfoo/promptfoo,https://github.com/promptfoo/promptfoo/pull/4054,"analysisWe need to classify as performance or non-performance. The PR is about server-side pagination, filtering, search, adding indices for improved query performance. The primary purpose: to support large evals, server side pagination, filtering, search. It mentions adding indices to support search and filtering, improved query performance. But is the primary purpose performance? The main goal is to support large evals, server side pagination, filtering, search. That is more about scalability and functionality, but also performance improvements. The description says ""Adds indices to eval_results table for improved query performance."" But the main purpose is to support large evals, server side pagination, filtering, search. That is more about functionality and scalability. However, the presence of performance-related keywords: ""improved query performance"", ""indices"", ""server side pagination"" might be considered performance. But the classification guidelines: ""Performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" The PR includes ""improved query performance"" which is a performance keyword. But the primary purpose is to support large evals, server side pagination, filtering, search. That is more about functionality. But the question: ""determine whether the primary purpose of the pull request is to improve performance."" The PR is about adding server side pagination, filtering, search, indices. That is to improve performance for large evals. So yes, it's performance. The classification: 'performance'.assistantfinalperformance",17,1.0,False
+3133277192,908,feat: add ParadeDB full-text search support for enhanced task search performance,"Adds support for full text search using [ParadeDB](https://docs.paradedb.com/documentation/full-text/filtering). In my benchmark, searching takes 14ms with ParadeDB vs. 18ms with Typesense (vs. 206ms with plain Postgres).
+
+## Summary
+
+- Add support for ParadeDB full-text search extension to significantly improve task search performance on PostgreSQL                                      
+- Implement graceful fallback to standard ILIKE queries when ParadeDB is not available, maintaining backward compatibility",OpenAI_Codex,13721712,kolaente,closed,2025-06-10T11:47:08Z,2025-07-18T21:18:04Z,2025-07-18T21:18:04Z,159556794,https://api.github.com/repos/go-vikunja/vikunja,https://github.com/go-vikunja/vikunja/pull/908,"analysisWe need to classify as performance or non-performance. The PR title: ""feat: add ParadeDB full-text search support for enhanced task search performance"". Body mentions performance improvements: benchmark times, improved search performance. So it's performance. So output 'performance'.assistantfinalperformance",17,1.0,False
+3130071959,407,Add WAL tuning docs,"## Summary
+- document WAL tuning tips
+- link docs from README
+- add new page to docs index
+- tune postgres settings in compose
+",OpenAI_Codex,16663421,janbjorge,closed,2025-06-09T11:51:02Z,2025-06-09T18:22:10Z,,788904329,https://api.github.com/repos/janbjorge/pgqueuer,https://github.com/janbjorge/pgqueuer/pull/407,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Add WAL tuning docs"". Body: ""document WAL tuning tips, link docs from README, add new page to docs index, tune postgres settings in compose"". This is documentation about WAL tuning, which is performance tuning. The primary purpose is to add documentation, but the content is about performance tuning. The instruction: ""Given a text combining the title and body of a pull request, determine whether the primary purpose of the pull request is to improve performance."" The PR is about adding docs for WAL tuning, which is performance. So classification: 'performance'.assistantfinalperformance",17,1.0,False
+3071083616,137,feat: replace SQLite with DuckDB,"This PR replaces SQLite with DuckDB.
+
+SQLite is great but suffers from a number of issues that make it unsuitable for local RAG:
+1. ❌ SQLite's best vector search extension is probably [sqlite-vec](https://github.com/asg017/sqlite-vec), but [extensions are blocked by default on macOS](https://alexgarcia.xyz/sqlite-vec/python.html#macos-blocks-sqlite-extensions-by-default).
+2. ❌ The sqlite-vec extension also still [doesn't have an accelerated index](https://github.com/asg017/sqlite-vec/issues/25) such as a HNSW index, which means its limited to around a million document chunks.
+3. ❌ SQLite's built-in full-text search extension [FTS5](https://sqlite.org/fts5.html) doesn't offer BM25 scoring.
+
+On the other hand:
+1. ✅ DuckDB has an easily installable vector search extension called [VSS](https://duckdb.org/docs/stable/extensions/vss.html). 
+2. ✅ The VSS extension has accelerated HNSW indexes with experimental support for persistence to disk.
+3. ✅ DuckDB has an easily installable full-text search extension called [FTS](https://duckdb.org/docs/stable/extensions/full_text_search). The only downside to this index is that it needs to be updated manually after inserting, updating, or removing document chunks.
+
+
+Changes:
+1. Simplify the `_typing.py` module and make it more easier to add support for other databases.
+2. Update `keyword_search` to use BM25 when using DuckDB.
+3. Simplify `vector_search` to a single implementation for both DuckDB and PostgreSQL.
+4. Update DuckDB's full-text index after document insertion.
+5. Add tests for in-memory and repeated DuckDB database creation.
+6. Reintroduce support for the `dot` and `l2` metrics.
+7. Add a dependency on `duckdb` and `duckdb-engine`, DuckDB's SQLAlchemy driver.
+8. Remove the dependencies on PyNNDescent and Numba.
+9. Install and configure clang(++) as the default compilers for llama-cpp-python to fix an issue with local development with Dev Containers on macOS.
+
+Note: this PR was originally drafted by [OpenAI Codex](https://chatgpt.com/codex).",OpenAI_Codex,4543654,lsorber,closed,2025-05-17T21:41:28Z,2025-05-19T14:34:59Z,2025-05-19T14:34:59Z,812973394,https://api.github.com/repos/superlinear-ai/raglite,https://github.com/superlinear-ai/raglite/pull/137,"analysisWe need to classify as performance or non-performance. The PR replaces SQLite with DuckDB. The motivation: SQLite's vector search extension blocked on macOS, no accelerated index, limited to million chunks, FTS5 doesn't offer BM25. DuckDB has VSS with accelerated HNSW indexes, persistence, full-text search with BM25. So performance improvements: vector search speed, indexing, BM25. Also removing dependencies on PyNNDescent and Numba, maybe performance. But the primary purpose: replace SQLite with DuckDB to improve performance for local RAG. The title: ""feat: replace SQLite with DuckDB"". The body explains performance issues. So classification: performance.assistantfinalperformance",17,1.0,False
+2920951577,1064,feat: improve search functionality with pagination and visual feedback,"Closes #1063
+
+This PR improves the search functionality in the dashboard by adding pagination and visual feedback during search operations.
+
+## Changes
+- Implemented pagination in AppTable.vue for better performance with large datasets
+- Added multi-term search support for more flexible filtering
+- Added visual feedback during search operations with a spinner icon
+- Optimized debounce timing for search input from 500ms to 300ms
+- Ensured the search works for both app name and bundleid
+
+## Testing
+- Verified that typing in the search box filters apps by name
+- Verified that typing a bundleid in the search box filters apps by bundleid
+- Tested with multiple search terms to ensure filtering works correctly
+- Tested pagination with large datasets to ensure performance is acceptable
+
+Link to Devin run: https://app.devin.ai/sessions/96be49775cff44bbb1c32785a78c3041
+Requested by: User",Devin,158243242,devin-ai-integration[bot],closed,2025-03-14T18:07:04Z,2025-03-15T05:36:51Z,,442321089,https://api.github.com/repos/Cap-go/capgo,https://github.com/Cap-go/capgo/pull/1064,"analysisWe need to classify as performance or non-performance. The PR title: ""feat: improve search functionality with pagination and visual feedback"". Body mentions pagination, visual feedback, optimized debounce timing, performance with large datasets. Keywords: performance, large datasets, optimized debounce, performance acceptable. So it's performance-related. So label 'performance'.assistantfinalperformance",17,1.0,False
+3050105100,3450,Add guide on using EXPLAIN ANALYZE in PostgreSQL,"# Add guide on using EXPLAIN ANALYZE in PostgreSQL
+
+This PR adds a new guide on using EXPLAIN ANALYZE in PostgreSQL to diagnose slow queries. The guide provides a comprehensive tutorial on understanding query plans, interpreting execution statistics, and optimizing database performance.
+
+## Changes
+
+- Added a new guide: ""Using EXPLAIN ANALYZE in PostgreSQL to Diagnose Slow Queries""
+- Added a new contributor: Lina Byte (Community Guide Contributor)
+
+Link to Devin run: https://app.devin.ai/sessions/71ce4db5073e47e8a99a73da31443a1b
+Requested by: Daniel Price (daniel@neon.tech)
+",Devin,158243242,devin-ai-integration[bot],open,2025-05-08T21:14:39Z,,,352436122,https://api.github.com/repos/neondatabase/website,https://github.com/neondatabase/website/pull/3450,analysisWe need to classify as performance or non-performance. The PR adds a guide on using EXPLAIN ANALYZE to diagnose slow queries and optimize database performance. The content is about performance optimization. The primary purpose is to improve performance. So classification: performance.assistantfinalperformance,17,1.0,False
+2920983723,1066,perf: optimize MAU loading mechanism for better performance with large datasets,"Closes #1063
+
+This PR optimizes the MAU loading mechanism to improve performance with large datasets.
+
+## Changes
+- Replaced individual API calls with a single bulk API call using getAppMetrics
+- Implemented caching for MAU numbers to avoid redundant API calls
+- Added loading state for MAU numbers to provide visual feedback
+- Optimized watchEffect to avoid unnecessary API calls
+
+## Testing
+- Verified that MAU numbers are displayed correctly after optimization
+- Tested with a large number of apps to ensure performance is acceptable
+- Tested on mobile screen sizes to ensure it works on smaller devices
+- Tested with different search terms to ensure filtering works correctly
+
+Link to Devin run: https://app.devin.ai/sessions/38a38f81d3f9427ebfa20151e4889e7a
+Requested by: User",Devin,158243242,devin-ai-integration[bot],closed,2025-03-14T18:19:38Z,2025-03-15T05:38:03Z,,442321089,https://api.github.com/repos/Cap-go/capgo,https://github.com/Cap-go/capgo/pull/1066,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""perf: optimize MAU loading mechanism for better performance with large datasets"". Contains ""perf"" and ""performance"". So definitely performance. So output 'performance'.assistantfinalperformance",17,1.0,False
+3099021790,157,Add debounced QR code updates,Resolves #138 ,OpenAI_Codex,35736525,lyqht,closed,2025-05-29T03:03:18Z,2025-05-29T03:05:49Z,2025-05-29T03:05:49Z,630944068,https://api.github.com/repos/lyqht/mini-qr,https://github.com/lyqht/mini-qr/pull/157,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Add debounced QR code updates"". Body: ""Resolves #138"". No other content. Debounced updates likely to reduce frequency of updates, improving performance or responsiveness. Debounce is a performance optimization to reduce calls. So likely performance. The guidelines: performance-related PR may contain keywords like latency, optimization, slow, etc. Debounce is a performance optimization. So classify as 'performance'.assistantfinalperformance",17,0.28155585348956447,False
+3186657928,89,Improve tray icon update frequency,"## Summary
+- refresh the tray icon only every 5 seconds
+",OpenAI_Codex,39589028,eplatonoff,closed,2025-06-29T22:49:27Z,2025-07-04T14:50:39Z,,214868921,https://api.github.com/repos/eplatonoff/pilorama,https://github.com/eplatonoff/pilorama/pull/89,"analysisWe need to classify whether the primary purpose is to improve performance. The PR title: ""Improve tray icon update frequency"". Summary: ""refresh the tray icon only every 5 seconds"". This is about reducing frequency of updates, likely to reduce CPU usage or performance overhead. It's about performance improvement: less frequent updates to reduce resource usage. So classification: 'performance'.assistantfinalperformance",17,0.25086714398698173,False
+3267083771,955,Prevent duplicate refresh-frame intervals,"## Summary
+- track refresh-frame interval id
+- reuse same interval to avoid starting many refresh timers
+- clear the interval when processing finishes
+- refresh every 5 seconds to reduce server load
+
+## Testing
+- `cargo test --workspace --exclude integration-testing --exclude rag-engine`
+
+------
+https://chatgpt.com/codex/tasks/task_e_688607b4d6208320b85f6eb671944bd8",OpenAI_Codex,173255911,242816,closed,2025-07-27T12:59:42Z,2025-07-28T06:41:50Z,2025-07-28T06:41:50Z,663396489,https://api.github.com/repos/bionic-gpt/bionic-gpt,https://github.com/bionic-gpt/bionic-gpt/pull/955,"analysisWe need to classify as performance or non-performance. The PR title: ""Prevent duplicate refresh-frame intervals"". Summary: track refresh-frame interval id, reuse same interval to avoid starting many refresh timers, clear interval when processing finishes, refresh every 5 seconds to reduce server load. This is about reducing server load, preventing duplicate timers, likely performance improvement. Keywords: ""refresh every 5 seconds to reduce server load"" - performance. So classify as 'performance'.assistantfinalperformance",17,0.23881346744195356,False
+3093078361,527,Fix per-input refresh debouncing,"## Summary
+- handle refresh rate limiting per input descriptor in `InputsTab`
+
+## Testing
+- `dotnet build Elsa.Studio.sln -c Release` *(fails: Unable to load the service index for source https://api.nuget.org/v3/index.json)*",OpenAI_Codex,938393,sfmskywalker,closed,2025-05-27T08:19:55Z,2025-05-27T08:21:30Z,2025-05-27T08:21:30Z,622646426,https://api.github.com/repos/elsa-workflows/elsa-studio,https://github.com/elsa-workflows/elsa-studio/pull/527,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Fix per-input refresh debouncing"". Summary: handle refresh rate limiting per input descriptor in InputsTab. This is about debouncing refresh, likely to reduce unnecessary refreshes, improving performance. The body mentions testing. The keywords: ""debouncing"", ""refresh rate limiting"". This is about performance. So classify as 'performance'.assistantfinalperformance",17,0.23346030811042984,False
+3027244028,1323,Add debounce to pyplot example Randomize button,"# Add debounce to pyplot example Randomize button
+
+## Description
+This PR adds a debounce to the Randomize button in the pyplot example to reduce lag when processing data. The implementation:
+
+- Uses the `.debounce(1200)` method on the Randomize button's on_click event handler to add a 1.2 second debounce delay
+- Keeps the implementation simple and focused on just the button that needs debouncing
+
+## Testing
+- Tested locally with the development server
+- Verified that the debouncing works correctly with the Randomize button
+- Confirmed no errors in the console
+
+Link to Devin run: https://app.devin.ai/sessions/61b87a6c1a0645b2b5da2ba4487d16fd
+Requested by: Alek Petuskey (alek@reflex.dev)
+",Devin,158243242,devin-ai-integration[bot],closed,2025-04-29T06:44:29Z,2025-04-29T06:45:06Z,,577975610,https://api.github.com/repos/reflex-dev/reflex-web,https://github.com/reflex-dev/reflex-web/pull/1323,"analysisWe need to classify as performance or non-performance. The PR adds debounce to reduce lag when processing data. Debounce is a performance improvement. Keywords: lag, debounce, reduce lag. So it's performance.assistantfinalperformance",17,0.22791952607646573,False
+3240335886,1599,Implement redraw debounce,"## Summary
+- debouce redraw events so repeated requests don't overwhelm the terminal
+- add `RequestRedraw` event and schedule redraws after 100ms
+
+## Testing
+- `cargo clippy --tests`
+- `cargo test` *(fails: Sandbox Denied errors in landlock tests)*
+
+------
+https://chatgpt.com/codex/tasks/task_i_68792a65b8b483218ec90a8f68746cd8",OpenAI_Codex,219906144,aibrahim-oai,closed,2025-07-17T17:18:15Z,2025-07-17T19:54:55Z,2025-07-17T19:54:55Z,965415649,https://api.github.com/repos/openai/codex,https://github.com/openai/codex/pull/1599,"analysisWe need to classify the pull request as performance or non-performance. The PR title: ""Implement redraw debounce"". Summary: ""debounce redraw events so repeated requests don't overwhelm the terminal"". That is about reducing frequency of redraws, improving performance by avoiding too many redraws. So it's a performance improvement. So classification: 'performance'.assistantfinalperformance",17,0.22474770854019982,False
+3027146476,1321,Fix lag in pyplot example by implementing proper debouncing,"# Fix lag in pyplot example by implementing proper debouncing
+
+## Description
+This PR fixes lag in the pyplot example in the documentation by properly implementing debouncing using Reflex's built-in mechanism. The implementation:
+
+- Uses the `.debounce()` method on event handlers to add a 1.2 second debounce delay
+- Removes unnecessary custom debouncing code with asyncio and time tracking
+- Simplifies the event handlers for better readability
+
+## Testing
+- Tested locally with the development server
+- Verified that the debouncing works correctly with the slider and randomize button
+- Tested with different numbers of points to ensure smooth performance
+- Confirmed no errors in the console
+
+Link to Devin run: https://app.devin.ai/sessions/61b87a6c1a0645b2b5da2ba4487d16fd
+Requested by: Alek Petuskey (alek@reflex.dev)
+",Devin,158243242,devin-ai-integration[bot],closed,2025-04-29T06:00:35Z,2025-04-30T03:19:28Z,,577975610,https://api.github.com/repos/reflex-dev/reflex-web,https://github.com/reflex-dev/reflex-web/pull/1321,"analysisWe need to classify as performance or non-performance. The PR title: ""Fix lag in pyplot example by implementing proper debouncing"". The description: ""Fix lag in the pyplot example in the documentation by properly implementing debouncing using Reflex's built-in mechanism."" It mentions lag, performance, debouncing. So it's performance. So output 'performance'.assistantfinalperformance",17,0.21810318920664237,False
+3119752724,25,Improve input tracking with debouncing,"## Summary
+- debounce uiohook events for smoother ComputerAction logs
+- coalesce mouse move events into `trace_mouse`
+- coalesce keyboard input into `type_keys`
+
+## Testing
+- `npm install --ignore-scripts`
+- `npm run build`
+- `npm test` *(fails: no tests found)*
+
+------
+https://chatgpt.com/codex/tasks/task_b_6840f279e8c08329b1fc8e9addebc0dc",OpenAI_Codex,868976,atupem,closed,2025-06-05T03:55:44Z,2025-06-12T04:01:21Z,,926709003,https://api.github.com/repos/bytebot-ai/bytebot,https://github.com/bytebot-ai/bytebot/pull/25,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve input tracking with debouncing"". Summary: debounce uiohook events for smoother ComputerAction logs, coalesce mouse move events into trace_mouse, coalesce keyboard input into type_keys. This is about debouncing input events to reduce noise, likely improving performance by reducing event handling overhead. Keywords: debounce, smoother logs, coalesce events. This is performance improvement. So classify as 'performance'.assistantfinalperformance",17,0.21662259398775718,False
+3136694740,1985,Close PGLite instances immediately after query execution,"# Close PGLite instances immediately after query execution
+
+## Summary
+
+Modified the PGliteInstanceManager to close PGLite instances immediately after query execution instead of keeping them in memory per session. This change reduces memory usage by not holding database instances in memory between queries.
+
+<img width=""767"" alt=""スクリーンショット 2025-06-12 15 42 16"" src=""https://github.com/user-attachments/assets/8defb768-553b-4818-ade0-4ec5d8a9096d"" />
+
+
+## Changes Made
+
+- **PGliteInstanceManager.ts**: 
+  - Removed session-based instance storage (`Map<string, PGliteInstance>`)
+  - Removed automatic cleanup interval and related methods
+  - Modified `executeQuery` to create new instances per query and close them in a `finally` block
+  - Simplified class structure by removing unnecessary session management
+
+- **types.ts**: 
+  - Removed unused `PGliteInstance` interface
+  - Cleaned up unused imports
+
+## Technical Details
+
+### Before
+- Instances were stored in a Map by sessionId
+- Automatic cleanup removed inactive instances after 30 minutes
+- Memory usage accumulated over time with multiple sessions
+
+### After
+- New instance created for each query execution
+- Instance closed immediately after query completion using try/finally
+- Zero memory accumulation between queries
+- Maintains API compatibility (sessionId parameter kept but unused)
+
+## Testing
+
+- ✅ Lint checks pass (Biome, ESLint, TypeScript)
+- ✅ Build successful
+- ⏳ CI checks pending
+
+## Breaking Changes
+
+None - the public API remains unchanged. The `executeQuery` function signature is identical.
+
+## Memory Impact
+
+This change should significantly reduce memory usage, especially for applications with:
+- Multiple concurrent sessions
+- Long-running processes
+- Infrequent database queries
+
+---
+
+**Link to Devin run**: https://app.devin.ai/sessions/e27d72606b85489782dee0f2bbe94f2e
+
+**Requested by**: noritaka.ikeda@route06.co.jp
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-11T12:44:10Z,2025-06-12T07:06:53Z,2025-06-12T07:06:52Z,839216423,https://api.github.com/repos/liam-hq/liam,https://github.com/liam-hq/liam/pull/1985,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Close PGLite instances immediately after query execution"". The body: describes reducing memory usage by not holding database instances in memory between queries. This is a performance improvement: memory usage, resource usage. Keywords: memory, reduce memory usage. So classification: performance.assistantfinalperformance",17,0.19417727946633168,False
+3256509471,605,BUS-1495: Implement Snowflake adapter streaming with network-level row limiting,"# BUS-1495: Implement Snowflake adapter streaming with network-level row limiting
+
+## Summary
+
+Implemented streaming functionality in the Snowflake adapter to prevent out-of-memory (OOM) errors when handling large query results. The key change replaces the previous approach of fetching all rows into memory then limiting client-side with true network-level row limiting using the Snowflake Node.js driver's streaming capabilities.
+
+**Key Changes:**
+- Modified `SnowflakeAdapter.query()` to use `streamResult: true` and `stmt.streamRows({ start: 0, end: limit })`
+- Added default 5000 row limit when `maxRows` is not specified or is 0
+- Implemented stream event handling for 'data', 'error', and 'end' events
+- Updated unit tests to mock streaming behavior
+- Fixed integration test property names and imports
+- Maintained backward compatibility with existing adapter interface
+
+## Review & Testing Checklist for Human
+
+⚠️ **HIGH RISK** - This PR makes significant changes to core query execution logic and requires thorough testing.
+
+- [x] **Test with real Snowflake credentials** - Verify that streaming actually works end-to-end with a real Snowflake connection (most critical)
+- [x] **Validate Snowflake SDK streaming API** - Confirm that `stmt.streamRows({ start, end })` parameters and stream events match the actual SDK behavior
+- [x] **Test edge cases** - Empty result sets, query errors, connection failures, and results exactly equal to the limit
+- [x] **Verify backward compatibility** - Ensure existing code using the adapter continues to work without changes
+- [x] **Confirm default behavior change** - Validate that the new 5000 row default limit is acceptable for existing use cases
+
+**Recommended Test Plan:**
+1. Run integration tests with real Snowflake credentials
+2. Test queries with various row counts (< 5000, = 5000, > 5000)
+3. Test with and without explicit `maxRows` parameter
+4. Verify query caching still works as expected
+5. Test error scenarios (invalid SQL, connection issues)
+
+---
+
+### Diagram
+
+```mermaid
+%%{ init : { ""theme"" : ""default"" }}%%
+graph TD
+    Client[""Client Code""]
+    Adapter[""snowflake.ts<br/>SnowflakeAdapter""]:::major-edit
+    UnitTests[""snowflake.test.ts<br/>Unit Tests""]:::major-edit
+    IntTests[""snowflake.int.test.ts<br/>Integration Tests""]:::minor-edit
+    MemTests[""snowflake-memory-protection.int.test.ts<br/>Memory Protection Tests""]:::minor-edit
+    SnowflakeSDK[""Snowflake Node.js SDK""]:::context
+
+    Client -->|""query(sql, params, maxRows)""| Adapter
+    Adapter -->|""connection.execute({streamResult: true})""| SnowflakeSDK
+    SnowflakeSDK -->|""stmt.streamRows({start: 0, end: limit})""| Adapter
+    Adapter -->|""stream events: data, error, end""| Client
+    
+    UnitTests -->|""mocks streaming behavior""| Adapter
+    IntTests -->|""tests real connections""| Adapter
+    MemTests -->|""tests large result sets""| Adapter
+
+    subgraph Legend
+        L1[""Major Edit""]:::major-edit
+        L2[""Minor Edit""]:::minor-edit  
+        L3[""Context/No Edit""]:::context
+    end
+
+    classDef major-edit fill:#90EE90
+    classDef minor-edit fill:#87CEEB
+    classDef context fill:#FFFFFF
+```
+
+### Notes
+
+**Critical Risk**: This implementation is based on assumptions about the Snowflake Node.js SDK streaming API that haven't been validated against a real Snowflake connection. The `streamRows` method parameters, return types, and event handling could differ from the actual SDK behavior.
+
+**Behavioral Change**: The adapter now applies row limits at the network level instead of fetching all rows then limiting in memory. This is the desired behavior for preventing OOM, but represents a significant change in how the adapter works internally.
+
+**Session Info**: 
+- Requested by: Dallin Bentley (@dallinbentley)
+- Session URL: https://app.devin.ai/sessions/e532bcb78ef74d8e90b530f5f9edea27",Devin,158243242,devin-ai-integration[bot],closed,2025-07-23T13:57:48Z,2025-07-23T16:15:05Z,2025-07-23T16:15:05Z,855264010,https://api.github.com/repos/buster-so/buster,https://github.com/buster-so/buster/pull/605,"analysisWe need to classify as performance or non-performance. The PR implements streaming to prevent out-of-memory errors, uses network-level row limiting, memory usage improvement. Keywords: memory, optimization, speed, performance, etc. This is clearly performance improvement. So label 'performance'.assistantfinalperformance",17,0.14718779551355318,True
+3134916409,251153,Fix notebook sticky scroll flashing by using single reusable delayer,"The notebook sticky scroll was experiencing continuous flashing when scrolling headers close to the sticky scroll area. This was caused by improper debouncing in the scroll event handler.
+
+## Root Cause
+
+Each scroll event created a new `Delayer(100)` instance, but multiple delayers could be active simultaneously when scroll events occurred rapidly (faster than 100ms apart). This caused:
+
+1. Multiple delayed updates to be pending at once
+2. Rapid successive content updates
+3. Visual flashing as the sticky scroll content updated repeatedly
+4. Potential memory inefficiency from creating/disposing many delayer instances
+
+## Solution
+
+Replace the per-event delayer creation with a single reusable delayer instance:
+
+**Before:**
+```typescript
+this._disposables.add(this.notebookEditor.onDidScroll(() => {
+    const d = new Delayer(100);  // ❌ New delayer each time
+    d.trigger(() => {
+        d.dispose();
+        // ... update logic
+    });
+}));
+```
+
+**After:**
+```typescript
+private readonly scrollDelayer = this._register(new Delayer(100));
+
+this._disposables.add(this.notebookEditor.onDidScroll(() => {
+    this.scrollDelayer.trigger(() => {  // ✅ Reuse same delayer
+        // ... update logic
+    });
+}));
+```
+
+## Benefits
+
+- **Eliminates flashing**: Only one delayed update can be pending at a time
+- **Improves performance**: No overhead from creating/disposing multiple delayers
+- **Better memory usage**: Single reusable instance vs multiple short-lived instances
+- **Maintains functionality**: All existing behavior preserved
+- **Minimal change**: Only 6 lines added, 4 removed
+
+## Testing
+
+Validated with a mock implementation that simulates rapid scroll events - the fix successfully debounces multiple events into a single update call.
+
+Fixes #211114.",Copilot,198982749,Copilot,open,2025-06-10T21:45:31Z,,,41881900,https://api.github.com/repos/microsoft/vscode,https://github.com/microsoft/vscode/pull/251153,"analysisWe need to classify whether the primary purpose of the pull request is to improve performance. The PR title: ""Fix notebook sticky scroll flashing by using single reusable delayer"". The body describes that the issue was continuous flashing due to improper debouncing, causing multiple delayed updates, visual flashing, memory inefficiency. The solution: replace per-event delayer creation with a single reusable delayer instance. Benefits: eliminates flashing, improves performance, better memory usage. So the primary purpose is to improve performance (reduce flashing, memory usage). The classification: 'performance'.assistantfinalperformance",17,0.05775042125313371,False
+3173304702,252342,Fix sticky scroll performance issue by using correct array for min content width calculation,"Sticky scrolling was causing noticeable performance issues and stuttering during scroll operations due to inefficient DOM queries in the `StickyScrollWidget._renderRootNode` method.
+
+## Problem
+
+The `_renderRootNode` method was calculating `_minContentWidthInPx` using the old `this._renderedStickyLines` array instead of the newly built `renderedStickyLines` array. This caused:
+
+1. **Performance degradation**: Reading `scrollWidth` from potentially stale/removed DOM elements triggered unnecessary layout recalculations
+2. **Incorrect calculations**: Using outdated scroll width values from elements that were being removed from the DOM
+3. **Browser frame drops**: The additional layout work caused visible stuttering during scroll operations
+
+## Solution
+
+Changed line 248 in `stickyScrollWidget.ts` to use the correct array and added proper empty array handling:
+
+```typescript
+// Before (buggy):
+this._minContentWidthInPx = Math.max(...this._renderedStickyLines.map(l => l.scrollWidth)) + layoutInfo.verticalScrollbarWidth;
+
+// After (fixed):
+this._minContentWidthInPx = renderedStickyLines.length > 0 
+    ? Math.max(...renderedStickyLines.map(l => l.scrollWidth)) + layoutInfo.verticalScrollbarWidth 
+    : 0;
+```
+
+## Impact
+
+- **Performance**: Eliminates forced layout recalculations by using fresh scroll width values that were already computed during rendering
+- **Accuracy**: Ensures minimum content width calculation reflects the actual current DOM state
+- **User Experience**: Reduces scroll stuttering and frame drops when sticky scroll is enabled
+- **Minimal Risk**: Only 3 lines changed, preserving all existing functionality
+
+The fix ensures that during sticky scroll updates, we use the scroll width values from the current rendering cycle instead of potentially accessing removed DOM elements.
+
+Fixes #191973.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `electronjs.org`
+>   - Triggering command: `node-gyp                                                                           ` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-06-24T21:09:26Z,,,41881900,https://api.github.com/repos/microsoft/vscode,https://github.com/microsoft/vscode/pull/252342,"analysisWe need to classify the pull request as 'performance' or 'non-performance'. The PR title: ""Fix sticky scroll performance issue by using correct array for min content width calculation"". Body describes performance issue, stuttering, layout recalculations, etc. It's clearly a performance improvement. So classification: 'performance'.assistantfinalperformance",17,0.05633242051455637,True
+3136041106,14760,Fix scroll wheel responsiveness in Windows App SDK by using system scroll settings,"## Problem
+
+Scroll wheel behavior in React Native Windows using the new architecture (Windows App SDK) was significantly less responsive compared to the WinUI 3 Gallery app and other native Windows applications. Users reported that scrolling felt sluggish and required much more effort, with fewer lines scrolled per wheel notch than expected.
+
+## Root Cause
+
+The `OnPointerWheelChanged` method in `ScrollViewComponentView.cpp` was using the raw mouse wheel delta (typically 120 per notch) multiplied only by `pointScaleFactor`, completely ignoring Windows system settings for wheel scroll behavior that users configure in their system preferences.
+
+## Solution
+
+This PR implements system-aware scroll wheel calculation that respects Windows user preferences:
+
+1. **Added `GetSystemWheelScrollLines()` helper function** that retrieves the user's configured ""lines per wheel notch"" setting using `SystemParametersInfo(SPI_GETWHEELSCROLLLINES, ...)`
+
+2. **Updated scroll calculation** to use proper line-based scrolling:
+   ```cpp
+   // Before: Raw delta approach
+   scrollDown(-delta * m_layoutMetrics.pointScaleFactor, true)
+   
+   // After: System-aware line-based approach  
+   const float notches = delta / 120.0f;
+   const float linesToScroll = notches * systemLinesPerNotch * c_scrollerLineDelta * m_layoutMetrics.pointScaleFactor;
+   scrollDown(-linesToScroll, true)
+   ```
+
+3. **Math comparison**:
+   - **Before**: 120 pixels per notch (regardless of user preferences)
+   - **After**: ~48 pixels per notch with default 3-line setting, ~80 pixels with 5-line setting
+   - Properly scales with DPI and respects user's accessibility needs
+
+## Benefits
+
+- ✅ **Responsive scrolling**: Matches native Windows application behavior
+- ✅ **User preference aware**: Respects system scroll wheel settings
+- ✅ **Accessibility friendly**: Works with custom line counts for users with mobility needs
+- ✅ **DPI aware**: Maintains proper scaling on high-DPI displays
+- ✅ **Minimal impact**: Only 7 lines of code changed, no breaking changes
+
+## Testing
+
+Validated the mathematical logic with various scenarios:
+- Standard 3-line setting: 48 pixels per notch
+- High accessibility 5-line setting: 80 pixels per notch  
+- High DPI (1.5x): 72 pixels per notch with 3-line setting
+- Backward scrolling: Proper negative values
+
+Fixes #14653.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `googlechromelabs.github.io`
+>   - Triggering command: `/usr/local/bin/node install.mjs ` (dns block)
+> - `https://storage.googleapis.com/chrome-for-testing-public/130.0.6723.116/linux64/chrome-headless-shell-linux64.zip`
+>   - Triggering command: `/usr/local/bin/node install.mjs ` (http block)
+> - `https://storage.googleapis.com/chrome-for-testing-public/130.0.6723.116/linux64/chrome-linux64.zip`
+>   - Triggering command: `/usr/local/bin/node install.mjs ` (http block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+",Copilot,198982749,Copilot,closed,2025-06-11T08:58:57Z,2025-07-14T15:23:48Z,,48009214,https://api.github.com/repos/microsoft/react-native-windows,https://github.com/microsoft/react-native-windows/pull/14760,"analysisWe need to classify as 'performance' or 'non-performance'. The PR is about improving scroll wheel responsiveness, which is a performance improvement? It's about user experience, responsiveness, but it's not about speed of code execution, but about UI responsiveness. The guidelines: performance-related PRs may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs.
+
+The PR title: ""Fix scroll wheel responsiveness in Windows App SDK by using system scroll settings"". The body mentions ""scroll wheel behavior... significantly less responsive... sluggish... fewer lines scrolled per wheel notch"". The solution: system-aware scroll wheel calculation. This is about responsiveness, but is it performance? It improves user experience by making scrolling faster or more responsive. The guidelines say ""responsive"" is a keyword. So yes, it's performance. So classify as 'performance'.
+
+Thus output: performance.assistantfinalperformance",17,0.05602896023063486,True

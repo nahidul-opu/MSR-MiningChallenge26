@@ -1,0 +1,484 @@
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
+3254645443,12213,Update F# transpiler for array usage,"## Summary
+- attempt to use F# arrays instead of lists in transpiler
+- adjust index updates and list operations
+- regenerate 100-prisoners artifacts
+
+## Testing
+- `go vet ./...`
+- `MOCHI_ROSETTA_INDEX=4 MOCHI_NOW_SEED=1 go test ./transpiler/x/fs -run Rosetta -tags=slow -count=1` *(fails)*
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6880424d7eec8320a9721716b76d39b7",OpenAI_Codex,1218621,tamnd,closed,2025-07-23T02:51:08Z,2025-07-23T02:51:32Z,2025-07-23T02:51:32Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12213,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Update F# transpiler for array usage"". Summary: attempt to use F# arrays instead of lists in transpiler, adjust index updates and list operations, regenerate artifacts. This is about using arrays instead of lists, which can improve performance. But is the primary purpose performance? It seems to be about changing data structures to arrays for performance. The description mentions adjusting index updates and list operations. It might be to improve performance. The keywords: ""array usage"" vs ""list usage"". The change likely improves performance. There's no explicit mention of performance, but the change is to use arrays instead of lists, which is a performance improvement. The classification: performance.assistantfinalperformance",7,1.0,False
+3263193319,13119,Fix Zig transpiler printing and benchmark stats,"## Summary
+- update Zig codegen to use new `std.io.getStdOut().writer()` API
+- add Linux memory stats for benchmark mode
+- let rosetta tests use real time when benchmarking
+- regenerate Zig output and bench data for first Rosetta programs
+- refresh durations in `ROSETTA.md`
+
+## Testing
+- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=true go test -tags slow ./transpiler/x/zig -run TestZigTranspiler_Rosetta -count=1 -v`
+- `MOCHI_ROSETTA_INDEX=2 MOCHI_BENCHMARK=true go test -tags slow ./transpiler/x/zig -run TestZigTranspiler_Rosetta -count=1 -v`
+- `MOCHI_ROSETTA_INDEX=1 go test -tags slow ./transpiler/x/zig -run TestZigTranspiler_Rosetta -count=1`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_68837cab0d688320b7b096f7d5bfe12b",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T13:11:54Z,2025-07-25T13:12:08Z,2025-07-25T13:12:07Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/13119,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Fix Zig transpiler printing and benchmark stats"". Summary: update Zig codegen to use new std.io API, add Linux memory stats for benchmark mode, let rosetta tests use real time when benchmarking, regenerate Zig output and bench data for first Rosetta programs, refresh durations in ROSETTA.md. This includes adding memory stats for benchmark mode, updating benchmark stats. That is performance related. The changes are about benchmark stats, memory stats, real time usage, durations. So it's performance. So label 'performance'.assistantfinalperformance",7,1.0,False
+3261928697,12955,Add benchmark support for transpiler and VM tests,"## Summary
+- allow wrapping generated main in benchmark block via `benchMainFlag`
+- record benchmark outputs for Go transpiler examples
+- support Rosetta benchmarking in the VM tests
+- generate VM Rosetta checklist with durations and memory usage
+
+## Testing
+- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=1 go test -tags slow ./transpiler/x/go -run Rosetta -count=1`
+- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=1 go test -tags slow ./runtime/vm -run Rosetta -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6883020b17188320b6159714612d08c5",OpenAI_Codex,1218621,tamnd,open,2025-07-25T04:17:24Z,,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12955,"analysisWe need to classify as performance or non-performance. The PR adds benchmark support for transpiler and VM tests. It mentions benchmark outputs, durations, memory usage. It's about performance measurement. So it's performance.assistantfinalperformance",7,1.0,False
+3261822593,12900,Update PHP benchmark logic,"## Summary
+- avoid MOCHI_NOW_SEED when benchmarking PHP rosetta programs so timing is real
+- regenerate benchmark result for program 1
+- update README, TASKS, and rosetta checklist timestamp
+
+## Testing
+- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=1 go test ./transpiler/x/php -run Rosetta -count=1 -tags=slow`
+- `UPDATE=1 MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=1 go test ./transpiler/x/php -run Rosetta -count=1 -tags=slow`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6882e86aa2e48320a2b2f8b9e05c0742",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T02:57:48Z,2025-07-25T03:01:44Z,2025-07-25T03:01:44Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12900,"analysisWe need to classify as performance or non-performance. The PR title: ""Update PHP benchmark logic"". Summary: avoid MOCHI_NOW_SEED when benchmarking PHP rosetta programs so timing is real; regenerate benchmark result; update README, TASKS, and rosetta checklist timestamp. This is about benchmarking logic, ensuring real timing. It's about performance measurement. The keywords: benchmark, timing, real. It's about performance. So classification: performance.assistantfinalperformance",7,1.0,False
+3261767764,12892,Add benchmark flag to Go transpiler,"## Summary
+- add benchMain flag for Go transpiler
+- update Go transpiler rosetta tests to use benchmark flag
+- generate benchmark output for `100-doors-2`
+- add VM Rosetta test suite and progress report
+
+## Testing
+- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=true go test ./transpiler/x/go -run Rosetta -tags slow -count=1`
+- `MOCHI_ROSETTA_INDEX=1 go test ./runtime/vm -run Rosetta -tags slow -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6882e782c9448320afd442e1b69c10c6",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T02:25:27Z,2025-07-25T02:26:03Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12892,"analysisWe need to classify as performance or non-performance. The PR adds benchmark flag to Go transpiler, updates tests to use benchmark flag, generate benchmark output, add VM Rosetta test suite and progress report. This is about benchmarking, performance measurement. The primary purpose is to add benchmark flag, not necessarily performance improvement. But the description: ""Add benchmark flag to Go transpiler"" and ""generate benchmark output for `100-doors-2`"". It's about benchmarking, not necessarily improving performance. But the classification criteria: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, etc. This PR contains ""benchmark"" which is a performance measurement. The question: is it performance? The guidelines: ""Performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" Benchmark is a performance measurement. The PR is about adding a benchmark flag, not necessarily improving performance. But it's about measuring performance. The classification might be ""performance"" because it's about performance measurement. The guidelines say ""performance-related pull requests may contain keywords such as... or any other terms referring to how faster and efficiently software runs."" Benchmark is a term referring to performance measurement. So likely classify as performance. The primary purpose: to add benchmark flag, update tests to use benchmark flag, generate benchmark output. That is about performance measurement. So classification: performance.assistantfinalperformance",7,1.0,False
+3261691643,12846,Enable bench-mode in Elixir transpiler,"## Summary
+- add `benchMain` option to Elixir transpiler so `main` can be wrapped in a benchmarking block
+- run benchmark mode when `MOCHI_BENCHMARK=true`
+- record benchmark results in Rosetta progress table
+- update Rosetta progress table format
+- regenerate `100-doors-2` Elixir output with benchmark metrics
+
+## Testing
+- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=true go test ./transpiler/x/ex -tags slow -run Rosetta -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6882dcdc911083209e54a09d6ea333a9",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T01:38:25Z,2025-07-25T01:38:39Z,2025-07-25T01:38:38Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12846,"analysisWe need to classify as performance or non-performance. The PR adds bench-mode, benchmarking, records results, updates progress table. It's about benchmarking, performance measurement. The primary purpose is to enable bench-mode, record benchmark results. It's about performance measurement, not necessarily optimization. But the instruction says performance-related PR may contain keywords like benchmark, performance, etc. This PR is about enabling bench-mode, which is performance measurement. So classify as 'performance'.assistantfinalperformance",7,1.0,True
+3261682254,12844,Add CS benchmark mode and update Rosetta,"## Summary
+- add benchmark block option to CS transpiler
+- capture durations and memory in Rosetta tests
+- skip MOCHI_NOW_SEED when benchmarking
+- parse JSON results from the output
+- regenerate code/output for `100-doors-2`
+
+## Testing
+- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=1 go test -tags slow ./transpiler/x/cs -run Rosetta -count=1 -v`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6882dc5bbf748320816593903b0c59e5",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T01:32:25Z,2025-07-25T01:32:39Z,2025-07-25T01:32:39Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12844,"analysisWe need to classify as performance or non-performance. The PR adds CS benchmark mode, captures durations and memory, skip seed, parse JSON results, regenerate code. This is about benchmarking, measuring performance. So it's performance.assistantfinalperformance",7,1.0,False
+3261702887,12852,Add benchmark wrapper for F# transpiler,"## Summary
+- support benchmark wrapping for main function in fs transpiler
+- update fs stub and rosetta tests for benchmark mode
+- regenerate benchmarked output for `100-doors-2`
+- reformat F# Rosetta checklist with timing/memory columns
+- fix benchmark seeding so runtime uses real clock
+
+## Testing
+- `MOCHI_ROSETTA_INDEX=1 UPDATE=1 MOCHI_BENCHMARK=1 go test -tags=slow ./transpiler/x/fs -run Rosetta -count=1 -v`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6882dcf114b08320ba0474680fcdce3f",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T01:45:26Z,2025-07-25T01:45:38Z,2025-07-25T01:45:38Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12852,"analysisWe need to classify as performance or non-performance. The PR title: ""Add benchmark wrapper for F# transpiler"". Summary: support benchmark wrapping for main function in fs transpiler, update tests, regenerate benchmarked output, reformat checklist with timing/memory columns, fix benchmark seeding so runtime uses real clock. This is clearly performance-related: adding benchmark wrapper, timing/memory columns, etc. So classification: performance.assistantfinalperformance",7,1.0,False
+3261705783,12854,Add benchmark support to Fortran transpiler,"## Summary
+- add benchmark mode flag to Fortran transpiler
+- generate timing/memory JSON when enabled
+- record benchmark info in ROSETTA checklist table
+- update Fortran rosetta tests to handle benchmark mode
+- include generated output for first program
+
+## Testing
+- `go test ./transpiler/x/fortran -tags slow -run TestFortranTranspiler_Rosetta -count=1 -v`
+- `MOCHI_BENCHMARK=1 go test ./transpiler/x/fortran -tags slow -run TestFortranTranspiler_Rosetta -count=1 -v || true`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6882ddafb1fc83209eef216895909b60",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T01:47:11Z,2025-07-25T01:47:31Z,2025-07-25T01:47:31Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12854,"analysisWe need to classify as performance or non-performance. The PR adds benchmark support, generating timing/memory JSON, record benchmark info, etc. It's about benchmarking, measuring performance. The primary purpose is to add benchmark support, not necessarily to improve performance. But the instruction: ""Performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" The PR includes ""benchmark mode flag"", ""generate timing/memory JSON"", ""record benchmark info"". It references memory, timing. That is performance-related. The primary purpose is to add benchmark support, but that is performance measurement. The classification likely ""performance"". So output: performance.assistantfinalperformance",7,1.0,True
+3261747303,12879,Update FS transpiler benchmark support,"## Summary
+- update F# transpiler to allow bench block wrapping
+- regenerate Rosetta benchmark output for first programs
+- update ROSETTA readme table with durations
+
+## Testing
+- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=1 go test -tags slow ./transpiler/x/fs -run Rosetta -count=1 -v`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6882e32973c08320878cb7e86f73be9e",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T02:12:08Z,2025-07-25T02:12:20Z,2025-07-25T02:12:20Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12879,"analysisWe need to classify as performance or non-performance. The PR title: ""Update FS transpiler benchmark support"". Summary: update F# transpiler to allow bench block wrapping, regenerate Rosetta benchmark output for first programs, update ROSETTA readme table with durations. Testing includes running benchmark tests. This is about benchmark support, likely performance. The keywords: benchmark, durations, performance. So classify as 'performance'.assistantfinalperformance",7,1.0,False
+3261733844,12871,Improve Elixir transpiler benchmarking,"## Summary
+- wrap generated main with benchmark helper when requested
+- fix input builtin to avoid crashes on EOF
+- update ROSETTA progress table with checkmark status and benchmark stats
+- regenerate Elixir output for `100-doors-2` with benchmark info
+
+## Testing
+- `MOCHI_ROSETTA_INDEX=1 go test ./transpiler/x/ex -run Rosetta -tags slow -count=1`
+- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=true go test ./transpiler/x/ex -run Rosetta -tags slow -count=1`
+- `go test ./transpiler/x/ex -run ^$ -tags slow`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6882e047998883208582d1f75a7a7d3b",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T02:04:19Z,2025-07-25T02:04:32Z,2025-07-25T02:04:32Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12871,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Elixir transpiler benchmarking"". The body: mentions wrap generated main with benchmark helper, fix input builtin to avoid crashes on EOF, update progress table with checkmark status and benchmark stats, regenerate output with benchmark info. This is about benchmarking, performance measurement. It seems performance-related. So classify as 'performance'.assistantfinalperformance",7,1.0,False
+3261869159,12928,Update Dart transpiler benchmarking,"## Summary
+- add WrapMain flag to Dart transpiler and wrap statements in a benchmark block when requested
+- output absolute memory usage in benchmark code
+- write `.bench` files and update benchmark handling in Dart Rosetta tests
+- update Dart ROSETTA checklist format
+- regenerate benchmark for `100-doors-2` in Dart
+
+## Testing
+- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=true go test ./transpiler/x/dart -run Rosetta -tags=slow -count=1 -v`
+- `go test ./transpiler/x/dart -run UpdateRosetta -tags=slow -v`
+- `go test ./transpiler/x/dart -run TestTranspile_PrintHello -tags=slow -count=1`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6882f3e204088320a3a4d1956ebcd684",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T03:31:01Z,2025-07-25T03:35:49Z,2025-07-25T03:35:49Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12928,"analysisWe need to classify as performance or non-performance. The PR title: ""Update Dart transpiler benchmarking"". Body: adding WrapMain flag, benchmark block, output memory usage, write.bench files, update benchmark handling, regenerate benchmark. This is about benchmarking, performance measurement. It includes memory usage, benchmarking. So it's performance. So label 'performance'.assistantfinalperformance",7,1.0,False
+3261868679,12926,Add bench mode toggle to C# transpiler,"## Summary
+- add `SetBenchMain` flag for wrapping main function in benchmark block
+- update C# transpiler to avoid negative RNG values and fix substring
+- generate Rosetta output for program 1 with benchmark metrics
+- adjust C# rosetta tests to handle benchmark mode
+
+## Testing
+- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=1 go test ./transpiler/x/cs -run TestCSTranspiler_Rosetta_Golden -tags slow -count=1 -timeout=0`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6882f3df3d80832089a082e988ae7514",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T03:30:36Z,2025-07-25T03:34:32Z,2025-07-25T03:34:32Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12926,"analysisWe need to classify whether the primary purpose is performance. The PR adds bench mode toggle to C# transpiler, adds SetBenchMain flag for wrapping main function in benchmark block, update transpiler to avoid negative RNG values and fix substring, generate Rosetta output for program 1 with benchmark metrics, adjust tests to handle benchmark mode. The focus is adding benchmark mode, generating benchmark metrics. This is about performance measurement, not necessarily performance improvement. But the classification is about whether the primary purpose is to improve performance. The PR adds a bench mode toggle, which is for benchmarking, not necessarily improving performance. However, it might be used to measure performance. The instruction says performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. This PR includes ""bench mode toggle"", ""benchmark metrics"", ""benchmark block"". That is about performance measurement. The question: is that considered performance? The classification is about improving performance. The PR is adding a benchmark mode, not necessarily improving performance. But the presence of ""benchmark"" might be considered performance. The instruction says performance-related PRs may contain keywords such as... or any other terms referring to how faster and efficiently software runs. Benchmark is a term used to measure performance. So likely classify as performance. The primary purpose is to add bench mode toggle to C# transpiler. That is to measure performance. So classification: performance.assistantfinalperformance",7,1.0,False
+3266937953,13718,Run call-a-function-2 with benchmark,"## Summary
+- transpile call-a-function-2 with benchmark enabled
+- record timing and memory usage in ROSETTA checklist
+
+## Testing
+- `ROSETTA_INDEX=155 MOCHI_BENCHMARK=1 go test ./transpiler/x/cpp -tags slow -run TestCPPTranspiler_Rosetta_Golden -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6885f08bb2bc8320be78fd0fceeb6d3e",OpenAI_Codex,1218621,tamnd,closed,2025-07-27T09:39:17Z,2025-07-27T09:40:00Z,2025-07-27T09:40:00Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/13718,"analysisWe need to classify as performance or non-performance. The PR title: ""Run call-a-function-2 with benchmark"". Summary: ""transpile call-a-function-2 with benchmark enabled, record timing and memory usage"". Testing includes benchmark. So it's about performance measurement. So classification: performance.assistantfinalperformance",7,0.36264937266186215,False
+3261616089,12819,Add bench block golden test for F#,"## Summary
+- add BenchStmt code generation for F# transpiler
+- capture memory and time for bench blocks
+- enable deterministic bench output in tests
+- track bench_block test in README/TASKS
+- commit generated bench_block.fs
+
+## Testing
+- `go vet ./...`
+- `go test ./transpiler/x/fs -c -tags slow`
+- `go test ./transpiler/x/fs -run VMValid/bench_block -tags slow -count=1`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_688280a4fc448320a5abd06c94656355",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T00:54:51Z,2025-07-25T00:55:03Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12819,"analysisWe need to classify whether the primary purpose is performance. The PR adds bench block golden test for F#. It adds BenchStmt code generation, capture memory and time for bench blocks, deterministic bench output, track bench_block test. The title: ""Add bench block golden test for F#"". The body mentions capturing memory and time for bench blocks. That is performance measurement. The primary purpose seems to add a benchmark test, capturing memory and time. That is performance. So classify as 'performance'.assistantfinalperformance",7,0.32761809062420477,False
+3261684960,12845,Add benchmark support to C++ transpiler tests,"## Summary
+- allow wrapping main function in C++ output with a benchmark block
+- record benchmark results in rosetta tests when `MOCHI_BENCHMARK` is set
+- update rosetta checklist format with duration and memory columns
+- regenerate C++ output for `100-doors-2` and store benchmark results
+
+## Testing
+- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=true go test ./transpiler/x/cpp -run Rosetta -count=1 -tags slow -update-rosetta-cpp`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6882dc06d5b083208a174d283b31314c",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T01:34:00Z,2025-07-25T01:34:35Z,2025-07-25T01:34:35Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12845,"analysisWe need to classify as performance or non-performance. The PR adds benchmark support to C++ transpiler tests, record benchmark results, update checklist format with duration and memory columns, regenerate output. This is about adding benchmarking, measuring performance. The primary purpose is to add benchmark support, not necessarily to improve performance. But the description: ""Add benchmark support to C++ transpiler tests"" - it's adding benchmarking, not necessarily performance improvement. But the keywords: benchmark, duration, memory, performance. The classification: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, etc. This PR includes memory, duration, benchmark. It is about adding benchmark support, not necessarily improving performance. But the classification is about whether the primary purpose is to improve performance. The PR is adding benchmark support, which is about measuring performance, not necessarily improving it. But the guidelines: ""Performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" This PR includes memory, benchmark, duration. It is about measuring performance. The primary purpose is to add benchmark support, not to improve performance. But the classification might still be 'performance' because it's about performance measurement. The guidelines say ""performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" This PR includes memory, benchmark, duration. So it qualifies. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The PR is adding benchmark support, not improving performance. But the guidelines might still classify as performance because it's about performance measurement. The phrase ""primary purpose of the pull request is to improve performance"" - this PR is not improving performance, it's adding benchmarking. So maybe it's non-performance. But the guidelines mention that performance-related PRs may contain keywords. But the classification is about improvement, not measurement. The guidelines: ""Performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" So if it contains those keywords, it's performance. But the phrase ""primary purpose of the pull request is to improve performance"" might be ambiguous. The guidelines say ""Performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" So if it contains those, it's performance. This PR contains memory, benchmark, duration. So it's performance. I'd classify as 'performance'.assistantfinalperformance",7,0.3156450143462471,False
+3261822428,12899,Add Pascal bench mode,"## Summary
+- improve Pascal transpiler with benchmark mode and memory helper
+- support MOCHI_BENCHMARK in Pascal rosetta tests
+- update Pascal Rosetta checklist
+- regenerate Pascal output for `100-doors-2`
+
+## Testing
+- `MOCHI_BENCHMARK=1 ROSETTA_INDEX=1 go test ./transpiler/x/pas -run Rosetta -tags=slow -count=1 -update-rosetta-pas -v`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6882e39b345c8320acb4847e2da4b723",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T02:57:40Z,2025-07-25T03:01:55Z,2025-07-25T03:01:55Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12899,"analysisWe need to classify as performance or non-performance. The PR title: ""Add Pascal bench mode"". Summary: ""improve Pascal transpiler with benchmark mode and memory helper"". It mentions benchmark mode, memory helper. It's about performance. So classify as 'performance'.assistantfinalperformance",7,0.31118288599355604,False
+3261752051,12881,Add Python benchmark wrapper,"## Summary
+- update Python transpiler to wrap programs without a main function in a benchmark block
+- record memory usage via `resource.getrusage`
+- update rosetta progress table to use check mark status and show benchmark stats
+- regenerate `100-doors-2` Python output with benchmark info
+
+## Testing
+- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=true go test -tags=slow -run TestPyTranspiler_Rosetta_Golden/001 -update-rosetta-py -count=1`
+- `python3 tests/rosetta/transpiler/Python/100-doors-2.py > tests/rosetta/transpiler/Python/100-doors-2.bench`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6882e402dff88320839a16af24da66cd",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T02:14:35Z,2025-07-25T02:14:49Z,2025-07-25T02:14:49Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12881,"analysisWe need to classify as performance or non-performance. The PR adds a Python benchmark wrapper, records memory usage, updates progress table, regenerates output with benchmark info. This is about benchmarking, measuring performance, memory usage. So it's performance. The classification: 'performance'.assistantfinalperformance",7,0.30571842249221354,False
+3261650840,12838,Enhance Python transpiler bench mode,"## Summary
+- add bench mode support to the Python transpiler
+- propagate MOCHI_BENCHMARK into tests and tools
+- write benchmark results to `.bench` files
+- track benchmark data in ROSETTA progress table
+- regenerate Python code for `100-doors-2.mochi`
+
+## Testing
+- `go test -c -tags slow ./transpiler/x/py > /tmp/test.bin`
+- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=true go test ./transpiler/x/py -tags slow -run Rosetta -update-rosetta-py -count=1`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6882d784a7e08320bbc45efeb29c04c9",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T01:17:30Z,2025-07-25T01:17:42Z,2025-07-25T01:17:42Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12838,"analysisWe need to classify as performance or non-performance. The PR title: ""Enhance Python transpiler bench mode"". Summary: add bench mode support, propagate MOCHI_BENCHMARK into tests and tools, write benchmark results to.bench files, track benchmark data in ROSETTA progress table, regenerate Python code for 100-doors-2.mochi. This is about benchmarking, performance measurement. The primary purpose is to improve performance? It adds bench mode support, but is it to improve performance or just to measure? The description: ""Enhance Python transpiler bench mode"" - adding bench mode support. It writes benchmark results, track data. It doesn't explicitly say it's optimizing code. But it's about benchmarking. The instruction says performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, etc. This PR contains ""bench mode"", ""benchmark results"", ""track benchmark data"". That is about performance measurement. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The PR is about adding bench mode support, not necessarily improving performance. But it's about measuring performance. The classification likely ""performance"" because it's about performance measurement. The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. This PR includes ""bench mode"", ""benchmark results"", ""track benchmark data"". That is about performance measurement. So classify as 'performance'.assistantfinalperformance",7,0.29017115749925193,False
+3261888593,12942,Update Java benchmark handling,"## Summary
+- adjust benchmark env parsing for Java tests
+- regenerate Java rosetta outputs with benchmark info
+- update docs and progress tables
+
+## Testing
+- `UPDATE=1 MOCHI_BENCHMARK=1 go test -tags slow ./transpiler/x/java -run Rosetta -index 1 -count=1`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6882fbca330c8320aba20e29cf392a68",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T03:46:19Z,2025-07-25T03:46:36Z,2025-07-25T03:46:36Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12942,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Update Java benchmark handling"". Summary: adjust benchmark env parsing for Java tests, regenerate Java rosetta outputs with benchmark info, update docs and progress tables. This is about benchmark handling, likely performance. The keywords: benchmark, performance. So classify as 'performance'.assistantfinalperformance",7,0.2804156238765904,False
+3263100548,13095,Update scala rosetta outputs 11-25,"## Summary
+- run Scala transpiler on Rosetta tasks 11–25 in benchmark mode
+- update Scala Rosetta checklist with timings
+- add benchmark output files
+
+## Testing
+- `MOCHI_ROSETTA_INDEX=11 MOCHI_BENCHMARK=1 go test ./transpiler/x/scala -run Rosetta -tags slow -count=1`
+- `MOCHI_ROSETTA_INDEX=12 MOCHI_BENCHMARK=1 go test ./transpiler/x/scala -run Rosetta -tags slow -count=1`
+- `MOCHI_ROSETTA_INDEX=13 MOCHI_BENCHMARK=1 go test ./transpiler/x/scala -run Rosetta -tags slow -count=1`
+- `MOCHI_ROSETTA_INDEX=14 MOCHI_BENCHMARK=1 go test ./transpiler/x/scala -run Rosetta -tags slow -count=1`
+- `MOCHI_ROSETTA_INDEX=15 MOCHI_BENCHMARK=1 go test ./transpiler/x/scala -run Rosetta -tags slow -count=1`
+- `MOCHI_ROSETTA_INDEX=16 MOCHI_BENCHMARK=1 go test ./transpiler/x/scala -run Rosetta -tags slow -count=1`
+- `MOCHI_ROSETTA_INDEX=17 MOCHI_BENCHMARK=1 go test ./transpiler/x/scala -run Rosetta -tags slow -count=1`
+- `MOCHI_ROSETTA_INDEX=18 MOCHI_BENCHMARK=1 go test ./transpiler/x/scala -run Rosetta -tags slow -count=1`
+- `MOCHI_ROSETTA_INDEX=19 MOCHI_BENCHMARK=1 go test ./transpiler/x/scala -run Rosetta -tags slow -count=1`
+- `MOCHI_ROSETTA_INDEX=20 MOCHI_BENCHMARK=1 go test ./transpiler/x/scala -run Rosetta -tags slow -count=1`
+- `MOCHI_ROSETTA_INDEX=21 MOCHI_BENCHMARK=1 go test ./transpiler/x/scala -run Rosetta -tags slow -count=1`
+- `MOCHI_ROSETTA_INDEX=22 MOCHI_BENCHMARK=1 go test ./transpiler/x/scala -run Rosetta -tags slow -count=1`
+- `MOCHI_ROSETTA_INDEX=23 MOCHI_BENCHMARK=1 go test ./transpiler/x/scala -run Rosetta -tags slow -count=1`
+- `MOCHI_ROSETTA_INDEX=24 MOCHI_BENCHMARK=1 go test ./transpiler/x/scala -run Rosetta -tags slow -count=1`
+- `MOCHI_ROSETTA_INDEX=25 MOCHI_BENCHMARK=1 go test ./transpiler/x/scala -run Rosetta -tags slow -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_688374fdd4dc83209515dd89afa56bc6",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T12:42:58Z,2025-07-25T12:43:18Z,2025-07-25T12:43:18Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/13095,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Update scala rosetta outputs 11-25"". Summary: run Scala transpiler on Rosetta tasks 11–25 in benchmark mode, update checklist with timings, add benchmark output files. This is about benchmarking, measuring performance. It seems performance-related. The keywords: benchmark, timings. So classify as 'performance'.assistantfinalperformance",7,0.26388551195476767,False
+3261746125,12878,Enable bench mode flag in Haskell transpiler,"## Summary
+- add `benchMain` flag to Haskell transpiler
+- update tests and CLI helpers for new parameter
+- record benchmark runs without seeding time
+- generate progress table header in `ROSETTA.md`
+- regenerate code/output for `100-doors-2` example
+
+## Testing
+- `CGO_ENABLED=0 ROSETTA_INDEX=1 MOCHI_BENCHMARK=1 go test ./transpiler/x/hs -tags slow -run Rosetta -count=1`
+- `CGO_ENABLED=0 ROSETTA_INDEX=1 go test ./transpiler/x/hs -tags slow -run Rosetta -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6882e2e1208483208bfcfa367ef4446e",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T02:11:24Z,2025-07-25T02:11:35Z,2025-07-25T02:11:35Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12878,"analysisWe need to classify whether the primary purpose is performance. The PR adds bench mode flag, updates tests, records benchmark runs, generates progress table header, regenerates code. The focus is enabling bench mode flag, recording benchmark runs, generating progress table header. This is about benchmarking, performance measurement. The keywords: bench, benchmark, performance. So it's performance. So label 'performance'.assistantfinalperformance",7,0.24480185432529764,False
+3261765113,12890,Enable bench mode for Kotlin Rosetta tests,"## Summary
+- add benchmark environment toggle to rosetta tests
+- regenerate Kotlin README, ROSETTA checklist and TASKS docs
+- run first Rosetta program in benchmark mode
+
+## Testing
+- `MOCHI_BENCHMARK=true ROSETTA_INDEX=1 go test -tags slow ./transpiler/x/kt -run RosettaKotlin -count=1`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6882e663359c832099a0e863c62823c7",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T02:23:58Z,2025-07-25T02:24:11Z,2025-07-25T02:24:11Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12890,"analysisWe need to classify as performance or non-performance. The PR title: ""Enable bench mode for Kotlin Rosetta tests"". Summary: add benchmark environment toggle to rosetta tests, regenerate docs, run first Rosetta program in benchmark mode. This is about enabling benchmark mode, likely to measure performance. The content mentions ""bench mode"" and ""benchmark"". That is performance-related. So classification: performance.assistantfinalperformance",7,0.23784040553189825,False
+3261756685,12883,Enhance Racket benchmark mode,"## Summary
+- support benchmark mode for Racket transpiler
+- generate real timing in microseconds
+- run rosetta golden tests without NOW seed when benchmarking
+- update Racket transpiler progress
+- regenerate output for `100-doors-2`
+
+## Testing
+- `ROSETTA_INDEX=1 MOCHI_BENCHMARK=1 go test ./transpiler/x/rkt -tags slow -run Rosetta -count=1 -v`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6882e46af1588320ae2ae7fb086c3721",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T02:17:23Z,2025-07-25T02:17:33Z,2025-07-25T02:17:33Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12883,"analysisWe need to classify as performance or non-performance. The PR title: ""Enhance Racket benchmark mode"". Summary: support benchmark mode for Racket transpiler, generate real timing in microseconds, run rosetta golden tests without NOW seed when benchmarking, update Racket transpiler progress, regenerate output for `100-doors-2`. This is about benchmarking, generating timing, performance measurement. It's about performance. So classification: performance.assistantfinalperformance",7,0.23556810357932617,False
+3261724373,12865,Add benchmark mode to scheme transpiler,"## Summary
+- support benchmarking in the Scheme transpiler
+- update Scheme rosetta tests to handle benchmark mode
+- update golden output with benchmark data
+
+## Testing
+- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=1 go test -tags=slow ./transpiler/x/scheme -run Rosetta -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6882de5ac9b8832097347de04ffae021",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T01:58:29Z,2025-07-25T01:58:48Z,2025-07-25T01:58:48Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12865,"analysisWe need to classify as performance or non-performance. The PR adds benchmark mode to scheme transpiler, updates tests, golden output with benchmark data. This is about benchmarking, performance measurement. The primary purpose is to add benchmark mode, which is performance-related. So classify as 'performance'.assistantfinalperformance",7,0.22526285837451626,False
+3118042228,73,Restore benchmark test,"## Summary
+- bring back `#![feature(test)]` and `extern crate test` in `vm_test.rs`
+- reintroduce the `bench_fibo` benchmark
+
+## Testing
+- `cargo test` *(fails: `#[feature]` may not be used on the stable release channel)*
+
+------
+https://chatgpt.com/codex/tasks/task_b_683fc5b8cfd0832499845f7bcd52a534",OpenAI_Codex,9913176,maekawatoshiki,closed,2025-06-04T14:23:52Z,2025-06-04T14:26:23Z,,138584142,https://api.github.com/repos/maekawatoshiki/rapidus,https://github.com/maekawatoshiki/rapidus/pull/73,"analysisWe need to classify the pull request as performance or non-performance. The PR title: ""Restore benchmark test"". The body: ""bring back `#![feature(test)]` and `extern crate test` in `vm_test.rs` reintroduce the `bench_fibo` benchmark"". It's about restoring a benchmark test. Benchmarks are performance tests. So it's performance. The classification: 'performance'.assistantfinalperformance",7,0.2249133122148259,False
+3261697837,12849,Add Kotlin benchmark wrapping and checklist table,"## Summary
+- add benchMain flag to Kotlin transpiler and wrap main body in a Bench block
+- update rosetta helpers to keep progress in a table format with duration/memory stats
+- support MOCHI_BENCHMARK env in Kotlin rosetta and golden tests
+- update CLI generation logic for kotlin
+- regenerate golden files and progress data
+
+## Testing
+- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=1 go test ./transpiler/x/kt -run TestRosettaKotlin -count=1 -tags=slow`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6882ddcf0f648320aabbede07fc2893d",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T01:42:13Z,2025-07-25T01:42:29Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12849,"analysisWe need to classify as performance or non-performance. The PR adds Kotlin benchmark wrapping, progress table with duration/memory stats, support MOCHI_BENCHMARK env, etc. It's about benchmarking, measuring performance, adding benchMain flag, etc. So it's performance.assistantfinalperformance",7,0.22156361572384076,False
+3225129469,7936,Enable C++ backend for TPCH q1-q2,"## Summary
+- regenerate C++ sources for TPCH q1 and q2
+- update expected runtime outputs for TPCH q1 and q2
+
+## Testing
+- `g++ /tmp/q1.cpp -std=c++17 -o /tmp/q1 && /tmp/q1 > /tmp/q1.out`
+- `g++ /tmp/q2.cpp -std=c++17 -o /tmp/q2 && /tmp/q2 > /tmp/q2.out`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68722d236a708320b67141b144338d38",OpenAI_Codex,1218621,tamnd,closed,2025-07-12T09:47:33Z,2025-07-12T09:48:52Z,2025-07-12T09:48:52Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7936,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Enable C++ backend for TPCH q1-q2"". Summary: regenerate C++ sources for TPCH q1 and q2, update expected runtime outputs. This is about enabling C++ backend, likely to improve performance. The body mentions generating C++ sources, updating outputs. It's about performance? The keywords: ""runtime outputs"" but not explicitly performance. However enabling C++ backend likely improves performance. The classification: performance.assistantfinalperformance",7,0.22145967606058495,False
+3261710160,12857,Add benchmark support to Haskell transpiler,"## Summary
+- implement benchmark mode for Haskell transpiler
+- update golden tests to accept benchmark flag
+- record benchmark results in `ROSETTA.md`
+- run the first Rosetta program in benchmark mode
+
+## Testing
+- `MOCHI_ROSETTA_INDEX=1 go test ./transpiler/x/hs -tags slow -run Rosetta -count=1`
+- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=1 go test ./transpiler/x/hs -tags slow -run Rosetta -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6882dcfafb448320b32587c89ea8e3c3",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T01:49:57Z,2025-07-25T01:50:11Z,2025-07-25T01:50:11Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12857,"analysisWe need to classify as performance or non-performance. The PR adds benchmark support, updates golden tests, records benchmark results, runs benchmark mode. This is about measuring performance, adding benchmark mode. It's performance-related. So label 'performance'.assistantfinalperformance",7,0.2098610253176964,False
+3125799000,628,test: box rebuild performance test,"## Summary
+- add performance benchmark for rebuilding a `Box` with style overrides
+
+## Testing
+- `flutter test packages/mix/test/bechmarks/widget_build_test.dart` *(fails: `flutter` not found)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_684318723bac832bbc92ef8e817e5301",OpenAI_Codex,62367544,tilucasoli,closed,2025-06-06T20:28:54Z,2025-06-06T20:35:53Z,,378459401,https://api.github.com/repos/btwld/mix,https://github.com/btwld/mix/pull/628,"analysisWe need to classify as performance or non-performance. The PR title: ""test: box rebuild performance test"". Summary: add performance benchmark for rebuilding a Box with style overrides. So it's about performance benchmark. So classification: performance.assistantfinalperformance",7,0.18552242618866877,False
+3155815373,641,Make benchmarks only run with release builds,"This PR enforces that benchmarks can only be run with release builds, preventing execution with debug builds which would provide inconsistent and misleading performance data.
+
+## Changes Made
+
+### 1. Updated Justfile Commands
+- Removed `target` parameter from `bench` and `bench-ci` commands
+- Hard-coded both commands to use `--profile=release`
+- Added explanatory comments about release-only requirement
+
+**Before:**
+```just
+bench target=default-target features="""":
+    cargo bench --profile={{ if target == ""debug"" { ""dev"" } else { target } }} {{ if features =="""" {''} else { ""--features "" + features } }} -- --verbose
+```
+
+**After:**
+```just
+# Benchmarks only run with release builds for performance consistency  
+bench features="""":
+    cargo bench --profile=release {{ if features =="""" {''} else { ""--features "" + features } }} -- --verbose
+```
+
+### 2. Added Compile-Time Enforcement
+Added a compile-time check in the benchmark source code that prevents compilation in debug mode:
+
+```rust
+// Benchmarks are only meaningful and should only run with release builds.
+// Debug builds have different performance characteristics and would not provide
+// useful benchmarking data for performance regression testing.
+#[cfg(debug_assertions)]
+compile_error!(""Benchmarks must be run with release builds only. Use `cargo bench --release` or `just bench`."");
+```
+
+### 3. Updated GitHub Workflows
+- **Benchmarks.yml**: Removed `release` parameter from `bench-ci` call (now defaults to release)
+- **dep_rust.yml**: Removed `${{ matrix.config }}` parameter from `bench-ci` call (already had release-only guard)
+
+### 4. Updated Documentation
+Updated `docs/benchmarking-hyperlight.md` to reflect that only release builds are supported, removing references to debug benchmark support.
+
+## Validation
+
+All changes have been tested to ensure:
+- ✅ Debug benchmark compilation fails with clear error message
+- ✅ Release benchmark compilation succeeds  
+- ✅ `just bench` and `just bench-ci` commands use release profile
+- ✅ GitHub workflows updated correctly
+- ✅ All existing functionality preserved
+
+This ensures benchmarks provide consistent, meaningful performance data for regression testing while preventing accidental execution with debug builds.
+
+Fixes #638.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-06-18T07:37:33Z,2025-07-29T23:00:13Z,,883829350,https://api.github.com/repos/hyperlight-dev/hyperlight,https://github.com/hyperlight-dev/hyperlight/pull/641,"analysisWe need to classify the pull request as 'performance' or 'non-performance'. The PR is about making benchmarks only run with release builds, ensuring performance data consistency. It is about performance measurement, but the primary purpose is to enforce that benchmarks run only with release builds. This is about performance measurement consistency. The classification guidelines: performance-related PRs may contain keywords like performance, speed, etc. This PR includes ""performance"" in the description: ""Make benchmarks only run with release builds"". It is about performance data. So classify as 'performance'.assistantfinalperformance",7,0.1792406891954076,True
+3261618278,12821,Add bench block support in Java transpiler,"## Summary
+- support `bench` blocks in the Java transpiler
+- emit helper function `_mem` for memory usage
+- update golden test harness to seed timestamps
+- include golden output for `bench_block.mochi`
+
+## Testing
+- `go test -tags slow ./transpiler/x/java -run TestJavaTranspiler_VMValid_Golden/bench_block -count=1`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_688280c88ae48320b6771db3a342085d",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T00:56:55Z,2025-07-25T00:57:08Z,2025-07-25T00:57:08Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12821,"analysisWe need to classify whether the primary purpose is performance. The PR adds bench block support, emits helper function _mem for memory usage, updates golden test harness to seed timestamps, includes golden output. The title: ""Add bench block support in Java transpiler"". Bench block likely for benchmarking. The body mentions memory usage helper, golden test harness. This is about benchmarking, performance measurement. The primary purpose is to add bench block support, which is for performance measurement. So classification: 'performance'.assistantfinalperformance",7,0.16047583392065948,False
+3261612045,12814,Add memory tracking for bench blocks in C++ transpiler,"## Summary
+- implement `_mem()` helper that returns process memory usage via `getrusage`
+- capture memory before and after `bench` blocks and print the difference
+- enable `UseMem` tracking through the transpiler
+- commit generated `bench_block.cpp`
+
+## Testing
+- `go test -tags slow ./transpiler/x/cpp -run TestCPPTranspiler_VMValid_Golden/bench_block -count=1`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6882807000348320b142c69603e39e65",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T00:51:34Z,2025-07-25T00:51:48Z,2025-07-25T00:51:48Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12814,"analysisWe need to classify as performance or non-performance. The PR adds memory tracking for bench blocks, capturing memory before and after, printing difference. This is about memory usage, performance. So classification: performance.assistantfinalperformance",7,0.13695933074727248,False
+3175920300,16571,wip: memory metrics,"<!--
+Contributions welcome! See https://github.com/ethereum-optimism/.github/blob/master/CONTRIBUTING.md
+-->
+
+**Description**
+
+Implement a simple way to measure memory exposed as a metric that can be used by any service",OpenAI_Codex,6626818,tynes,closed,2025-06-25T14:39:12Z,2025-07-28T09:24:47Z,,238797860,https://api.github.com/repos/ethereum-optimism/optimism,https://github.com/ethereum-optimism/optimism/pull/16571,"analysisWe need to classify as performance or non-performance. The PR title: ""wip: memory metrics"". Body: ""Implement a simple way to measure memory exposed as a metric that can be used by any service"". This is about memory metrics, not necessarily performance improvement. It's about exposing memory usage metrics. That is not necessarily a performance improvement, but it's about monitoring memory usage. The classification: performance? The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs.
+
+Memory is a keyword. But memory metrics is about measuring memory usage, not necessarily improving performance. But the guidelines say memory is a keyword. But the context matters. The guidelines: ""Performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" So memory is a keyword. But is measuring memory usage considered performance? It could be considered performance monitoring. But the primary purpose is to measure memory usage, not to improve performance. The classification might be ambiguous. But guidelines say memory is a keyword. But the phrase ""memory metrics"" is about metrics, not necessarily improvement. But the guidelines might treat memory as a performance keyword. But we need to decide. The PR is about adding a metric for memory usage. That is a performance metric. It might be considered performance. But the primary purpose is to expose memory metrics, not to optimize memory usage. But it's still performance-related. The guidelines: ""Performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" So memory is a keyword. So we classify as performance. But is it ""performance"" or ""non-performance""? The guidelines say memory is a keyword. So likely performance. So answer: performance.assistantfinalperformance",7,0.0938922476075915,False
+3023248867,246,feat: allow configuring metrics to reduce cardinality,"# Refactor metrics to reduce cardinality
+
+This PR reduces the cardinality of metrics by:
+
+1. Adding a configurable error label mode (""compact"" or ""verbose"") 
+   - In ""compact"" mode, only the error type is used as a label
+   - In ""verbose"" mode (default for backward compatibility), the full error message is used
+
+2. Adding configurable histogram buckets for all duration metrics
+   - Users can specify their own buckets to reduce the number of time series
+
+## Changes
+
+- Added `errorLabelMode` and `histogramBuckets` fields to `MetricsConfig`
+- Modified `ErrorSummary` to support compact mode
+- Added a `SetHistogramBuckets` function to replace metrics with custom buckets
+- Added initialization in the `Init` function
+- Updated documentation
+
+Requested by: Aram Alipoor (aram@erpc.cloud)
+
+Link to Devin run: https://app.devin.ai/sessions/11e4da16560e4af5b51861e97be3fe93
+",Devin,158243242,devin-ai-integration[bot],closed,2025-04-27T18:31:13Z,2025-04-28T13:44:36Z,2025-04-28T13:44:36Z,796633002,https://api.github.com/repos/erpc/erpc,https://github.com/erpc/erpc/pull/246,"analysisWe need to classify as performance or non-performance. The PR is about reducing cardinality of metrics, adding configurable error label mode, histogram buckets. This is about metrics cardinality, which can affect performance (storage, query). But is it primarily performance? The title: ""feat: allow configuring metrics to reduce cardinality"". The description: ""This PR reduces the cardinality of metrics by:..."". Cardinality reduction can improve performance of metrics storage and query. But is it a performance improvement? It reduces cardinality, which can reduce storage overhead and improve query performance. So yes, it's performance. The keywords: ""reduce cardinality"" is not explicitly performance keyword but it's about metrics cardinality. The guidelines mention performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. This PR does not contain those keywords. But the content is about reducing cardinality, which is a performance improvement. The guidelines say ""or any other terms referring to how faster and efficiently software runs."" Cardinality reduction is a performance improvement. So we should classify as 'performance'.
+
+Thus answer: performance.assistantfinalperformance",7,0.08863371058941273,False

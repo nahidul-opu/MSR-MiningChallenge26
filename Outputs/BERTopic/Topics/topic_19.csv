@@ -1,0 +1,1082 @@
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
+3142181649,19,Replace CLI subprocess approach with Claude Code SDK,"## Description
+
+Replace the current CLI subprocess execution approach with the Claude Code SDK for better performance, type safety, and error handling. This is a clean replacement that maintains the same interface while providing significant performance improvements.
+
+## Type of Change
+
+Please add the appropriate label(s) to this PR and check the relevant box(es):
+
+- [ ] 🐛 `bug` - Bug fix (non-breaking change which fixes an issue)
+- [x] ✨ `feature` - New feature (non-breaking change which adds functionality)
+- [ ] 💥 `breaking` - Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] 📚 `documentation` - Documentation update
+- [x] ⚡ `performance` - Performance improvement
+- [ ] 🔨 `refactor` - Code refactoring
+- [ ] 🧪 `test` - Adding or updating tests
+- [ ] 🔧 `chore` - Maintenance, dependencies, tooling
+
+## Changes Made
+
+- **Complete replacement**: CLI subprocess execution → Claude Code SDK
+- **Same interface**: `executeClaudeCommand` function maintains identical signature
+- **Identical output**: Same JSON message structure (`system`, `assistant`, `result` types)
+- **Simplified implementation**: No feature flags, fallbacks, or complex configuration
+- **Working directory**: Maintains project root execution behavior
+- **Dependencies**: Added `npm:@anthropic-ai/claude-code` to deno.lock
+
+## Testing
+
+- [x] Tests pass locally (`make test`)
+- [x] Code is formatted (`make format`)
+- [x] Code is linted (`make lint`)
+- [x] Type checking passes (`make typecheck`)
+- [x] All quality checks pass (`make check`)
+- [x] Manual testing performed - Verified SDK produces identical JSON output format
+
+## Checklist
+
+- [x] My code follows the project's style guidelines
+- [x] I have performed a self-review of my own code
+- [x] I have commented my code, particularly in hard-to-understand areas
+- [ ] I have made corresponding changes to the documentation
+- [ ] I have added/updated tests for my changes
+- [x] All tests pass
+
+## Screenshots (if applicable)
+
+N/A - Backend implementation change with no UI modifications.
+
+## Additional Notes
+
+This addresses issue #18 with a clean, simple replacement approach:
+
+**Performance Benefits:**
+- Eliminates process spawning overhead for each request
+- Direct memory access instead of IPC communication
+- Native JavaScript error handling
+
+**Compatibility:**
+- Zero breaking changes to API
+- Identical JSON output format maintained
+- Same function interface for minimal integration impact
+
+**Simplicity:**
+- No feature flags or configuration complexity
+- Clean, focused implementation
+- Easier to maintain and understand
+
+Closes #18
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,80381,sugyan,closed,2025-06-13T04:05:15Z,2025-06-13T14:14:33Z,2025-06-13T14:14:33Z,999285986,https://api.github.com/repos/sugyan/claude-code-webui,https://github.com/sugyan/claude-code-webui/pull/19,"analysisWe need to classify as 'performance' or 'non-performance'. The PR description explicitly says performance improvement, includes performance label, mentions performance benefits. So classification: performance.assistantfinalperformance",19,1.0,True
+3200679276,4304,Implement lazy loading for RegistryInstance to improve latency in operations where the registry does not need to be read,"👨 
+
+Before:
+
+```
+julia> @time Pkg.instantiate()
+  0.390297 seconds (1.95 M allocations: 148.381 MiB, 16.29% gc time, 31.03% compilation time: 68% of which was recompilation)
+```
+
+After:
+```
+julia> @time Pkg.instantiate()
+  0.161872 seconds (456.14 k allocations: 27.898 MiB, 9.75% gc time, 86.52% compilation time: 60% of which was recompilation)
+```
+
+
+-----
+
+🤖 
+
+- Change RegistryInstance to mutable struct with lazily loaded fields
+- Defer expensive operations (decompression, Registry.toml parsing) until needed
+- Add ensure_registry_loaded\!() to trigger loading on first access
+- Use getproperty() to automatically load when accessing name, uuid, repo, description, or pkgs
+- Fix #4301 by reducing initial registry creation overhead
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+",Claude_Code,1282691,KristofferC,closed,2025-07-03T21:18:03Z,2025-07-04T08:34:04Z,2025-07-04T08:34:04Z,82341193,https://api.github.com/repos/JuliaLang/Pkg.jl,https://github.com/JuliaLang/Pkg.jl/pull/4304,"analysisWe need to classify as performance or non-performance. The PR title: ""Implement lazy loading for RegistryInstance to improve latency in operations where the registry does not need to be read"". Body describes performance improvements: lazy loading, reduce allocations, speed up instantiate. So it's performance. So output 'performance'.assistantfinalperformance",19,1.0,False
+3090065215,19,Add Claude CLI support with Strategy Pattern architecture (v0.6.0),"## 🚀 Major Enhancement: Claude CLI Support & Strategy Pattern Architecture
+
+This PR introduces comprehensive Claude CLI support with a robust Strategy Pattern architecture, bringing the MCP installer to v0.6.0 with significant performance and extensibility improvements.
+
+## ✨ New Features
+
+### Claude CLI Integration
+- **Automatic Detection**: Detects if `claude` CLI is available at startup
+- **Immediate Availability**: Servers installed via CLI are available instantly (no restart required)
+- **Graceful Fallback**: Falls back to Claude Desktop config if CLI unavailable
+- **Enhanced UX**: Clear feedback on installation method and availability status
+
+### Strategy Pattern Architecture
+- **Extensible Design**: Clean interface ready for multiple installation environments
+- **Performance Optimized**: Early strategy detection (1 call vs 4 calls per operation)
+- **Future-Ready**: Prepared for Docker, Kubernetes, VS Code Extensions, and more
+- **Maintainable**: Eliminated conditional branching duplication throughout codebase
+
+## 🏗️ Technical Improvements
+
+### Architecture Changes
+- Added `InstallationStrategy` interface with concrete implementations:
+  - `ClaudeCliStrategy` - For `claude` CLI installations
+  - `ClaudeDesktopStrategy` - For traditional config file approach
+- Global strategy initialization at server startup
+- Unified installation interface across all environments
+
+### Performance Enhancements
+- **Before**: 4 `hasClaudeCLI()` calls per installation operation
+- **After**: 1 `hasClaudeCLI()` call per server startup
+- Eliminated redundant environment detection
+- Streamlined installation flow
+
+### Code Quality
+- Removed legacy `installToClaudeCLI`/`installToClaudeDesktop` functions
+- Simplified conditional logic throughout the codebase
+- Better separation of concerns
+- Enhanced error handling and user feedback
+
+## 📦 Installation & Usage
+
+### For Claude CLI (New - Recommended):
+```bash
+claude mcp add mcp-installer npx --args @o2alexanderfedin/mcp-installer
+```
+
+### For Claude Desktop (Existing):
+```json
+{
+  ""mcpServers"": {
+    ""mcp-installer"": {
+      ""command"": ""npx"",
+      ""args"": [""@o2alexanderfedin/mcp-installer""]
+    }
+  }
+}
+```
+
+## 🔄 Backward Compatibility
+
+✅ **No Breaking Changes**: All existing Claude Desktop installations continue to work exactly as before
+✅ **Enhanced Experience**: Existing users get improved performance and better error messages
+✅ **Seamless Migration**: No action required for current users
+
+## 🧪 Testing
+
+- ✅ TypeScript compilation passes
+- ✅ Build system works correctly  
+- ✅ Module loads without runtime errors
+- ✅ Backward compatibility verified
+- ✅ Strategy pattern functionality confirmed
+
+## 📋 Commits Included
+
+1. **Add Claude CLI support with automatic detection and fallback** (`8e50814`)
+   - Core Claude CLI integration
+   - Automatic detection logic
+   - Enhanced README documentation
+
+2. **Remove unused function to fix TypeScript compilation** (`dd6e4a9`)
+   - Clean up legacy code
+   - Fix compilation issues
+
+3. **Refactor installation logic using Strategy Pattern** (`a778373`)
+   - Complete Strategy Pattern implementation
+   - Performance optimizations
+   - Code simplification
+
+4. **Bump version to 0.6.0** (`ce7ed5c`)
+   - Version update for release
+
+## 🎯 Future Roadmap
+
+This architecture enables easy addition of new installation environments:
+- Docker containers (`docker run` commands)
+- Kubernetes deployments (`kubectl apply`)
+- VS Code Extensions (`.vscode/settings.json`)
+- JetBrains IDEs (plugin configuration)
+- Cloud deployments (AWS Lambda, Google Cloud Functions)
+
+---
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,77516945,o2alexanderfedin,open,2025-05-26T05:38:39Z,,,894640711,https://api.github.com/repos/anaisbetts/mcp-installer,https://github.com/anaisbetts/mcp-installer/pull/19,"analysisWe need to classify as 'performance' or 'non-performance'. The PR description includes performance improvements: ""Performance Optimized: Early strategy detection (1 call vs 4 calls per operation)"", ""Performance Enhancements"". Also mentions ""significant performance and extensibility improvements"". So it's performance. The classification: 'performance'.assistantfinalperformance",19,1.0,True
+3226043406,4902,feat: lazy load CLI command actions for improved startup performance,"## Summary
+
+This PR implements lazy loading for CLI command actions as outlined in TODO.md, resulting in a **15.7% overall improvement** in CLI startup performance.
+
+### Key Changes:
+- Separated command registration (lightweight) from action execution (heavyweight)
+- Applied dynamic imports for all command actions
+- Optimized checkNodeVersion to remove heavy imports
+- Kept main.ts completely unchanged as required
+
+## Performance Results
+
+### Overall Performance
+- **Main branch average:** 971.84ms
+- **Feature branch average:** 819.00ms
+- **Improvement:** 152.84ms (15.7% faster)
+
+### Top 5 Most Improved Commands
+
+| Command | Main (ms) | Feature (ms) | Improvement (ms) | % Faster |
+|---------|-----------|--------------|------------------|----------|
+| validate | 988.45 | 820.17 | 168.28 | 17.0% |
+| init | 998.59 | 831.59 | 167.00 | 16.7% |
+| export | 991.45 | 826.09 | 165.36 | 16.7% |
+| show | 990.22 | 826.54 | 163.68 | 16.5% |
+| share | 985.84 | 823.22 | 162.62 | 16.5% |
+
+### All Commands Performance Comparison
+
+| Command | Main (ms) | Feature (ms) | Improvement (ms) |
+|---------|-----------|--------------|------------------|
+| help | 950.48 | 803.65 | 146.83 |
+| eval | 965.16 | 812.03 | 153.13 |
+| eval help | 962.44 | 809.09 | 153.35 |
+| init | 998.59 | 831.59 | 167.00 |
+| view | 961.37 | 807.18 | 154.19 |
+| list | 965.70 | 809.64 | 156.06 |
+| show | 990.22 | 826.54 | 163.68 |
+| auth login | 965.89 | 806.39 | 159.50 |
+| auth logout | 965.12 | 808.45 | 156.67 |
+| auth whoami | 960.51 | 808.14 | 152.37 |
+| cache clear | 973.60 | 822.12 | 151.48 |
+| config show | 967.38 | 812.36 | 155.02 |
+| delete | 963.28 | 810.41 | 152.87 |
+| export | 991.45 | 826.09 | 165.36 |
+| import | 959.79 | 809.01 | 150.78 |
+| share | 985.84 | 823.22 | 162.62 |
+| validate | 988.45 | 820.17 | 168.28 |
+| debug | 969.55 | 819.36 | 150.19 |
+| model-scan | 975.96 | 823.60 | 152.36 |
+| generate dataset | 989.25 | 833.66 | 155.59 |
+| generate assertions | 980.55 | 827.68 | 152.87 |
+
+## Commands Refactored
+
+- ✅ eval
+- ✅ init  
+- ✅ view
+- ✅ generate (dataset, assertions)
+- ✅ share
+- ✅ show
+- ✅ list
+- ✅ cache
+- ✅ config
+- ✅ auth
+- ✅ delete
+- ✅ export
+- ✅ import
+- ✅ validate
+- ✅ debug
+- ✅ modelScan
+
+## Testing
+
+All CI checks pass:
+- ✅ Build
+- ✅ Lint
+- ✅ Format
+- ✅ Tests
+- ✅ Circular dependencies check
+- ✅ Python tests
+- ✅ Integration tests
+
+## Breaking Changes
+
+None - all changes are internal optimizations that maintain the same external API.
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,7235481,mldangelo,open,2025-07-13T02:47:49Z,,,633927609,https://api.github.com/repos/promptfoo/promptfoo,https://github.com/promptfoo/promptfoo/pull/4902,"analysisWe need to classify as 'performance' or 'non-performance'. The PR clearly is about lazy loading CLI command actions for improved startup performance, with performance results. So it's performance.assistantfinalperformance",19,1.0,False
+3193183157,7710,Optimize datatype CLI performance by skipping accessor loop for 0-ary constructors,"This PR fixes a significant performance regression in the CLI when declaring datatypes with many 0-ary constructors (constructors with no arguments).
+
+## Problem
+
+The issue was identified through profiling data showing that `cmd_context::dt_eh::operator()` was spending excessive time in:
+- `datatype::util::get_constructor_recognizer` (67.03% of time, 8743 calls)  
+- `datatype::util::get_constructor_accessors` (36.53% of time, 5600 calls)
+
+For datatypes with many 0-ary constructors like:
+```smt2
+(declare-datatype Element (
+  (a1) (a2) (a3) ... (a50000)
+))
+```
+
+The CLI was taking 4+ seconds for 50,000 constructors and 14+ seconds for 100,000 constructors, while the API could handle 100,000 constructors in just 300ms.
+
+## Root Cause
+
+The performance bottleneck was in `cmd_context::dt_eh::operator()` where the code was calling `get_constructor_accessors()` and iterating through the results for **every** constructor, including 0-ary constructors that have no accessors by definition.
+
+## Solution
+
+Added a simple check `if (c->get_arity() > 0)` before calling `get_constructor_accessors()` and iterating through accessors:
+
+```cpp
+if (c->get_arity() > 0) {
+    for (func_decl * a : *m_dt_util.get_constructor_accessors(c)) {
+        TRACE(new_dt_eh, tout << ""new accessor: "" << a->get_name() << ""\n"";);
+        m_owner.insert(a);
+    }
+}
+```
+
+This avoids the expensive accessor lookup and empty loop iteration for 0-ary constructors while preserving full functionality for constructors that do have accessors.
+
+## Performance Results
+
+- **1,000 constructors**: ~9ms  
+- **10,000 constructors**: ~137ms
+- **50,000 constructors**: ~3s (significant improvement from the original 4s)
+
+## Validation
+
+- All existing datatype tests pass
+- Mixed datatypes with both 0-ary and non-0-ary constructors work correctly
+- API performance remains unaffected
+- No functional regressions detected
+
+Fixes #7709.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-01T16:55:38Z,2025-07-01T21:23:50Z,,32944298,https://api.github.com/repos/Z3Prover/z3,https://github.com/Z3Prover/z3/pull/7710,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Optimize datatype CLI performance by skipping accessor loop for 0-ary constructors"". The body describes performance regression, profiling, solution to improve performance. So it's a performance PR. So output 'performance'.assistantfinalperformance",19,1.0,False
+3186777284,742,Refactor CLI parsing to separate syntax parsing from option validation,"## Problem
+
+The current `parse_cli` functionality performs both CLI syntax parsing and option existence validation, which requires loading the full FFmpeg options dictionary. This increases package size because the complete options list gets bundled into release files.
+
+## Solution
+
+This PR refactors the CLI parsing to separate these concerns:
+
+### New Functions
+- **`parse_cli(cli: str)`** - Parses CLI arguments by syntax only, without loading the options dictionary
+- **`parse_with_validation(cli: str, validate_options: bool)`** - Allows explicit control over validation behavior
+
+### Modified Functions
+- **`parse_global()`, `parse_input()`, `parse_output()`** - Made `ffmpeg_options` parameter optional
+- **`parse_filter_complex()`** - Updated to handle optional filter validation
+- **`parse_options()`** - Already only handled syntax parsing (no changes needed)
+
+### Backward Compatibility
+The original `parse()` function remains unchanged and continues to validate options by default.
+
+## Usage Examples
+
+### Before (loads full options dictionary)
+```python
+from ffmpeg.compile.compile_cli import parse
+stream = parse(""ffmpeg -i input.mp4 -c:v libx264 output.mp4"")
+```
+
+### After (syntax-only parsing, no dictionary loading)
+```python
+from ffmpeg.compile.compile_cli import parse_cli
+stream = parse_cli(""ffmpeg -i input.mp4 -c:v libx264 output.mp4"")
+```
+
+### Explicit validation control
+```python
+from ffmpeg.compile.compile_cli import parse_with_validation
+
+# No validation (smaller package size)
+stream = parse_with_validation(cli, validate_options=False)
+
+# With validation (backward compatible)
+stream = parse_with_validation(cli, validate_options=True)
+```
+
+## Benefits
+
+1. **Reduced Package Size** - `parse_cli()` avoids loading the full options dictionary
+2. **Improved Performance** - Faster parsing without validation overhead
+3. **Flexible Validation** - Can enable/disable validation as needed
+4. **Backward Compatibility** - Existing code continues to work unchanged
+
+## Testing
+
+- ✅ Comprehensive unit tests verify dictionary loading behavior
+- ✅ Compatibility tests ensure both parsing methods work correctly
+- ✅ Complex CLI commands with filters tested successfully
+- ✅ Mocking confirms `parse_cli()` doesn't load options dictionary
+- ✅ All existing functionality preserved
+
+Fixes #741
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-30T00:55:04Z,2025-07-01T06:56:27Z,,722865845,https://api.github.com/repos/livingbio/typed-ffmpeg,https://github.com/livingbio/typed-ffmpeg/pull/742,"analysisWe need to classify the pull request as performance or non-performance. The PR refactors CLI parsing to separate syntax parsing from option validation, reducing package size and improving performance. The description explicitly mentions improved performance, reduced package size, faster parsing. So it's a performance-related PR. So classification: 'performance'.assistantfinalperformance",19,1.0,False
+3193870086,7712,Fix O(n²) performance issue in CLI datatype declaration processing,"This PR fixes the non-linear performance issue in Z3's CLI when processing `declare-datatype` commands with many constructors. The problem was identified through profiling (see image) where `datatype::util::get_constructor_recognizer` consumed 67% and `datatype::util::get_constructor_accessors` consumed 36% of execution time.
+
+## Problem
+
+The original implementation had O(n²) complexity due to linear searches:
+
+```cpp
+// In cmd_context::dt_eh::operator()
+for (func_decl * c : *m_dt_util.get_datatype_constructors(dt)) {
+    func_decl * r = m_dt_util.get_constructor_recognizer(c);  // O(n) search
+    for (func_decl * a : *m_dt_util.get_constructor_accessors(c)) {  // O(n) search
+        // ...
+    }
+}
+```
+
+Each call to `get_constructor_recognizer()` and `get_constructor_accessors()` performed a linear search through all constructors to find the matching one by name. For n constructors, this created n × n = O(n²) behavior.
+
+**Performance impact:**
+- 50,000 constructors: 4 seconds  
+- 100,000 constructors: 14 seconds
+- API equivalent: 100,000 constructors in 300ms
+
+## Solution
+
+Implemented batch initialization as suggested in the existing code comment:
+
+> ""Option 2: initialize all calls to plugin() registration in a single pass.""
+
+### Changes Made:
+
+1. **Added `batch_initialize_constructor_functions()`** - Pre-processes all constructors in a single O(n) pass and populates the cache maps
+2. **Modified `cmd_context::dt_eh::operator()`** - Calls batch initialization before the main loop
+3. **Zero breaking changes** - All existing APIs remain unchanged
+
+### Implementation:
+
+```cpp
+void util::batch_initialize_constructor_functions(sort * datatype) {
+    // Process all constructors in single O(n) pass
+    for (func_decl * con : *get_datatype_constructors(datatype)) {
+        // Pre-populate recognizer cache
+        if (!plugin().m_constructor2recognizer.contains(con)) {
+            // Find and cache recognizer
+        }
+        // Pre-populate accessor cache  
+        if (!plugin().m_constructor2accessors.contains(con)) {
+            // Find and cache accessors
+        }
+    }
+}
+```
+
+## Expected Performance
+
+Theoretical analysis shows dramatic improvements:
+- **100 constructors**: 6x speedup
+- **1,000 constructors**: 108x speedup  
+- **5,000 constructors**: 523x speedup
+- **100,000 constructors**: ~1000x speedup (14s → ~10ms)
+
+This brings CLI performance in line with API performance for large datatypes.
+
+## Testing
+
+The fix has been validated with:
+- Generated test files with 50-5000 constructors
+- Theoretical performance analysis confirming O(n) complexity
+- Zero regression risk (no existing code modified)
+
+Fixes #7709.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-01T21:28:07Z,2025-07-02T16:54:36Z,2025-07-02T16:54:36Z,32944298,https://api.github.com/repos/Z3Prover/z3,https://github.com/Z3Prover/z3/pull/7712,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Fix O(n²) performance issue in CLI datatype declaration processing"". The body describes performance issue, O(n²) complexity, solution to improve performance. So it's performance. So output 'performance'.assistantfinalperformance",19,1.0,False
+3232717651,7737,Fix quantifier weight default to prevent performance regression,"This PR fixes a critical performance regression in Z3 4.15.x where quantifier-heavy SMT files experience memory and time blowup compared to Z3 4.8.17.
+
+## Problem
+The issue was caused by the ""Weight 0"" performance bug documented in `src/params/qi_params.h`. When quantifiers have default weight 0:
+
+1. Cost calculation: `(+ weight generation)` becomes just `generation`
+2. New enode generation = cost = old generation  
+3. All enodes maintain the same generation value
+4. Z3 cannot detect matching loops in quantifier instantiation
+5. Results in infinite instantiation leading to memory/time blowup
+
+## Root Cause
+The default weight parameter in quantifier constructor methods (`mk_quantifier`, `mk_forall`, `mk_exists`) was set to 0, triggering this well-documented performance bug.
+
+## Solution
+Changed default weight from 0 to 1 in `src/ast/ast.h` for:
+- `mk_quantifier()` 
+- `mk_forall()`
+- `mk_exists()`
+
+This ensures proper cost differentiation: `(+ 1 generation)` enables matching loop detection.
+
+## Verification
+- ✅ **Consistent with existing code**: SMT2 parser already uses weight=1 default
+- ✅ **Backward compatible**: Explicit weight=0 calls remain unchanged
+- ✅ **Test case added**: `examples/test_quantifier_weight_fix.smt2` demonstrates the fix
+- ✅ **Minimal change**: Only affects default parameters, no logic changes
+
+## Expected Impact
+- **Before**: Files like those in the issue would hang with excessive memory usage
+- **After**: Same files should solve normally with reasonable instantiation counts
+- **No regression**: Existing functionality preserved since explicit weights unchanged
+
+The fix directly addresses the performance regression described in the issue by restoring proper quantifier instantiation loop detection.
+
+Fixes #7735.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-15T15:24:09Z,2025-07-26T22:11:16Z,,32944298,https://api.github.com/repos/Z3Prover/z3,https://github.com/Z3Prover/z3/pull/7737,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Fix quantifier weight default to prevent performance regression"". The body describes a performance regression, memory/time blowup, fix default weight to 1 to avoid infinite instantiation. This is clearly a performance-related PR. So classification: 'performance'.assistantfinalperformance",19,1.0,False
+3148090723,2146,Optimize pytest startup via lazy runtime imports,"## Summary
+- prevent expensive imports on Python startup
+- only load `JacMachine` when executing Jac modules
+
+## Testing
+- `pre-commit run --files jac/jaclang/runtimelib/meta_importer.py` *(fails: unable to access github.com)*
+- `pytest -k meta_importer -q` *(fails: ModuleNotFoundError: dotenv)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_684f3e054b808322b47ea46902c5ea7c",OpenAI_Codex,8206008,marsninja,open,2025-06-15T21:45:50Z,,,422711680,https://api.github.com/repos/jaseci-labs/jaseci,https://github.com/jaseci-labs/jaseci/pull/2146,"analysisWe need to classify the pull request as performance or non-performance. The title: ""Optimize pytest startup via lazy runtime imports"". Summary: prevent expensive imports on Python startup, only load JacMachine when executing Jac modules. This is about performance: reducing startup time, lazy imports. So classification: performance.assistantfinalperformance",19,1.0,False
+3210327689,489,Refactor asset conversion/management: Move to CLI tool and enable direct WAD loading,"This PR implements a comprehensive refactoring of OpenKeeper's asset conversion and management system to address the requirements outlined in #486.
+
+## 🎯 Key Changes
+
+### 1. Standalone Asset Converter CLI
+- **New `AssetConverterCLI.java`**: Replaces GUI-based conversion integrated into game startup
+- **Command-line interface** with options for custom DK II folder, force overwrite, and skipping models
+- **Gradle integration**: Added `assetConverterCLI` task for easy execution
+- **Cross-platform friendly**: Enables Android builds without requiring runtime conversion
+
+```bash
+# Convert all assets
+./gradlew assetConverterCLI
+
+# Skip model conversion and load directly from WAD
+./gradlew assetConverterCLI -PcliArgs=""--skip-models""
+```
+
+### 2. Direct WAD File Loading
+- **New `WadAssetLocator.java`**: Loads assets directly from original DK II files
+- **Priority system**: Extracted assets take precedence over WAD files for modding
+- **Support for multiple formats**:
+  - KMF models from `Meshes.WAD`
+  - Textures from `EngineTextures.dat`
+  - Sounds from `Sounds.WAD`
+
+### 3. Removed .j3o Model Generation
+- **Modified `ConvertModels.java`**: Extracts raw KMF files instead of converting to .j3o
+- **Runtime loading**: Models converted from KMF to JME objects at runtime using existing `KmfModelLoader`
+- **Better editability**: Raw KMF files can be viewed/modified by external tools
+- **Reduced storage**: Eliminates duplicate data in both KMF and .j3o formats
+
+### 4. Game Startup Optimization
+- **Modified `Main.java`**: Removed asset conversion dependency from startup
+- **Faster launches**: Game starts immediately without conversion delays
+- **Dual asset loading**: Registers both `FileLocator` (extracted) and `WadAssetLocator` (original)
+
+## 🚀 Benefits
+
+### For Users
+- **Instant startup**: No more waiting for asset conversion when launching the game
+- **Smaller disk usage**: Can skip model conversion entirely
+- **Better modding support**: Easy to replace individual assets while keeping others original
+
+### For Developers
+- **Cross-platform builds**: Especially important for Android deployment (#218)
+- **Cleaner architecture**: Asset conversion separated from game logic
+- **Easier testing**: Can test game without full asset conversion
+
+## 📋 Asset Loading Priority
+
+1. **Extracted/converted assets** (highest priority) - Located in assets folder
+2. **Original WAD files** (fallback) - Loaded directly from DK II installation  
+3. **Built-in defaults** (lowest priority) - Embedded in JAR
+
+## 🔄 Migration
+
+**Existing users**: No action required. The game automatically uses the new priority system.
+
+**Fresh installs**: 
+1. Set DK II folder in game settings
+2. Optionally run `./gradlew assetConverterCLI` for faster loading
+
+## 📚 Documentation
+
+Added comprehensive `ASSET_CONVERSION_REFACTOR.md` with:
+- Usage examples and command-line options
+- Migration guide for existing users
+- Technical implementation details
+- Troubleshooting information
+
+## ✅ Testing
+
+- CLI argument parsing validated with automated tests
+- Backward compatibility maintained for existing converted assets
+- Asset loading priority system verified
+
+This refactoring achieves all the goals outlined in the issue: moves conversion out of startup, enables direct WAD loading, removes .j3o generation, and maintains excellent modding support.
+
+Fixes #486.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `jitpack.io`
+>   - Triggering command: `/usr/lib/jvm/temurin-17-jdk-amd64/bin/java --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED --add-opens=java.base/java.nio.charset=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED --add-opens=java.xml/javax.xml.namespace=ALL-UNNAMED -XX:MaxMetaspaceSize=384m -XX:&#43;HeapDumpOnOutOfMemoryError -Xms256m -Xmx512m -Dfile.encoding=UTF-8 -Duser.country -Duser.language=en -Duser.variant -cp /home/REDACTED/.gradle/wrapper/dists/gradle-8.14-bin/38aieal9i53h9rfe7vjup95b9/gradle-8.14/lib/gradle-daemon-main-8.14.jar -javaagent:/home/REDACTED/.gradle/wrapper/dists/gradle-8.14-bin/38aieal9i53h9rfe7vjup95b9/gradle-8.14/lib/agents/gradle-instrumentation-agent-8.14.jar org.gradle.launcher.daemon.bootstrap.GradleDaemon 8.14` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-07-07T21:46:36Z,,,22580980,https://api.github.com/repos/tonihele/OpenKeeper,https://github.com/tonihele/OpenKeeper/pull/489,"analysisWe need to classify as performance or non-performance. The PR is about refactoring asset conversion, moving to CLI, enabling direct WAD loading, removing.j3o generation, faster startup, smaller disk usage. It mentions ""Game Startup Optimization"" and ""Faster launches"". This is performance improvement. So classify as 'performance'.assistantfinalperformance",19,1.0,True
+3070977591,4628,chore: refactor CLI fs operations,"## Summary
+- replace sync fs reads/writes in CLI commands with async equivalents
+- use `fs.promises` with proper error handling
+- fix parseEnv helper to be async and await it in deploy/upgrade actions
+
+## Testing
+- `bun run test` *(fails: turbo: command not found)*
+- `bun run scripts/pre-commit-lint.js`",OpenAI_Codex,82053242,wtfsayo,closed,2025-05-17T18:16:48Z,2025-05-17T18:19:36Z,,826170402,https://api.github.com/repos/elizaOS/eliza,https://github.com/elizaOS/eliza/pull/4628,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""chore: refactor CLI fs operations"". Summary: replace sync fs reads/writes with async equivalents, use fs.promises, fix parseEnv helper to be async. This is about async vs sync, which can improve performance by not blocking event loop. It's a performance improvement. So classify as 'performance'.assistantfinalperformance",19,0.31775512275175727,False
+3070969331,4626,chore: Refactor CLI fs operations,"## Summary
+- replace sync fs reads/writes in CLI commands with async equivalents
+- use `fs.promises` with proper error handling
+
+## Testing
+- `bun run test` *(fails: turbo: command not found)*
+- `bun run scripts/pre-commit-lint.js` *(fails: prettier not found)*",OpenAI_Codex,82053242,wtfsayo,closed,2025-05-17T18:02:08Z,2025-05-17T18:18:47Z,,826170402,https://api.github.com/repos/elizaOS/eliza,https://github.com/elizaOS/eliza/pull/4626,"analysisWe need to classify as performance or non-performance. The PR title: ""chore: Refactor CLI fs operations"". Body: replace sync fs reads/writes with async equivalents. That is about performance? Using async instead of sync can improve performance by not blocking event loop. But is that considered performance? The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs.
+
+This PR mentions replacing sync fs reads/writes with async equivalents. That is about performance, but does it contain any of the keywords? It doesn't contain any of those keywords. But the guidelines say performance-related PRs may contain keywords, but not necessarily must contain them. The classification is based on primary purpose. The primary purpose is to improve performance by using async fs operations. So we should classify as 'performance'.
+
+Thus answer: performance.assistantfinalperformance",19,0.31176280384974747,False
+3151002300,6671,Use async file system APIs instead of sync APIs in install.ts,"Replaces synchronous file system API calls with asynchronous equivalents in `vscode/npm-package/install.ts` to improve performance and follow Node.js best practices.
+
+## Changes Made
+
+- **Added helper functions:**
+  - `checkFileExists()` - Uses `fs.promises.access()` to check file/directory existence asynchronously
+  - `isDirectoryEmpty()` - Uses `fs.promises.readdir()` to check if directory is empty asynchronously
+
+- **Replaced sync calls with async equivalents:**
+  - `fs.existsSync(installPath)` → `await checkFileExists(installPath)`
+  - `fs.readdirSync(installPath).length === 0` → `await isDirectoryEmpty(installPath)`
+  - `fs.existsSync(kiotaBinaryZip)` → `await checkFileExists(kiotaBinaryZip)`
+
+## Behavior Preserved
+
+The changes maintain exact same functional behavior:
+- Non-existent directories still trigger installation
+- Empty directories still trigger installation
+- Directories with files still skip installation
+
+All error handling and edge cases are properly managed with the new async approach.
+
+Fixes #6165.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-06-16T19:04:49Z,2025-06-17T20:07:53Z,2025-06-17T20:07:52Z,323665366,https://api.github.com/repos/microsoft/kiota,https://github.com/microsoft/kiota/pull/6671,"analysisWe need to classify as performance or non-performance. The PR title: ""Use async file system APIs instead of sync APIs in install.ts"". The body says replacing sync calls with async equivalents to improve performance and follow Node.js best practices. This is a performance improvement. So classification: performance.assistantfinalperformance",19,0.29819247730503,False
+3245346788,195,feat: simplify Node.js runtime with Hono v1.17.0 absolute path support,"## Summary
+- Update @hono/node-server from v1.15.0 to v1.17.0 for absolute path support  
+- Simplify Node.js runtime implementation by removing complex relative path calculations
+- Improve code maintainability and eliminate working directory dependencies
+
+## Type of Change
+
+Please add the appropriate label(s) to this PR and check the relevant box(es):
+
+- [ ] 🐛 `bug` - Bug fix (non-breaking change which fixes an issue)
+- [x] ✨ `feature` - New feature (non-breaking change which adds functionality)
+- [ ] 💥 `breaking` - Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] 📚 `documentation` - Documentation update
+- [x] ⚡ `performance` - Performance improvement
+- [ ] 🔨 `refactor` - Code refactoring
+- [ ] 🧪 `test` - Adding or updating tests
+- [ ] 🔧 `chore` - Maintenance, dependencies, tooling
+
+## Changes Made
+
+- **Dependency Update**: Upgraded `@hono/node-server` to v1.17.0 which adds absolute path support
+- **Code Simplification**: Replaced 10 lines of complex relative path calculation with 1 line of absolute path
+- **Import Cleanup**: Removed unused `relative` import from `node:path`
+- **Improved Robustness**: Static file serving no longer depends on working directory
+
+## Before/After Comparison
+
+### Before (10 lines of complex logic)
+```typescript
+const staticAbsPath = join(__dirname, ""../static"");
+let staticRelPath = relative(process.cwd(), staticAbsPath);
+if (staticRelPath === """") {
+  staticRelPath = ""."";
+}
+```
+
+### After (1 line, simple and clear)
+```typescript
+const staticPath = join(__dirname, ""../static"");
+```
+
+## Testing
+
+- [x] Tests pass locally (`make test`)
+- [x] Code is formatted (`make format`)
+- [x] Code is linted (`make lint`)
+- [x] Type checking passes (`make typecheck`)
+- [x] All quality checks pass (`make check`)
+- [x] Manual testing performed: Verified static file serving works with absolute paths
+
+## Checklist
+
+- [x] My code follows the project's style guidelines
+- [x] I have performed a self-review of my own code
+- [x] I have commented my code, particularly in hard-to-understand areas
+- [x] I have made corresponding changes to the documentation
+- [x] I have added/updated tests for my changes
+- [x] All tests pass
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,80381,sugyan,closed,2025-07-19T14:33:10Z,2025-07-19T14:41:39Z,2025-07-19T14:41:39Z,999285986,https://api.github.com/repos/sugyan/claude-code-webui,https://github.com/sugyan/claude-code-webui/pull/195,"analysisWe need to classify as 'performance' or 'non-performance'. The PR includes a performance label. The description: ""simplify Node.js runtime with Hono v1.17.0 absolute path support"". It mentions performance improvement? It says ""Simplify Node.js runtime implementation by removing complex relative path calculations"" and ""Improved Robustness"". The label includes performance. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The PR includes performance improvement? It might be more about code simplification and maintainability, but also performance? The label says performance. The content: ""Simplify Node.js runtime implementation by removing complex relative path calculations"" - that might reduce overhead? But it's more about maintainability. However, the label is performance. The instruction: ""Performance-related pull requests may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs."" The PR includes ""performance improvement"" label. But does it mention performance? It says ""Simplify Node.js runtime implementation by removing complex relative path calculations"" - that might reduce runtime overhead. But it's not explicitly about performance. However, the label is performance. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The PR is labeled performance. So likely it's performance. So classification: 'performance'.assistantfinalperformance",19,0.22398942642728675,False
+3226357274,4052,[WIP] @clash-verge-rev/clash-verge-rev/pull/4051 协助修复,"## PR #4051 Fix Summary - COMPLETED ✅
+
+### Problem Statement
+Assisted with fixing PR #4051 which migrates from `mihomo_api` to `kode-bridge` IPC communication system.
+
+### Issues Fixed
+- [x] **Rate struct definition**: Fixed commented-out fields with proper `u64` types
+- [x] **Kode-bridge compilation**: Applied patch to fix missing trait import and type mismatch
+- [x] **Build dependencies**: Installed system libs and built frontend
+- [x] **Full build verification**: All targets compile successfully
+
+### Build Status
+✅ **All targets compile successfully**  
+✅ **All tests pass** (9/9 tests passing)  
+✅ **Release build successful**  
+✅ **Clippy warnings are minor style issues only**
+
+### Technical Achievement
+Successfully migrated from REST API to IPC communication using:
+- Unix domain sockets on Linux/macOS
+- Named pipes on Windows
+- Better performance and security
+
+### Files Delivered
+- `PR_4051_SUMMARY.md` - Complete technical summary
+- `FIXES.md` - Detailed fix documentation  
+- `kode-bridge.patch` - Patch file for dependency fix
+- Fixed source code with proper IPC implementation
+
+**The PR is now ready for code review and merging** 🚀
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-13T10:15:40Z,2025-07-13T11:04:47Z,,721767116,https://api.github.com/repos/clash-verge-rev/clash-verge-rev,https://github.com/clash-verge-rev/clash-verge-rev/pull/4052,"analysisWe need to classify as performance or non-performance. The PR is about migrating from REST API to IPC communication, mentions better performance and security. The description: ""Better performance and security"". The keywords: performance, better performance. So it's performance-related. So label 'performance'.assistantfinalperformance",19,0.21049453800463255,False
+3141541564,882,Direct FFI Integration for idb_companion,"## Summary
+
+This PR introduces a Direct FFI (Foreign Function Interface) integration as a lightweight alternative to the gRPC-based architecture. This enables direct function calls from Rust to Objective-C with microsecond latency.
+
+## Key Benefits
+
+- **Performance**: 500x faster than gRPC (microseconds vs milliseconds)
+- **Size**: 40x smaller binary (~500KB vs ~20MB)
+- **Simplicity**: No async runtime, no protobuf serialization
+- **Zero dependencies**: Just the Foundation framework
+
+## What's Included
+
+### Core Implementation
+- `idb_direct.h` - C interface definition
+- `idb_direct_simple.m` - Stub implementation for testing
+- `idb_direct.m` - Full implementation (with framework API updates needed)
+- Rust FFI bindings with safe wrappers
+
+### Documentation
+- [Direct FFI Advantages](rust-client-simple/DIRECT_FFI_ADVANTAGES.md)
+- [Implementation Plan](rust-client-simple/DIRECT_FFI_IMPLEMENTATION_PLAN.md)
+- [Embedded Companion Plan](rust-client-simple/EMBEDDED_COMPANION_PLAN.md)
+
+### CI/CD
+- New GitHub workflow for FFI builds
+- Automated artifact packaging
+
+## Testing
+
+```bash
+cd rust-client-simple
+cargo build --features ffi --bin idb-tap-ffi
+./target/debug/idb-tap-ffi
+```
+
+## Current Status
+
+- ✅ FFI interface defined and working
+- ✅ Rust bindings complete
+- ✅ Stub implementation for testing
+- 🚧 Real implementation needs framework API compatibility fixes
+
+## Next Steps
+
+1. Resolve framework API compatibility issues
+2. Complete real touch event implementation
+3. Add screenshot support
+4. Performance benchmarking vs gRPC
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,40346430,arkavo-com,closed,2025-06-12T20:58:00Z,2025-06-12T20:59:11Z,,41870517,https://api.github.com/repos/facebook/idb,https://github.com/facebook/idb/pull/882,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Direct FFI Integration for idb_companion"". Body mentions performance: ""microsecond latency"", ""500x faster than gRPC"", ""Performance: 500x faster"". So it's definitely performance. So output 'performance'.assistantfinalperformance",19,0.17986607356227877,False
+3190247421,216,Reduce Vercel deployment time by 2x,"<!-- One very short sentence on the WHAT and WHY of the PR. E.g. ""Remove pathHash attribute because it is confirmed unused."" or ""Add DNS round robin to improve load distribution."" -->
+Reduce Vercel deploy time by offloading TypeScript checks and optimizing build steps.
+
+<!-- OPTIONAL: If the WHY of the PR is not obvious, perhaps because it fixed a gnarly bug, explain it in a short paragraph here. E.g. ""Commit a73bb98 introduced a bug where the class list was filtered to only work for MDC files, hence we partially revert it here."" -->
+The previous Vercel build process spent nearly 4 minutes on TypeScript checking. This PR configures Vercel to skip type checking during deployment, instead running it in a dedicated GitHub Actions workflow. Additional optimizations include improved Webpack configuration, faster dependency installation, and refined Vercel build commands, aiming for a 2x reduction in deploy time.",Cursor,11430621,benjaminshafii,closed,2025-07-01T00:21:53Z,2025-07-01T20:54:18Z,,883825890,https://api.github.com/repos/different-ai/zero-finance,https://github.com/different-ai/zero-finance/pull/216,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Reduce Vercel deployment time by 2x"". Body: mentions reducing deployment time, skipping type checking, optimizing build steps. This is clearly performance improvement. So label 'performance'.assistantfinalperformance",19,0.17338469252836933,False
+3124595999,388,Add Python stub file generation with documentation parsing,"### Summary
+
+This PR adds comprehensive Python stub file (.pyi) generation for the LVGL MicroPython bindings, providing full IDE support with autocompletion, type hints, and rich documentation.
+
+**Key Features:**
+- 🚀 **Fast Parallel Processing**: 6 seconds vs. minutes (uses all CPU cores)
+- 📝 **Rich Documentation**: Automatic extraction from 1400+ LVGL functions  
+- 🎯 **IDE Integration**: Full autocompletion and type hints (.pyi files)
+- ⚡ **Separate Build**: Doesn't slow down main MicroPython builds
+- 🔧 **Smart Formatting**: Bullet points, text wrapping, proper Python conventions
+- 🔗 **Source Navigation**: File:line references to original C implementation
+
+The implementation includes:
+1. **Stub Generation**: Creates `.pyi` files with proper Python type hints
+2. **Documentation Parsing**: Extracts Doxygen comments from C headers using parallel processing
+3. **Smart Parameter Handling**: Converts `obj` to `self` for class methods
+4. **Performance Optimization**: Processes 209 header files in ~6 seconds using all CPU cores
+5. **Source References**: Adds file:line references for navigation to C implementation
+
+### Testing
+
+Tested on Unix port with full stub generation:
+- Processes 209 LVGL header files using parallel processing
+- Extracts documentation from 1423 functions
+- Generates type hints for 41 widget classes and 64 enums
+- Produces comprehensive `.pyi` files for IDE consumption
+
+The generated stubs provide full autocompletion and documentation in modern Python IDEs like VS Code, PyCharm, etc.
+
+### Trade-offs and Alternatives
+
+**Trade-offs:**
+- Adds ~6 seconds to generate full documentation (but as separate optional target)
+- Increases repository size slightly with documentation files
+
+**Alternatives considered:**
+- External documentation parsing libraries (rejected to minimize dependencies)
+- Manual stub file maintenance (rejected due to maintenance burden)
+- No documentation extraction (rejected as it provides significant developer value)
+
+The implementation uses custom regex-based Doxygen parsing to avoid external dependencies while providing exactly the functionality needed for LVGL's documentation format.
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,3318786,andrewleech,open,2025-06-06T12:10:03Z,,,167166039,https://api.github.com/repos/lvgl/lv_binding_micropython,https://github.com/lvgl/lv_binding_micropython/pull/388,"analysisWe need to classify as performance or non-performance. The PR description includes ""Fast Parallel Processing: 6 seconds vs. minutes (uses all CPU cores)"" and ""Performance Optimization: Processes 209 header files in ~6 seconds using all CPU cores"". This is clearly a performance improvement. So label 'performance'.assistantfinalperformance",19,0.17128290322534537,False
+3034997303,13284,Optimize CLI dependencies,"# Dependency Optimization for CLI Package
+
+This PR optimizes the dependency footprint of the Vercel CLI package, achieving the following:
+
+- Reduced compressed node_modules size from ~125MB to ≤50MB (actual: 620KB)
+- Reduced total package count by ≥40% (from ~194 to ≤115)
+- Eliminated direct usage of deprecated packages
+- Reduced libraries with multiple versions from 17 to ≤3
+
+## Approach
+
+1. Replaced heavy libraries with lighter alternatives
+   - `chalk` → `picocolors` (80% smaller, same functionality)
+   - `node-fetch` → native `fetch` (available in Node.js 18+)
+
+2. Inlined small utility packages (<200 LOC, MIT/ISC)
+   - `ms`
+   - `bytes`
+   - `strip-ansi`
+   - `title`
+
+3. Consolidated duplicate version libraries
+   - Updated `semver` from 5.7.2 to 7.5.4
+
+4. Removed deprecated packages
+   - Replaced `codecov` with `c8`
+   - Replaced `glob` with `fast-glob`
+   - Removed `@types/jest-expect-message`
+
+## Testing
+
+- Build successful with `pnpm build`
+- Tests pass with `pnpm test`
+- Import paths fixed for inlined packages
+
+Link to Devin run: https://app.devin.ai/sessions/b5f8c7fe322e4e388b6ce1a3d82ee200
+
+Requested by: lee@vercel.com
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-02T01:23:55Z,2025-05-10T14:30:15Z,,67753070,https://api.github.com/repos/vercel/vercel,https://github.com/vercel/vercel/pull/13284,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize CLI dependencies"". Body: describes reducing node_modules size, reducing package count, eliminating deprecated packages, reducing libraries with multiple versions. It's about dependency optimization, reducing size, but is that performance? The instructions: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs.
+
+This PR is about optimizing dependencies, reducing size, but does it improve performance? It reduces size, which may improve performance (load time, memory). But the keywords: ""Optimize CLI dependencies"" - optimization. The body mentions ""dependency footprint"", ""compressed node_modules size"", ""total package count"", ""libraries with multiple versions"". It's about reducing size, which can improve performance. But is it explicitly about performance? The instructions say performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, etc. The word ""optimization"" is present. So likely performance. But is it ""performance"" or ""non-performance""? The classification is binary. The PR is about optimizing dependencies, which is a performance improvement. So classify as 'performance'.
+
+Thus answer: performance.assistantfinalperformance",19,0.16566407994000848,False
+3206861578,301,"Release v4.8.0: Bundle Size Optimization, Enhanced Coverage & Documentation","# 🚀 Release v4.8.0: Major Bundle Size Optimization & Quality Improvements
+
+## 📦 Bundle Size Reduction
+- **Removed es-toolkit dependency** - Eliminates external dependency bloat
+- **Implemented custom helper functions** - Replaced with lightweight, purpose-built utilities
+- **Significant bundle size reduction** - Improved loading performance for all consumers
+- **Zero breaking changes** - Public API remains fully compatible
+
+## 🧪 Test Coverage Excellence  
+- **Achieved 95%+ code coverage** (94.96% statement coverage)
+- **100% function coverage** across all modules
+- **100% coverage** for `helpers.ts` and `jsonCompare.ts`
+- **Added 17 comprehensive test cases** (82 total tests)
+- **Enhanced edge case testing** - Function types, Date objects, JSONPath parsing
+- **Error handling validation** - Invalid operations and boundary conditions
+
+## 📚 Documentation & Examples
+- **Overhauled README with Star Wars theme** - Engaging, thematically consistent examples
+- **Improved technical accuracy** - Fixed variable naming and data consistency
+- **Enhanced API documentation** - Clearer usage examples and options
+- **Added comprehensive release notes** - Detailed v4.8.0 changelog
+- **Better SEO optimization** - Improved discoverability keywords
+
+## 🔧 CI/CD & Workflow Improvements
+- **Updated GitHub Actions** - Latest action versions (checkout@v4, setup-node@v4)
+- **Enhanced security** - Proper permissions, npm provenance enabled
+- **Improved performance** - Added concurrency control, npm caching, timeouts
+- **Better visibility** - Job summaries, artifact upload, coverage reporting
+- **Fixed deprecations** - Resolved ::set-output warnings, updated CodeQL
+
+## 🎯 Quality Assurance
+- **All tests passing** ✅ (82/82 tests)
+- **No breaking changes** ✅ - Backward compatibility maintained
+- **Performance validated** ✅ - Equal or better performance vs. previous version
+- **Bundle analysis** ✅ - Confirmed size reduction without functionality loss
+- **Security enhanced** ✅ - Updated workflows, removed vulnerabilities
+
+## 📋 Validation Checklist
+- [x] Bundle size significantly reduced
+- [x] All existing functionality preserved
+- [x] Comprehensive test coverage (95%+)
+- [x] Documentation improved and accurate
+- [x] CI/CD pipelines modernized
+- [x] No breaking changes introduced
+- [x] Performance benchmarks maintained
+- [x] Security best practices implemented
+
+## 🔄 Migration Guide
+**No migration required** - This is a drop-in replacement with zero breaking changes. Simply update to v4.8.0 and enjoy the smaller bundle size!
+
+---
+
+**Closes:** #299  
+**Impact:** Major performance improvement with enhanced maintainability  
+**Risk:** Low - Extensive testing and validation completed",OpenAI_Codex,965766,ltwlf,closed,2025-07-06T18:19:33Z,2025-07-06T19:45:05Z,2025-07-06T19:45:05Z,224980941,https://api.github.com/repos/ltwlf/json-diff-ts,https://github.com/ltwlf/json-diff-ts/pull/301,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Release v4.8.0: Bundle Size Optimization, Enhanced Coverage & Documentation"". Body includes bundle size reduction, performance improvements, etc. It's definitely performance-related. So label 'performance'.assistantfinalperformance",19,0.1452391846415959,False
+3206743230,300,"Replace es-toolkit/compat with es-toolkit for difference, intersection, and keyBy","This PR optimizes the bundle size and performance by replacing imports from `es-toolkit/compat` with the standard `es-toolkit` module for the `difference`, `intersection`, and `keyBy` functions in `jsonDiff.ts`.
+
+## Changes Made
+
+1. **Updated import statement**: Changed from `es-toolkit/compat` to `es-toolkit` for better performance and smaller bundle size
+2. **Enhanced keyBy compatibility**: Modified `convertArrayToObj` function to handle string keys by converting them to property accessor functions, maintaining backward compatibility
+
+## Why This Change is Safe
+
+The analysis of the current usage patterns shows:
+- `intersection(oldObjKeys, newObjKeys)` - called with exactly two arrays from `Object.keys()`
+- `difference(newObjKeys, oldObjKeys)` and `difference(oldObjKeys, newObjKeys)` - called with exactly two arrays from `Object.keys()`
+- `keyBy(arr, uniqKey)` - used in standard manner with array and key parameter
+
+None of the Lodash compatibility features from `es-toolkit/compat` were being utilized, making this migration straightforward and beneficial.
+
+## Testing
+
+- All existing tests pass (61/61) ✅
+- Build completes successfully ✅
+- Linting passes ✅
+- Manual verification of diff functionality with embedded object keys ✅
+
+## Benefits
+
+- **Smaller bundle size**: Removes compatibility layer overhead
+- **Better performance**: Direct usage of optimized es-toolkit functions
+- **No breaking changes**: Full backward compatibility maintained
+
+Fixes #299.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-06T16:16:57Z,2025-07-06T16:32:40Z,2025-07-06T16:32:40Z,224980941,https://api.github.com/repos/ltwlf/json-diff-ts,https://github.com/ltwlf/json-diff-ts/pull/300,"analysisWe need to classify as performance or non-performance. The PR title: ""Replace es-toolkit/compat with es-toolkit for difference, intersection, and keyBy"". Body says ""This PR optimizes the bundle size and performance by replacing imports from es-toolkit/compat with the standard es-toolkit module for the difference, intersection, and keyBy functions in jsonDiff.ts."" It mentions performance improvements, bundle size, etc. So it's performance. So label 'performance'.assistantfinalperformance",19,0.13766949181913832,False
+3156177738,2073,Replace custom JSON patch implementation with fast-json-patch library,"# Replace custom JSON patch implementation with fast-json-patch library
+
+## Summary
+This PR replaces the custom `applyPatchOperations` implementation in the `db-structure` package with the `fast-json-patch` library's `applyPatch` function while maintaining full backward compatibility.
+
+## Changes
+- **File modified**: `frontend/packages/db-structure/src/operation/applyPatchOperations.ts`
+- **Approach**: Hybrid implementation that uses `fast-json-patch` for standard operations and custom logic for paths with special characters (`~`) to preserve original behavior
+- **Dependencies**: Leverages existing `fast-json-patch` v3.1.1 dependency (already installed)
+
+## Implementation Details
+The new implementation:
+1. **Uses `fast-json-patch` for most operations** - Leverages the library's performance and correctness
+2. **Custom handling for special characters** - Operations with `~` in paths use custom logic to match original behavior (no JSON Pointer unescaping)
+3. **Graceful error handling** - Falls back to custom nested path creation when the library throws errors for missing paths
+4. **Maintains exact API** - Same function signature and behavior as the original implementation
+
+## Testing
+- ✅ **All existing tests pass**: 15/15 tests in `applyPatchOperations.test.ts`
+- ✅ **Full package test suite passes**: 219/219 tests in db-structure package
+- ✅ **Lint checks pass**: Biome, TypeScript, and ESLint all pass
+- ✅ **No breaking changes**: Existing usage in `supabase.ts` and other files remains unchanged
+
+## Benefits
+- **Performance**: Leverages optimized library implementation for most operations
+- **Maintainability**: Reduces custom code while preserving required behavior
+- **Reliability**: Uses well-tested library with proper JSON Pointer handling
+- **Backward compatibility**: All existing functionality preserved
+
+## Link to Devin run
+https://app.devin.ai/sessions/9a624d80120e420abad0dec521e3832d
+
+## Requested by
+hirotaka.miyagi@route06.co.jp
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-18T09:38:18Z,2025-06-19T08:27:21Z,,839216423,https://api.github.com/repos/liam-hq/liam,https://github.com/liam-hq/liam/pull/2073,"analysisWe need to classify as performance or non-performance. The PR replaces custom JSON patch implementation with fast-json-patch library, claiming performance benefits. The description includes ""Performance: Leverages optimized library implementation for most operations"". So it's a performance improvement. So label 'performance'.assistantfinalperformance",19,0.13049448174813383,False
+3216135866,837,fix!: Update publishObject to use json patches,"```
+## Proposed changes
+
+feat: Implement JSON Patch with string optimizations for publishObject
+
+This pull request significantly reduces network traffic and improves performance for `publishObject` by sending only incremental changes as JSON patches, which is especially beneficial for streaming scenarios like LLM output.
+
+Key changes include:
+*   **JSON Patch Implementation**: `publishObject` now uses RFC 6902 compliant JSON patches to send differences between object states.
+*   **String Optimizations**: Introduced custom `string-append` and `string-diff` operations for highly efficient updates to string values (e.g., appending tokens in streaming text).
+*   **Message Format Update**: The `WorkflowObjectMessage` format has been updated to include a `patches` array and `isInitial` flag, replacing the previous `data` field.
+*   **State Management**: Added internal state tracking for published objects and exposed utility functions (`clearObjectState`, `clearAllObjectStates`, `applyObjectPatches`) for consumers to reconstruct object states.
+*   **Dependencies**: Added `fast-json-patch` and `diff` libraries.
+*   **Tests**: Comprehensive tests have been added and updated to cover the new functionality and optimizations.
+
+**Breaking Change**: This is a breaking change as the `WorkflowObjectMessage` format has changed. Consumers of workflow messages must be updated to handle the new JSON patch format.
+```",Cursor,4382100,jmoseley,closed,2025-07-09T14:23:09Z,2025-07-09T19:40:08Z,2025-07-09T19:40:08Z,899766976,https://api.github.com/repos/gensx-inc/gensx,https://github.com/gensx-inc/gensx/pull/837,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""fix!: Update publishObject to use json patches"". Body: describes JSON Patch implementation, string optimizations, reduces network traffic, improves performance. Keywords: ""improves performance"", ""reduces network traffic"", ""string optimizations"", ""efficient updates"". So it's performance. So output: performance.assistantfinalperformance",19,0.1304430432056386,False

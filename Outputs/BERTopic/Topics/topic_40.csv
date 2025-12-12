@@ -1,0 +1,114 @@
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
+3241695471,9440,Improve Lua compiler membership optimization,"## Summary
+- optimize Lua compiler for `in`, `contains`, and `starts_with`
+- add list type helpers
+- update generated Lua sources
+- log progress in TASKS
+
+## Testing
+- `go test ./compiler/x/lua -run TestLuaCompiler_VMValid_Golden -tags=slow -update`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6879b6718cec8320896bbdfa10b01db8",OpenAI_Codex,1218621,tamnd,closed,2025-07-18T03:13:58Z,2025-07-18T03:14:12Z,2025-07-18T03:14:11Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9440,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Lua compiler membership optimization"". Summary: optimize Lua compiler for `in`, `contains`, and `starts_with`. Add list type helpers. Update generated Lua sources. Log progress. The test mentions slow tag. The description indicates optimization of compiler for membership operations. That is performance improvement. So classification: performance.assistantfinalperformance",40,1.0,False
+3241715810,9459,Improve Lua compiler,"## Summary
+- inline print handling instead of `__print`
+- remove `__eq` helper and use native equality checks
+- adjust set operation helpers to compare values directly
+- document progress in Lua TASKS
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6879bc1311908320b634d6f0bf4979cb",OpenAI_Codex,1218621,tamnd,closed,2025-07-18T03:28:21Z,2025-07-18T03:28:33Z,2025-07-18T03:28:33Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9459,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Improve Lua compiler"". Body: inline print handling instead of __print, remove __eq helper and use native equality checks, adjust set operation helpers to compare values directly, document progress. These changes likely improve performance by reducing overhead of helper functions, inline print handling. The description mentions performance improvements. So classify as 'performance'.assistantfinalperformance",40,1.0,False
+3262693853,13026,Add Lua benchmarks for Rosetta tasks 46-55 and streamline helpers,"## Summary
+- generate benchmark output for Rosetta programs 46-55
+- update Lua ROSETTA progress table with timings
+- include benchmark output files in repo
+- refactor Lua transpiler so helper functions are only emitted when referenced
+
+## Testing
+- `MOCHI_BENCHMARK=1 go test ./transpiler/x/lua -tags slow -run Rosetta -index=46`
+- `MOCHI_BENCHMARK=1 go test ./transpiler/x/lua -tags slow -run Rosetta -index=52`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_688351b2e6888320a180d5e8794397dc",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T10:05:36Z,2025-07-25T10:05:49Z,2025-07-25T10:05:49Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/13026,"analysisWe need to classify as performance or non-performance. The PR adds Lua benchmarks for Rosetta tasks 46-55 and streamlines helpers. It mentions generating benchmark output, updating progress table with timings, including benchmark output files, refactoring transpiler to emit helper functions only when referenced. This is about performance measurement and optimization. Keywords: benchmark, timings, performance. So it's performance.assistantfinalperformance",40,1.0,True
+3224983644,7926,Improve Lua codegen,"## Summary
+- reduce runtime helper usage in Lua compiler
+- update generated Lua output
+- mark helper reduction done in README
+
+## Testing
+- `go test ./...`
+- `GOFLAGS=-tags=slow go run scripts/compile_lua.go`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6871f5b0e8448320b54b959a482d541f",OpenAI_Codex,1218621,tamnd,closed,2025-07-12T07:17:42Z,2025-07-12T07:28:03Z,2025-07-12T07:28:03Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7926,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Lua codegen"". Summary: reduce runtime helper usage in Lua compiler, update generated Lua output, mark helper reduction done in README. This seems to be about reducing runtime helper usage, which could improve performance. But is it explicitly about performance? The description: ""reduce runtime helper usage in Lua compiler"" - that could reduce overhead, thus performance improvement. But the classification guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. The PR description does not contain those keywords. But the content ""reduce runtime helper usage"" might be considered optimization. But the guidelines say ""or any other terms referring to how faster and efficiently software runs."" So we need to decide if this is performance. The PR is about code generation improvement, reducing runtime helper usage. That likely improves performance. But does it mention performance? Not explicitly. But the guidelines allow ""any other terms referring to how faster and efficiently software runs."" ""reduce runtime helper usage"" could be considered optimization. But it's ambiguous. The guidelines: ""Performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" So ""reduce runtime helper usage"" is not a keyword but could be considered optimization. But the guidelines say ""or any other terms referring to how faster and efficiently software runs."" So we can interpret that as yes. But we need to be careful: The PR might be about code generation improvements, not necessarily performance. But ""reduce runtime helper usage"" likely reduces overhead, thus performance improvement. I'd lean to performance. But let's check if there's any mention of performance. The summary: ""reduce runtime helper usage in Lua compiler"" - that is an optimization. The title: ""Improve Lua codegen"" - could be performance. The body: ""update generated Lua output"" - not necessarily performance. ""mark helper reduction done in README"" - not performance. So the only performance hint is ""reduce runtime helper usage"". That is an optimization. So I'd classify as performance. The guidelines: ""or any other terms referring to how faster and efficiently software runs."" So yes. So classification: performance.assistantfinalperformance",40,1.0,False
+3239403987,9329,Lua compiler improvements,"## Summary
+- optimize Lua compiler to skip helper calls when indexing simple lists or strings
+- update runtime boolean printing to match golden expectations
+- regenerate Lua machine outputs
+- note new capabilities in Lua machine README
+
+## Testing
+- `go test -tags slow ./compiler/x/lua -run VMValid_Golden` *(fails: 73 passed, 27 failed)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_6878e44977a88320a02aad168cf0272c",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T12:27:28Z,2025-07-17T12:28:00Z,2025-07-17T12:28:00Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9329,"analysisWe need to classify as performance or non-performance. The PR title: ""Lua compiler improvements"". Body: mentions optimizing Lua compiler to skip helper calls when indexing simple lists or strings. That is a performance improvement. Also mentions runtime boolean printing, regenerate outputs, note new capabilities. The main purpose is performance optimization. So label 'performance'.assistantfinalperformance",40,1.0,True
+3216682526,6920,Lua compiler improvements,"## Summary
+- make the Lua compiler inline append operations when a list literal is given
+- regenerate Lua machine outputs with updated compiler
+
+## Testing
+- `go test -tags slow ./compiler/x/lua -run TestLuaCompiler_ValidPrograms -count=1`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_686ea73dc9208320b8742e6cc573b62c",OpenAI_Codex,1218621,tamnd,closed,2025-07-09T17:41:35Z,2025-07-09T17:41:48Z,2025-07-09T17:41:47Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/6920,"analysisWe need to classify as performance or non-performance. The PR title: ""Lua compiler improvements"". Summary: ""make the Lua compiler inline append operations when a list literal is given"" and ""regenerate Lua machine outputs with updated compiler"". This seems like a compiler improvement, but is it performance? Inlining append operations could improve performance of generated code. But the description is about compiler changes, not runtime performance. However, the improvement is about making the compiler inline append operations, which could reduce runtime overhead. That is a performance improvement. But the question: ""primary purpose of the pull request is to improve performance."" The PR is about compiler improvements, but the change is to inline append operations, which likely improves runtime performance. The summary also mentions ""regenerate Lua machine outputs with updated compiler"". That is more about updating outputs. The main change is inlining append operations. That is a performance optimization. So classify as 'performance'.
+
+Thus answer: performance.assistantfinalperformance",40,1.0,False
+3261739055,12875,Add benchmarking mode for Lua transpiler,"## Summary
+- update Lua transpiler with optional benchmark wrapping
+- collect real execution time and memory usage
+- support `MOCHI_BENCHMARK` in golden tests
+- regenerate `ROSETTA.md` checklist as a table
+- run benchmark for program 1 (`100-doors-2`)
+
+## Testing
+- `MOCHI_BENCHMARK=1 go test -v ./transpiler/x/lua -run Rosetta -index 1 -tags slow -count=1 -update`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6882e1921d7083208c68f8db0897ee19",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T02:07:34Z,2025-07-25T02:07:49Z,2025-07-25T02:07:49Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12875,"analysisWe need to classify as performance or non-performance. The PR adds benchmarking mode, collects execution time and memory usage, support MOCHI_BENCHMARK in golden tests, regenerate checklist, run benchmark for program 1. This is about performance measurement, not necessarily optimization. But it's about adding benchmarking mode, collecting real execution time and memory usage. That is performance-related. The classification: 'performance'.assistantfinalperformance",40,1.0,False
+3259716066,12649,Add main handling and faster list append for Lua transpiler,"## Summary
+- support programs with `main` by emitting a call at the end of generated Lua
+- optimize `append` translation to mutate the list instead of copying
+- add Lua translation for `pow` builtin
+- mark `brilliant-numbers` as transpiled
+- add transpiled Lua and expected output for `brilliant-numbers`
+
+## Testing
+- `go test ./transpiler/x/lua -run Rosetta -index 137 -tags slow -update -v` *(fails: took too long, interrupted)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_68821c2110f48320ad9295c7092004e9",OpenAI_Codex,1218621,tamnd,closed,2025-07-24T12:23:37Z,2025-07-24T12:25:14Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12649,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Add main handling and faster list append for Lua transpiler"". Summary: support main, optimize append translation to mutate list instead of copying, add pow builtin, mark brilliant-numbers as transpiled, add transpiled Lua and expected output. The key is ""faster list append"" and ""optimize append translation to mutate the list instead of copying"". That is a performance improvement. So classification: performance.assistantfinalperformance",40,1.0,True
+3238396793,9165,Improve Dart compiler code emission,"## Summary
+- avoid emitting unused `_equal` helper in Dart output
+- conditionally call `_equal` when comparing lists or maps
+
+## Testing
+- `go test ./compiler/x/dart -tags slow -count=1`
+- `go test ./compiler/x/dart -tags slow -run VMValid -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68789dee023c8320a29b78551deb4e18",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T07:03:20Z,2025-07-17T07:03:39Z,2025-07-17T07:03:38Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9165,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Dart compiler code emission"". Summary: avoid emitting unused `_equal` helper in Dart output; conditionally call `_equal` when comparing lists or maps. This is about code emission, removing unused helper, making code more efficient. It's about performance? It reduces code size, maybe improves runtime performance by not calling unused helper. It's a compiler optimization. The description: avoid emitting unused helper, conditionally call when needed. That is a performance improvement. So classify as 'performance'.assistantfinalperformance",40,1.0,False
+3238548454,9203,Improve Dart equality codegen,"## Summary
+- avoid `_equal` helper when comparing lists or maps with null
+- note improvement in Dart compiler tasks
+
+## Testing
+- `go test ./compiler/x/dart -tags slow -run TestDartCompiler_VMValid_Golden -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6878a92ce41c8320b43c5a82fcac2ec9",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T07:54:45Z,2025-07-17T07:55:19Z,2025-07-17T07:55:19Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9203,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Improve Dart equality codegen"". Summary: avoid `_equal` helper when comparing lists or maps with null. Note improvement in Dart compiler tasks. This seems to be about code generation for equality, likely to reduce overhead, maybe performance improvement. The summary mentions ""avoid `_equal` helper when comparing lists or maps with null"" - that could reduce function call overhead, maybe performance. Also ""note improvement in Dart compiler tasks"" - maybe tasks improved. The question: is the primary purpose to improve performance? The description: ""Improve Dart equality codegen"" - could be about correctness or maintainability. But the mention of avoiding helper and improvement in compiler tasks suggests performance. The keywords: ""performance"" not explicitly present, but ""improvement"" and ""avoid helper"" might be performance. The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. The PR mentions ""improvement in Dart compiler tasks"" - maybe compile-time performance. That is compile-time-hog? Not exactly. But ""improve Dart equality codegen"" could be about code generation performance. The summary: ""avoid `_equal` helper when comparing lists or maps with null"" - that might reduce runtime overhead. So likely performance. So classify as 'performance'.assistantfinalperformance",40,1.0,False

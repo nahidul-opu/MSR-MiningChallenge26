@@ -1,0 +1,530 @@
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
+2905716327,9027,refactor(twap): implement strategy pattern for accumulator updates,"This commit refactors the TWAP module to use the strategy pattern more thoroughly for its accumulator updates. Previously, the strategy pattern was only used for TWAP computation but not for the accumulator updates.
+
+Key changes:
+- Add `updateAccumulators` method to the twapStrategy interface
+- Implement strategy-specific accumulator update logic for both arithmetic and geometric strategies
+- Modify `getInterpolatedRecord` to use the provided strategy's accumulator update method
+- Update remaining code to use the appropriate strategy for accumulator updates
+- Maintain backward compatibility in exported functions and existing code paths
+
+With this change, geometric accumulator calculations are now only performed when using the geometric strategy, making the system more efficient by avoiding unnecessary calculations for the arithmetic strategy.
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+Co-Authored-By: Claude <noreply@anthropic.com>
+
+Closes: #7113 ",Claude_Code,6440154,ValarDragon,closed,2025-03-09T22:29:23Z,2025-03-21T00:03:05Z,,304841810,https://api.github.com/repos/osmosis-labs/osmosis,https://github.com/osmosis-labs/osmosis/pull/9027,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""refactor(twap): implement strategy pattern for accumulator updates"". Body: describes refactoring to use strategy pattern for accumulator updates, previously only used for TWAP computation. It mentions that geometric accumulator calculations are now only performed when using the geometric strategy, making the system more efficient by avoiding unnecessary calculations for the arithmetic strategy. That is a performance improvement: avoiding unnecessary calculations. The body also says ""making the system more efficient"". So it's performance. The keywords: efficient, avoid unnecessary calculations. So classification: performance.assistantfinalperformance",4,1.0,True
+3146870376,146,Improve putAll efficiency,"## Summary
+- detect large bulk inserts in CompactMap.putAll
+- copy existing entries directly to a backing map
+- add regression tests ensuring putAll switches representation when exceeding the threshold
+
+## Testing
+- `mvn -q test` *(fails: `mvn: command not found`)*
+
+------
+https://chatgpt.com/codex/tasks/task_b_684dfe1a0a5c832a92f0720ed80566f3",OpenAI_Codex,5373774,jdereg,closed,2025-06-14T23:09:08Z,2025-06-14T23:09:30Z,2025-06-14T23:09:30Z,12670630,https://api.github.com/repos/jdereg/java-util,https://github.com/jdereg/java-util/pull/146,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve putAll efficiency"". Summary: detect large bulk inserts in CompactMap.putAll, copy existing entries directly to a backing map, add regression tests ensuring putAll switches representation when exceeding threshold. This is about performance improvement. So classification: performance.assistantfinalperformance",4,1.0,False
+3124191731,8572,HDDS-13114. Make MaxSubCompactions configureable for manual compaction,"## What changes were proposed in this pull request?
+
+https://github.com/apache/ozone/pull/8141#discussion_r2093792426
+
+ 
+In https://github.com/apache/ozone/pull/8141 `RDBStore#compactTable` was introduced. 
+
+We should set `options.setMaxCompactionBytes()` when we open the snapshot rocksdb this could be useful so that we ensure one sub compaction doesn't take up a lot of memory. Also look into making ManagedCompactRangeOptions.setMaxSubCompactions() configurable so that we don't use a lot of CPU for this operation. It is ok if the compactions take time.
+
+This can be achieved by adding `ManagedRangeCompactionOption` into `AbstractRDBStore`, `RDBStore`, `RDBStoreBuilder`. Also the corresponding rocksdb config keys.
+
+## What is the link to the Apache JIRA
+
+https://issues.apache.org/jira/browse/HDDS-13114
+
+## How was this patch tested?
+
+CI:
+https://github.com/peterxcli/ozone/actions/runs/15484301525",OpenAI_Codex,54034701,peterxcli,open,2025-06-06T09:22:21Z,,,212382406,https://api.github.com/repos/apache/ozone,https://github.com/apache/ozone/pull/8572,"analysisWe need to classify as performance or non-performance. The PR is about making MaxSubCompactions configurable for manual compaction, to limit memory usage and CPU usage. It's about compaction configuration, memory usage, CPU usage. It's about performance tuning. The description: ""We should set options.setMaxCompactionBytes() when we open the snapshot rocksdb this could be useful so that we ensure one sub compaction doesn't take up a lot of memory. Also look into making ManagedCompactRangeOptions.setMaxSubCompactions() configurable so that we don't use a lot of CPU for this operation. It is ok if the compactions take time."" This is about performance. So classification: performance.assistantfinalperformance",4,1.0,False
+3186329921,3992,Optimize runtime/vm,"## Summary
+- const fold more list operations
+- regenerate tpch IRs
+
+## Testing
+- `make test STAGE=runtime/vm`
+- `go test ./runtime/vm -c`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_686167a4ad548320b2c992000bfd6d76",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T16:33:40Z,2025-06-29T16:34:06Z,2025-06-29T16:34:06Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3992,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize runtime/vm"". Summary: ""const fold more list operations, regenerate tpch IRs"". This seems like performance optimization. Keywords: optimize, runtime, vm. Likely performance. So label 'performance'.assistantfinalperformance",4,1.0,False
+3179347779,3563,Add liveness analysis to VM compiler,"## Summary
+- add liveness analysis pass for VM functions
+- track register usage and eliminate dead writes
+- shrink function register counts after optimization
+
+## Testing
+- `go test ./runtime/vm -run .`
+- `go test ./...` *(fails: requires apt packages)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_685d57b8fe548320b65e48c63d74406f",OpenAI_Codex,1218621,tamnd,closed,2025-06-26T14:34:34Z,2025-06-27T03:38:27Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3563,"analysisWe need to classify as performance or non-performance. The PR adds liveness analysis to VM compiler, track register usage, eliminate dead writes, shrink function register counts after optimization. This is about optimization, reducing register usage, eliminating dead writes, which improves performance. So classify as 'performance'.assistantfinalperformance",4,1.0,False
+3091688841,127,Improve CompactMap array operations with binary search,"## Summary
+- implement `pairBinarySearch` for even-indexed lookups
+- use binary search in `putInCompactArray`, `get`, `containsKey`, and `removeFromCompactArray`
+- add tests for sorted and reverse case-insensitive ordering
+
+## Testing
+- `mvn -q -DskipTests=false test` *(fails: `mvn` not found)*",OpenAI_Codex,5373774,jdereg,closed,2025-05-26T16:52:20Z,2025-05-26T16:52:42Z,2025-05-26T16:52:42Z,12670630,https://api.github.com/repos/jdereg/java-util,https://github.com/jdereg/java-util/pull/127,"analysisWe need to classify the pull request as performance or non-performance. The title: ""Improve CompactMap array operations with binary search"". The body: implementing binary search for array operations, likely to improve performance. Keywords: ""binary search"", ""improve"", ""array operations"". The description: ""implement pairBinarySearch for even-indexed lookups, use binary search in putInCompactArray, get, containsKey, and removeFromCompactArray"". This is about performance improvement. So classification: 'performance'.assistantfinalperformance",4,1.0,False
+3188803096,4233,Update VM const reuse and refresh TPC‑DS IR,"## Summary
+- reuse constant registers when building grouped records in the VM compiler
+- refresh TPC-DS IR disassembly for queries q60–q69
+
+## Testing
+- `go test -tags slow ./tests/vm -run TestVM_TPCDS/q60 -update -count=1`
+- `go test -tags slow ./tests/vm -run TestVM_TPCDS/q61 -update -count=1`
+- `go test -tags slow ./tests/vm -run TestVM_TPCDS/q62 -update -count=1`
+- `go test -tags slow ./tests/vm -run TestVM_TPCDS/q63 -update -count=1`
+- `go test -tags slow ./tests/vm -run TestVM_TPCDS/q64 -update -count=1`
+- `go test -tags slow ./tests/vm -run TestVM_TPCDS/q65 -update -count=1`
+- `go test -tags slow ./tests/vm -run TestVM_TPCDS/q66 -update -count=1`
+- `go test -tags slow ./tests/vm -run TestVM_TPCDS/q67 -update -count=1`
+- `go test -tags slow ./tests/vm -run TestVM_TPCDS/q68 -update -count=1`
+- `go test -tags slow ./tests/vm -run TestVM_TPCDS/q69 -update -count=1`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6862a22aa7a88320b9f259582d22d4a4",OpenAI_Codex,1218621,tamnd,closed,2025-06-30T14:56:07Z,2025-06-30T15:03:12Z,2025-06-30T15:03:11Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4233,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Update VM const reuse and refresh TPC‑DS IR"". Summary: reuse constant registers when building grouped records in the VM compiler; refresh TPC-DS IR disassembly for queries q60–q69. This seems to be about reusing constant registers, which could be a performance optimization. But also refreshing IR disassembly for queries. The main change: reuse constant registers. That is a performance improvement. The keywords: reuse constant registers, VM compiler. No explicit performance keywords but it's about optimization. The instruction says performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, etc. But not mandatory. The content indicates improvement of performance by reusing registers. So classify as 'performance'.assistantfinalperformance",4,1.0,False
+3183820232,3871,Implement register coalescing,"## Summary
+- reduce virtual register usage by eliminating redundant `Move` ops
+- update Optimize loop to invoke new pass
+- refresh IR golden files
+
+## Testing
+- `go test ./...`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_685ebb7fa8d88320a14da8cc0e5a151a",OpenAI_Codex,1218621,tamnd,closed,2025-06-27T19:00:49Z,2025-06-29T16:25:46Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3871,"analysisWe need to classify the pull request as performance or non-performance. The PR title: ""Implement register coalescing"". Summary: reduce virtual register usage by eliminating redundant Move ops, update Optimize loop to invoke new pass, refresh IR golden files. This is about register coalescing, which reduces register usage, potentially improving performance. But is it primarily performance? It reduces virtual register usage, which could improve performance by reducing register pressure, but the primary purpose is to reduce register usage, not necessarily performance. However, register coalescing is an optimization that can improve performance. The description: ""reduce virtual register usage by eliminating redundant Move ops"". That is an optimization. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The PR is about register coalescing, which is an optimization pass. It might be considered performance. The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. The PR description does not contain those keywords. But the content is about optimization. The guidelines say ""or any other terms referring to how faster and efficiently software runs."" Register coalescing is an optimization that can improve performance. But the description doesn't mention performance explicitly. However, the guidelines say ""performance-related pull requests may contain keywords such as... or any other terms referring to how faster and efficiently software runs."" It doesn't say that the presence of those keywords is required. But we need to decide if the primary purpose is to improve performance. Register coalescing is an optimization that reduces register usage, which can improve performance. But the primary purpose might be to reduce register usage, not necessarily performance. But it's an optimization pass. I'd lean that it's a performance improvement. The guidelines: ""Performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" The PR does not contain those keywords. But the guidelines say ""or any other terms referring to how faster and efficiently software runs."" The PR is about register coalescing, which is an optimization. It's likely a performance improvement. I'd classify as 'performance'.assistantfinalperformance",4,1.0,False
+3188736652,4220,Update q7 IR,"## Summary
+- update q7.ir.out after improving the VM's handling of TPC-H queries
+
+## Testing
+- `go test ./tests/vm -tags slow -run TestVM_TPCH/q7.mochi -count=1` *(fails: signal interrupt)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_68629c3e679883208422e5eab4c62db9",OpenAI_Codex,1218621,tamnd,closed,2025-06-30T14:37:33Z,2025-06-30T14:38:19Z,2025-06-30T14:38:19Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4220,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Update q7 IR"". Summary: ""update q7.ir.out after improving the VM's handling of TPC-H queries"". That suggests performance improvement: ""improving the VM's handling of TPC-H queries"" likely performance. Keywords: improving, handling, TPC-H queries. Might be performance. The body mentions testing. No explicit performance keywords but ""improving the VM's handling"" implies performance. So classify as 'performance'.assistantfinalperformance",4,1.0,False
+3188632066,4199,Update vm constant reuse and IR,"## Summary
+- reuse constant registers when building grouped records in the VM
+- update TPCH q13 IR output
+
+## Testing
+- `go test ./...`
+- `go test -tags slow -run TestVM_TPCH/q13.mochi -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686283dcce4483208629d98d625f7888",OpenAI_Codex,1218621,tamnd,closed,2025-06-30T14:07:07Z,2025-06-30T14:07:31Z,2025-06-30T14:07:31Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4199,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Update vm constant reuse and IR"". Summary: reuse constant registers when building grouped records in the VM; update TPCH q13 IR output. This seems to be about reusing constant registers, which could be a performance improvement. But is it primarily performance? The summary says ""reuse constant registers when building grouped records in the VM"". That is likely a performance optimization. Also ""update TPCH q13 IR output"" might be a functional change. But the main change is constant reuse. That is a performance improvement. So classify as 'performance'.
+
+Check keywords: ""reuse constant registers"" - not explicitly performance keyword but it's about optimization. The instruction says performance-related PR may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. The PR doesn't contain those keywords. But the instruction says ""may contain keywords"" but not required. We need to determine if primary purpose is performance. The change is about reusing constant registers, which is a performance optimization. So classification: performance.
+
+Thus output: performance.assistantfinalperformance",4,1.0,True
+3188614216,4197,Add constant reuse for empty collections,"## Summary
+- enhance VM constant intern table so empty lists/maps reuse registers
+
+## Testing
+- `make test`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6862917f178c83209c27b504ac211536",OpenAI_Codex,1218621,tamnd,closed,2025-06-30T14:01:40Z,2025-06-30T14:07:42Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4197,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Add constant reuse for empty collections"". Summary: ""enhance VM constant intern table so empty lists/maps reuse registers"". This is about reusing constants for empty collections, likely to reduce memory usage and maybe speed up constant lookup. It's about performance: memory optimization, reuse of constants. The description mentions ""enhance VM constant intern table so empty lists/maps reuse registers"". That is a performance improvement. So classification: 'performance'.assistantfinalperformance",4,1.0,False
+3188614083,4196,Improve constant reuse in VM,"## Summary
+- reuse empty list and map constants in the VM
+- regenerate IR output for TPC‑H query 21
+
+## Testing
+- `go test ./...`
+- `go test -tags slow ./tests/vm -run TestVM_TPCH/q21\.mochi -count=1`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6862917cb7fc83209fe36289b2524e07",OpenAI_Codex,1218621,tamnd,closed,2025-06-30T14:01:38Z,2025-06-30T14:04:55Z,2025-06-30T14:04:55Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4196,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve constant reuse in VM"". Summary: reuse empty list and map constants in the VM, regenerate IR output for TPC-H query 21. This is about reusing constants, likely to reduce memory usage or improve performance. The keywords: ""reuse"", ""constants"", ""VM"". It might be performance improvement. The description: ""Improve constant reuse in VM"" suggests performance. There's no explicit mention of speed, memory, etc. But reusing constants reduces memory allocation overhead, which is a performance improvement. So classify as 'performance'.assistantfinalperformance",4,1.0,False
+3188613776,4195,Update VM constant reuse,"## Summary
+- enable reuse of empty list and map constants in the VM
+- no changes to golden output needed for TPCH q20 but confirmed compilation
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6862917b798c832093dcbbe9c463e6ea",OpenAI_Codex,1218621,tamnd,closed,2025-06-30T14:01:32Z,2025-06-30T14:04:43Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4195,"analysisWe need to classify as performance or non-performance. The PR title: ""Update VM constant reuse"". Summary: enable reuse of empty list and map constants in the VM. No changes to golden output needed for TPCH q20 but confirmed compilation. This is about reusing constants, which likely improves memory usage and maybe performance. The keywords: ""reuse"", ""empty list and map constants"". This is about memory optimization. The instruction says performance-related PR may contain keywords like memory, optimization, leak, speed, perf, etc. ""memory"" is a keyword. So it's performance. So classification: performance.assistantfinalperformance",4,1.0,False
+3188613267,4193,Improve VM constant reuse,"## Summary
+- improve constant reuse by deduplicating list and map values
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6862917832608320a45c035333107f8d",OpenAI_Codex,1218621,tamnd,closed,2025-06-30T14:01:24Z,2025-06-30T14:04:33Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4193,"analysisWe need to classify the pull request as performance or non-performance. The title: ""Improve VM constant reuse"". Summary: ""improve constant reuse by deduplicating list and map values"". This is about deduplicating constants to reduce memory usage? It might be performance improvement by reducing memory usage. The description: ""improve constant reuse by deduplicating list and map values"". That is about memory usage, deduping constants. That could be considered performance improvement. The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. The PR mentions ""improve constant reuse"" and ""deduplicating list and map values"". That is about memory usage, deduping constants. That is a performance improvement. So classify as 'performance'.assistantfinalperformance",4,1.0,False
+3188613010,4191,Update VM constant reuse,"## Summary
+- support reusing empty list constants in the VM
+- regenerate IR for TPCH q14
+
+## Testing
+- `go test ./...`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6862916f111c83209ade486c0581ee66",OpenAI_Codex,1218621,tamnd,closed,2025-06-30T14:01:21Z,2025-06-30T14:04:13Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4191,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Update VM constant reuse"". Summary: support reusing empty list constants in the VM, regenerate IR for TPCH q14. This seems about reusing constants, maybe memory/performance? Reusing empty list constants could reduce memory usage or speed. But is it primarily performance? It might be about memory optimization. The description: ""support reusing empty list constants in the VM"" - that is a performance improvement: reduce memory usage, maybe speed. ""regenerate IR for TPCH q14"" - maybe to fix something. The question: is the primary purpose to improve performance? The keywords: memory, optimization, speed, etc. The PR mentions ""constant reuse"" which is a memory optimization. So likely performance. So classify as 'performance'.assistantfinalperformance",4,1.0,False
+3188612213,4190,Support constant reuse for empty lists in VM,"## Summary
+- improve VM constant register reuse by caching empty lists
+
+## Testing
+- `go test ./...`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6862916c405483209ec316ae13db839d",OpenAI_Codex,1218621,tamnd,closed,2025-06-30T14:01:07Z,2025-06-30T14:03:59Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4190,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Support constant reuse for empty lists in VM"". Summary: ""improve VM constant register reuse by caching empty lists"". This is about reusing constants, likely to reduce memory usage or speed. It's about performance optimization. So classification: performance.assistantfinalperformance",4,1.0,False
+3170043914,1118,Implement KV batch PutMany,"## Summary
+- add PutMany RPC to kv.proto and regenerate protobuf code
+- extend KVService server and NATS store with PutMany handling
+- update sync poller to batch KV writes using PutMany
+- revise KV interfaces and mocks for PutMany support
+- refresh Armis integration tests and sweep result utilities for new APIs
+
+## Testing
+- `go test ./...` *(fails: TestArmisIntegration_Fetch_WithUpdaterAndCorrelation, TestDefaultKVWriter_WriteSweepConfig, TestSweepResultsQuery_Pagination in pkg/sync/integrations/armis)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_685a0deb86cc83209ded43866c89c806",OpenAI_Codex,1821930,mfreeman451,closed,2025-06-24T02:49:48Z,2025-06-24T02:52:14Z,2025-06-24T02:52:14Z,916252207,https://api.github.com/repos/carverauto/serviceradar,https://github.com/carverauto/serviceradar/pull/1118,"analysisWe need to classify whether the primary purpose of the pull request is to improve performance. The PR adds PutMany RPC, batch writes, updates sync poller to batch KV writes, etc. This is about batching writes to improve performance. So classification: 'performance'.assistantfinalperformance",4,1.0,False
+3181030935,3584,Implement liveness analysis optimization,"## Summary
+- add a liveness analysis pass with dead code elimination
+- invoke optimization on every compiled function
+- extend optimizer with constant folding and branch pruning
+- regenerate IR golden files for vm tests
+
+## Testing
+- `go test ./...`
+- `go test -tags slow ./tests/vm -run TestVM_IR -update`
+- `go run tools/update_tpch/main.go` *(fails: signal interrupt)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_685df2482eb48320bb2f16322cd2778f",OpenAI_Codex,1218621,tamnd,closed,2025-06-27T01:44:26Z,2025-06-27T05:15:39Z,2025-06-27T05:15:39Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3584,"analysisWe need to classify whether the primary purpose is performance. The PR implements liveness analysis optimization, dead code elimination, constant folding, branch pruning, etc. These are optimizations to improve performance. So classification: 'performance'.assistantfinalperformance",4,1.0,True
+3186091790,3953,Disable vm optimizations,"## Summary
+- add EnableOptimizations flag to runtime/vm
+- avoid running Optimize unless flag enabled
+- regenerate IR for a subset of TPC-H queries with optimizations off
+
+## Testing
+- `go run ./tools/update_tpch >/tmp/update.log`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6861205dbb388320a3014c08596ea849",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T11:44:33Z,2025-07-01T12:02:23Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3953,"analysisWe need to classify as performance or non-performance. The PR title: ""Disable vm optimizations"". Summary: add EnableOptimizations flag to runtime/vm, avoid running Optimize unless flag enabled, regenerate IR for subset of TPC-H queries with optimizations off. This is about disabling optimizations, which is performance-related. It's about runtime optimization, likely performance. So classification: performance.assistantfinalperformance",4,1.0,False
+3188169860,4172,Update VM for TPCH,"## Summary
+- reuse null constants in the VM
+- update tpc-h IR outputs for new constant register reuse
+
+## Testing
+- `go test ./tests/vm -run TestVM_TPCH/q22 -tags=slow -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68626f44059483209176665e25b81a1d",OpenAI_Codex,1218621,tamnd,closed,2025-06-30T11:40:40Z,2025-06-30T11:41:13Z,2025-06-30T11:41:13Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4172,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Update VM for TPCH"". Summary: reuse null constants in the VM, update tpc-h IR outputs for new constant register reuse. This seems like an optimization: reusing null constants in the VM, which could improve performance by reducing memory usage or speed. The summary mentions ""reuse null constants"" which is an optimization. The testing is about VM. The question: is the primary purpose to improve performance? It seems yes: reusing constants reduces memory usage and maybe speed. It's an optimization. So classify as 'performance'.assistantfinalperformance",4,1.0,False
+3188066607,4165,Enable constant register reuse in VM,"## Summary
+- reuse constant registers in the VM compiler so repeated constants are not re-emitted
+- update IR output for TPC‑H q22 after compilation change
+
+## Testing
+- `go test ./tests/vm -tags slow -run TestVM_TPCH/q22.mochi -update -count=1`
+- `go test ./tests/vm -tags slow -run TestVM_TPCH/q22.mochi -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68626c19d0d0832093c801b4bd5bf1c7",OpenAI_Codex,1218621,tamnd,closed,2025-06-30T11:04:06Z,2025-06-30T11:04:25Z,2025-06-30T11:04:25Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4165,"analysisWe need to classify as performance or non-performance. The PR title: ""Enable constant register reuse in VM"". Summary: reuse constant registers in the VM compiler so repeated constants are not re-emitted. That is about optimization, reducing code size, maybe performance. It's about reusing registers, reducing emission of constants. That likely improves performance or at least reduces code size. The keywords: ""reuse"", ""compiler"", ""constants"", ""re-emitted"". It's about optimization. So classify as 'performance'.assistantfinalperformance",4,1.0,False
+3186065104,3951,Fix VM map argument optimization,"## Summary
+- ensure map creation uses contiguous registers by copying to temporaries
+- update TPCH q1 IR golden file
+
+## Testing
+- `go test ./tests/vm -run TestVM_TPCH/q1.mochi -tags slow -count=1 -v`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68611bdd928c8320bfae7863c61c4a54",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T11:14:37Z,2025-07-01T03:06:12Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3951,"analysisWe need to classify as performance or non-performance. The PR title: ""Fix VM map argument optimization"". Summary: ensure map creation uses contiguous registers by copying to temporaries; update golden file. This seems about optimization of VM map argument, likely performance improvement. Keywords: optimization. So classify as performance.assistantfinalperformance",4,1.0,False
+3169934401,2756,Implement register reuse for VM,"## Summary
+- implement simple liveness analysis to allocate physical registers
+- update compiler to run register allocation after building a function
+- regenerate golden files for VM tests
+
+## Testing
+- `go test ./tests/vm -run .`
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6859ab6272348320881a692011032d46",OpenAI_Codex,1218621,tamnd,closed,2025-06-24T01:36:43Z,2025-06-24T04:07:52Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2756,"analysisWe need to classify whether the primary purpose of the pull request is to improve performance. The PR title: ""Implement register reuse for VM"". Summary: implement liveness analysis to allocate physical registers, update compiler to run register allocation after building a function, regenerate golden files for VM tests. This is about register reuse, which is a performance optimization. It likely improves performance by reducing register usage, maybe improving speed. The description mentions liveness analysis, register allocation, which is a performance optimization. So classification: 'performance'.
+
+Check if any other aspects: It's about register reuse, which is a performance improvement. So answer: performance.assistantfinalperformance",4,1.0,False
+3186441704,4016,Enable VM register compaction when MakeMap absent,"## Summary
+- add helper to detect MakeMap usage
+- enable CompactRegisters optimisation when safe
+
+## Testing
+- `go build ./runtime/vm/...`
+- `go vet ./...`
+- `go test ./...`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6861747e93448320b472f1b0f1f77eff",OpenAI_Codex,1218621,tamnd,open,2025-06-29T18:30:11Z,,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4016,"analysisWe need to classify as performance or non-performance. The PR title: ""Enable VM register compaction when MakeMap absent"". Summary: add helper to detect MakeMap usage, enable CompactRegisters optimisation when safe. This is about enabling an optimization in the VM, likely to improve performance. The description mentions ""CompactRegisters optimisation"". That is a performance optimization. So classify as 'performance'.assistantfinalperformance",4,1.0,False
+3186031697,3946,Reduce map constant instructions,"## Summary
+- remove `freshConst` and reuse constant registers for map and struct literals
+- refresh VM IR golden files with optimized instructions
+- optimize hash join register increments to reduce instruction count
+
+## Testing
+- `go test -tags slow ./tests/vm -run TestVM_IR`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_68610771c4cc8320b81dea13cf8d45f9",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T10:32:04Z,2025-07-01T03:06:06Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3946,"analysisWe need to classify as performance or non-performance. The PR title: ""Reduce map constant instructions"". Summary: remove freshConst and reuse constant registers for map and struct literals; refresh VM IR golden files with optimized instructions; optimize hash join register increments to reduce instruction count. This is about reducing instruction count, optimizing VM IR, reusing constants, reducing register increments. This is performance improvement. So label 'performance'.assistantfinalperformance",4,1.0,False
+3183832117,3872,Add register coalescing,"## Summary
+- implement register coalescing pass
+- integrate it in Optimize
+- test register coalescing
+- rename pass to `coalesceRegisters`
+
+## Testing
+- `go vet ./...`
+- `go test ./...`
+
+Codex couldn't run certain commands due to environment limitations. Consider configuring a setup script or internet access in your Codex environment to install dependencies.
+
+------
+https://chatgpt.com/codex/tasks/task_e_685ebb524f7c83208f136ac3fa2cce32",OpenAI_Codex,1218621,tamnd,closed,2025-06-27T19:06:13Z,2025-06-29T16:25:53Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3872,"analysisWe need to classify whether the primary purpose is performance. The PR adds register coalescing pass, which is an optimization to reduce register usage, likely improving performance. Register coalescing is a compiler optimization to reduce register spills, thus improving performance. So it's performance.assistantfinalperformance",4,1.0,False
+3188892969,4253,Improve row map assembly,"## Summary
+- optimize `buildRowMap` to avoid copying when key/value pairs are already contiguous
+
+## Testing
+- `go test -tags slow ./tests/vm -run TestVM_TPCH/q14 -count=1`
+- `go test -tags slow ./tests/vm -run TestVM_TPCH/q14 -update -count=1`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6862a8172e8c83208c921c2bc121339d",OpenAI_Codex,1218621,tamnd,closed,2025-06-30T15:19:51Z,2025-07-03T10:40:35Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4253,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve row map assembly"". Summary: ""optimize buildRowMap to avoid copying when key/value pairs are already contiguous"". This is clearly a performance optimization. So label 'performance'.assistantfinalperformance",4,1.0,False
+3188925003,4261,Update lower builtin folding and TPC-DS IR outputs,"## Summary
+- support constant folding for `lower` builtin in the VM compiler
+- regenerate IR output for TPC‑DS queries q50–q59 to reflect the updated compiler behavior
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6862aa0298588320bdee85ae21c4f291",OpenAI_Codex,1218621,tamnd,closed,2025-06-30T15:29:04Z,2025-06-30T15:29:47Z,2025-06-30T15:29:47Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4261,"analysisWe need to classify as performance or non-performance. The PR title: ""Update lower builtin folding and TPC-DS IR outputs"". Summary: support constant folding for `lower` builtin in the VM compiler; regenerate IR output for TPC‑DS queries q50–q59 to reflect updated compiler behavior. This is about constant folding, which is a compile-time optimization. That is performance improvement. So classify as 'performance'.assistantfinalperformance",4,0.4019919374118199,False
+3189026488,4268,Update vm reverse folding,"## Summary
+- fold constant `reverse` calls at compile time
+- refresh IR golden for tpc-ds q8
+
+## Testing
+- `go test -tags slow ./tests/vm -run ""TPCDS/q[1-9]\.mochi$"" -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6862aeaf410c8320af622849dc372d40",OpenAI_Codex,1218621,tamnd,closed,2025-06-30T15:56:37Z,2025-06-30T15:57:03Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4268,"analysisWe need to classify as performance or non-performance. The PR title: ""Update vm reverse folding"". Summary: fold constant reverse calls at compile time, refresh IR golden for tpc-ds q8. This is about constant folding, compile-time optimization. That is performance improvement. So classify as 'performance'.assistantfinalperformance",4,0.3935066497219107,False
+3189032906,4282,Update vm substring folding and tpch q8,"## Summary
+- enhance VM substring constant folding using `clampSlice`
+- refresh tpch `q8` IR output to match current compiler
+
+## Testing
+- `go test ./tests/vm -tags=slow -run ""TestVM_TPCH/q8.mochi"" -v`
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6862af20813c832093714f858eacfd84",OpenAI_Codex,1218621,tamnd,closed,2025-06-30T15:59:02Z,2025-06-30T16:01:56Z,2025-06-30T16:01:56Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4282,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Update vm substring folding and tpch q8"". Summary: ""enhance VM substring constant folding using clampSlice"" and ""refresh tpch q8 IR output to match current compiler"". This seems to be about improving VM substring folding, which is a compiler optimization. That is a performance improvement. The second part is updating test output. The primary purpose is performance improvement. So label 'performance'.assistantfinalperformance",4,0.36220004329102795,False
+3188608115,4181,Update VM constant folding for cast,"## Summary
+- enhance compile-time constant folding to handle `as` cast expressions
+- regenerate tpch q9 IR after optimization changes
+
+## Testing
+- `go test -tags slow ./tests/vm -run TestVM_TPCH/q9 -update`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6862916300c08320a800fe129dbf5964",OpenAI_Codex,1218621,tamnd,closed,2025-06-30T13:59:56Z,2025-06-30T14:02:28Z,2025-06-30T14:02:28Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4181,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Update VM constant folding for cast"". Summary: ""enhance compile-time constant folding to handle `as` cast expressions"" and ""regenerate tpch q9 IR after optimization changes"". This is about constant folding, which is a compile-time optimization. That is a performance improvement. So classify as 'performance'.assistantfinalperformance",4,0.3005208314214536,False
+3184493975,3880,Add profiling-guided optimization to VM,"## Summary
+- add `Profile` data structure to collect VM execution counts
+- track instruction counts during execution
+- provide optimization passes that remove cold instructions
+- expose helpers to compile with profiles
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_685f5b8937308320ba4f11637d98cda1",OpenAI_Codex,1218621,tamnd,closed,2025-06-28T03:11:30Z,2025-06-30T03:19:34Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3880,"analysisWe need to classify as performance or non-performance. The PR adds profiling-guided optimization to VM, collecting execution counts, removing cold instructions, exposing helpers to compile with profiles. This is about performance optimization. So label 'performance'.assistantfinalperformance",4,0.2927759990049658,False
+3188781479,4228,Update tpc-ds IR outputs and improve union_all,"## Summary
+- optimize `union_all` to preallocate slice space
+- regenerate tpc-ds IR golden files (q1–q9)
+
+## Testing
+- `for i in {1..9}; do go test -tags slow ./tests/vm -run ""TestVM_TPCDS/q${i}.mochi""; done`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6862a1c8adbc8320b2d18bdb50694436",OpenAI_Codex,1218621,tamnd,closed,2025-06-30T14:50:07Z,2025-06-30T14:50:28Z,2025-06-30T14:50:28Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4228,"analysisWe need to classify as performance or non-performance. The PR title: ""Update tpc-ds IR outputs and improve union_all"". Summary: ""optimize `union_all` to preallocate slice space"". That is a performance optimization. So classification: performance.assistantfinalperformance",4,0.28896625275538274,False
+3188718282,4206,Improve const folding and update tpch q6 IR,"## Summary
+- canonicalize float constants in `constKey`
+- update TPCH q6 IR to reflect new compilation output
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68629c3c2b488320a548e63de0e4ff12",OpenAI_Codex,1218621,tamnd,closed,2025-06-30T14:31:45Z,2025-06-30T14:34:23Z,2025-06-30T14:34:23Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4206,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve const folding and update tpch q6 IR"". The body: ""canonicalize float constants in constKey, update TPCH q6 IR to reflect new compilation output"". This is about constant folding, which is a compiler optimization. That is performance improvement. So classify as 'performance'.assistantfinalperformance",4,0.25086964539690854,False
+3184492040,3879,Add peephole optimizations to VM,"## Summary
+- add peephole optimizer to remove redundant instructions and simplify arithmetic
+- document optimization pass in `runtime/vm` README
+
+## Testing
+- `go vet ./...`
+- `go test ./...`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_685f5b33ff8483209f5c4718156d409f",OpenAI_Codex,1218621,tamnd,closed,2025-06-28T03:08:50Z,2025-06-30T03:19:28Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3879,"analysisWe need to classify as performance or non-performance. The PR title: ""Add peephole optimizations to VM"". Summary: add peephole optimizer to remove redundant instructions and simplify arithmetic. This is a performance improvement. So classification: performance.assistantfinalperformance",4,0.23618886969593544,False
+3190320694,4340,Enable vm group append for tpc-ds,"## Summary
+- update group append logic in `runtime/vm` to avoid unnecessary slice copies
+- refresh golden IR output for TPC‑DS query q63
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686331ccc148832089976c24064a1e30",OpenAI_Codex,1218621,tamnd,closed,2025-07-01T01:10:01Z,2025-07-01T01:10:16Z,2025-07-01T01:10:16Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4340,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Enable vm group append for tpc-ds"". Summary: update group append logic in runtime/vm to avoid unnecessary slice copies. That sounds like performance optimization: avoid unnecessary slice copies. Also refresh golden IR output. So it's performance. So label 'performance'.assistantfinalperformance",4,0.22291998406069505,False
+3186346363,3998,Update job tool and VM optimization,"## Summary
+- keep trailing newline when writing JOB dataset IR
+- propagate move results into `Expect` instructions for tighter VM code
+
+## Testing
+- `go vet ./...`
+- `go test ./runtime/vm -run TestDummy -count=1`
+- `go test ./tools/update_job -run TestDummy -count=1`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_68616b6376008320994c097383441bf3",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T16:48:12Z,2025-07-01T12:01:46Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3998,"analysisWe need to classify as performance or non-performance. The PR title: ""Update job tool and VM optimization"". Summary: keep trailing newline when writing JOB dataset IR, propagate move results into `Expect` instructions for tighter VM code. This seems like optimization of VM code, making it tighter. That is performance improvement. Keywords: optimization, VM optimization. So classify as 'performance'.assistantfinalperformance",4,0.2110812453780764,False
+3185688727,3925,Add unreachable code removal and update IR outputs,"## Summary
+- improve VM optimizations by removing unreachable instructions
+- ensure division or modulo operations remain for runtime errors
+- regenerate IR outputs for VM tests
+- add helper tool to update job dataset files
+
+## Testing
+- `go test ./tests/vm -tags slow -run TestVM_ErrorStackTrace -v`
+- `go test ./tests/vm -tags slow -run TestVM_TPCH -v`
+- `go test ./tests/vm -tags slow -run TestVM_JOB -v`
+- `go test ./tests/vm -tags slow -run TestVM_IR -v`
+- `go test ./tests/vm -tags slow`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6860a822ea04832084b620bf77df3355",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T02:57:50Z,2025-07-01T03:05:52Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3925,"analysisWe need to classify as performance or non-performance. The PR title: ""Add unreachable code removal and update IR outputs"". Summary: ""improve VM optimizations by removing unreachable instructions"". That is optimization, removing unreachable code. That is a performance improvement. So classify as 'performance'.assistantfinalperformance",4,0.21040449896628802,False
+3186331079,3993,Run job dataset update and improve VM peephole,"## Summary
+- regenerate JOB dataset IR using `runtime/vm`
+- optimize VM peephole pass to remove `Move` before `Return`
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686168e980b88320b0be529f35127990",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T16:35:09Z,2025-06-29T16:35:34Z,2025-06-29T16:35:34Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3993,"analysisWe need to classify as performance or non-performance. The PR title: ""Run job dataset update and improve VM peephole"". Body: ""regenerate JOB dataset IR using runtime/vm, optimize VM peephole pass to remove Move before Return"". This is about optimizing VM peephole pass, removing unnecessary Move before Return. That is a performance optimization. So classification: performance.assistantfinalperformance",4,0.2088161185330698,False
+3186063431,3950,Run vm tests and refresh IR outputs,"## Summary
+- improve peephole optimizer to avoid rewriting registers for mutating ops
+- regenerate IR for group_by_conditional_sum test
+- run runtime/vm tests
+
+## Testing
+- `go test ./runtime/vm -tags slow`
+- `go test ./tests/vm -tags slow -run TestVM_IR -update`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_68611c3d11e88320b098d0ae31fd67d6",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T11:12:09Z,2025-07-01T03:06:10Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3950,"analysisWe need to classify as performance or non-performance. The PR title: ""Run vm tests and refresh IR outputs"". Body: ""improve peephole optimizer to avoid rewriting registers for mutating ops"". That is about peephole optimizer improvement, likely performance. Also ""regenerate IR for group_by_conditional_sum test"". ""run runtime/vm tests"". The key phrase: ""improve peephole optimizer to avoid rewriting registers for mutating ops"" - that is optimization. So performance. So label 'performance'.assistantfinalperformance",4,0.20448148716962342,False
+3186033939,3947,Optimize vm grouping,"## Summary
+- optimize group by by precalculating count
+- regenerate IR golden files
+
+## Testing
+- `go test ./...`
+- `go test -tags slow ./tests/vm -run TestVM_IR -update`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6861129b9b388320b583fadf63b24343",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T10:35:42Z,2025-06-29T10:36:08Z,2025-06-29T10:36:08Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3947,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize vm grouping"". Summary: ""optimize group by by precalculating count"" and ""regenerate IR golden files"". This seems like performance optimization: ""optimize group by by precalculating count"" suggests performance improvement. Also ""Optimize vm grouping"" likely performance. So classify as 'performance'.assistantfinalperformance",4,0.15047084788580495,False
+3187229759,4084,Improve VM sum handling,"## Summary
+- speed up `sum` on groups by checking the stored count
+- regenerate TPC-DS q1 IR
+- clarify q1 dataset comments
+
+## Testing
+- `go test ./tests/vm -tags slow -run TestVM_TPCDS/q1.mochi -v`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68621ea9039483208f671c2955bca4c8",OpenAI_Codex,1218621,tamnd,open,2025-06-30T05:46:25Z,,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4084,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve VM sum handling"". Summary: ""speed up `sum` on groups by checking the stored count"". That is performance improvement. So label 'performance'.assistantfinalperformance",4,0.14152498659504031,False
+3186305413,3980,Optimize group by compilation,"## Summary
+- optimize VM compiler for group queries by storing group index separately
+- regenerate IR golden files
+
+## Testing
+- `go test -tags slow ./tests/vm -run TestVM_IR -update`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_68616031fb8083209432cdba77413783",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T16:01:38Z,2025-06-29T16:01:50Z,2025-06-29T16:01:50Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3980,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize group by compilation"". Summary: ""optimize VM compiler for group queries by storing group index separately"". That is a performance optimization. So label 'performance'.assistantfinalperformance",4,0.13857999264513893,False
+3115186500,1069,Optimize group_match masking,"## Summary
+- optimize boolean selection generation in `group_match`
+
+## Testing
+- `pytest static_frame/test/unit/test_type_blocks.py::TestUnit::test_type_blocks_group_match_b -q`
+- `pytest static_frame/test/unit/test_type_blocks.py::TestUnit::test_type_blocks_group_match_c -q`
+- `pytest static_frame/test/unit/test_type_blocks.py::TestUnit::test_type_blocks_group_match_d -q`
+- `pytest static_frame/test/unit/test_type_blocks.py::TestUnit::test_type_blocks_group_match_e -q`
+- `pytest static_frame/test/unit/test_type_blocks.py::TestUnit::test_type_blocks_group_match_f -q`
+- `pytest static_frame/test/unit/test_type_blocks.py::TestUnit::test_type_blocks_group_sorted_d -q`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_683f4a25f6648332b235929991cd0db3",OpenAI_Codex,395503,flexatone,open,2025-06-03T19:30:02Z,,,116150224,https://api.github.com/repos/static-frame/static-frame,https://github.com/static-frame/static-frame/pull/1069,"analysisWe need to classify the pull request as performance or non-performance. The title: ""Optimize group_match masking"". Summary: ""optimize boolean selection generation in group_match"". That sounds like performance optimization. Keywords: optimize, performance. So classification: performance.assistantfinalperformance",4,0.1317767305198639,False
+3186318107,3988,Improve group by compilation,"## Summary
+- optimize VM group by compile logic to avoid extra index lookups
+- update IR golden files for group by tests
+
+## Testing
+- `make fmt`
+- `make test` *(fails: cc error: returnflag undeclared)*
+- `go test -tags=slow ./tests/vm -run TestVM_IR -update`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_686163d459a8832091f5698d8a0d1d64",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T16:17:31Z,2025-06-29T16:17:47Z,2025-06-29T16:17:47Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3988,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve group by compilation"". Summary: ""optimize VM group by compile logic to avoid extra index lookups"". That is a performance optimization. So label 'performance'.assistantfinalperformance",4,0.13044708824033863,False
+3186370979,4001,Improve group by compile-time performance,"## Summary
+- optimize group-by query compilation by maintaining a list of groups during accumulation
+- regenerate IR outputs for group-by query tests
+
+## Testing
+- `go test -tags=slow ./tests/vm -run TestVM_IR -update` *(fails: no tests to run)*
+- `go test -tags=slow ./tests/vm -run group_by -update` *(fails: no tests to run)*
+- `go run ./cmd/mochi run --ir tests/vm/valid/group_by.mochi`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6861717baa848320bd588c48309ebb1e",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T17:12:37Z,2025-06-29T17:28:05Z,2025-06-29T17:28:05Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4001,"analysisWe need to classify as performance or non-performance. The title: ""Improve group by compile-time performance"". The body mentions optimizing group-by query compilation, maintain list of groups during accumulation, regenerate IR outputs. This is clearly about compile-time performance. So classification: performance.assistantfinalperformance",4,0.1239354006249752,False
+3186332246,3994,Optimize group by algorithm,"## Summary
+- add `needItems` tracking to VM compiler to omit storing group items when unused
+- detect aggregate usage via new helpers in `queryutil.go`
+- conditionally accumulate group items only when required
+
+## Testing
+- `go test ./...`
+- `go test -tags slow ./tests/vm -update` *(fails: command timed out)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_6861673a3c788320a30d44672464ff34",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T16:36:41Z,2025-07-01T12:01:53Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3994,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize group by algorithm"". Summary: add needItems tracking to VM compiler to omit storing group items when unused; detect aggregate usage via new helpers; conditionally accumulate group items only when required. This is about optimization, reducing memory usage, maybe performance. Keywords: optimize, omit storing, conditionally accumulate. It's about performance improvement. So classification: performance.assistantfinalperformance",4,0.12299076977887112,False
+3177801861,3422,Improve Zig backend grouping,"## Summary
+- optimize Zig query grouping with an `AutoHashMap`
+- update TPCH q1 generated Zig code
+- add Zig compiler output for TPCH q1 under dataset
+- update Zig backend tasks
+
+## Testing
+- `go test ./...` *(fails: lua test requires json library)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_685cd9b5b95c8320b60a2c11924ac5ae",OpenAI_Codex,1218621,tamnd,closed,2025-06-26T05:34:37Z,2025-06-26T05:38:22Z,2025-06-26T05:38:22Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3422,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Zig backend grouping"". Summary: ""optimize Zig query grouping with an AutoHashMap"". That is optimization. Also ""update TPCH q1 generated Zig code"". It's about performance. So classification: performance.assistantfinalperformance",4,0.11122537392810003,False

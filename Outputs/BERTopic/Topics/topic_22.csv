@@ -1,0 +1,348 @@
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
+3246999732,61,Add database caching for folder scan results to improve performance,"## 功能概述 / Feature Overview
+
+实现了第一次扫描文件夹后创建数据库，以后再次扫描优先读取数据库，有任何变化都写入数据库的功能。
+
+Implemented database caching functionality where the first folder scan creates a database, subsequent scans prioritize reading from the database, and any changes are written back to the database.
+
+## 主要改动 / Key Changes
+
+### 🗄️ Database Integration
+- Added SQLite database support with `rusqlite` dependency
+- Created comprehensive database module (`src/database.rs`) with CRUD operations
+- Automatic database schema creation and initialization
+- Database file automatically added to `.gitignore`
+
+### ⚡ Smart Scanning Logic
+- **First scan**: Full filesystem scan + database creation
+- **Subsequent scans**: Load from cache → Check for changes → Update database
+- Performance improvement: ~10-100x faster loading from cache
+- Intelligent change detection and incremental updates
+
+### 🔄 Enhanced Scanner (`src/scanner.rs`)
+```rust
+// New intelligent scanning flow:
+1. Check if database exists and has cached data
+2. Load cached data first (instant UI update)
+3. Perform filesystem scan in background
+4. Compare and detect changes
+5. Update database with changes only
+6. Clean up deleted folder records
+```
+
+### 📊 UI Improvements (`src/tabs/clear_tab.rs`)
+- Database status indicator showing record count and last update
+- Real-time status messages: ""从缓存加载数据..."" → ""正在检查文件系统变化..."" → ""扫描完成""
+- Visual feedback for database operations
+
+## 使用效果 / User Experience
+
+### 首次使用 / First Use
+- Normal filesystem scan behavior
+- Creates `appdata_cleaner.db` automatically
+- No user action required
+
+### 后续使用 / Subsequent Use
+- Instant loading of cached folder data
+- Background verification for changes
+- Seamless user experience with improved performance
+
+## 技术细节 / Technical Details
+
+### Database Schema
+```sql
+CREATE TABLE folder_scans (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    folder_type TEXT NOT NULL,          -- Roaming/Local/LocalLow
+    folder_name TEXT NOT NULL,
+    folder_size INTEGER NOT NULL,
+    last_modified TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    UNIQUE(folder_type, folder_name)
+);
+```
+
+### Performance Optimizations
+- Batch database operations for better performance
+- Indexed queries for fast lookups
+- Minimal memory footprint
+- Automatic cleanup of stale records
+
+## 测试 / Testing
+- ✅ Comprehensive unit tests for database operations
+- ✅ Integration tests for scanner functionality
+- ✅ Backward compatibility verified
+- ✅ Error handling and fallback mechanisms tested
+
+## 兼容性 / Compatibility
+- **Backward compatible**: Works seamlessly without existing database
+- **Error resilient**: Falls back to filesystem scan if database issues occur
+- **No breaking changes**: Existing functionality unchanged
+- **Cross-platform**: SQLite bundled for all platforms
+
+## Files Changed
+- `Cargo.toml` - Added rusqlite dependency
+- `src/database.rs` - New database module (complete implementation)
+- `src/scanner.rs` - Enhanced with caching logic
+- `src/tabs/clear_tab.rs` - UI improvements and status handling
+- `src/main.rs` - Added database module import
+- `.gitignore` - Added database files to ignore list
+
+Resolves the issue by implementing efficient database caching that dramatically improves scan performance while maintaining full compatibility with existing functionality.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-21T02:41:03Z,2025-07-21T04:51:41Z,2025-07-21T04:51:41Z,893798089,https://api.github.com/repos/TC999/AppDataCleaner,https://github.com/TC999/AppDataCleaner/pull/61,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Add database caching for folder scan results to improve performance"". The body clearly states performance improvement, mentions ~10-100x faster loading, caching, etc. So it's performance.assistantfinalperformance",22,1.0,True
+3276475340,240,Refactor scanning API to stream files,"## Summary
+- expose streaming APIs in `ScannerRepositoryInterface`
+- use `Flow` in `ScannerRepositoryImpl` for file and folder scanning
+- update use cases to emit items incrementally
+- adapt `CleanOperationHandler` and `ScannerViewModel` to process new streams
+
+## Testing
+- `./gradlew tasks --all`
+- `./gradlew test` *(fails: SDK location not found)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_6889efda9d48832da33536bb1a6765b3",OpenAI_Codex,61864357,MihaiCristianCondrea,closed,2025-07-30T10:19:52Z,2025-07-30T12:35:38Z,2025-07-30T12:35:38Z,600355571,https://api.github.com/repos/MihaiCristianCondrea/Smart-Cleaner-for-Android,https://github.com/MihaiCristianCondrea/Smart-Cleaner-for-Android/pull/240,"analysisWe need to classify as performance or non-performance. The PR title: ""Refactor scanning API to stream files"". The body: expose streaming APIs, use Flow, update use cases to emit items incrementally, adapt handlers to process streams. This is about refactoring API to stream files, likely to improve performance by streaming rather than loading all at once. But is it explicitly performance? The description mentions ""stream files"" which can improve performance by reducing memory usage and latency. But the classification is about primary purpose: performance improvement. The PR is about refactoring scanning API to stream files. That is likely a performance improvement. The keywords: ""stream"", ""Flow"", ""incrementally"". Not explicitly ""performance"" but it's about streaming to reduce memory usage. The guidelines: performance-related PR may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs. The PR does not contain those keywords. But the content indicates a performance improvement. The guidelines say ""Performance-related pull requests may contain keywords such as... or any other terms referring to how faster and efficiently software runs."" It doesn't say that if it doesn't contain those keywords, it's not performance. But the primary purpose is to improve performance. The PR is refactoring scanning API to stream files, which is likely to improve performance. So classification: performance.assistantfinalperformance",22,1.0,False
+3187260592,1663,Add column-aware scan feature,"## Summary
+- add `scan_data_with_columns` method to `Store` trait with default implementation
+- test default method via memory storage integration test
+- implement optimized projection for Parquet storage
+- add Parquet integration test using new method
+
+## Testing
+- `cargo clippy --all-targets -- -D warnings`
+- `cargo fmt --all`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6862225bceb0832aae028b4b5082ca86",OpenAI_Codex,2025065,panarch,open,2025-06-30T06:03:34Z,,,227265548,https://api.github.com/repos/gluesql/gluesql,https://github.com/gluesql/gluesql/pull/1663,"analysisWe need to classify whether the primary purpose is performance. The PR adds column-aware scan feature, optimized projection for Parquet storage, tests. This seems to be about performance: scanning only needed columns, optimized projection. So it's performance. So label 'performance'.assistantfinalperformance",22,1.0,False
+3214766453,132,Avoid duplicate grouping on main thread,"## Summary
+- compute duplicate groups during scanning
+- keep duplicate groups in scanner state
+- access the computed groups in the tabs UI
+- reset groups when leaving the analyze screen
+
+## Testing
+- `./gradlew test` *(fails: SDK location not found)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_686e10f2c84c832d892afecca677f3cf",OpenAI_Codex,61864357,MihaiCristianCondrea,closed,2025-07-09T06:59:29Z,2025-07-09T07:00:43Z,2025-07-09T07:00:43Z,600355571,https://api.github.com/repos/MihaiCristianCondrea/Smart-Cleaner-for-Android,https://github.com/MihaiCristianCondrea/Smart-Cleaner-for-Android/pull/132,"analysisWe need to classify the pull request as performance or non-performance. The title: ""Avoid duplicate grouping on main thread"". Summary: compute duplicate groups during scanning, keep duplicate groups in scanner state, access computed groups in tabs UI, reset groups when leaving analyze screen. This seems to be about avoiding duplicate grouping on main thread, likely to improve performance by moving computation off main thread. The description mentions scanning, grouping, UI. The PR likely improves performance by moving grouping off main thread. The keywords: ""main thread"" indicates performance. The summary: compute duplicate groups during scanning, keep groups in scanner state, access computed groups in UI, reset groups when leaving analyze screen. This is about performance optimization. So classification: performance.assistantfinalperformance",22,1.0,False
+3196710615,424,Make trigger ignore heartbeat updates,"## Summary
+- avoid notifications when only housekeeping columns change
+- drop & recreate trigger during upgrades so it monitors fewer columns
+
+## Testing
+- `PGUSER=pgquser PGDATABASE=pgqdb PGPASSWORD=pgqpw PGHOST=localhost PGPORT=5432 uv run ruff check .`
+- `PGUSER=pgquser PGDATABASE=pgqdb PGPASSWORD=pgqpw PGHOST=localhost PGPORT=5432 uv run mypy .`
+- `PGUSER=pgquser PGDATABASE=pgqdb PGPASSWORD=pgqpw PGHOST=localhost PGPORT=5432 uv sync --all-extras --frozen`
+- `PGUSER=pgquser PGDATABASE=pgqdb PGPASSWORD=pgqpw PGHOST=localhost PGPORT=5432 uv run pytest -v`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6865017952cc832d89972f6a67d038cd",OpenAI_Codex,16663421,janbjorge,closed,2025-07-02T17:46:15Z,2025-07-03T21:50:16Z,,788904329,https://api.github.com/repos/janbjorge/pgqueuer,https://github.com/janbjorge/pgqueuer/pull/424,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Make trigger ignore heartbeat updates"". Summary: avoid notifications when only housekeeping columns change; drop & recreate trigger during upgrades so it monitors fewer columns. This is about reducing notifications, likely performance improvement? It's about ignoring heartbeat updates to reduce unnecessary notifications, which could improve performance by reducing load. But is it performance? The keywords: ""performance"" not present. But the description: ""avoid notifications when only housekeeping columns change"" - that reduces overhead. It's a performance improvement. The guidelines: performance-related PR may contain keywords like latency, optimization, slow, etc. But not required; we can still classify as performance if the primary purpose is to improve performance. This PR is about reducing notifications, which is a performance improvement. So classify as 'performance'.assistantfinalperformance",22,1.0,False
+3246122368,3992,Improve temp cleanup performance,"## Summary
+- add async executor for cleanup tasks
+- replace `Files.list` with `DirectoryStream` and support batching
+- expose new `batchSize` and `pauseBetweenBatchesMs` settings
+- update tests for streaming logic
+
+## Testing
+- `./gradlew spotlessApply`
+- `./gradlew build`
+
+
+------
+https://chatgpt.com/codex/tasks/task_b_687c96b541688328a177d53d01d1ba97",OpenAI_Codex,77850077,Frooodle,open,2025-07-20T07:51:19Z,,,594155488,https://api.github.com/repos/Stirling-Tools/Stirling-PDF,https://github.com/Stirling-Tools/Stirling-PDF/pull/3992,"analysisWe need to classify as performance or non-performance. The title: ""Improve temp cleanup performance"". The body mentions async executor, replace Files.list with DirectoryStream, batching, settings, tests. This is clearly performance improvement. So label 'performance'.assistantfinalperformance",22,1.0,False
+3179011328,843,Implement parallel DB summary for BigQuery,"## Summary
+- fetch BigQuery table columns concurrently
+- return columns in database summary
+- update BigQuery summary tests for column data
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_685d2f8f0dbc8320a26d18b3f0e48b0c",OpenAI_Codex,16530606,karakanb,closed,2025-06-26T12:44:21Z,2025-06-27T11:01:11Z,2025-06-27T11:01:11Z,674225653,https://api.github.com/repos/bruin-data/bruin,https://github.com/bruin-data/bruin/pull/843,"analysisWe need to classify whether the primary purpose of the pull request is to improve performance. The PR title: ""Implement parallel DB summary for BigQuery"". Summary: fetch BigQuery table columns concurrently, return columns in database summary, update tests. This is about concurrency to fetch columns concurrently, likely to improve performance. The description mentions ""parallel DB summary"" and ""fetch BigQuery table columns concurrently"". That is a performance improvement. So classification: 'performance'.assistantfinalperformance",22,1.0,False
+3276815242,835,Add disable_samples column configuration flag,"# Add disable_samples column configuration flag
+
+## Summary
+
+This PR implements a new `disable_samples` configuration flag that allows users to prevent sample collection for specific columns at the column level. When `disable_samples: true` is set on a column in `schema.yml`, that column will not be sampled during test failures, regardless of any PII tags or other configuration.
+
+**Key Changes:**
+- Added `is_sampling_disabled_for_column()` macro to check column-level configuration
+- Modified `query_test_result_rows()` to skip sampling when `disable_samples: true` is configured
+- Added comprehensive integration tests covering prevent sampling, normal sampling, and PII tag override scenarios
+
+**Usage Example:**
+```yaml
+models:
+  - name: user_data
+    columns:
+      - name: password_hash
+        config:
+          disable_samples: true  # Never sample this column
+      - name: email
+        config:
+          tags: ['pii']  # Sample exclusion via PII tags
+      - name: login_count
+        # Will be sampled normally
+```
+
+## Review & Testing Checklist for Human
+
+- [ ] **Verify column config access pattern works** - Test with a real `schema.yml` file to ensure the graph node access path `parent_model.get('columns', {}).get(test_column_name, {}).get('config', {})` is correct
+- [ ] **End-to-end functionality test** - Create a failing test with `disable_samples: true` and verify no samples are collected in `test_result_rows` table
+- [ ] **Regression testing** - Verify existing sampling functionality still works for columns without the `disable_samples` flag
+- [ ] **Integration test validation** - Run the new integration tests to ensure they pass and actually test the intended functionality
+- [ ] **Edge case testing** - Test behavior with missing column names, non-existent models, and different test types beyond `not_null`
+
+**Recommended Test Plan:**
+1. Create a model with mixed column configurations (some with `disable_samples: true`, some without)
+2. Run tests that fail and verify only the appropriate columns have samples collected
+3. Test with various dbt test types (not_null, unique, relationships, etc.)
+4. Verify the feature works with both generic and singular tests
+
+---
+
+### Diagram
+
+```mermaid
+%%{ init : { ""theme"" : ""default"" }}%%
+graph TD
+    Schema[""schema.yml<br/>disable_samples: true""]:::context
+    TestMat[""macros/edr/materializations/<br/>test/test.sql""]:::major-edit
+    QueryRows[""query_test_result_rows()""]:::major-edit
+    CheckDisabled[""is_sampling_disabled_for_column()""]:::major-edit
+    GraphNodes[""dbt graph.nodes<br/>column config access""]:::context
+    IntTests[""integration_tests/tests/<br/>test_disable_samples_config.py""]:::major-edit
+    TestResults[""test_result_rows table<br/>(sample storage)""]:::context
+
+    Schema --> GraphNodes
+    TestMat --> QueryRows
+    QueryRows --> CheckDisabled
+    CheckDisabled --> GraphNodes
+    QueryRows --> TestResults
+    IntTests --> TestMat
+    
+    subgraph Legend
+        L1[Major Edit]:::major-edit
+        L2[Minor Edit]:::minor-edit  
+        L3[Context/No Edit]:::context
+    end
+
+    classDef major-edit fill:#90EE90
+    classDef minor-edit fill:#87CEEB
+    classDef context fill:#FFFFFF
+```
+
+### Notes
+
+- **Testing Limitation**: Local integration tests failed due to environment setup issues, so the implementation couldn't be fully verified locally. CI testing will be critical to validate functionality.
+- **Implementation Risk**: The column configuration access pattern assumes a specific structure in dbt's graph nodes that may need adjustment based on actual dbt behavior.
+- **Session Info**: Implemented by Devin AI for @arbiv in session https://app.devin.ai/sessions/3838f375f01b48338b9937dbd22776e3
+
+Link to Devin run: https://app.devin.ai/sessions/3838f375f01b48338b9937dbd22776e3
+Requested by: Yosef Arbiv (@arbiv)
+
+<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
+
+## Summary by CodeRabbit
+
+* **New Features**
+  * Added support for disabling sample row collection in test results when the ""disable_samples"" configuration is enabled for specific columns.
+  * Sample rows are no longer collected or displayed for tests on columns with ""disable_samples"" set to true, including columns tagged as ""pii"".
+
+* **Tests**
+  * Introduced new integration tests to verify correct behavior of the ""disable_samples"" configuration in various scenarios.
+
+<!-- end of auto-generated comment: release notes by coderabbit.ai -->",Devin,158243242,devin-ai-integration[bot],closed,2025-07-30T12:18:01Z,2025-07-30T12:23:28Z,,446093093,https://api.github.com/repos/elementary-data/dbt-data-reliability,https://github.com/elementary-data/dbt-data-reliability/pull/835,"analysisWe need to classify whether the primary purpose is to improve performance. The PR adds a configuration flag to disable sampling for specific columns. This is about reducing sample collection, which is a performance improvement (reduces overhead, storage, maybe speed). The description: ""Add disable_samples column configuration flag"" and ""prevent sample collection for specific columns"". This is a performance improvement. So classification: 'performance'.assistantfinalperformance",22,1.0,True
+3213281518,95050,Chunk task creation for record deletion,"<!-- Describe your PR here. -->
+Chunks the task creation for deleting Seer grouping records to improve performance and resource utilization.
+
+Previously, `call_delete_seer_grouping_records_by_hash` would dispatch a single task with all group hashes, which could be inefficient for large numbers. This change modifies the function to chunk group hashes into batches of 1000, dispatching a separate `delete_seer_grouping_records_by_hash` task for each batch.
+
+This enhances memory efficiency, improves task distribution across workers, and increases scalability for large-scale deletions.
+
+A new test `test_call_delete_seer_grouping_records_by_hash_chunked` has been added to verify the chunking logic.",Cursor,1976777,JoshFerge,closed,2025-07-08T17:33:07Z,2025-07-08T17:36:45Z,,873328,https://api.github.com/repos/getsentry/sentry,https://github.com/getsentry/sentry/pull/95050,"analysisWe need to classify as performance or non-performance. The PR title: ""Chunk task creation for record deletion"". Body: ""Chunks the task creation for deleting Seer grouping records to improve performance and resource utilization."" It explicitly mentions performance improvement, memory efficiency, task distribution, scalability. So it's performance.assistantfinalperformance",22,1.0,False
+3257571628,219,Optimize duplicate detection,"## Summary
+- add config flag to toggle duplicate scanning
+- support partial MD5 hashing for large files
+- remove duplicate scan cancellation logic
+- use partial hashing in duplicate utilities and scanning
+- use setting in worker and repository when checking duplicates
+
+## Testing
+- `./gradlew help`
+- `./gradlew assembleDebug` *(fails: SDK location not found)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_688137cdeac0832dbee4584fd3de9cfc",OpenAI_Codex,61864357,MihaiCristianCondrea,closed,2025-07-23T20:09:33Z,2025-07-23T20:29:57Z,2025-07-23T20:29:57Z,600355571,https://api.github.com/repos/MihaiCristianCondrea/Smart-Cleaner-for-Android,https://github.com/MihaiCristianCondrea/Smart-Cleaner-for-Android/pull/219,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize duplicate detection"". Summary: add config flag to toggle duplicate scanning, support partial MD5 hashing for large files, remove duplicate scan cancellation logic, use partial hashing in duplicate utilities and scanning, use setting in worker and repository when checking duplicates. This is about duplicate detection optimization, likely performance improvement. Keywords: optimize, partial MD5 hashing for large files, remove cancellation logic. It's about performance. So classification: performance.assistantfinalperformance",22,1.0,True
+3256824443,218,Optimize WhatsApp media loading,"## Summary
+- use lightweight `DirectorySummary` that only stores file count and size
+- implement paged file listing in `WhatsAppCleanerRepository`
+- add `GetWhatsAppMediaFilesUseCase`
+- load WhatsApp details screen lazily with `LoadFiles` event
+- fetch all files on demand when cleaning
+- wire new use case through DI
+
+## Testing
+- `./gradlew test -q` *(fails: SDK location not found)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_6880fcccb1f0832db4e76a82bb0b75bf",OpenAI_Codex,61864357,MihaiCristianCondrea,closed,2025-07-23T15:27:06Z,2025-07-23T19:28:02Z,2025-07-23T19:28:02Z,600355571,https://api.github.com/repos/MihaiCristianCondrea/Smart-Cleaner-for-Android,https://github.com/MihaiCristianCondrea/Smart-Cleaner-for-Android/pull/218,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize WhatsApp media loading"". The body mentions using lightweight DirectorySummary, paged file listing, lazy loading, fetch all files on demand, etc. This is about performance optimization: reducing memory usage, improving loading speed. So classification: 'performance'.assistantfinalperformance",22,0.2615353423929017,False
+3246158661,212,Improve WhatsAppCleanerViewModel thread usage,"## Summary
+- avoid collecting DataStore flows on IO threads
+- offload heavy sorting in WhatsApp details view model to `Dispatchers.Default`
+- remove redundant IO dispatcher when saving grid preference
+
+## Testing
+- `./gradlew lint` *(fails: SDK location not found)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_687caade7cec832db8771f18db8554b7",OpenAI_Codex,61864357,MihaiCristianCondrea,closed,2025-07-20T08:45:12Z,2025-07-20T08:45:21Z,2025-07-20T08:45:21Z,600355571,https://api.github.com/repos/MihaiCristianCondrea/Smart-Cleaner-for-Android,https://github.com/MihaiCristianCondrea/Smart-Cleaner-for-Android/pull/212,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve WhatsAppCleanerViewModel thread usage"". Summary: avoid collecting DataStore flows on IO threads, offload heavy sorting to Dispatchers.Default, remove redundant IO dispatcher when saving grid preference. This is about thread usage, performance optimization. So it's performance.assistantfinalperformance",22,0.23998979667914003,False
+3246151790,211,Fix heavy UI updates on main thread,"## Summary
+- offload contact selection loops to `Dispatchers.Default`
+- collect duplicate contacts on `Dispatchers.Default` instead of `Dispatchers.IO`
+
+## Testing
+- `./gradlew tasks --all`
+- `./gradlew assembleDebug` *(fails: SDK location not found)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_687ca92b8818832d89108685569f8459",OpenAI_Codex,61864357,MihaiCristianCondrea,closed,2025-07-20T08:37:18Z,2025-07-20T08:37:30Z,2025-07-20T08:37:30Z,600355571,https://api.github.com/repos/MihaiCristianCondrea/Smart-Cleaner-for-Android,https://github.com/MihaiCristianCondrea/Smart-Cleaner-for-Android/pull/211,"analysisWe need to classify as performance or non-performance. The PR title: ""Fix heavy UI updates on main thread"". Summary: offload contact selection loops to Dispatchers.Default, collect duplicate contacts on Dispatchers.Default instead of Dispatchers.IO. This is about performance: heavy UI updates, moving loops off main thread to improve performance. So classification: performance.assistantfinalperformance",22,0.18380394023764476,False
+3257665431,220,Improve bulk file selection handling,"## Summary
+- use file path strings for selection maps
+- move bulk selection work to background dispatcher
+- update selection logic to operate on path keys
+- batch update large selections with yielding
+
+## Testing
+- `./gradlew assembleDebug` *(fails: SDK location not found)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_6881464bcb60832d80ded62053ac13c8",OpenAI_Codex,61864357,MihaiCristianCondrea,closed,2025-07-23T20:44:16Z,2025-07-23T21:00:09Z,2025-07-23T21:00:09Z,600355571,https://api.github.com/repos/MihaiCristianCondrea/Smart-Cleaner-for-Android,https://github.com/MihaiCristianCondrea/Smart-Cleaner-for-Android/pull/220,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve bulk file selection handling"". Summary: use file path strings for selection maps, move bulk selection work to background dispatcher, update selection logic to operate on path keys, batch update large selections with yielding. This seems to be about performance: moving bulk selection work to background dispatcher, batch update large selections with yielding. So it's performance improvement. So label 'performance'.assistantfinalperformance",22,0.16399184793511798,False
+3246161753,214,Fix dispatcher usage for file grouping,"## Summary
+- offload file grouping to IO dispatcher
+
+## Testing
+- `./gradlew test` *(fails: SDK location not found)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_687cac331dd8832d84dcae6ec2e6178c",OpenAI_Codex,61864357,MihaiCristianCondrea,closed,2025-07-20T08:49:36Z,2025-07-20T08:49:46Z,2025-07-20T08:49:46Z,600355571,https://api.github.com/repos/MihaiCristianCondrea/Smart-Cleaner-for-Android,https://github.com/MihaiCristianCondrea/Smart-Cleaner-for-Android/pull/214,"analysisWe need to classify the PR as performance or non-performance. The title: ""Fix dispatcher usage for file grouping"". Summary: ""offload file grouping to IO dispatcher"". This is about concurrency, moving file grouping to IO dispatcher. That likely improves performance by offloading IO heavy work to IO dispatcher, reducing main thread load. It's about performance improvement. So classification: performance.assistantfinalperformance",22,0.16292375818442967,False
+3165797836,25,Fix ANR on TV show detail screen,"## Summary
+- fix ANR when opening a TV show by loading poster with `CustomTarget`
+
+## Testing
+- `./gradlew test` *(fails: Unable to download gradle wrapper)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_6857c93d15bc832bba3fea1d195f0443",OpenAI_Codex,22895813,halilozel1903,closed,2025-06-22T09:16:40Z,2025-06-22T09:16:57Z,2025-06-22T09:16:57Z,225194766,https://api.github.com/repos/halilozel1903/AndroidTVMovieParadise,https://github.com/halilozel1903/AndroidTVMovieParadise/pull/25,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Fix ANR on TV show detail screen"". ANR stands for Application Not Responding. It's a performance issue: the app is freezing. The body: ""fix ANR when opening a TV show by loading poster with CustomTarget"". This is about performance, specifically responsiveness. So classification: 'performance'.assistantfinalperformance",22,0.15037076626152374,False
+3239733181,669,Fix unresponsive message display,Improve responsiveness of the message display and artifact viewer on mobile devices.,Cursor,666683,swuecho,closed,2025-07-17T14:06:44Z,2025-07-17T14:07:47Z,2025-07-17T14:07:47Z,615684995,https://api.github.com/repos/swuecho/chat,https://github.com/swuecho/chat/pull/669,"analysisWe need to classify as performance or non-performance. The PR title: ""Fix unresponsive message display"". Body: ""Improve responsiveness of the message display and artifact viewer on mobile devices."" This is about responsiveness, performance. So classification: performance.assistantfinalperformance",22,0.11148678098833098,False
+3210656212,233,Fix mobile overflow issue for get started card,Improve welcome slideshow responsiveness to prevent overflow and enable interaction on mobile.,Cursor,11430621,benjaminshafii,closed,2025-07-08T00:59:36Z,2025-07-08T01:01:14Z,2025-07-08T01:01:14Z,883825890,https://api.github.com/repos/different-ai/zero-finance,https://github.com/different-ai/zero-finance/pull/233,"analysisWe need to classify as performance or non-performance. The PR title: ""Fix mobile overflow issue for get started card"". Body: ""Improve welcome slideshow responsiveness to prevent overflow and enable interaction on mobile."" This is about responsiveness, overflow, enabling interaction. It's about UI responsiveness, but is it performance? The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs.
+
+The body contains ""Improve welcome slideshow responsiveness to prevent overflow and enable interaction on mobile."" The word ""responsiveness"" is present. That is a keyword. So it's performance. So classify as 'performance'.assistantfinalperformance",22,0.10542331902125927,False

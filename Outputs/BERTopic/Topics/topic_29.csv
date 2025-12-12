@@ -1,0 +1,946 @@
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
+3151242547,49424,Add EnableDefaultItems=false optimization for restore operations,"Improves restore performance by disabling default item globbing during restore operations, addressing significant performance issues on projects with large numbers of files.
+
+## Problem
+
+During `dotnet restore` operations, MSBuild spends excessive time on default item globbing (Compile, EmbeddedResource, None items) which can take 45+ seconds on projects with 100k+ files. Restore operations don't actually need these items to be evaluated, making this globbing unnecessary overhead.
+
+## Solution
+
+Automatically adds `EnableDefaultItems=false` property to MSBuild arguments during restore operations while respecting user-provided values to avoid conflicts.
+
+## Changes
+
+- **`Constants.AddRestoreOptimizations()`**: New method that adds `EnableDefaultItems=false` if user hasn't already specified it
+- **`RestoreCommand.CreateForwarding()`**: Apply optimization for explicit restore commands (`dotnet restore`)
+- **`RestoringCommand.GetSeparateRestoreCommand()`**: Apply optimization for implicit restore scenarios (`dotnet build` without `--no-restore`)
+- **Comprehensive property parsing**: Handles multiple MSBuild property syntax formats (`-property:`, `-p:`, `--property:`) with case-insensitive matching
+
+## User Experience
+
+- **Transparent**: Users won't notice any behavior changes except faster restores
+- **Respects user preferences**: If user explicitly sets `EnableDefaultItems=true/false`, their value is preserved
+- **Backward compatible**: No breaking changes to existing workflows
+
+## Testing
+
+Added comprehensive unit tests covering:
+- Basic optimization behavior
+- User override scenarios with various property syntax formats
+- Case-insensitive property matching
+- Integration with both explicit and implicit restore paths
+
+## Expected Impact
+
+Based on the original performance analysis, this should reduce restore evaluation time from ~45 seconds to ~300ms on projects with large file counts.
+
+Fixes #49415.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `josvsblobprodcus372.vsblob.vsassets.io`
+>   - Triggering command: `/home/REDACTED/work/sdk/sdk/.dotnet/dotnet msbuild /m /nologo /clp:Summary /v:minimal /nr:true /warnaserror /p:TreatWarningsAsErrors=true /p:ContinuousIntegrationBuild=false /home/REDACTED/work/sdk/sdk/artifacts/toolset/restore.proj /t:__WriteToolsetLocation /clp:ErrorsOnly;NoSummary /p:__ToolsetLocationOutputFile=/home/REDACTED/work/sdk/sdk/artifacts/toolset/10.0.0-beta.25315.102.txt ` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-16T20:33:51Z,2025-06-25T14:43:43Z,,63984307,https://api.github.com/repos/dotnet/sdk,https://github.com/dotnet/sdk/pull/49424,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Add EnableDefaultItems=false optimization for restore operations"". Body describes performance improvement: reduce restore evaluation time. So it's performance. So output 'performance'.assistantfinalperformance",29,1.0,False
+3151370964,12025,Add fast-paths for ToolLocationHelper property functions,"This PR adds fast-path implementations for two commonly used ToolLocationHelper property functions that were identified as performance bottlenecks in template projects:
+
+- `GetPlatformSDKLocation(String, String)`
+- `GetPlatformSDKDisplayName(String, String)`
+
+## Problem
+When building template projects in .NET 10.0.100-preview.5, these property functions don't have fast paths and require expensive reflection calls during project evaluation. The tracing output showed:
+
+```
+ReceiverType=Microsoft.Build.Utilities.ToolLocationHelper; ObjectInstanceType=; MethodName=GetPlatformSDKLocation(String, String)
+ReceiverType=Microsoft.Build.Utilities.ToolLocationHelper; ObjectInstanceType=; MethodName=GetPlatformSDKDisplayName(String, String)
+```
+
+## Solution
+Added fast-path implementations in `WellKnownFunctions.cs` following the established pattern:
+
+1. **Added project reference** to `Microsoft.Build.Utilities.csproj` in the Build project to access ToolLocationHelper
+2. **Implemented fast-paths** for both methods with proper argument validation using `ParseArgs.TryGetArgs`
+3. **Added test coverage** to verify the implementation works correctly
+
+The fast-paths avoid the expensive reflection mechanism and provide direct calls to the underlying methods when the signature matches exactly (two string parameters).
+
+## Changes
+- `src/Build/Microsoft.Build.csproj`: Added project reference to Utilities
+- `src/Build/Evaluation/Expander/WellKnownFunctions.cs`: Added fast-path implementations
+- `src/Build.UnitTests/Evaluation/Expander_Tests.cs`: Added test case
+
+## Testing
+- ✅ Successfully built entire solution
+- ✅ Added and verified test case `TestToolLocationHelperFastPaths` 
+- ✅ Verified existing ToolLocationHelper tests still pass
+- ✅ Confirmed fast-paths execute without errors and return expected results
+
+Fixes #12024.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `dnceng.pkgs.visualstudio.com`
+>   - Triggering command: `dotnet build src/Build/Microsoft.Build.csproj --configuration Debug --verbosity minimal ` (dns block)
+>   - Triggering command: `dotnet test src/Build.UnitTests/Microsoft.Build.Engine.UnitTests.csproj --filter TestToolLocationHelperFastPaths --configuration Debug --verbosity normal ` (dns block)
+>   - Triggering command: `/home/REDACTED/work/_temp/ghcca-node/node/bin/node /home/REDACTED/work/_temp/copilot-developer-action-main/dist/index.js ` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,open,2025-06-16T21:24:28Z,,,32051890,https://api.github.com/repos/dotnet/msbuild,https://github.com/dotnet/msbuild/pull/12025,"analysisWe need to classify the pull request as 'performance' or 'non-performance'. The PR title: ""Add fast-paths for ToolLocationHelper property functions"". The body describes adding fast-path implementations to avoid expensive reflection calls, improving performance. Keywords: fast-paths, performance bottlenecks, expensive reflection calls, fast-paths avoid expensive reflection. So it's a performance improvement. So classification: 'performance'.assistantfinalperformance",29,1.0,False
+3153610172,12030,Add fast-path optimizations for Char.IsDigit in performance-critical paths,"This PR adds fast-path optimizations for `Char.IsDigit` calls in MSBuild's performance-critical conditional expression parsing paths, addressing performance concerns raised by the .NET SDK team.
+
+## Changes Made
+
+### Added Fast-Path Implementation
+- Added `CharacterUtilities.IsDigit(char candidate)` method with optimized ASCII range checking (`c >= '0' && c <= '9'`)
+- This avoids the overhead of Unicode categorization for common ASCII digit scenarios
+
+### Updated Performance-Critical Paths
+Replaced `char.IsDigit()` calls with the fast-path implementation in:
+- `CharacterUtilities.IsNumberStart()` - used when parsing numeric literals in conditions
+- `CharacterUtilities.IsSimpleStringChar()` - used when parsing identifiers and strings in conditions  
+- `CharacterUtilities.IsHexDigit()` - updated to leverage the new fast-path for digit detection
+- `Scanner.SkipDigits()` - critical loop that processes digit sequences in conditional expressions
+
+### Added Test Coverage
+- Added comprehensive unit test `CharacterUtilities_IsDigit_WorksCorrectly()` that validates:
+  - All ASCII digits ('0'-'9') are correctly identified
+  - Non-digit characters (letters, symbols, whitespace) are correctly rejected
+
+## Performance Impact
+These changes optimize the most frequently used code paths when MSBuild evaluates conditional expressions containing numeric values. The fast-path eliminates Unicode categorization overhead for ASCII digits, which are the vast majority of digits encountered in build scripts.
+
+## Backward Compatibility
+All changes maintain 100% backward compatibility. The behavior is identical to `char.IsDigit()` for ASCII characters, and the optimized paths only affect performance, not functionality.
+
+## Test Results
+- All existing Scanner tests continue to pass (25 tests)
+- New fast-path test passes
+- No regressions detected
+
+Fixes #12029.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `dnceng.pkgs.visualstudio.com`
+>   - Triggering command: `dotnet build src/Build.UnitTests/Microsoft.Build.Engine.UnitTests.csproj --verbosity minimal ` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-17T13:55:15Z,2025-06-23T08:31:36Z,2025-06-23T08:31:36Z,32051890,https://api.github.com/repos/dotnet/msbuild,https://github.com/dotnet/msbuild/pull/12030,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Add fast-path optimizations for Char.IsDigit in performance-critical paths"". The body describes fast-path optimizations, performance concerns, etc. It's clearly performance. So label 'performance'.assistantfinalperformance",29,1.0,False
+3153767187,12033,Add Microsoft.Extensions.FileSystemGlobbing support to MSBuildGlob with trait-based feature flag,"This PR implements an alternative globbing implementation using `Microsoft.Extensions.FileSystemGlobbing` as requested in the issue, allowing MSBuild to evaluate performance and maintainability benefits of using the official .NET globbing library instead of the custom implementation.
+
+## Changes Made
+
+- **Added Microsoft.Extensions.FileSystemGlobbing dependency** to the Microsoft.Build project
+- **Created FileSystemGlobbingMSBuildGlob class** that implements `IMSBuildGlob` using `Microsoft.Extensions.FileSystemGlobbing.Matcher`
+- **Added trait-based feature flag** `UseFileSystemGlobbingForMSBuildGlob` controlled by the `MSBUILD_USE_FILESYSTEMGLOBBING` environment variable
+- **Modified MSBuildGlob.IsMatch()** to conditionally delegate to the new implementation when the trait is enabled
+- **Added test infrastructure** to verify the trait system works correctly
+
+## Usage
+
+The feature can be enabled by setting the environment variable:
+```bash
+export MSBUILD_USE_FILESYSTEMGLOBBING=1
+```
+
+When enabled, all `MSBuildGlob.IsMatch()` calls will use `Microsoft.Extensions.FileSystemGlobbing` instead of the built-in regex-based implementation.
+
+## Testing
+
+- ✅ All existing MSBuildGlob tests continue to pass, ensuring backward compatibility
+- ✅ Trait system correctly switches between implementations based on environment variable
+- ✅ Basic compatibility verified between both implementations
+
+## Implementation Details
+
+The implementation maintains full API compatibility by:
+1. Adding a lazy-initialized `FileSystemGlobbingMSBuildGlob` instance to `MSBuildGlob`
+2. Checking the trait in `IsMatch()` and delegating appropriately
+3. Using compatible path handling logic for both Windows and Unix systems
+
+This provides the foundation for performance evaluation and potential migration to `Microsoft.Extensions.FileSystemGlobbing` while maintaining all existing functionality and ensuring zero impact when the feature is disabled (default state).
+
+Fixes #12032.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `37cvsblobprodcus359.vsblob.vsassets.io`
+>   - Triggering command: `dotnet restore src/Build/Microsoft.Build.csproj ` (dns block)
+> - `7tjvsblobprodcus341.vsblob.vsassets.io`
+>   - Triggering command: `dotnet restore src/Build/Microsoft.Build.csproj ` (dns block)
+> - `dnceng.pkgs.visualstudio.com`
+>   - Triggering command: `dotnet test src/Build.UnitTests/Microsoft.Build.Engine.UnitTests.csproj --filter MSBuildGlob_Tests --no-build ` (dns block)
+>   - Triggering command: `dotnet restore src/Build/Microsoft.Build.csproj ` (dns block)
+>   - Triggering command: `dotnet build src/Build/Microsoft.Build.csproj --no-restore ` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,open,2025-06-17T14:42:57Z,,,32051890,https://api.github.com/repos/dotnet/msbuild,https://github.com/dotnet/msbuild/pull/12033,"analysisWe need to classify whether the primary purpose is to improve performance. The PR adds Microsoft.Extensions.FileSystemGlobbing support to MSBuildGlob with trait-based feature flag. It says ""allowing MSBuild to evaluate performance and maintainability benefits of using the official.NET globbing library instead of the custom implementation."" It also mentions ""performance evaluation"" and ""potential migration to Microsoft.Extensions.FileSystemGlobbing"". But is the primary purpose to improve performance? The PR is adding an alternative implementation, but the main goal is to evaluate performance and maintainability. It might be a performance-related PR because it introduces a new implementation that could be faster. The description says ""provides the foundation for performance evaluation and potential migration"". The primary purpose is to evaluate performance, but not necessarily to improve performance directly. However, the PR is about adding a new implementation that could be faster. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The PR is about adding a new implementation to evaluate performance. The primary purpose is to evaluate performance, not necessarily to improve it. But the description says ""allowing MSBuild to evaluate performance and maintainability benefits"". The PR is not directly improving performance, but enabling evaluation. But the classification might still be 'performance' because it deals with performance evaluation. The guidelines: ""Performance-related pull requests may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs."" The title: ""Add Microsoft.Extensions.FileSystemGlobbing support to MSBuildGlob with trait-based feature flag"". The body mentions ""performance and maintainability benefits"". It doesn't explicitly mention speed or performance. But it does mention ""performance evaluation"". The guidelines say ""or any other terms referring to how faster and efficiently software runs."" The PR is about evaluating performance, but not necessarily improving it. But the classification might still be 'performance' because it's about performance evaluation. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The primary purpose is to evaluate performance, not necessarily to improve. But the PR is adding a new implementation that could be faster. The primary purpose is to evaluate performance and maintainability. That is performance-related. So classification: 'performance'.assistantfinalperformance",29,1.0,False
+3198922993,12109,Detect and log dev drive at the start of build,"Implements Dev Drive detection and logging at build start to help customers and Microsoft understand Dev Drive usage impact on build performance.
+
+## Changes
+
+This PR adds Dev Drive detection following the same pattern as the existing Long Paths feature (#10151):
+
+### Core Implementation
+- **NativeMethods.cs**: Added `DevDriveStatus` enum and `IsOnDevDrive()` method using Windows `GetVolumeInformation` API to detect ReFS file system (Dev Drive uses ReFS)
+- **XMake.cs**: Added Dev Drive status logging to build start environment information at diagnostic verbosity level
+- **Strings.resx**: Added localized resource strings for Dev Drive logging messages
+
+### Behavior
+- **Windows**: Detects if current directory is on a Dev Drive and logs ""detected"" or ""not detected""
+- **Non-Windows**: Returns ""not applicable"" and doesn't log (same pattern as Long Paths)
+- Only logs when status is applicable (Windows systems), following established logging patterns
+- Appears in diagnostic build output alongside other environment information
+
+### Testing
+- Added unit test to verify Dev Drive detection returns valid enum values
+- Successfully builds and runs on both Windows and Linux
+- Manually verified logging works with diagnostic verbosity: `dotnet MSBuild.dll project.proj -v:diagnostic`
+
+## Example Output
+
+On Windows with Dev Drive:
+```
+Environment at start of build:
+...
+Based on the current directory file system, Dev Drive is detected.
+...
+```
+
+On Windows without Dev Drive:
+```
+Environment at start of build:
+...
+Based on the current directory file system, Dev Drive is not detected.
+...
+```
+
+On non-Windows platforms, no Dev Drive message appears (not applicable).
+
+This information will be valuable for performance investigations, as Dev Drive can significantly reduce build times (the issue mentions a 10-minute copy operation reduced to ~2 minutes when moved to Dev Drive).
+
+Fixes #12108.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `dnceng.pkgs.visualstudio.com`
+>   - Triggering command: `dotnet build /tmp/TestDevDrive/TestDevDrive.csproj -v:diagnostic` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-07-03T10:42:16Z,,,32051890,https://api.github.com/repos/dotnet/msbuild,https://github.com/dotnet/msbuild/pull/12109,"analysisWe need to classify as performance or non-performance. The PR is about detecting Dev Drive usage and logging it to help customers and Microsoft understand Dev Drive usage impact on build performance. It mentions that Dev Drive can significantly reduce build times. The primary purpose is to detect and log dev drive at start of build. The description says ""This information will be valuable for performance investigations, as Dev Drive can significantly reduce build times"". The PR is about logging dev drive detection, not directly optimizing performance. But the purpose is to help understand performance. The classification guidelines: performance-related PRs may contain keywords like latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs. This PR includes ""performance investigations"" and ""Dev Drive can significantly reduce build times"". It mentions performance. So likely classify as performance. The primary purpose is to detect dev drive usage to help performance investigations. That is performance. So classification: performance.assistantfinalperformance",29,1.0,True
+3219696751,62661,[Blazor] Make _serializerCache static readonly to avoid creating dictionaries per instance,"This change optimizes the `PersistentStateValueProvider` class by making the `_serializerCache` field static instead of instance-level. 
+
+## Problem
+Previously, every instance of `PersistentStateValueProvider` would create its own `ConcurrentDictionary` for caching serializers, even though the serializers are typically registered as singletons in the DI container and don't vary between instances.
+
+## Solution
+Changed `_serializerCache` from `private readonly` to `private static readonly`. This allows all instances to share the same cache, reducing memory allocation and improving performance when multiple `PersistentStateValueProvider` instances are created.
+
+## Impact
+- **Performance**: Reduces memory allocation by sharing the serializer cache across all instances
+- **Compatibility**: No breaking changes - the cache behavior remains functionally identical
+- **Thread Safety**: `ConcurrentDictionary` is already thread-safe, making the static sharing safe
+
+## Testing
+- ✅ All Components tests pass (1,124 tests)
+- ✅ All PersistentStateValueProvider tests pass (35 tests)  
+- ✅ All IPersistentComponentStateSerializer tests pass (2 tests)
+- ✅ No build regressions in the core Components project
+
+Fixes #62659.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-10T14:56:39Z,2025-07-10T16:31:44Z,2025-07-10T16:31:44Z,17620347,https://api.github.com/repos/dotnet/aspnetcore,https://github.com/dotnet/aspnetcore/pull/62661,"analysisWe need to classify as performance or non-performance. The PR title: ""[Blazor] Make _serializerCache static readonly to avoid creating dictionaries per instance"". The body says it optimizes by making static, reducing memory allocation, improving performance. So it's performance. So label 'performance'.assistantfinalperformance",29,1.0,False
+3135316626,594,Fix static member exports to not instantiate declaring type,"## Problem
+
+When accessing static member exports through MEF, the framework was unnecessarily instantiating the declaring type, even though static members don't require an instance. This caused performance overhead and potential unwanted side effects from constructor execution.
+
+Consider this example:
+```cs
+class Some
+{
+   [Export]
+   public static string Member => ""Hi"";
+}
+```
+
+Before this fix, MEF would instantiate the `Some` class when obtaining the value of the static `Member` property, even though instantiation is not necessary for static members.
+
+## Root Cause
+
+The issue occurred in two places:
+
+1. **`ExportProvider.CreateExport()`** - Always called `GetValueReadyToRetrieveExportingMembers()` even for static members, causing instantiation
+2. **`RuntimeExportProvider.GetExportedValue()`** - Always created `partLifecycle` even for static members, which could trigger instantiation
+
+## Solution
+
+- Modified both `ExportProvider.CreateExport()` and `RuntimeExportProvider.GetExportedValue()` to check if members are static using `MemberRef.IsStatic()` before creating part lifecycle trackers
+- For static members, bypass part instantiation entirely and call `GetValueFromMember(null, ...)` directly
+- Added comprehensive unit tests covering all static member types (fields, properties, methods)
+
+## Tests Added
+
+- `StaticFieldExportDoesNotInstantiateClass` - Verifies static fields don't cause instantiation
+- `StaticPropertyExportDoesNotInstantiateClass` - Verifies static properties don't cause instantiation  
+- `StaticMethodExportDoesNotInstantiateClass` - Verifies static methods don't cause instantiation
+- `StaticExportInMixedClassDoesNotInstantiateClass` - Verifies static exports in mixed classes don't cause instantiation
+- `InstanceExportInMixedClassDoesInstantiateClass` - Verifies instance exports still work correctly
+
+The fix ensures static member exports perform better and don't have unwanted side effects from unnecessary instantiation, while maintaining full compatibility with existing functionality.
+
+Fixes #593.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `1elvsblobprodwus2177.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+>   - Triggering command: `dotnet build --force ` (dns block)
+>   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
+> - `1mcvsblobprodwus2174.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+> - `1n8vsblobprodwus2184.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
+> - `2wrvsblobprodwus2180.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+>   - Triggering command: `dotnet build --force ` (dns block)
+> - `5o1vsblobprodwus2115.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+>   - Triggering command: `dotnet build --force ` (dns block)
+> - `5zivsblobprodwus217.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+>   - Triggering command: `dotnet build --force ` (dns block)
+>   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
+> - `78kvsblobprodwus2152.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+>   - Triggering command: `dotnet build --force ` (dns block)
+> - `7q7vsblobprodwus2144.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+>   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
+> - `7t8vsblobprodwus2168.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+> - `84hvsblobprodwus2148.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+>   - Triggering command: `dotnet build --force ` (dns block)
+> - `8wdvsblobprodwus2137.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+>   - Triggering command: `dotnet build --force ` (dns block)
+> - `8yfvsblobprodwus2171.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
+> - `an0vsblobprodwus2146.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+>   - Triggering command: `dotnet build --force ` (dns block)
+> - `b15vsblobprodwus2164.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+>   - Triggering command: `dotnet build --force ` (dns block)
+> - `b5svsblobprodwus2116.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+>   - Triggering command: `dotnet build --force ` (dns block)
+> - `balvsblobprodwus2129.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+>   - Triggering command: `dotnet build --force ` (dns block)
+> - `cbvvsblobprodwus2131.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build --force ` (dns block)
+> - `etjvsblobprodwus2172.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
+> - `g3xvsblobprodwus2151.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+> - `hd3vsblobprodwus2117.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
+> - `i01vsblobprodwus216.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+>   - Triggering command: `dotnet build --force ` (dns block)
+>   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
+> - `ia4vsblobprodwus2112.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
+> - `izzvsblobprodwus2142.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+>   - Triggering command: `dotnet build --force ` (dns block)
+> - `jhgvsblobprodwus2167.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+> - `jk4vsblobprodwus2186.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+>   - Triggering command: `dotnet build --force ` (dns block)
+>   - Triggering command: `/home/REDACTED/work/_temp/ghcca-node/node/bin/node /home/REDACTED/work/_temp/copilot-developer-action-main/dist/index.js ` (dns block)
+> - `jlovsblobprodwus2163.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+>   - Triggering command: `dotnet build --force ` (dns block)
+> - `jqivsblobprodwus2187.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+>   - Triggering command: `dotnet build --force ` (dns block)
+> - `mdcvsblobprodwus2159.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+>   - Triggering command: `dotnet build --force ` (dns block)
+> - `mt2vsblobprodwus2110.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
+> - `ndavsblobprodwus219.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+> - `nypvsblobprodwus2178.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+>   - Triggering command: `dotnet build --force ` (dns block)
+> - `p2tvsblobprodwus2189.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+>   - Triggering command: `dotnet build --force ` (dns block)
+> - `s0ivsblobprodwus2134.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+>   - Triggering command: `dotnet build --force ` (dns block)
+>   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
+> - `tn2vsblobprodwus2124.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+>   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
+> - `v41vsblobprodwus2175.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+>   - Triggering command: `dotnet build --force ` (dns block)
+> - `vd2vsblobprodwus2150.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+>   - Triggering command: `dotnet build --force ` (dns block)
+> - `wlnvsblobprodwus2188.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+>   - Triggering command: `dotnet build --force ` (dns block)
+> - `wztvsblobprodwus2155.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
+> - `x1mvsblobprodwus2181.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+> - `xktvsblobprodwus2141.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+>   - Triggering command: `dotnet build --force ` (dns block)
+>   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
+> - `xofvsblobprodwus2114.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+>   - Triggering command: `dotnet build --force ` (dns block)
+> - `y1mvsblobprodwus2138.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build ` (dns block)
+>   - Triggering command: `dotnet build --force ` (dns block)
+>   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
+> - `zugvsblobprodwus2169.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+",Copilot,198982749,Copilot,open,2025-06-11T02:50:00Z,,,89300492,https://api.github.com/repos/microsoft/vs-mef,https://github.com/microsoft/vs-mef/pull/594,"analysisWe need to classify the pull request as 'performance' or 'non-performance'. The PR title: ""Fix static member exports to not instantiate declaring type"". The description: It addresses performance overhead due to unnecessary instantiation of static members. It modifies code to avoid instantiation, improving performance. So it's a performance improvement. So classification: 'performance'.assistantfinalperformance",29,1.0,True
+3120627194,11953,Deprecate BuildEventArgs.ThreadId and make it always return 0,"This PR deprecates the `BuildEventArgs.ThreadId` property as discussed in issue #6152 to improve performance and reduce memory usage.
+
+## Changes Made
+
+1. **Added `[Obsolete]` attribute** to the `ThreadId` property with a descriptive message indicating it will be removed in a future version
+2. **Changed the constructor** to set `threadId = 0` instead of computing `System.Threading.Thread.CurrentThread.GetHashCode()`
+
+## Impact
+
+- **Performance improvement**: Eliminates the thread hash computation in every `BuildEventArgs` constructor
+- **Memory neutral**: The `threadId` field still exists but stores a constant value instead of variable hash codes
+- **Backward compatibility**: All existing code continues to work with deprecation warnings
+- **Consistent behavior**: `ThreadId` now always returns 0 instead of unpredictable hash values
+
+## Testing
+
+- ✅ All Framework unit tests pass (75/75)
+- ✅ All serialization tests pass (48/48) 
+- ✅ Binary logger compatibility verified
+- ✅ Third-party code will receive obsolete warnings but continue to function
+
+## Rationale
+
+As noted in the issue comments, `ThreadId` appears to be unused and the current implementation using thread hash codes provides little value. The maintainers agreed to deprecate it for version 17.0 rather than outright removal to avoid breaking third-party code that might access this property.
+
+The thread ID was already commented out in `EventArgsFormatting.cs` (lines 224-229), confirming it's not actively used for display purposes.
+
+Fixes #6152.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `dnceng.pkgs.visualstudio.com`
+>   - Triggering command: `dotnet build src/Framework/Microsoft.Build.Framework.csproj --configuration Debug ` (dns block)
+>   - Triggering command: `./.dotnet/dotnet build src/Framework/Microsoft.Build.Framework.csproj --configuration Debug ` (dns block)
+>   - Triggering command: `./.dotnet/dotnet build src/Framework.UnitTests/Microsoft.Build.Framework.UnitTests.csproj --configuration Debug ` (dns block)
+> - `http://168.63.129.16:80/machine/`
+>   - Triggering command: `/usr/bin/python3 -u bin/WALinuxAgent-2.13.1.1-py3.9.egg -collect-logs ` (http block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-05T10:10:32Z,2025-06-05T16:06:06Z,,32051890,https://api.github.com/repos/dotnet/msbuild,https://github.com/dotnet/msbuild/pull/11953,"analysisWe need to classify as performance or non-performance. The PR is about deprecating ThreadId property, removing thread hash computation, to improve performance and reduce memory usage. It explicitly says ""Performance improvement: Eliminates the thread hash computation"". So it's performance. So label 'performance'.assistantfinalperformance",29,1.0,False
+3120599542,11952,Fix always-true condition in LazyItemEvaluator metadata expansion logic,"This PR fixes a logical bug in the `NeedToExpandMetadataForEachItem` method where a condition was always evaluating to true, causing unnecessary metadata expansion and breaking an optimization path.
+
+## Problem
+
+In `LazyItemEvaluator.LazyItemOperation.cs` line 293, the condition:
+
+```csharp
+if (_referencedItemLists.Count >= 0)
+```
+
+is always true because `Count` is never negative. This caused the method to always expand metadata for each item individually when any metadata was present, regardless of whether item list references (`@(...)` expressions) were actually involved.
+
+## Root Cause
+
+The always-true condition meant the else branch (lines 297-308) that checks for bare built-in metadata was never executed, breaking the intended optimization logic documented in the surrounding comments.
+
+## Solution
+
+Changed the condition to properly check for non-empty collections:
+
+```csharp
+if (_referencedItemLists.Count > 0)
+```
+
+## Impact
+
+- **Performance**: Restores the optimization path for common cases without item list references
+- **Correctness**: Metadata expansion now correctly follows the intended logic:
+  - Expand per-item when item lists are referenced (`@(...)` expressions), OR  
+  - Expand per-item when bare built-in metadata is present
+  - Otherwise, use the more efficient batch expansion approach
+
+This is a minimal, surgical fix that addresses the exact issue reported by static analysis tools.
+
+Fixes #5586.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `dnceng.pkgs.visualstudio.com`
+>   - Triggering command: `dotnet build src/Build/Microsoft.Build.csproj --configuration Debug ` (dns block)
+> - `http://168.63.129.16:80/machine/`
+>   - Triggering command: `/usr/bin/python3 -u bin/WALinuxAgent-2.13.1.1-py3.9.egg -collect-logs ` (http block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-05T10:02:08Z,2025-06-17T06:48:14Z,2025-06-17T06:48:12Z,32051890,https://api.github.com/repos/dotnet/msbuild,https://github.com/dotnet/msbuild/pull/11952,"analysisWe need to classify the PR as 'performance' or 'non-performance'. The PR fixes a logical bug that caused unnecessary metadata expansion, restoring optimization path. The impact mentions performance: ""Restores the optimization path for common cases without item list references"". So it's a performance improvement. The description includes performance-related keywords: ""performance"", ""optimization"", ""unnecessary metadata expansion"", ""optimization path"". So classification: 'performance'.assistantfinalperformance",29,1.0,False
+3081345740,49090,Prevent double-building of Microsoft.DotNet.Cli.Utils.csproj by excluding PublishDir from global properties,"This PR fixes an issue where `Microsoft.DotNet.Cli.Utils.csproj` is being built twice during the SDK build process, causing PDB mismatches on some platforms (particularly s390x in source-build).
+
+## Issue details
+- `Microsoft.NET.Build.Containers.csproj` references `Microsoft.DotNet.Cli.Utils.csproj`
+- In `GenerateLayout.targets`, the `PublishContainersSdk` target publishes `Microsoft.NET.Build.Containers.csproj` with specific `PublishDir` property values
+- By default, MSBuild propagates global properties like `PublishDir` to referenced projects
+- When `PublishDir` changes, MSBuild treats it as a different build configuration and rebuilds referenced projects
+- This causes `Microsoft.DotNet.Cli.Utils.csproj` to be built twice with different settings, resulting in PDB mismatches
+
+## Solution
+Added `GlobalPropertiesToRemove=""PublishDir""` to all MSBuild calls in `GenerateLayout.targets` that either:
+1. Explicitly set the `PublishDir` property, or
+2. Could potentially propagate `PublishDir` to referenced projects
+
+This prevents the `PublishDir` property from being passed to referenced projects like `Microsoft.DotNet.Cli.Utils.csproj`, ensuring it's only built once during the entire build process.
+
+The change follows the suggested approach from @marcpopMSFT in the issue comments.
+
+Fixes #44033.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `pkgs.dev.azure.com`
+>   - Triggering command: `/home/REDACTED/work/sdk/sdk/.dotnet/dotnet msbuild /m /nologo /clp:Summary /v:minimal /nr:true /warnaserror /p:TreatWarningsAsErrors=true /p:ContinuousIntegrationBuild=false /home/REDACTED/work/sdk/sdk/artifacts/toolset/restore.proj /t:__WriteToolsetLocation /clp:ErrorsOnly;NoSummary /p:__ToolsetLocationOutputFile=/home/REDACTED/work/sdk/sdk/artifacts/toolset/10.0.0-beta.25265.101.txt ` (dns block)
+>   - Triggering command: `/home/REDACTED/work/_temp/ghcca-node/node/bin/node /home/REDACTED/work/_temp/copilot-developer-action-main/dist/index.js ` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-05-21T20:31:51Z,2025-07-16T22:02:28Z,2025-07-16T22:02:28Z,63984307,https://api.github.com/repos/dotnet/sdk,https://github.com/dotnet/sdk/pull/49090,"analysisWe need to classify as performance or non-performance. The PR is about preventing double-building of a project to avoid PDB mismatches. It's about build process optimization, but is it performance? It's about reducing unnecessary builds, which is a performance improvement. The keywords: ""build twice"", ""rebuild"", ""build process"", ""prevent double-building"". This is about build performance, not runtime performance. But the classification is about improving performance of software. The guidelines mention performance-related PRs may contain keywords like latency, optimization, slow, memory, speed, etc. This PR is about build optimization, which is a performance improvement. So classify as 'performance'.assistantfinalperformance",29,1.0,False
+3269663648,6203,Add field support to DynamicDataAttribute,"This PR adds support for public static fields as data sources in `DynamicDataAttribute`, addressing a key performance improvement request for test data management.
+
+## Problem
+
+Previously, `DynamicDataAttribute` only supported properties and methods as data sources. This meant that even for constant test data, new objects were created on each access due to property getters or method calls, despite being static:
+
+```csharp
+// Property - creates new array on each access
+public static IEnumerable<object[]> TestData => new[]
+{
+    new object[] { 25, 250 },
+    new object[] { 42, 420 },
+    new object[] { 164, 1640 }
+};
+
+// Method - also creates new array on each call  
+public static IEnumerable<object[]> GetTestData() => new[]
+{
+    new object[] { 25, 250 },
+    new object[] { 42, 420 },
+    new object[] { 164, 1640 }
+};
+```
+
+## Solution
+
+Added comprehensive support for static fields as data sources, allowing truly constant test data:
+
+```csharp
+// Field - created once, reused efficiently
+public static int[][] TestData = new[]
+{
+    new[] { 25, 250 },
+    new[] { 42, 420 },
+    new[] { 164, 1640 }
+};
+
+[TestMethod]
+[DynamicData(nameof(TestData), DynamicDataSourceType.Field)]
+public void TestWithExplicitField(int input, int expected) { /* ... */ }
+
+[TestMethod]
+[DynamicData(nameof(TestData))] // Auto-detect also works
+public void TestWithAutoDetect(int input, int expected) { /* ... */ }
+```
+
+## Key Features
+
+- **Explicit field specification**: `DynamicDataSourceType.Field` for direct field targeting
+- **Auto-detection support**: Fields are discovered automatically after properties and methods
+- **External class support**: Works with fields in other classes via declaring type parameter
+- **Inheritance support**: Fields from base classes are properly resolved
+- **Full integration**: Complete support in analyzer, source generation, and runtime
+- **Comprehensive validation**: Proper error messages for non-static fields and type mismatches
+
+## Implementation Details
+
+- Extended `DynamicDataSourceType` enum with `Field = 3` option
+- Added field detection and data extraction methods in `DynamicDataOperations`
+- Updated auto-detect logic with priority: Property → Method → Field
+- Enhanced analyzer to validate field usage and provide appropriate diagnostics
+- Updated source generation to handle field symbols correctly
+- Added comprehensive test coverage for all field scenarios
+
+## Backward Compatibility
+
+This change is fully backward compatible - all existing code continues to work exactly as before. The new field support is purely additive functionality.
+
+Fixes #5321.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `37cvsblobprodcus359.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/TestFramework/TestFramework/TestFramework.csproj` (dns block)
+> - `4zjvsblobprodcus390.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/TestFramework/TestFramework/TestFramework.csproj` (dns block)
+> - `7devsblobprodcus323.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/TestFramework/TestFramework/TestFramework.csproj` (dns block)
+> - `l49vsblobprodcus358.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/TestFramework/TestFramework/TestFramework.csproj` (dns block)
+> - `ljcvsblobprodcus317.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/TestFramework/TestFramework/TestFramework.csproj` (dns block)
+> - `sqdvsblobprodcus333.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/TestFramework/TestFramework/TestFramework.csproj` (dns block)
+> - `st8vsblobprodcus339.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/TestFramework/TestFramework/TestFramework.csproj` (dns block)
+> - `ytvvsblobprodcus310.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/TestFramework/TestFramework/TestFramework.csproj` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to the custom allowlist in this repository's [Copilot coding agent settings](https://github.com/microsoft/testfx/settings/copilot/coding_agent) (admins only)
+>
+> </details>
+
+
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-07-28T12:16:41Z,,,65080725,https://api.github.com/repos/microsoft/testfx,https://github.com/microsoft/testfx/pull/6203,"analysisWe need to classify whether the primary purpose is to improve performance. The PR adds support for static fields as data sources, which reduces object creation overhead, improving performance. The description explicitly says ""addressing a key performance improvement request for test data management."" So it's performance. So label 'performance'.assistantfinalperformance",29,0.3174809842173936,True
+3147449966,3921,[DataGrid] Add IsFixed parameter,"This PR adds an `IsFixed` parameter to the `FluentDataGrid` component that allows developers to optimize performance when working with static datasets that are not expected to change during the grid's lifetime. Fix #3911
+
+## Changes
+
+### New Parameter
+- Added `IsFixed` boolean parameter with default value `false` to maintain backward compatibility
+- When `IsFixed=true`, the grid optimizes refresh behavior for static datasets
+- When `IsFixed=false` (default), maintains existing behavior from v4.11.9
+
+### Performance Optimizations
+When `IsFixed=true`:
+- Skips hash computation for Items collection change detection
+- Reduces automatic `RefreshItems` calls to only forced or initial requests
+- Maintains full functionality for pagination, explicit refreshes, and data source changes
+
+### Usage Example
+```razor
+<!-- Default behavior (existing functionality) -->
+<FluentDataGrid Items=""@dynamicData.AsQueryable()"">
+    <PropertyColumn Property=""@(x => x.Name)"" />
+</FluentDataGrid>
+
+<!-- Optimized for static datasets -->
+<FluentDataGrid Items=""@staticData.AsQueryable()"" IsFixed=""true"">
+    <PropertyColumn Property=""@(x => x.Name)"" />
+</FluentDataGrid>
+```
+
+### Implementation Details
+- Modified `OnParametersSetAsync()` to respect the `IsFixed` parameter in change detection logic
+- Enhanced `RefreshDataCoreAsync()` to be more conservative about automatic refreshes when `IsFixed=true`
+- Added comprehensive test coverage including edge cases and explicit refresh scenarios
+
+### Backward Compatibility
+- Default value of `false` ensures existing code continues to work unchanged
+- All existing functionality (pagination, sorting, explicit refreshes) remains fully functional
+- No breaking changes to existing APIs
+
+This implementation replaces the automatic refresh logic that was added in v4.12.0 with more controlled behavior when developers know their dataset is static, providing significant performance benefits for such scenarios.
+
+Fixes #3920.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `7tjvsblobprodcus341.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
+> - `80zvsblobprodcus35.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj -f net9.0 ` (dns block)
+>   - Triggering command: `dotnet test tests/Core/Microsoft.FluentUI.AspNetCore.Components.Tests.csproj -f net9.0 --filter FluentDataGrid_IsFixed --verbosity normal ` (dns block)
+> - `8xbvsblobprodcus382.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj -f net9.0 ` (dns block)
+>   - Triggering command: `dotnet test tests/Core/Microsoft.FluentUI.AspNetCore.Components.Tests.csproj -f net9.0 --filter FluentDataGrid_IsFixed --verbosity normal ` (dns block)
+> - `aka.ms`
+>   - Triggering command: `curl -I -sSL --retry 5 --retry-delay 2 --connect-timeout 15 REDACTED ` (dns block)
+> - `bcnvsblobprodcus378.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj -f net9.0 ` (dns block)
+>   - Triggering command: `dotnet test tests/Core/Microsoft.FluentUI.AspNetCore.Components.Tests.csproj -f net9.0 --filter FluentDataGrid_IsFixed --verbosity normal ` (dns block)
+> - `c50vsblobprodcus330.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj -f net9.0 ` (dns block)
+>   - Triggering command: `dotnet test tests/Core/Microsoft.FluentUI.AspNetCore.Components.Tests.csproj -f net9.0 --filter FluentDataGrid_IsFixed --verbosity normal ` (dns block)
+> - `c78vsblobprodcus322.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
+> - `d0svsblobprodcus381.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj -f net9.0 ` (dns block)
+>   - Triggering command: `dotnet test tests/Core/Microsoft.FluentUI.AspNetCore.Components.Tests.csproj -f net9.0 --filter FluentDataGrid_IsFixed --verbosity normal ` (dns block)
+> - `imzvsblobprodcus368.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj -f net9.0 ` (dns block)
+>   - Triggering command: `dotnet test tests/Core/Microsoft.FluentUI.AspNetCore.Components.Tests.csproj -f net9.0 --filter FluentDataGrid_IsFixed --verbosity normal ` (dns block)
+> - `jd4vsblobprodcus366.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj -f net9.0 ` (dns block)
+>   - Triggering command: `dotnet test tests/Core/Microsoft.FluentUI.AspNetCore.Components.Tests.csproj -f net9.0 --filter FluentDataGrid_IsFixed --verbosity normal ` (dns block)
+> - `jrqvsblobprodcus343.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj -f net9.0 ` (dns block)
+>   - Triggering command: `dotnet test tests/Core/Microsoft.FluentUI.AspNetCore.Components.Tests.csproj -f net9.0 --filter FluentDataGrid_IsFixed --verbosity normal ` (dns block)
+> - `kh4vsblobprodcus325.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj -f net9.0 ` (dns block)
+>   - Triggering command: `dotnet test tests/Core/Microsoft.FluentUI.AspNetCore.Components.Tests.csproj -f net9.0 --filter FluentDataGrid_IsFixed --verbosity normal ` (dns block)
+> - `kmuvsblobprodcus389.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj -f net9.0 ` (dns block)
+>   - Triggering command: `dotnet test tests/Core/Microsoft.FluentUI.AspNetCore.Components.Tests.csproj -f net9.0 --filter FluentDataGrid_IsFixed --verbosity normal ` (dns block)
+> - `l49vsblobprodcus358.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj -f net9.0 ` (dns block)
+>   - Triggering command: `dotnet test tests/Core/Microsoft.FluentUI.AspNetCore.Components.Tests.csproj -f net9.0 --filter FluentDataGrid_IsFixed --verbosity normal ` (dns block)
+> - `lylvsblobprodcus31.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj -f net9.0 ` (dns block)
+>   - Triggering command: `dotnet test tests/Core/Microsoft.FluentUI.AspNetCore.Components.Tests.csproj -f net9.0 --filter FluentDataGrid_IsFixed --verbosity normal ` (dns block)
+> - `nn8vsblobprodcus340.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj -f net9.0 ` (dns block)
+>   - Triggering command: `dotnet test tests/Core/Microsoft.FluentUI.AspNetCore.Components.Tests.csproj -f net9.0 --filter FluentDataGrid_IsFixed --verbosity normal ` (dns block)
+> - `o3svsblobprodcus318.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj -f net9.0 ` (dns block)
+>   - Triggering command: `dotnet test tests/Core/Microsoft.FluentUI.AspNetCore.Components.Tests.csproj -f net9.0 --filter FluentDataGrid_IsFixed --verbosity normal ` (dns block)
+> - `uy6vsblobprodcus34.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
+> - `vb4vsblobprodcus33.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
+> - `x3yvsblobprodcus370.vsblob.vsassets.io`
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
+>   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj -f net9.0 ` (dns block)
+>   - Triggering command: `dotnet test tests/Core/Microsoft.FluentUI.AspNetCore.Components.Tests.csproj -f net9.0 --filter FluentDataGrid_IsFixed --verbosity normal ` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-15T12:17:46Z,2025-06-17T07:32:33Z,,348132133,https://api.github.com/repos/microsoft/fluentui-blazor,https://github.com/microsoft/fluentui-blazor/pull/3921,"analysisWe need to classify as performance or non-performance. The PR adds IsFixed parameter to optimize performance for static datasets. It explicitly mentions performance optimizations, skipping hash computation, reducing refresh calls. So it's performance. So output 'performance'.assistantfinalperformance",29,0.23534668789032914,False
+3210885983,54325,[WIP] Antd table performance issue when pagination is disabled and data set is > 100. This issue causes huge lag in row selection and page navigation. Issue occurred since 2019,"Thanks for assigning this issue to me. I'm starting to work on it and will keep this PR's description up to date as I form a plan and make progress.
+
+Original issue description:
+
+> ### Reproduction link
+> 
+> [![Edit on CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/custom-selection-antd-5-8-2-forked-hfm79m)
+> 
+> ### Steps to reproduce
+> 
+> Display around 100rows in Antd table, clicking on selection causes a noticeable delay. Have tried other people's work around but man the delay is really obvious. Trying to migrate from ag grid to antd, but the table is almost making the component unusable... 
+> 
+> ShouldCellUpdate is not helping 
+> shouldCellUpdate: (record, prevRecord) => !_.isEqual(record, prevRecord)
+> 
+> ### What is expected?
+> 
+> Not expecting performance issue for 100+ dataset
+> 
+> ### What is actually happening?
+> 
+> delay for small size data
+> 
+> | Environment | Info |
+> | --- | --- |
+> | antd | 5.8.2 |
+> | React | 18.2 |
+> | System | web |
+> | Browser | Chrome |
+> 
+> <!-- generated by ant-design-issue-helper. DO NOT REMOVE -->
+
+
+Fixes #44039.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-08T03:27:16Z,2025-07-12T02:41:59Z,,34526884,https://api.github.com/repos/ant-design/ant-design,https://github.com/ant-design/ant-design/pull/54325,"analysisWe need to classify as performance or non-performance. The PR title: ""[WIP] Antd table performance issue when pagination is disabled and data set is > 100. This issue causes huge lag in row selection and page navigation."" Body describes performance issue, lag, delay. So it's performance. So output 'performance'.assistantfinalperformance",29,0.147815807136611,False

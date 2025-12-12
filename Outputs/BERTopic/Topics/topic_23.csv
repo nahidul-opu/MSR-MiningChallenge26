@@ -1,0 +1,212 @@
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
+3093387507,1782,Add benchmark for deserializing large added vocab +  optimizations,,OpenAI_Codex,48595927,ArthurZucker,open,2025-05-27T10:09:25Z,,,219035799,https://api.github.com/repos/huggingface/tokenizers,https://github.com/huggingface/tokenizers/pull/1782,"analysisWe need to classify as performance or non-performance. The title: ""Add benchmark for deserializing large added vocab + optimizations"". The body likely includes performance. The keywords: ""benchmark"", ""deserializing large"", ""optimizations"". This is performance. So output 'performance'.assistantfinalperformance",23,1.0,False
+3240593081,9,Codex/integrate tygent module for performance,,OpenAI_Codex,212389004,tygent0,open,2025-07-17T19:00:42Z,,,1020430400,https://api.github.com/repos/Doriandarko/make-it-heavy,https://github.com/Doriandarko/make-it-heavy/pull/9,"analysisWe need to classify the PR as performance or non-performance. The title: ""Codex/integrate tygent module for performance"". The body is not provided. The title suggests integration of tygent module for performance. That likely is performance improvement. The phrase ""for performance"" indicates it's about performance. So classify as 'performance'.assistantfinalperformance",23,1.0,False
+3217675934,246,Cursor/analyze and optimize code performance 4130,,Cursor,5333537,gmathi,open,2025-07-10T02:36:33Z,,,92864511,https://api.github.com/repos/gmathi/NovelLibrary,https://github.com/gmathi/NovelLibrary/pull/246,"analysisWe need to classify the pull request. The title: ""Cursor/analyze and optimize code performance 4130"". The body is not provided. The title indicates ""optimize code performance"". So it's performance. So output 'performance'.assistantfinalperformance",23,1.0,False
+3087728875,94,Cursor/identify additional shallow store optimizations d0c6,,Cursor,2830514,ryokun6,closed,2025-05-23T23:42:19Z,2025-05-23T23:42:27Z,2025-05-23T23:42:27Z,923332984,https://api.github.com/repos/ryokun6/ryos,https://github.com/ryokun6/ryos/pull/94,"analysisWe need to classify whether the primary purpose is performance. The title: ""Cursor/identify additional shallow store optimizations d0c6"". Body? Not provided. The title suggests ""shallow store optimizations"" which likely refers to performance improvements. The phrase ""optimizations"" indicates performance. So classify as 'performance'.assistantfinalperformance",23,1.0,False
+3127630140,1253,Compute point index map lazily,"This PR avoids storing `alt->point-idxs` in `alt-table`, instead computing it directly (basically `invert-index`) when needed. This is good because we only actually need this index in one place. Behavior should be unchanged.
+
+https://chatgpt.com/codex/tasks/task_e_6844b88d56048331a0349cec4e0720da",OpenAI_Codex,30707,pavpanchekha,closed,2025-06-07T22:56:40Z,2025-06-09T16:34:41Z,,13683952,https://api.github.com/repos/herbie-fp/herbie,https://github.com/herbie-fp/herbie/pull/1253,"analysisWe need to classify as performance or non-performance. The PR title: ""Compute point index map lazily"". Body: ""This PR avoids storing `alt->point-idxs` in `alt-table`, instead computing it directly (basically `invert-index`) when needed. This is good because we only actually need this index in one place. Behavior should be unchanged.""
+
+This is about avoiding storing an index, computing lazily. That could reduce memory usage, but is it performance? It's about memory usage, but also potentially performance improvement by not storing. The description says ""avoids storing... instead computing it directly when needed"". That might reduce memory overhead, but also might increase compute time. The primary purpose seems to be to reduce memory usage, not necessarily speed. But the instruction says performance-related PRs may contain keywords like memory, optimization, leak, speed, perf, etc. This PR mentions memory usage: ""avoids storing..."". That is memory optimization. So it qualifies as performance. The classification: 'performance'.assistantfinalperformance",23,1.0,False
+3158165385,415,Add autovacuum optimization CLI,,OpenAI_Codex,16663421,janbjorge,closed,2025-06-18T21:06:51Z,2025-06-22T11:05:49Z,2025-06-22T11:05:49Z,788904329,https://api.github.com/repos/janbjorge/pgqueuer,https://github.com/janbjorge/pgqueuer/pull/415,"analysisWe need to classify the PR as performance or non-performance. The title: ""Add autovacuum optimization CLI"". Body not provided. The title suggests adding a CLI for autovacuum optimization. Autovacuum is a database maintenance process that cleans up dead tuples, etc. Adding a CLI to optimize autovacuum might improve performance by tuning autovacuum parameters. This is performance-related. So classification: performance.assistantfinalperformance",23,1.0,False
+3196341284,423,Add drain benchmark strategy,,OpenAI_Codex,16663421,janbjorge,closed,2025-07-02T15:38:33Z,2025-07-03T12:04:57Z,2025-07-03T12:04:57Z,788904329,https://api.github.com/repos/janbjorge/pgqueuer,https://github.com/janbjorge/pgqueuer/pull/423,"analysisWe need to classify the PR as performance or non-performance. The title: ""Add drain benchmark strategy"". Body not provided. The title suggests adding a benchmark strategy for drain. Could be performance? ""drain benchmark strategy"" might be about measuring performance of draining operations. But could also be about adding a strategy for draining something, maybe a queue. Without body, we guess. The phrase ""benchmark"" indicates performance measurement. So likely performance. So classify as 'performance'.assistantfinalperformance",23,1.0,False
+3223857318,3641,Refactor QZydis instance in Bridge class,Make `QZydis` a member of the `Bridge` class to optimize `GuiGetDisassembly` performance and ensure configuration synchronization.,Cursor,2458265,mrexodia,closed,2025-07-11T18:38:12Z,2025-07-21T11:24:09Z,2025-07-21T11:24:09Z,33791743,https://api.github.com/repos/x64dbg/x64dbg,https://github.com/x64dbg/x64dbg/pull/3641,"analysisWe need to classify as performance or non-performance. The PR title: ""Refactor QZydis instance in Bridge class"". Body: ""Make `QZydis` a member of the `Bridge` class to optimize `GuiGetDisassembly` performance and ensure configuration synchronization."" The body explicitly mentions optimizing performance. So it's a performance PR. So label 'performance'.assistantfinalperformance",23,1.0,False
+3212315483,672,Add speed index to models,Still need to feed the model values with relevant ones,Cursor,8428699,yannbu,closed,2025-07-08T12:16:04Z,2025-07-09T15:07:00Z,2025-07-09T15:07:00Z,899127822,https://api.github.com/repos/WorkflowAI/WorkflowAI,https://github.com/WorkflowAI/WorkflowAI/pull/672,"analysisWe need to classify whether the primary purpose is performance. The title: ""Add speed index to models"". Body: ""Still need to feed the model values with relevant ones"". The title mentions ""speed index"" which could be a metric for performance. But the body says ""Still need to feed the model values with relevant ones"". That seems like adding a new field to models, maybe for performance metrics. The question: is the primary purpose to improve performance? The phrase ""speed index"" suggests a performance metric. But is the PR adding a new field to store speed index? That could be for performance measurement, but not necessarily improving performance. The instruction: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, etc. The title contains ""speed index"". That is a keyword. So likely performance. The body doesn't mention improvement, but the title is enough. So classify as 'performance'.assistantfinalperformance",23,1.0,False
+3111841315,492,Add Git web worker for background isomorphic-git operations,,Cursor,4608155,colebemis,closed,2025-06-02T22:42:30Z,2025-06-02T22:57:29Z,,517126881,https://api.github.com/repos/lumen-notes/lumen,https://github.com/lumen-notes/lumen/pull/492,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Add Git web worker for background isomorphic-git operations"". Body not provided. The title suggests adding a web worker to run background git operations, likely to avoid blocking UI, improving responsiveness. That is a performance improvement. So classify as 'performance'.assistantfinalperformance",23,1.0,False
+3250477735,397,Optimize nancorrmatrix and nancovmatrix for cache locality,"Refactor `nancorrmatrix` and `nancovmatrix` to process observations sequentially. This improves cache locality by reducing random memory access patterns, leading to better performance.
+
+The previous implementation iterated over variable pairs, then observations, resulting in scattered memory access. The new approach iterates over observations first, loading an entire observation into cache, then processing all variable pairs for that observation. This reduces cache misses significantly.
+
+Also adds new benchmark parameters to test these functions with larger inputs.
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+",Claude_Code,5635139,max-sixty,closed,2025-07-22T00:19:55Z,2025-07-22T00:28:17Z,2025-07-22T00:28:17Z,25501620,https://api.github.com/repos/numbagg/numbagg,https://github.com/numbagg/numbagg/pull/397,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize nancorrmatrix and nancovmatrix for cache locality"". Body describes refactoring to improve cache locality, reduce random memory access, better performance. So it's performance. So output 'performance'.assistantfinalperformance",23,0.3578162075398804,False
+3153767204,2516,alpaka kernels for matrix multiplication and addition,,OpenAI_Codex,115539225,Akasxh,open,2025-06-17T14:42:57Z,,,26217535,https://api.github.com/repos/alpaka-group/alpaka,https://github.com/alpaka-group/alpaka/pull/2516,"analysisWe need to classify whether the primary purpose is performance. The title: ""alpaka kernels for matrix multiplication and addition"". That suggests adding kernels for matrix multiplication and addition. Likely performance improvement? It might be adding new kernels to improve performance of matrix ops. But the description is minimal. The title suggests adding kernels, likely for performance. But is it explicitly performance? The guidelines: performance-related PRs may contain keywords like speed, perf, etc. The title doesn't contain those. But the content: ""alpaka kernels for matrix multiplication and addition"". That could be adding new kernels to improve performance. But the instruction: determine whether the primary purpose is to improve performance. The title indicates adding kernels for matrix multiplication and addition. That could be performance improvement. But no explicit performance keyword. However, matrix multiplication is often performance-critical. But the guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. The title doesn't contain any of those. The body is empty. So we cannot be sure. The safe classification might be non-performance. But the content suggests adding kernels for matrix multiplication and addition, which is likely performance improvement. But the guidelines say performance-related PRs may contain keywords. But not mandatory? The instruction: ""Performance-related pull requests may contain keywords such as... or any other terms referring to how faster and efficiently software runs."" It doesn't say that if they don't contain those, it's not performance. But the classification is based on primary purpose. The title indicates adding kernels for matrix multiplication and addition. That could be for performance. But we don't have evidence. I'd lean towards performance because matrix multiplication is performance-critical. But the guidelines emphasize keywords. The title doesn't have them. But the content is minimal. I'd classify as performance? Let's think: The PR is adding kernels for matrix multiplication and addition. That is likely to improve performance of those operations. So performance. I'll output 'performance'.assistantfinalperformance",23,0.3389915405371094,False
+3239263606,6472,Optimize draw shape pressure property,"This PR refactors how draw shape point pressure is stored and handled, leading to storage optimization and improved clarity.
+
+Previously, pressure was stored as a float `0-1` in the `z` property of a point, with `0` or `0.5` indicating no pressure. This update changes the storage to:
+1.  **Omit the `z` property entirely** when no pressure information is available (e.g., mouse input).
+2.  Store pressure as an **integer between `0` and `100`** when pressure is provided (e.g., pen/stylus input).
+
+A new migration (`OptimizePressure: 3`) is included to safely convert existing draw shapes to the new format, ensuring backward and forward compatibility. This change reduces the data size of draw shapes and makes the pressure values more intuitive.
+
+### Change type
+
+- [ ] `bugfix`
+- [x] `improvement`
+- [ ] `feature`
+- [ ] `api`
+- [ ] `other`
+
+### Test plan
+
+1.  **Draw with mouse:**
+    *   Select the draw tool.
+    *   Draw a shape using a mouse.
+    *   Verify the shape is drawn correctly. (Internally, points should *not* have a `z` property).
+2.  **Draw with pen/stylus (if applicable):**
+    *   Select the draw tool.
+    *   Draw a shape using a pen or stylus with varying pressure.
+    *   Verify the shape's stroke width changes with pressure. (Internally, points *should* have a `z` property with an integer value between 0-100).
+3.  **Load old files:**
+    *   Open a file created before this PR with draw shapes.
+    *   Verify the draw shapes load and display correctly, and their pressure values are migrated.
+
+- [x] Unit tests
+- [x] End to end tests
+
+### Release notes
+
+- Optimized draw shapes by storing pressure as an integer (0-100) only when provided, reducing file size and improving data clarity. Non-pressure inputs (e.g., mouse) no longer store a pressure value. Existing draw shapes will be automatically migrated.",Cursor,23072548,steveruizok,closed,2025-07-17T11:42:48Z,2025-07-28T13:50:13Z,,365739812,https://api.github.com/repos/tldraw/tldraw,https://github.com/tldraw/tldraw/pull/6472,"analysisWe need to classify as 'performance' or 'non-performance'. The PR is about optimizing storage of pressure property, reducing data size, improving clarity. It's about storage optimization, reducing file size. That is a performance improvement? The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs.
+
+This PR mentions ""storage optimization"" and ""reduces the data size of draw shapes"". That is a memory optimization. It reduces file size, which is a performance improvement. So classify as 'performance'.
+
+Thus output: performance.assistantfinalperformance",23,0.3084160266478769,True
+2892658334,493,Add Memory Bucket Optimizer Tool,"# Memory Bucket Optimizer Tool for wolfSSL
+
+This PR adds a memory bucket optimizer tool for wolfSSL's static memory feature. The tool analyzes malloc sizes from the wolfSSL example client and suggests optimal bucket configurations to minimize wasted memory overhead.
+
+## Features
+- Analyzes malloc sizes from the wolfSSL example client
+- Suggests optimal bucket configurations to minimize wasted memory overhead
+- Orders bucket sizes from smallest to largest
+- Works with different TLS operations (TLS 1.2, TLS 1.3, different servers)
+- Includes visualization with gnuplot charts
+- Supports testing with WOLFSSL_NO_MALLOC for embedded systems
+
+## IDE Parsing Issues
+During development, we noticed that some IDEs report syntax errors in wolfSSL header files (memory.h, ssl.h) and implementation files (memory.c). These errors are **NOT** related to our memory bucket optimizer changes but are rather due to the IDE's inability to properly parse the complex conditional compilation directives in the wolfSSL codebase.
+
+These syntax errors are purely IDE parsing issues and do not indicate actual code problems. They are a result of the complex conditional compilation structure of the wolfSSL codebase, which is designed to support multiple platforms, configurations, and feature sets. The code compiles and runs correctly despite these IDE errors.
+
+## Link to Devin run
+https://app.devin.ai/sessions/41da69b84f0b4df8aeabf89a731efcb1
+
+## Requested by
+jacob@wolfssl.com",Devin,158243242,devin-ai-integration[bot],closed,2025-03-04T01:05:18Z,2025-03-13T14:51:55Z,,21290295,https://api.github.com/repos/wolfSSL/wolfssl-examples,https://github.com/wolfSSL/wolfssl-examples/pull/493,"analysisWe need to classify as performance or non-performance. The PR adds a memory bucket optimizer tool to minimize wasted memory overhead. That is about memory usage optimization, which is performance-related. The description mentions memory overhead, optimization. So it's performance.assistantfinalperformance",23,0.0721407565676505,True
+3215138589,4579,优化内存分析功能性能,"Optimize memory analysis functions to prevent high CPU usage and freezing.
+
+The previous implementation could lead to 100% CPU utilization and system freezes due to processing a large number of objects without limits. This PR introduces timeouts, limits on the number of objects analyzed, and simplifies complex deep analysis to significantly improve performance and stability.",Cursor,51039935,jxxghp,closed,2025-07-09T09:10:19Z,2025-07-09T09:43:46Z,2025-07-09T09:43:46Z,647509652,https://api.github.com/repos/jxxghp/MoviePilot,https://github.com/jxxghp/MoviePilot/pull/4579,"analysisWe need to classify as performance or non-performance. The PR title: ""优化内存分析功能性能"" (Optimize memory analysis function performance). Body: ""Optimize memory analysis functions to prevent high CPU usage and freezing."" It mentions high CPU usage, freezing, timeouts, limits, simplify deep analysis to improve performance and stability. This is clearly performance. So output 'performance'.assistantfinalperformance",23,0.060661502003914076,False
+3226522393,126,Fix memory allocation issue for large files by capping StaticSparseDAG capacity,"Thanks for asking me to work on this. I will get started on it and keep this PR's description up to date as I form a plan and make progress.
+
+Original description:
+
+> Reproduce this issue and try to fix it
+
+
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-13T13:52:51Z,2025-07-13T14:30:53Z,2025-07-13T14:30:53Z,132325183,https://api.github.com/repos/messense/jieba-rs,https://github.com/messense/jieba-rs/pull/126,"analysisWe need to classify as performance or non-performance. The PR title: ""Fix memory allocation issue for large files by capping StaticSparseDAG capacity"". Body: mentions memory allocation issue for large files. That is about memory usage, not necessarily performance. But memory allocation issues can be performance related? The instruction says performance-related PRs may contain keywords like memory, but memory is ambiguous. The instruction says ""Performance-related pull requests may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs."" So memory is included. But memory usage is about efficiency. The PR is about memory allocation issue for large files by capping capacity. That is about memory usage, which is a performance concern. So likely classify as performance. The instruction: ""determine whether the primary purpose of the pull request is to improve performance."" The PR is to fix memory allocation issue for large files. That is about memory usage, which is performance. So classification: performance.assistantfinalperformance",23,0.03524365701181702,False
+3125710825,1936,feat: update parts channel capacity from 1000 to 2500,"Updates the parts channel capacity from 1000 to 2500 to prevent blocking during processing of large blocks (128MB).
+
+## Changes
+
+- Increased `partsChan` buffer capacity from 1000 to 2500 in all relevant files:
+  - `node/node.go` - Main production code where the parts channel is created
+  - `consensus/reactor_test.go` - Test files using the parts channel
+  - `consensus/propagation/reactor_test.go`
+  - `consensus/propagation/commitment_test.go`
+  - `consensus/wal_generator.go`
+  - `consensus/byzantine_test.go`
+  - `consensus/replay_file.go`
+  - `consensus/common_test.go`
+
+## Problem
+
+The current capacity of 1000 can cause blocking when processing large 128MB blocks, which adds unnecessary complexity to the consensus mechanism and can impact performance.
+
+## Solution
+
+Increasing the channel capacity to 2500 provides sufficient buffer space to handle large block processing without blocking, simplifying the consensus flow and improving performance for large blocks.
+
+Fixes #1923.
+
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-06T19:42:55Z,2025-06-11T14:42:14Z,2025-06-11T14:42:14Z,221931137,https://api.github.com/repos/celestiaorg/celestia-core,https://github.com/celestiaorg/celestia-core/pull/1936,"analysisWe need to classify as performance or non-performance. The PR title: ""feat: update parts channel capacity from 1000 to 2500"". Body: mentions preventing blocking during processing of large blocks, capacity increase to avoid blocking, simplifying consensus flow and improving performance for large blocks. Keywords: blocking, performance, capacity, large blocks. This is clearly performance improvement. So label 'performance'.assistantfinalperformance",23,0.030990131694944925,False
+3181043136,2404,feat: Implement configurable batch queue throttling to prevent resource exhaustion,"## Problem
+
+The `BatchQueue` implementation in `sequencers/single/queue.go` had **no size limits**, leading to potential resource exhaustion and system instability. During DA congestion or connection issues, batches would accumulate faster than they could be processed, causing:
+
+- **Unbounded memory growth** from unlimited slice expansion
+- **Unbounded disk usage** from persistent storage without cleanup
+- **No backpressure mechanism** to signal upstream components when overwhelmed
+- **Performance degradation** during restart recovery with large persistent queues
+
+## Solution
+
+Added configurable queue limits with graceful error handling while maintaining full backward compatibility:
+
+### Key Changes
+
+1. **New Error Type for Backpressure**
+   ```go
+   var ErrQueueFull = errors.New(""batch queue is full"")
+   ```
+
+2. **Enhanced BatchQueue Structure**
+   ```go
+   type BatchQueue struct {
+       queue        []coresequencer.Batch
+       maxQueueSize int // 0 = unlimited for backward compatibility
+       mu           sync.Mutex
+       db           ds.Batching
+   }
+   ```
+
+3. **Throttling Logic in AddBatch**
+   ```go
+   // Check if queue is full (maxQueueSize of 0 means unlimited)
+   if bq.maxQueueSize > 0 && len(bq.queue) >= bq.maxQueueSize {
+       return ErrQueueFull
+   }
+   ```
+
+4. **Production-Ready Defaults**
+   - Set default limit of 1000 batches in single sequencer
+   - Enhanced error logging when queue reaches capacity
+   - Graceful error propagation with informative messages
+
+### Backward Compatibility
+
+- Existing tests use `maxSize: 0` (unlimited) to maintain current behavior
+- All existing functionality preserved
+- No breaking changes to public APIs
+
+### Test Coverage
+
+Added comprehensive test suites covering:
+- Various queue size limits (unlimited, within limit, at limit, exceeding limit)
+- Queue behavior after batch processing (demonstrates backpressure relief)
+- Thread safety under concurrent load (100 workers, 10 queue limit)
+- End-to-end integration testing with sequencer
+
+**Coverage increased from 76.7% to 78.0%**
+
+### Example Behavior
+
+```go
+// During normal operation
+queue := NewBatchQueue(db, ""batches"", 1000)
+err := queue.AddBatch(ctx, batch) // ✅ Success
+
+// During DA congestion (queue full)
+err := queue.AddBatch(ctx, batch) // ❌ Returns ErrQueueFull
+
+// After DA processes batches
+batch, _ := queue.Next(ctx)       // Frees space
+err = queue.AddBatch(ctx, batch)  // ✅ Success again
+```
+
+This prevents the resource exhaustion scenarios while allowing normal operation and providing clear backpressure signals to upstream components.
+
+Fixes #2252.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-06-27T01:50:31Z,2025-06-27T07:29:09Z,2025-06-27T07:29:08Z,335571729,https://api.github.com/repos/evstack/ev-node,https://github.com/evstack/ev-node/pull/2404,"analysisWe need to classify as performance or non-performance. The PR is about adding queue limits to prevent resource exhaustion, backpressure, performance degradation. It's about preventing memory growth, disk usage, performance degradation. It's about performance improvement. So classify as 'performance'.assistantfinalperformance",23,0.0280079153311526,True

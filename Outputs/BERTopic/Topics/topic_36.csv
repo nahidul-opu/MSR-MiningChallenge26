@@ -1,0 +1,199 @@
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
+3119031442,15,Add interactive chart for gh-pages site with Chart.js and toggle controls,"This PR replaces the static chart image on the gh-pages site with a fast, lightweight, and interactive chart using Chart.js.
+
+## 🎯 Key Features Added
+
+### Interactive Chart Controls
+- **Agent Toggles**: Show/hide data for individual agents (Copilot, Codex, Cursor, Devin)
+- **View Modes**: Switch between ""All Data"", ""Volume Only"" (bars), and ""Success Rate Only"" (lines)
+- **Smart Logic**: Toggles work together intelligently - view modes respect agent selections
+
+### Enhanced User Experience
+- **Rich Tooltips**: Hover for detailed information with cross-agent summaries at each time point
+- **Responsive Design**: Works seamlessly on desktop and mobile devices
+- **Graceful Fallback**: Automatically shows static PNG chart if JavaScript fails to load
+
+### Performance & Reliability
+- **Lightweight**: JSON data is only 8KB (vs 612KB PNG)
+- **Fast Loading**: Chart.js 4.4.0 loaded via CDN for optimal performance
+- **Maintains Compatibility**: Existing Python workflow preserved - still generates PNG charts
+
+## 🔧 Technical Implementation
+
+### Backend Changes (`generate_chart.py`)
+```python
+# New JSON export functionality
+def export_chart_data_json(df):
+    """"""Export chart data as JSON for interactive JavaScript chart""""""
+    # Converts pandas DataFrame to Chart.js compatible format
+    # Includes bars for volume data and lines for success rates
+```
+
+### Frontend Changes (`docs/index.html`)
+- Added Chart.js library via CDN
+- Created interactive canvas-based chart with dual y-axes
+- Implemented toggle controls with modern button styling
+- Added comprehensive JavaScript for chart interactions
+
+### Styling (`docs/styles.css`)
+- New styles for chart controls matching existing design
+- Responsive layout for mobile devices
+- Visual feedback for active/inactive toggles
+
+## 📊 Chart Visualization
+
+The interactive chart displays:
+- **Bar Charts**: PR volume (total and merged) for each agent
+- **Line Charts**: Success rate percentages over time
+- **Dual Y-Axes**: Volume (left) and percentage (right)
+- **Color Coding**: Consistent with original static chart
+
+## 🧪 Testing
+
+- Verified chart loads correctly with all data
+- Tested toggle functionality and view mode switching
+- Confirmed fallback behavior when JavaScript is disabled
+- Validated responsive design on different screen sizes
+- Ensured performance with both small and large datasets
+
+Fixes #14.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `http://168.63.129.16:80/machine/`
+>   - Triggering command: `/usr/bin/python3 -u bin/WALinuxAgent-2.13.1.1-py3.9.egg -collect-logs ` (http block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-04T20:27:58Z,2025-06-05T20:01:32Z,2025-06-05T20:01:32Z,988545158,https://api.github.com/repos/aavetis/PRarena,https://github.com/aavetis/PRarena/pull/15,"analysisWe need to classify as performance or non-performance. The PR adds interactive chart, mentions performance improvements: ""fast, lightweight, and interactive chart"", ""Lightweight: JSON data is only 8KB (vs 612KB PNG)"", ""Fast Loading: Chart.js 4.4.0 loaded via CDN for optimal performance"". These are performance-related. So classification: performance.assistantfinalperformance",36,1.0,True
+3107237879,1332,[alpha_factory] optimize in-browser frontier rendering,"## Summary
+- add canvas layer drawing utilities
+- support heavy evolution work in a Web Worker
+- switch to canvas for large populations
+
+## Testing
+- `python check_env.py --auto-install`
+- `pytest -q` *(fails: Duplicated timeseries in CollectorRegistry)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_683c4f38a8288333bdfbee92f1a3688d",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-01T13:09:55Z,2025-06-01T13:10:04Z,2025-06-01T13:10:04Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1332,"analysisWe need to classify as performance or non-performance. The PR title: ""[alpha_factory] optimize in-browser frontier rendering"". The summary: add canvas layer drawing utilities, support heavy evolution work in a Web Worker, switch to canvas for large populations. This is about rendering performance, using canvas instead of maybe DOM, heavy evolution work in Web Worker. So it's performance improvement. So label 'performance'.assistantfinalperformance",36,1.0,False
+3254258270,607,Add NVIDIA OpenCL capability checks,"## Summary
+- enable bitselect and LUT3 optimizations on modern NVIDIA hardware
+- document detection logic for SM and driver requirements
+
+## Testing
+- `python3 run-all-tests.py`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68800afd5adc832296152e7ff9fb2a67",OpenAI_Codex,2230318,3rdIteration,open,2025-07-22T22:31:51Z,,,197336679,https://api.github.com/repos/3rdIteration/btcrecover,https://github.com/3rdIteration/btcrecover/pull/607,"analysisWe need to classify whether the primary purpose is performance improvement. The PR adds NVIDIA OpenCL capability checks, enabling bitselect and LUT3 optimizations on modern NVIDIA hardware, and documents detection logic. This is about enabling optimizations, which is performance improvement. So classification: performance.assistantfinalperformance",36,1.0,False
+3115955142,1526,[alpha_factory] enable webgpu backend,"## Summary
+- add `onnxruntime-web` dependency
+- support WebGPU toggle and ONNX runtime backend
+- inline ONNX runtime into build output
+- document GPU acceleration
+- test gpu backend selection
+
+## Testing
+- `pre-commit run --files alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/README.md alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/build.js alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/package.json alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/src/ui/PowerPanel.js alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/src/utils/llm.js alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/tests/onnx_gpu_backend.test.js`
+- `python check_env.py --auto-install`
+- `pytest -q` *(fails: ValueError: Duplicated timeseries in CollectorRegistry)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_683fa19b8860833387de10ea38d23507",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-04T01:39:58Z,2025-06-04T01:40:06Z,2025-06-04T01:40:06Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1526,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""[alpha_factory] enable webgpu backend"". Summary: add onnxruntime-web dependency, support WebGPU toggle and ONNX runtime backend, inline ONNX runtime into build output, document GPU acceleration, test gpu backend selection. This is about enabling GPU acceleration, which is performance improvement. So classification: performance.assistantfinalperformance",36,1.0,False
+3177456304,2618,fix: defer plotly script in docs,"## Summary
+- load Plotly asynchronously in `alpha_agi_insight_v1` demo
+- defer the site script so Plotly is ready first
+
+## Testing
+- `python -m playwright install chromium`
+- `python - <<'PY'
+from playwright.sync_api import sync_playwright
+url = 'http://localhost:8000/docs/alpha_agi_insight_v1/index.html'
+with sync_playwright() as p:
+    browser = p.chromium.launch()
+    page = browser.new_page()
+    page.goto(url)
+    page.wait_for_selector('#capability-chart .main-svg', timeout=10000)
+    page.wait_for_selector('#timeline-chart .main-svg', timeout=10000)
+    page.wait_for_selector('#pareto-chart .main-svg', timeout=10000)
+    print('Charts loaded successfully with deferred script')
+    browser.close()
+PY
+
+------
+https://chatgpt.com/codex/tasks/task_e_685ca4a51e0c83338a06ce7682d90449",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-26T01:49:43Z,2025-06-26T01:49:52Z,2025-06-26T01:49:52Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/2618,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""fix: defer plotly script in docs"". Summary: load Plotly asynchronously in demo, defer site script so Plotly ready first. This is about performance: deferring script to improve load time, asynchronous loading. So it's performance. So label 'performance'.assistantfinalperformance",36,1.0,False
+3111884101,1467,[alpha_factory] gpu-aware llm backend,"## Summary
+- detect navigator.gpu when loading local LLM model
+- add GPU toggle in PowerPanel
+- inform workers if GPU is available
+- tests for GPU backend selection
+
+## Testing
+- `python check_env.py --auto-install`
+- `pytest -q` *(fails: Duplicated timeseries in CollectorRegistry)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_683e2bcc419c8333b7524f4e264a9645",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-02T23:02:46Z,2025-06-02T23:02:58Z,2025-06-02T23:02:58Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1467,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""[alpha_factory] gpu-aware llm backend"". Summary: detect navigator.gpu when loading local LLM model, add GPU toggle in PowerPanel, inform workers if GPU is available, tests for GPU backend selection. This is about GPU usage, which is performance improvement. It is about enabling GPU acceleration for LLM backend. That is performance. So classification: performance.assistantfinalperformance",36,1.0,False
+3107415367,1346,[alpha_factory] switch to Observable Plot for frontier rendering,"## Summary
+- add credibilityColor helper
+- replace frontier D3 rendering with Observable Plot
+- adjust index.html to call new renderer
+- include Observable Plot deps
+- add Playwright perf test
+
+## Testing
+- `python check_env.py --auto-install`
+- `pre-commit run --files alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/dist/app.js alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/index.html alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/package.json alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/src/render/colors.js alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/src/render/frontier.js alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/tests/test_plot_perf.py`
+- `pytest -q` *(fails: ValueError: Duplicated timeseries in CollectorRegistry)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_683c6ddd89c083339c231f577b174b27",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-01T15:21:05Z,2025-06-01T15:21:14Z,2025-06-01T15:21:14Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1346,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""[alpha_factory] switch to Observable Plot for frontier rendering"". Summary: add helper, replace frontier D3 rendering with Observable Plot, adjust index.html, include deps, add Playwright perf test. The summary indicates replacing D3 rendering with Observable Plot. That might be for performance? The test includes a Playwright perf test. The PR includes a performance test. But is the primary purpose to improve performance? The change is to switch rendering library. Could be for performance or for other reasons. The presence of a perf test suggests performance improvement. The summary doesn't explicitly mention performance, but the test indicates performance. The guidelines: performance-related PRs may contain keywords like latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs. The PR includes ""Playwright perf test"" and ""perf test"" in the testing section. That indicates performance. Also ""switch to Observable Plot"" might be for performance. So classify as 'performance'.assistantfinalperformance",36,1.0,False
+3122196699,1626,[alpha_factory] add regl renderer and fps test,"## Summary
+- switch plotCanvas to WebGL via regl
+- call plotCanvas for large populations
+- include regl devDependency
+- cover fps with a new Playwright test
+
+## Testing
+- `python check_env.py --auto-install`
+- `pytest -q` *(fails: 69 failed, 194 passed, 27 skipped)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_6841ddb39de88333b05f6690e3400ed7",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-05T18:21:39Z,2025-06-05T18:23:05Z,2025-06-05T18:23:05Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1626,"analysisWe need to classify as performance or non-performance. The PR title: ""[alpha_factory] add regl renderer and fps test"". Summary: switch plotCanvas to WebGL via regl, call plotCanvas for large populations, include regl devDependency, cover fps with a new Playwright test. This is about performance: using WebGL via regl to improve rendering performance, adding fps test. So it's performance. So label 'performance'.assistantfinalperformance",36,1.0,True
+3083867045,534,Add GPU-accelerated Smith-Waterman module,"## Summary
+- add optional GPU Smith-Waterman implementation using PyOpenCL
+- document how to use the GPU module
+- expose GPU module in README
+- include unit test exercising CPU fallback
+- ignore Python cache files
+- integrate GPU Smith-Waterman with CLI and new wrapper class
+
+## Testing
+- `python3 -m unittest discover -s src/test/python`
+- `./gradlew test` *(fails: No route to host)*",OpenAI_Codex,96280466,VerisimilitudeX,closed,2025-05-22T16:00:46Z,2025-05-22T16:04:14Z,2025-05-22T16:04:14Z,519909104,https://api.github.com/repos/VerisimilitudeX/DNAnalyzer,https://github.com/VerisimilitudeX/DNAnalyzer/pull/534,analysisWe need to classify whether the primary purpose is performance. The PR adds GPU-accelerated Smith-Waterman module. That is performance improvement. So label 'performance'.assistantfinalperformance,36,1.0,False
+3112222308,1482,[alpha_factory] handle GPU messages in evolver worker,"## Summary
+- update evolver.js worker to store GPU availability and pass it to `mutate`
+- extend `mutate` signature with a GPU flag
+- test worker GPU flag handling
+- document GPU toggle in the browser README
+
+## Testing
+- `python check_env.py --auto-install`
+- `pytest -q` *(fails: ValueError: Duplicated timeseries in CollectorRegistry)*
+- `pre-commit run --files alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/worker/evolver.js alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/src/evolve/mutate.js alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/tests/gpu_flag.test.js alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/README.md` *(failed to fetch hooks)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_683e66b0847c8333a44f1c95b964cba5",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-03T03:13:34Z,2025-06-03T03:14:02Z,2025-06-03T03:14:02Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1482,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""[alpha_factory] handle GPU messages in evolver worker"". Summary: update evolver.js worker to store GPU availability and pass it to mutate; extend mutate signature with GPU flag; test worker GPU flag handling; document GPU toggle. This is about GPU usage, likely performance improvement. It mentions GPU flag, GPU availability. It's about handling GPU messages, likely to improve performance by using GPU. So classification: performance.assistantfinalperformance",36,1.0,True

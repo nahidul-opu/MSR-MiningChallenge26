@@ -1,0 +1,269 @@
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
+3240157506,9343,Improve Fortran constant list folding,"## Summary
+- add constant list propagation to the Fortran compiler
+- fold `len`, `count`, `append`, `union`, `except`, etc. when lists are stored in variables
+- document new capability in `tests/machine/x/fortran/README.md`
+- record progress in `compiler/x/fortran/TASKS.md`
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6878e86c20c08320a63456631fb49b9d",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T16:17:26Z,2025-07-17T16:17:41Z,2025-07-17T16:17:40Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9343,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Fortran constant list folding"". Summary: add constant list propagation to Fortran compiler, fold len, count, append, union, except, etc. This is about constant folding, which is a compile-time optimization. It may improve performance by reducing runtime overhead. But is it primarily performance? The description: ""add constant list propagation to the Fortran compiler"" and ""fold len, count, append, union, except, etc. when lists are stored in variables"". This is a compile-time optimization. It likely improves performance. The keywords: ""fold"" ""propagation"" ""constant list folding"" - it's about optimization. The classification: performance. There's no mention of memory or speed explicitly, but it's an optimization. The guidelines: performance-related PRs may contain keywords such as optimization, etc. This is indeed an optimization. So classify as 'performance'.assistantfinalperformance",13,1.0,True
+3240180435,9350,fortran: fold len/count on constant lists,"## Summary
+- improve Fortran compiler constant folding
+- track lengths of constant lists for `len` and `count`
+- document the new optimisation
+
+## Testing
+- `go test ./compiler/x/fortran -run TestFortranCompiler_VMValid_Golden -tags slow -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6879223147d08320a00dddbdab02d1c0",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T16:26:10Z,2025-07-17T16:26:22Z,2025-07-17T16:26:22Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9350,"analysisWe need to classify as performance or non-performance. The PR title: ""fortran: fold len/count on constant lists"". Summary: ""improve Fortran compiler constant folding"" ""track lengths of constant lists for len and count"" ""document the new optimisation"". This is about compiler optimization, constant folding. That is a performance improvement. So classify as 'performance'.assistantfinalperformance",13,1.0,False
+3241741490,9475,Improve Fortran set-op folding,"## Summary
+- enhance Fortran compiler to fold chained set operations when all operands are constants
+- note the new feature in TASKS and machine README
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6879c1193bcc8320bb57e994fd7506e7",OpenAI_Codex,1218621,tamnd,closed,2025-07-18T03:43:44Z,2025-07-18T03:44:46Z,2025-07-18T03:44:46Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9475,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Improve Fortran set-op folding"". Summary: ""enhance Fortran compiler to fold chained set operations when all operands are constants"". That is about compiler optimization, folding constants. This is a performance improvement: constant folding reduces runtime cost. So classify as 'performance'.assistantfinalperformance",13,1.0,False
+3240293813,9363,Improve Fortran constant folding,"## Summary
+- enhance Fortran compiler constant folding
+- fold `len` for constant strings
+- document new optimization in README and TASKS
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6879243a44f48320af68a4631a1439b9",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T17:03:04Z,2025-07-17T17:03:19Z,2025-07-17T17:03:19Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9363,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Improve Fortran constant folding"". Summary: ""enhance Fortran compiler constant folding, fold len for constant strings, document new optimization in README and TASKS"". This is about compiler optimization, constant folding. That is a performance improvement. So classify as 'performance'.assistantfinalperformance",13,1.0,False
+3240351285,9378,fortran: fold membership constants,"## Summary
+- fold membership checks on constant integer or string lists at compile time
+- document membership folding in TASKS
+- mention optimized membership in machine README
+
+## Testing
+- `go test ./compiler/x/fortran -tags=slow -count=1` *(fails: 24 passed, 76 failed)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_68792cde63108320a83946a3f4f6a80a",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T17:24:51Z,2025-07-17T17:25:03Z,2025-07-17T17:25:03Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9378,"analysisWe need to classify as performance or non-performance. The PR title: ""fortran: fold membership constants"". Summary: ""fold membership checks on constant integer or string lists at compile time"". That is about compile-time optimization: folding membership checks. That is a performance improvement: compile-time constant folding reduces runtime overhead. So it's performance. Also mention optimized membership in machine README. So classification: performance.assistantfinalperformance",13,1.0,False
+3241693904,9439,Improve Fortran compiler constant folding,"## Summary
+- fold constant string lists in `append` and set operations
+- precompute membership checks when the list contains constant strings
+- track constant string lists during code generation
+
+## Testing
+- `go test ./compiler/x/fortran -tags slow -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6879b66c299c832098b5ccdace2e0b91",OpenAI_Codex,1218621,tamnd,closed,2025-07-18T03:13:06Z,2025-07-18T03:13:35Z,2025-07-18T03:13:35Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9439,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Fortran compiler constant folding"". The body: mentions folding constant string lists in append and set operations, precompute membership checks when list contains constant strings, track constant string lists during code generation. This is about compiler optimization, constant folding, precomputing membership checks. That is performance improvement. So classify as 'performance'.assistantfinalperformance",13,1.0,True
+3241727428,9464,Improve Fortran constant folding,"## Summary
+- extend the Fortran compiler with tracking for boolean and float list constants
+- fold `len`, `count`, `append`, `union`, `union_all`, `except`, and `intersect` when applied to constant boolean or float lists
+- expose helpers `literalBoolUnary`, `literalFloatUnary` and propagate literal bool/float expressions
+- document the new optimisation in the Fortran README and TASKS
+
+## Testing
+- `go test -c ./compiler/x/fortran -tags slow`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6879bbe43f988320873ee8bb5f2f1d9f",OpenAI_Codex,1218621,tamnd,closed,2025-07-18T03:35:35Z,2025-07-18T03:35:46Z,2025-07-18T03:35:46Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9464,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Fortran constant folding"". The body: extends compiler with tracking for boolean and float list constants, fold len, count, append, union, union_all, except, intersect when applied to constant boolean or float lists, expose helpers, propagate literal bool/float expressions, document new optimisation. This is about constant folding optimization, which is a performance improvement. So classification: performance.assistantfinalperformance",13,1.0,True
+3238766901,9275,Improve Fortran constant folding,"## Summary
+- constant-fold list set operations (`union`, `union_all`, `except`, `intersect`) when both operands are integer literals
+- run Fortran VM valid tests without using prewritten sources
+- note the new behaviour in documentation
+
+## Testing
+- `go test -tags slow -run TestFortranCompiler_VMValid_Golden -v` *(fails: gfortran not found)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_6878b9d7302c8320a86eef43a1838a96",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T09:05:48Z,2025-07-17T09:06:50Z,2025-07-17T09:06:50Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9275,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Fortran constant folding"". Summary: constant-fold list set operations when both operands are integer literals. That is an optimization of constant folding, which is a compile-time optimization. It's about improving performance by reducing runtime overhead. So it's performance. The keywords: optimization, speed, etc. So classification: performance.assistantfinalperformance",13,1.0,False
+3239345955,9319,Enhance Fortran compiler,"## Summary
+- fold simple integer `append` calls at compile time
+- document progress in Fortran TASKS
+
+## Testing
+- `go test ./compiler/x/fortran -run TestFortranCompiler_VMValid_Golden -tags slow`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6878e41b54688320a41b4c874d2b577f",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T12:10:30Z,2025-07-17T12:11:07Z,2025-07-17T12:11:07Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9319,"analysisWe need to classify as performance or non-performance. The PR title: ""Enhance Fortran compiler"". Summary: ""fold simple integer `append` calls at compile time"". That is a compile-time optimization, likely performance improvement. It might reduce runtime overhead. So it's performance. The body mentions testing. So classification: performance.assistantfinalperformance",13,1.0,False
+3242395273,9542,Improve Fortran compiler constant propagation,"## Summary
+- extend Fortran compiler with new constant scalar maps
+- propagate integers, booleans, floats, and maps through assignments
+- fold `values` builtin when its argument refers to a constant map
+
+## Testing
+- `go test ./compiler/x/fortran -tags slow -run TestFortranCompiler_VMValid_Golden -count=1` *(fails: unsupported expression at line 1)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_6879ffdd986083208b021a0ca87d817c",OpenAI_Codex,1218621,tamnd,closed,2025-07-18T08:33:24Z,2025-07-18T08:36:49Z,2025-07-18T08:36:49Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9542,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Improve Fortran compiler constant propagation"". The description: extend compiler with new constant scalar maps, propagate integers, booleans, floats, and maps through assignments, fold values builtin when its argument refers to a constant map. This is about constant propagation, which is an optimization. It improves performance by reducing runtime overhead. So it's a performance improvement. So label 'performance'.assistantfinalperformance",13,1.0,False
+3238725592,9254,Improve Fortran compiler constant folding,"## Summary
+- inline constant results for `len` and `count` when called on list literals
+- document new behaviour in TASKS and machine README
+
+## Testing
+- `go test ./compiler/x/fortran -run VMValid_Golden -tags slow -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6878b73f3d3c8320b491a00a2c87115b",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T08:52:23Z,2025-07-17T08:52:36Z,2025-07-17T08:52:36Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9254,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Fortran compiler constant folding"". The body: inline constant results for len and count when called on list literals, document new behaviour. This is about constant folding, which is a compiler optimization. It improves performance by computing constants at compile time. So it's a performance improvement. So classification: performance.assistantfinalperformance",13,1.0,False
+3242791087,9665,Improve Rust compiler constant list append,"## Summary
+- extend Rust compiler with `constList` tracking
+- fold `append` calls with constant lists into a single vector literal
+- document improvement in Rust README and TASKS
+- regenerate `append_builtin.rs` code
+
+## Testing
+- `go test ./compiler/x/rust -tags slow -run VM -count=1 -update`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_687a20b5d54c8320872643530da3c16e",OpenAI_Codex,1218621,tamnd,closed,2025-07-18T10:43:07Z,2025-07-18T10:43:16Z,2025-07-18T10:43:16Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9665,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Improve Rust compiler constant list append"". Summary: extend compiler with constList tracking, fold append calls with constant lists into a single vector literal, document improvement, regenerate code. This seems to be about compiler optimization: folding append calls into a single vector literal. That is a performance improvement: compile-time optimization to reduce runtime overhead. So classification: 'performance'.assistantfinalperformance",13,0.42052691605829745,False
+3224348044,7860,Improve C compiler constant folding,"## Summary
+- track literal integer lists in compiler
+- fold `append` on constant int lists
+
+## Testing
+- `go test ./compiler/x/c -tags slow -run TestCCompiler_ValidPrograms -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68715f9b9e94832087da86b731f099e6",OpenAI_Codex,1218621,tamnd,closed,2025-07-11T22:11:59Z,2025-07-11T22:12:12Z,2025-07-11T22:12:12Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7860,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Improve C compiler constant folding"". Summary: track literal integer lists in compiler, fold append on constant int lists. This is about compiler optimization: constant folding, which is a performance optimization. So classification: performance.assistantfinalperformance",13,0.39962807444847626,False
+3241753827,9480,Add constant string list inference to C backend,"## Summary
+- improve C compiler by tracking string list constants
+- precompute len/count/min/max for constant string lists
+- regenerate golden outputs
+- update compilation status and task log
+
+## Testing
+- `go test -tags slow ./compiler/x/c -run TestCCompiler_VMValid_Golden -update` *(fails: group_by_multi_join_sort, save_jsonl_stdout, tree_sum, update_stmt)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_6879c16a1c8483208ed805fdaf4bd6ef",OpenAI_Codex,1218621,tamnd,closed,2025-07-18T03:50:55Z,2025-07-18T03:51:20Z,2025-07-18T03:51:20Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9480,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Add constant string list inference to C backend"". Summary: ""improve C compiler by tracking string list constants, precompute len/count/min/max for constant string lists, regenerate golden outputs, update compilation status and task log"". This seems to be about compiler optimization: precomputing constants to improve performance? The summary says ""improve C compiler by tracking string list constants"". That could be performance improvement. But is the primary purpose performance? It might be about correctness or feature addition. The summary: ""precompute len/count/min/max for constant string lists"". That is an optimization to reduce runtime overhead. So likely performance. The keywords: ""improve"", ""precompute"", ""constant string lists"". The PR is about adding constant string list inference to C backend. That is a feature. But the summary says ""improve C compiler"". That could be performance improvement. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The PR is about adding a feature that may improve performance. But is the primary purpose performance? The title: ""Add constant string list inference to C backend"". That is a feature. The summary: ""improve C compiler by tracking string list constants"". That is a performance improvement. The test failures mention group_by_multi_join_sort, etc. But that might be due to golden outputs. The PR is about adding constant string list inference. That is a feature that may also improve performance. But the primary purpose is to add a feature, not necessarily performance. However, the summary explicitly says ""improve C compiler by tracking string list constants"". That is a performance improvement. The question: ""Given a text combining the title and body of a pull request, determine whether the primary purpose of the pull request is to improve performance."" So we need to decide if it's performance. The presence of ""improve"" and ""precompute"" suggests performance. The keywords list includes ""performance"". The PR is about precomputing constants to reduce runtime overhead. That is a performance improvement. So classify as 'performance'.assistantfinalperformance",13,0.29010223602198876,False
+3238674493,9244,Improve C# list indexing,"## Summary
+- enhance `compilePostfix` to emit direct indexing when the list or string type is known
+- add generated `list_index.cs` with expected output
+- update C# machine README
+
+## Testing
+- `go vet ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6878b1d7ed3c8320adcc27eeaeee9360",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T08:37:36Z,2025-07-17T08:38:09Z,2025-07-17T08:38:09Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9244,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Improve C# list indexing"". Summary: ""enhance compilePostfix to emit direct indexing when the list or string type is known"". That is about generating direct indexing, likely to improve performance. The body mentions adding generated list_index.cs with expected output, update README. It's about performance improvement: direct indexing vs something else. So classification: 'performance'.assistantfinalperformance",13,0.2650421668828973,False
+3202700175,5046,Improve C backend type inference and inline string ops,"## Summary
+- improve `listElemType` inference to avoid `AnyType`
+- inline string index and slice operations instead of calling runtime helpers
+- drop unused helper flags when deciding string headers
+
+## Testing
+- `make test`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6867d011c5b483208fa0bf0500371c72",OpenAI_Codex,1218621,tamnd,closed,2025-07-04T13:08:13Z,2025-07-04T13:08:26Z,2025-07-04T13:08:26Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/5046,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve C backend type inference and inline string ops"". Body: mentions improving listElemType inference to avoid AnyType, inline string index and slice operations instead of calling runtime helpers, drop unused helper flags when deciding string headers. This seems to be about performance: inlining string ops to avoid runtime calls, dropping unused flags. Also type inference improvement might be correctness, but also performance. The keywords: inline string ops, avoid runtime helpers, drop unused flags. That is performance. So classify as 'performance'.assistantfinalperformance",13,0.26092924296614506,False
+3152089491,1242,Fix list literal type inference in Go compiler,"## Summary
+- keep argument type when a list literal is compiled with a type hint
+- this prevents unnecessary slice conversions
+
+## Testing
+- `go test ./...`
+- `make -C examples/leetcode run-go ID=23`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6850ef5650588320a1841f4070ac1380",OpenAI_Codex,1218621,tamnd,closed,2025-06-17T05:14:05Z,2025-06-17T05:22:15Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/1242,"analysisWe need to classify the pull request as performance or non-performance. The title: ""Fix list literal type inference in Go compiler"". Body: ""keep argument type when a list literal is compiled with a type hint this prevents unnecessary slice conversions"". This is about compiler type inference, preventing unnecessary slice conversions. That likely improves performance? It reduces conversions, but is it a performance improvement? The change is about type inference, preventing unnecessary slice conversions. That could reduce runtime overhead, but it's more about correctness or efficiency of compilation. The classification: performance if it improves performance. The description says ""prevents unnecessary slice conversions"". That could be a performance improvement. But is it a performance PR? The guidelines: performance-related PRs may contain keywords like latency, optimization, slow, etc. This PR does not contain those keywords. But the content indicates a performance improvement: preventing unnecessary slice conversions. But the guidelines say ""Performance-related pull requests may contain keywords such as... or any other terms referring to how faster and efficiently software runs."" The PR does not contain those keywords. But the content itself indicates a performance improvement. The guidelines might be ambiguous. But the instruction: ""Given a text combining the title and body of a pull request, determine whether the primary purpose of the pull request is to improve performance."" The primary purpose: fix list literal type inference to keep argument type, preventing unnecessary slice conversions. That is a performance improvement? It reduces conversions, but it's more about correctness? It might be a performance improvement. But the guidelines: ""Performance-related pull requests may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs."" The PR does not contain those keywords. But the content indicates a performance improvement. The guidelines might be to look for keywords. But the instruction says ""Given a text combining the title and body of a pull request, determine whether the primary purpose of the pull request is to improve performance."" So we need to decide. The primary purpose: fix type inference to keep argument type, preventing unnecessary slice conversions. That is a performance improvement. So classification: performance. But the guidelines might want non-performance if no keywords. But the instruction says ""Given a text combining the title and body of a pull request, determine whether the primary purpose of the pull request is to improve performance."" So we should classify as performance. I'll output ""performance"".assistantfinalperformance",13,0.2410639490645044,False
+3225111162,7934,Update C backend to use stack arrays,"## Summary
+- add helper for `contains_array_int` and generate it when a list expression is backed by a stack array
+- emit `contains_array_int` instead of `contains_list_int` when possible
+- use `listLenExpr` and `listItemExpr` for query loops
+- regenerate C machine outputs
+
+## Testing
+- `go test ./compiler/x/c -run TestCCompiler_ValidPrograms -tags slow -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6872288ed9c88320812146efd45b5b2f",OpenAI_Codex,1218621,tamnd,closed,2025-07-12T09:35:57Z,2025-07-12T09:37:03Z,2025-07-12T09:37:03Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7934,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Update C backend to use stack arrays"". Body: mentions adding helper for contains_array_int, generating it when list expression backed by stack array, emit contains_array_int instead of contains_list_int when possible, use listLenExpr and listItemExpr for query loops, regenerate C machine outputs. This seems to be about using stack arrays instead of heap? Performance improvement? The description: ""Update C backend to use stack arrays"" suggests performance improvement by using stack arrays for speed and memory. Also mentions ""emit contains_array_int instead of contains_list_int when possible"" which might be performance. So likely performance. The guidelines: performance-related PRs may contain keywords like memory, optimization, speed, etc. This one mentions stack arrays, which is a performance optimization. So classify as 'performance'.assistantfinalperformance",13,0.24043632972789034,False
+3224871375,7914,Improve C backend list handling,"## Summary
+- expand C helper functions with `isListBoolType`
+- treat `len` selector on constant lists with compile-time length
+- index bool lists as arrays instead of struct data
+
+## Testing
+- `go test ./... -run TestDummy -count=1`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6871f0db1430832090e6cb81e7eb3e1b",OpenAI_Codex,1218621,tamnd,closed,2025-07-12T05:43:56Z,2025-07-12T05:44:07Z,2025-07-12T05:44:07Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7914,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve C backend list handling"". Summary: expand C helper functions with isListBoolType, treat len selector on constant lists with compile-time length, index bool lists as arrays instead of struct data. This seems to be about improving list handling, maybe performance? The changes: treat len selector on constant lists with compile-time length, index bool lists as arrays instead of struct data. That could improve performance by using compile-time length and array indexing. But is it primarily performance? The title ""Improve C backend list handling"" could be about correctness or performance. The summary mentions compile-time length, indexing bool lists as arrays. That likely improves performance. But is it explicitly about performance? The keywords: ""performance"" not present. But the changes might reduce overhead. The instruction: performance-related PR may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. The summary mentions compile-time length, indexing bool lists as arrays. That might be performance improvement. But does it mention speed? No. But compile-time length might reduce runtime overhead. The instruction says performance-related PR may contain keywords such as compile-time-hog. The summary mentions compile-time length. That might be considered compile-time optimization. But it's not explicitly about performance. However, the changes likely improve performance. The classification: performance. Let's decide: performance.assistantfinalperformance",13,0.2313265270156286,False
+3227087590,8622,Add list deallocation in C backend,"## Summary
+- free allocated result lists when compiling to C
+- append results to free list in `compileQueryExpr`
+- track allocations in the compiler
+- regenerate C output for `cross_join`
+- note enhancement in C `TASKS.md`
+
+## Testing
+- `go build -tags slow ./cmd/...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68745b757a288320bbcea20af92942e0",OpenAI_Codex,1218621,tamnd,closed,2025-07-14T01:40:17Z,2025-07-14T01:40:32Z,2025-07-14T01:40:32Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/8622,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Add list deallocation in C backend"". Summary: free allocated result lists when compiling to C, append results to free list in compileQueryExpr, track allocations in compiler, regenerate C output for cross_join, note enhancement in C TASKS.md. This is about memory management, freeing allocated lists, to avoid memory leaks. That is performance-related? It's about memory usage, freeing memory, preventing leaks. That is a performance improvement? It's more about memory safety, but also performance. The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, etc. This PR mentions ""free allocated result lists"", ""track allocations"", ""list deallocation"". It mentions memory. So it qualifies as performance. So classification: performance.assistantfinalperformance",13,0.2082526156135143,False
+3128833247,209,Improve compiler string slicing,"## Summary
+- specialize string slicing helpers for Go, Python and TypeScript compilers
+- pick specialized helper based on inferred type
+- add slice compilation test
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68460df9198083209ebd9148bd814d0c",OpenAI_Codex,1218621,tamnd,closed,2025-06-09T00:46:12Z,2025-06-09T00:58:55Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/209,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve compiler string slicing"". Summary: specialize string slicing helpers for Go, Python and TypeScript compilers, pick specialized helper based on inferred type, add slice compilation test. This seems to be about compiler optimization for string slicing, likely improving performance. The description mentions ""specialize string slicing helpers"" which could be performance improvement. The keywords: ""performance"" not explicitly but ""improve compiler string slicing"" could be performance. The guidelines: performance-related PR may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. The PR does not contain those keywords explicitly. But the description indicates improvement of compiler string slicing, which likely is a performance improvement. The guidelines say ""may contain keywords"" but not mandatory. We need to decide. The PR is about improving compiler string slicing, which is likely a performance improvement. So classify as 'performance'.assistantfinalperformance",13,0.1678151798062617,False
+3117664754,34,Refactor Go compiler type handling,"## Summary
+- reduce runtime helpers by using simple type inference in Go codegen
+- infer primitive types for binary operators and emit native ops when possible
+- update golden files for Go compiler
+
+## Testing
+- `go test ./compile/go -update`
+- `go test ./...`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_684035b079348320b8412381b3eea96a",OpenAI_Codex,1218621,tamnd,closed,2025-06-04T12:29:21Z,2025-06-04T12:29:36Z,2025-06-04T12:29:36Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/34,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Refactor Go compiler type handling"". Summary: reduce runtime helpers by using simple type inference in Go codegen, infer primitive types for binary operators and emit native ops when possible, update golden files. This is about type handling, code generation, reducing runtime helpers, emitting native ops. This likely improves performance by reducing runtime overhead and using native ops. The keywords: ""reduce runtime helpers"", ""emit native ops"", ""infer primitive types"". This is performance improvement. So classify as 'performance'.assistantfinalperformance",13,0.16006431901140766,False
+3152159948,1258,Refactor Go compiler variable tracking,"## Summary
+- refine variable usage tracking with typed maps
+- avoid runtime conversions when fetch, load and save options already map[string]any
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68510159a954832087b36cca0e0b929d",OpenAI_Codex,1218621,tamnd,closed,2025-06-17T05:55:08Z,2025-06-17T05:57:58Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/1258,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Refactor Go compiler variable tracking"". Summary: refine variable usage tracking with typed maps, avoid runtime conversions when fetch, load and save options already map[string]any. This seems like a refactor to improve performance by avoiding runtime conversions. The description mentions avoiding runtime conversions, which is a performance improvement. So likely performance. The keywords: ""avoid runtime conversions"" is about performance. So classify as 'performance'.assistantfinalperformance",13,0.15358421141140596,False
+3226302090,8385,Improve Go compiler struct reuse,"## Summary
+- enhance Go compiler struct inference so existing structs are reused
+- add `structMatches` helper
+- update checklists for TPCH progress
+- regenerate machine output for `cast_struct` example
+
+## Testing
+- `go test ./compiler/x/go -tags slow -run TestGoCompiler_ValidPrograms`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6873777e9cd48320aa36c8b4718e36ee",OpenAI_Codex,1218621,tamnd,closed,2025-07-13T09:25:31Z,2025-07-13T09:25:49Z,2025-07-13T09:25:49Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/8385,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Go compiler struct reuse"". Summary: ""enhance Go compiler struct inference so existing structs are reused"". That is about compiler struct inference, reusing structs. This is about compiler optimization? It might be about performance improvement of compiler? The description: ""struct reuse"" could reduce memory usage or compile time? It might be about performance of compiler. But the classification is about whether the primary purpose is to improve performance. The PR is about improving Go compiler struct reuse. That likely improves performance of the compiler (maybe compile time or memory). The keywords: ""performance"" not explicitly present. But ""reuse"" could reduce memory usage. The classification: performance. The guidelines: performance-related PR may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs. The PR mentions ""struct reuse"" which is about memory usage. That is a performance improvement. So classify as 'performance'.assistantfinalperformance",13,0.1503238813036973,False
+3118597570,66,Remove runtime arithmetic helpers in Go compiler,"## Summary
+- inline arithmetic operations for unknown types in Go compiler
+- drop deprecated runtime helper functions
+- raise compile errors if operand types are ambiguous
+
+## Testing
+- `go test ./...`
+- `go run ./cmd/mochi-bench | head -n 20`
+
+------
+https://chatgpt.com/codex/tasks/task_e_684082172ccc832098f8500278d9d9f6",OpenAI_Codex,1218621,tamnd,closed,2025-06-04T17:40:45Z,2025-06-04T17:40:56Z,2025-06-04T17:40:56Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/66,"analysisWe need to classify as performance or non-performance. The PR title: ""Remove runtime arithmetic helpers in Go compiler"". Summary: inline arithmetic operations for unknown types in Go compiler, drop deprecated runtime helper functions, raise compile errors if operand types are ambiguous. This seems to be about compiler changes, removing runtime helpers, inlining arithmetic operations. Does this improve performance? Inlining arithmetic operations could reduce runtime overhead, potentially improving performance. But the primary purpose might be to simplify compiler and remove deprecated helpers, not necessarily performance. However, inlining arithmetic operations could reduce function call overhead, improving performance. But the description doesn't explicitly mention performance improvement. It says ""inline arithmetic operations for unknown types in Go compiler"" - that could be a performance optimization. But the main goal might be to drop deprecated runtime helper functions. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The PR is about removing runtime arithmetic helpers, inlining arithmetic operations. That likely improves performance by reducing function calls. But is that the primary purpose? The summary: ""inline arithmetic operations for unknown types in Go compiler"" - that is a performance improvement. ""drop deprecated runtime helper functions"" - that's maintenance. ""raise compile errors if operand types are ambiguous"" - that's correctness. So the primary purpose might be to improve performance by inlining arithmetic operations. But the title ""Remove runtime arithmetic helpers"" suggests removing runtime overhead. I'd lean that it's performance. The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, etc. This PR doesn't contain those keywords. But the content indicates inlining arithmetic operations, which is a performance optimization. The question: ""determine whether the primary purpose of the pull request is to improve performance."" I'd classify as performance. So output: performance.assistantfinalperformance",13,0.14872849895835646,False
+3241690700,9435,Update Clojure compiler,"## Summary
+- avoid emitting `_cast_struct` and `_cast_struct_list` when the value already matches the target type
+- document the optimization in TASKS
+
+## Testing
+- `go vet ./...`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6879b65a24cc832090f470206870dc82",OpenAI_Codex,1218621,tamnd,closed,2025-07-18T03:11:18Z,2025-07-18T03:11:29Z,2025-07-18T03:11:29Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9435,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Update Clojure compiler"". Body: ""avoid emitting `_cast_struct` and `_cast_struct_list` when the value already matches the target type"" and ""document the optimization in TASKS"". This is about compiler optimization: avoid emitting unnecessary casts. That is a performance improvement. So classify as 'performance'.assistantfinalperformance",13,0.14513689242507213,False

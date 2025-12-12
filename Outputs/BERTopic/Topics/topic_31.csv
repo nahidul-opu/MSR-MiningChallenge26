@@ -1,0 +1,506 @@
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
+3235179464,6060,Replace LINQ Any+Single patterns with Where+FirstOrDefault for better performance,"This PR addresses a performance optimization opportunity identified in PR #5717 where the pattern of using `Any()` followed by `Single()` with the same predicate can be improved.
+
+## Problem
+The existing code uses this pattern in multiple places:
+```csharp
+if (collection.Any(x => x.Uid == item.Uid))
+{
+    var existing = collection.Single(x => x.Uid == item.Uid);
+    // handle duplicate...
+}
+```
+
+This approach has two issues:
+1. **Performance**: It enumerates the collection twice with the same predicate
+2. **Debuggability**: When `Single()` throws, it's harder to debug since you can't inspect the actual duplicate items
+
+## Solution
+Replace the pattern with:
+```csharp
+var existing = collection.Where(x => x.Uid == item.Uid).FirstOrDefault();
+if (existing is not null)
+{
+    // handle duplicate...
+}
+```
+
+## Benefits
+- **Performance**: Single enumeration instead of two separate LINQ operations
+- **Debuggability**: Better error context - developers can inspect the actual duplicate object when debugging
+- **Maintainability**: More explicit null checking following modern C# best practices
+
+## Changes
+Updated 14 instances across 3 files:
+- `TestHostOrchestratorManager.cs` (2 instances)
+- `TestHostControllersManager.cs` (6 instances) 
+- `TestHostManager.cs` (6 instances)
+
+All changes maintain identical functional behavior while improving performance and debugging experience.
+
+Fixes #5739.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-16T09:28:27Z,2025-07-17T08:26:05Z,2025-07-17T08:26:05Z,65080725,https://api.github.com/repos/microsoft/testfx,https://github.com/microsoft/testfx/pull/6060,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Replace LINQ Any+Single patterns with Where+FirstOrDefault for better performance"". The body describes performance optimization: enumerating twice vs once. So it's performance. So output 'performance'.assistantfinalperformance",31,1.0,False
+3212230718,26149,[Backport][release-474-e] Parallelize Iceberg materialized view base table freshness retrieval,"Backport of #24734 to release-474-e. This change parallelizes freshness retrieval for Iceberg materialized view base tables. See original PR for details and discussion: https://github.com/trinodb/trino/pull/24734
+
+## Summary
+
+This backport improves query planning performance for materialized views by parallelizing the retrieval of base table freshness information in the Iceberg connector. Instead of checking each base table sequentially, the freshness checks are now performed in parallel using the existing `processWithAdditionalThreads` utility.
+
+## Changes
+
+### Main Implementation (`IcebergMetadata.java`)
+- **Parallelized processing**: The `getMaterializedViewFreshness` method now processes multiple base tables concurrently using `processWithAdditionalThreads` instead of sequential iteration
+- **New error handling**: Added `CorruptedTableChange` record to properly handle corrupted tables with immediate STALE return
+- **Refactored logic**: Extracted table parsing logic into a dedicated `getTableChangeInfo(ConnectorSession, String)` method for better code organization
+
+### Test Cleanups
+Removed unused imports from test files:
+- `TestTrinoGlueCatalog.java`
+- `TestTrinoNessieCatalog.java`
+- `TestTrinoRestCatalog.java`
+
+## Performance Impact
+
+Based on benchmarks from the original PR:
+- **20 base tables with 10ms avg load time**: Reduces refresh time from 560ms to 310ms (~45% improvement)
+- **20 base tables with 100ms avg load time**: Reduces refresh time by more than 1 second
+
+## Technical Details
+
+The change maintains identical semantics while improving performance:
+
+**Before (Sequential):**
+```java
+for (String entry : tableToSnapshotIds) {
+    switch (getTableChangeInfo(session, tableHandle, snapshotAtRefresh)) {
+        // Process each table one by one
+    }
+}
+```
+
+**After (Parallel):**
+```java
+ImmutableList.Builder<Callable<TableChangeInfo>> tableChangeInfoTasks = ImmutableList.builder();
+for (String tableToSnapShot : Splitter.on(',').split(dependsOnTables)) {
+    tableChangeInfoTasks.add(() -> getTableChangeInfo(session, tableToSnapShot));
+}
+
+List<TableChangeInfo> tableChangeInfos = processWithAdditionalThreads(
+    tableChangeInfoTasks.build(), metadataFetchingExecutor);
+```
+
+## Release Notes
+
+```markdown
+* Improve query planning performance when reading from materialized views. ({issue}`24734`)
+```
+
+cc @chenjian2664
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `https://api.github.com/repos/trinodb/trino/branches`
+>   - Triggering command: `curl -s REDACTED` (http block)
+> - `https://api.github.com/repos/trinodb/trino/pulls/24734/commits`
+>   - Triggering command: `curl -s REDACTED` (http block)
+> - `repository.jboss.org`
+>   - Triggering command: `/usr/lib/jvm/temurin-17-jdk-amd64/bin/java --enable-native-access=ALL-UNNAMED -Xmx8192m --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED --add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED --add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED -XX:&#43;ExitOnOutOfMemoryError --enable-native-access=ALL-UNNAMED -classpath /home/REDACTED/.m2/wrapper/dists/apache-maven-3.9.10/e5402a93/boot/plexus-classworlds-2.9.0.jar -Dclassworlds.conf=/home/REDACTED/.m2/wrapper/dists/apache-maven-3.9.10/e5402a93/bin/m2.conf -Dmaven.home=/home/REDACTED/.m2/wrapper/dists/apache-maven-3.9.10/e5402a93 -Dlibrary.jansi.path=/home/REDACTED/.m2/wrapper/dists/apache-maven-3.9.10/e5402a93/lib/jansi-native -Dmaven.multiModuleProjectDirectory=/home/REDACTED/work/trino/trino org.codehaus.plexus.classworlds.launcher.Launcher compile -pl :trino-iceberg -q` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+
+*This pull request was created as a result of the following prompt from Copilot chat.*
+> Backport PR #24734 (Parallelize Iceberg materialized view base table freshness retrieval) from master to release-474-e branch.
+> - Cherry-pick all commits from https://github.com/trinodb/trino/pull/24734
+> - Resolve any merge conflicts if they arise, maintaining the original authorship and commit messages where possible.
+> - Ensure the code compiles and passes relevant CI for the release-474-e branch.
+> - Title: '[Backport][release-474-e] Parallelize Iceberg materialized view base table freshness retrieval'
+> - Description: 'Backport of #24734 to release-474-e. This change parallelizes freshness retrieval for Iceberg materialized view base tables. See original PR for details and discussion: https://github.com/trinodb/trino/pull/24734'
+> - Add a 'backport' label if available.
+> - Tag @chenjian2664 for visibility.
+> - Target branch: release-474-e
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-08T11:50:27Z,2025-07-08T13:02:06Z,,166515022,https://api.github.com/repos/trinodb/trino,https://github.com/trinodb/trino/pull/26149,"analysisWe need to classify as performance or non-performance. The PR title: ""[Backport][release-474-e] Parallelize Iceberg materialized view base table freshness retrieval"". The body describes parallelizing retrieval, improving query planning performance. It explicitly mentions performance improvement, benchmarks, etc. So it's performance. So output 'performance'.assistantfinalperformance",31,1.0,True
+3049300237,21192,perf: Optimize team bookings query by using batch version,"# Optimize Team Bookings Query by Using Batch Version
+
+## What's being changed and why
+
+This PR addresses a database performance issue by updating two locations in the web app code that were still using the single-user version of `BookingRepository.getAllAcceptedTeamBookingsOfUser` instead of the batch version `BookingRepository.getAllAcceptedTeamBookingsOfUsers` that was introduced in PR #21137.
+
+The problematic SQL query was causing database performance issues when checking team booking limits. By using the batch version of the repository function, we can reduce the number of database queries and improve performance.
+
+## Locations updated:
+
+1. `packages/lib/intervalLimits/server/getBusyTimesFromLimits.ts` - Updated `_getBusyTimesFromTeamLimits` function to use the batch version
+2. `packages/lib/intervalLimits/server/checkBookingLimits.ts` - Updated `checkBookingLimit` function to use the batch version
+
+## Testing
+
+- Type checking passes with `yarn type-check:ci`
+- The changes maintain the same functionality while improving database performance
+
+Link to Devin run: https://app.devin.ai/sessions/55468c0da81642c6aeae9308e4e34075
+Requested by: keith@cal.com
+
+    
+<!-- This is an auto-generated description by mrge. -->
+---
+
+## Summary by mrge
+Optimized team bookings queries by switching to the batch version, reducing database load and improving performance.
+
+- **Refactors**
+  - Replaced single-user team bookings queries with batch queries in booking limits and busy times logic.
+
+<!-- End of auto-generated description by mrge. -->
+
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-08T15:06:29Z,2025-05-08T15:08:09Z,,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/21192,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""perf: Optimize team bookings query by using batch version"". The body describes performance improvement: reducing number of database queries, improving performance. So classification: 'performance'.assistantfinalperformance",31,1.0,False
+3049320746,21193,perf: Optimize team bookings query by using batch version,"# Optimize Team Bookings Query by Using Batch Version
+
+## What's being changed and why
+
+This PR addresses a database performance issue by updating two locations in the web app code that were still using the single-user version of `BookingRepository.getAllAcceptedTeamBookingsOfUser` instead of the batch version `BookingRepository.getAllAcceptedTeamBookingsOfUsers` that was introduced in PR #21137.
+
+The problematic SQL query was causing database performance issues when checking team booking limits. By using the batch version of the repository function, we can reduce the number of database queries and improve performance.
+
+## Locations updated:
+
+1. `packages/lib/intervalLimits/server/getBusyTimesFromLimits.ts` - Updated `_getBusyTimesFromTeamLimits` function to use the batch version
+2. `packages/lib/intervalLimits/server/checkBookingLimits.ts` - Updated `checkBookingLimit` function to use the batch version
+
+## Testing
+
+- Type checking passes with `yarn type-check:ci`
+- The changes maintain the same functionality while improving database performance
+
+Link to Devin run: https://app.devin.ai/sessions/55468c0da81642c6aeae9308e4e34075
+Requested by: keith@cal.com
+
+    
+<!-- This is an auto-generated description by mrge. -->
+---
+
+## Summary by mrge
+Optimized team bookings queries by switching to the batch version of the repository function, reducing database load and improving performance. Now, team booking limits for multiple users are checked in a single query instead of one per user.
+
+<!-- End of auto-generated description by mrge. -->
+
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-08T15:12:23Z,2025-05-08T15:15:19Z,,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/21193,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""perf: Optimize team bookings query by using batch version"". Body describes performance improvement. So classification: performance.assistantfinalperformance",31,1.0,False
+2922685827,1076,fix: optimize user deletion process with queue-based system,"# User Deletion Performance Optimization
+
+## Problem
+Users cannot be deleted from the auth table due to incomplete implementation of the deletion process and performance issues with the Supabase Edge functions.
+
+## Solution
+- Implemented queue-based deletion system for better reliability
+- Added timeout handling to prevent Edge function timeouts
+- Optimized SQL functions for better performance
+- Added comprehensive error handling and logging
+- Created performance metrics tracking
+- Added tests for user deletion functionality
+
+### Queue-Based Deletion System
+- Created a `deletion_queue` table to store pending user deletions
+- Implemented a new Edge function `process_deletion_queue` to handle deletions asynchronously
+- Added retry mechanism with configurable retry count
+- Implemented health check endpoint to monitor queue status
+
+### Timeout Handling
+```typescript
+// Set a timeout for the request
+const timeoutPromise = new Promise<never>((_, reject) => {
+  setTimeout(() => reject(new Error('Operation timed out')), 25000) // 25 seconds timeout
+});
+
+// Wrap the operation in a race with the timeout
+await Promise.race([
+  processUserDeletion(c, oldRecord),
+  timeoutPromise,
+]);
+```
+
+### SQL Optimizations
+- Optimized the `delete_user` SQL function with more efficient queries
+- Created a separate `get_sole_admin_orgs` function to improve query performance
+- Used Common Table Expressions (CTEs) for better query performance
+```sql
+WITH sole_admin_orgs AS (
+    SELECT org_id 
+    FROM org_users
+    WHERE user_id = v_user_id 
+    AND user_right = 'super_admin'
+    AND org_id NOT IN (
+        SELECT org_id 
+        FROM org_users
+        WHERE user_right = 'super_admin' 
+        AND user_id != v_user_id
+    )
+)
+SELECT array_agg(org_id) INTO v_user_orgs FROM sole_admin_orgs;
+```
+
+### Performance Metrics
+- Added a `record_performance_metric` function to track deletion performance
+- Implemented metrics for deletion duration, success rate, and queue status
+- Added structured logging with request IDs for better traceability
+
+## Testing
+- Added automated tests for the user deletion process
+- Implemented retry logic in tests to handle asynchronous operations
+- Added helper functions for safer RPC and query operations
+
+Fixes #1072
+Link to Devin run: https://app.devin.ai/sessions/f0b22cb98e9047378baa11acab244b53
+Requested by: Cap-go
+",Devin,158243242,devin-ai-integration[bot],closed,2025-03-16T01:15:13Z,2025-03-16T14:42:08Z,,442321089,https://api.github.com/repos/Cap-go/capgo,https://github.com/Cap-go/capgo/pull/1076,"analysisWe need to classify as performance or non-performance. The PR title: ""fix: optimize user deletion process with queue-based system"". Body mentions performance optimization, queue-based system, timeout handling, SQL optimizations, performance metrics. So it's definitely performance. So label 'performance'.assistantfinalperformance",31,1.0,True
+2922692804,1077,fix: optimize user deletion process with queue-based system,"## Problem
+Users cannot be deleted from the auth table due to incomplete implementation of the deletion process and performance issues.
+
+## Solution
+- Implemented queue-based deletion system for better reliability
+- Added timeout handling to prevent Edge function timeouts
+- Optimized SQL functions for better performance
+- Added comprehensive error handling and logging
+- Created performance metrics tracking
+- Added tests for user deletion functionality
+
+## Testing
+- Added automated tests for the user deletion process
+- Verified SQL migration with Supabase local environment
+- Tested the deletion process end-to-end
+
+Fixes #1076
+Link to Devin run: https://app.devin.ai/sessions/a68db41c892340bba690131452892597
+Requested by: Cap-go
+",Devin,158243242,devin-ai-integration[bot],closed,2025-03-16T01:34:01Z,2025-03-16T14:42:06Z,2025-03-16T14:42:06Z,442321089,https://api.github.com/repos/Cap-go/capgo,https://github.com/Cap-go/capgo/pull/1077,"analysisWe need to classify as performance or non-performance. The PR title: ""fix: optimize user deletion process with queue-based system"". The body mentions performance issues, optimized SQL functions, performance metrics tracking. So it's performance. So output 'performance'.assistantfinalperformance",31,1.0,False
+3040980236,21119,feat(prisma): add middleware to detect and report slow Prisma queries to Sentry,"# Slow Query Detection Middleware for Prisma
+
+This PR adds a middleware to detect and report slow Prisma queries to Sentry, including the full raw SQL query in the reports for better query optimization.
+
+## Features
+
+- Detects queries that take longer than a configurable threshold
+- Reports slow queries to Sentry with detailed information
+- Configurable threshold via the `SLOW_QUERY_THRESHOLD_MS` environment variable
+- Rate limiting to avoid flooding Sentry with reports
+- Applied to the main Prisma client
+- Comprehensive integration tests to verify functionality
+
+## Implementation Details
+
+- Uses WeakMap for client state to avoid issues with Vercel's Fluid compute environment
+- Captures raw SQL queries using Prisma's `$on('query')` event system
+- Correlates middleware executions with raw SQL queries using timestamp matching
+- Includes automatic cleanup to prevent memory leaks
+- Handles clients without `$use` or `$on` methods gracefully
+
+## Testing
+
+Added true integration tests that verify:
+- Slow queries are properly detected based on the threshold
+- The raw SQL is correctly captured and included in reports
+- Rate limiting works as expected
+- The middleware respects the configured threshold
+- Complex queries with joins are handled correctly
+
+I've verified that:
+- Type checks pass: `yarn type-check:ci`
+- Linting passes: `yarn lint:report`
+- Tests pass: `TZ=UTC yarn test packages/prisma/middleware/__tests__/slowQueryDetection.integration-test.ts`
+
+Link to Devin run: https://app.devin.ai/sessions/5b4fdefeb6b6437a9df87e5315544650
+Requested by: zomars@cal.com
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-05T22:31:17Z,2025-05-17T15:47:12Z,,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/21119,"analysisWe need to classify as performance or non-performance. The PR adds middleware to detect and report slow Prisma queries to Sentry. It's about detecting slow queries, performance monitoring. The primary purpose is to detect slow queries, which is performance-related. So classification: performance.assistantfinalperformance",31,1.0,False
+3147975254,21826,feat: optimize Prisma queries by replacing findFirst with findUnique where applicable,"# Optimize Prisma queries by replacing findFirst with findUnique where applicable (Non-API and Non-Test files only)
+
+## Summary
+
+This PR systematically optimizes Prisma database queries across the Cal.com codebase by replacing `findFirst` and `findFirstOrThrow` with `findUnique` and `findUniqueOrThrow` where the WHERE clause uses unique index keys. This optimization leverages database unique constraints for better performance and type safety.
+
+**Note**: Per user request, all API-related files and test files have been excluded from these optimizations to maintain API stability and test compatibility.
+
+## Changes Made
+
+### Key Optimizations
+
+- **User queries**: Replaced `findFirst` with `findUnique` for queries using `id`, `email`, and other unique fields
+- **Team queries**: Optimized queries using `id` and composite unique constraints like `slug + parentId`
+- **EventType queries**: Replaced queries using `id`, `userId + slug`, and `teamId + slug` unique constraints
+- **Booking queries**: Optimized queries using `id`, `uid`, and `idempotencyKey` unique fields
+- **Membership queries**: Replaced queries using the composite unique constraint `userId + teamId`
+- **OAuth and authentication**: Optimized client and token queries using unique identifiers
+
+### Files Modified
+
+- **93 files** across the codebase were updated (55 API files and 14 test files excluded)
+- **205 insertions, 172 deletions** - primarily method name changes and formatting improvements
+- Changes span across:
+  - tRPC handlers and routers (non-API)
+  - Repository classes (non-API)
+  - App store integrations (non-API)
+  - Feature modules
+  - Web app components and utilities
+
+### Excluded from Optimization
+
+- **API v1 endpoints** (`apps/api/v1/pages/api/`)
+- **API v2 repositories** (`apps/api/v2/src/modules/`)
+- **Web API routes** (`apps/web/app/api/`, `apps/web/pages/api/`)
+- **App store API handlers** (`packages/app-store/*/api/`)
+- **Test files** (`*.test.ts`, `*.e2e.ts`, `*.integration-test.ts`, `testUtils.ts`)
+
+### Technical Details
+
+All replacements were made only where:
+1. The WHERE clause uses fields that have unique constraints in the Prisma schema
+2. The query logic expects a single result (not multiple matches)
+3. The change maintains identical functionality and error handling
+4. The file is not in an API directory or test file (per user request)
+
+## Verification
+
+✅ **Type checking**: `yarn type-check:ci` passes
+✅ **Tests**: All 2041 tests pass with `TZ=UTC yarn test`
+✅ **Linting**: Code formatting and quality checks pass
+✅ **CI**: All 36 CI checks passing
+
+## Performance Benefits
+
+- **Database performance**: `findUnique` queries use unique indexes, providing O(1) lookup performance
+- **Type safety**: Better TypeScript inference with guaranteed single results
+- **Query optimization**: Database can optimize unique constraint queries more effectively
+
+## Link to Devin run
+https://app.devin.ai/sessions/4521f4d3b21641089560237eb9b4ad0d
+
+## Requested by
+benny@cal.com (Benny Joo)
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-15T19:01:54Z,2025-06-17T06:52:03Z,2025-06-17T06:52:03Z,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/21826,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""feat: optimize Prisma queries by replacing findFirst with findUnique where applicable"". The body describes replacing findFirst with findUnique for unique constraints, improving database performance. This is clearly a performance improvement. So classification: 'performance'.assistantfinalperformance",31,1.0,True
+3070227634,21372,perf: parallelize getBusyTimes calls to improve performance,"# Parallelize getBusyTimes calls to improve performance
+
+## What does this PR do?
+
+This PR addresses a performance issue where each call to `getBusyTimes` takes progressively longer when called in a loop (as shown in the screenshot). The issue is particularly problematic for teams with 50+ members where the function may be called many times sequentially.
+
+- Fixes N/A (No specific issue number)
+
+## Visual Demo
+
+The original issue is demonstrated in the screenshot shared by the user, showing how the length of time for each `getBusyTimes` trace increases slightly with each call.
+
+## Changes
+
+- Parallelized calls to `getBusyTimesFromBookingLimits` and `getBusyTimesFromDurationLimits` in `getBusyTimesFromLimits.ts`
+- Parallelized calls to `getBusyTimesFromLimits` and `getBusyTimesFromTeamLimits` in `getUserAvailability.ts`
+- Optimized the `getBusyTimes` function to start database queries early and process results in parallel
+
+These changes focus specifically on the Prisma database calls as requested, while leaving the external calendar API calls unchanged.
+
+## Mandatory Tasks
+
+- [x] I have self-reviewed the code
+- [x] I have updated the developer docs in /docs if this PR makes changes that would require a documentation change. N/A
+- [x] I confirm automated tests are in place that prove my fix is effective or that my feature works.
+
+## How should this be tested?
+
+- Test with a team that has 50+ members to verify that the performance of `getBusyTimes` no longer degrades with each call
+- Compare the trace times before and after the changes to verify the performance improvement
+- Verify that all existing functionality continues to work as expected
+
+## Link to Devin run
+https://app.devin.ai/sessions/5edaa90977f84726a592c4e8cda677b4
+
+Requested by: keith@cal.com
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-17T02:58:48Z,2025-05-24T12:43:06Z,2025-05-24T12:43:06Z,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/21372,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""perf: parallelize getBusyTimes calls to improve performance"". The body clearly states performance improvement. So classification: performance.assistantfinalperformance",31,1.0,False
+3034903835,21067,perf: replace OR conditions with UNION in bookings query,"# Performance Improvement for Booking Queries
+
+This PR replaces the inefficient OR conditions in the booking queries with UNION queries, which are much more performant when querying large datasets. The optimized query is 212 times faster in production environments with millions of records.
+
+## Changes
+- Completely replaced Prisma ORM query with raw SQL using UNION instead of OR conditions
+- Maintained all existing filter functionality
+- Preserved the same data structure in the returned results
+- Added proper type checking for filters and parameters
+
+## Testing
+- Ran type checks and linting
+- Verified query structure matches the optimized example
+
+## Link to Devin run
+https://app.devin.ai/sessions/b183a6281d8d4c04b94d015024c38139
+
+Requested by: keith@cal.com
+
+    
+<!-- This is an auto-generated description by mrge. -->
+---
+
+## Summary by mrge
+Replaced slow OR conditions in the bookings query with UNION-based raw SQL, making large booking queries over 200x faster.
+
+- **Refactors**
+  - Switched from Prisma ORM to raw SQL with UNION for all main booking filters.
+  - Preserved all filter options and returned data structure.
+
+<!-- End of auto-generated description by mrge. -->
+
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-01T23:31:12Z,2025-05-11T15:30:44Z,,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/21067,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""perf: replace OR conditions with UNION in bookings query"". Body describes performance improvement, 212 times faster. So it's performance. So output 'performance'.assistantfinalperformance",31,1.0,False
+2887787232,495,[DEVIN: Ryan] Optimize create user query to not use interactive transaction,"# Optimize create user query to not use interactive transaction
+
+This PR optimizes the create user query in `apps/backend/src/app/api/latest/users/crud.tsx` to not use an interactive transaction. The changes include:
+
+1. Refactored the `onCreate` method to use direct Prisma client operations instead of the `retryTransaction` function
+2. Updated helper functions (`checkAuthData`, `getPasswordConfig`, and `getOtpConfig`) to accept either a `PrismaClient` or a `PrismaTransaction` for better type flexibility
+3. Fixed linting issues related to trailing spaces in the file
+
+The functionality remains the same, but the implementation is now more efficient by avoiding the overhead of interactive transactions.
+
+Link to Devin run: https://app.devin.ai/sessions/899abb43e33d47a1b0ac12c6a5d5a720
+Requested by: Konsti
+",Devin,158243242,devin-ai-integration[bot],closed,2025-02-28T18:08:06Z,2025-03-13T18:51:12Z,,764642350,https://api.github.com/repos/stack-auth/stack-auth,https://github.com/stack-auth/stack-auth/pull/495,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize create user query to not use interactive transaction"". Body: mentions optimizing create user query to not use interactive transaction, refactored to use direct Prisma client operations instead of retryTransaction, better type flexibility, linting. The primary purpose: improve performance by avoiding overhead of interactive transactions. So it's performance. So output: performance.assistantfinalperformance",31,1.0,False
+3042979666,21137,perf: Optimize team bookings query by fetching data for multiple users at once,"# Optimize Team Bookings Query and Busy Times Limits
+
+This PR optimizes the team bookings query and busy times limits by fetching data for multiple users at once, rather than making separate database calls for each user.
+
+## Changes
+
+1. Added a new `getAllAcceptedTeamBookingsOfUsers` function in BookingRepository that accepts multiple users
+2. Created a new `getBusyTimesFromTeamLimitsForUsers` function in util.ts that processes team booking limits for multiple users
+3. Added a new `getBusyTimesFromLimitsForUsers` function in util.ts that processes booking and duration limits for multiple users
+4. Moved the condition checks from getUserAvailability.ts to util.ts
+5. Updated the GetUserAvailabilityInitialData type to include teamBookingLimits, teamForBookingLimits, busyTimesFromLimits, and eventTypeForLimits properties
+6. Modified the _getUserAvailability function to use the batch-loaded data from initialData when available
+
+## Benefits
+
+- Reduces the number of database queries by fetching team bookings and busy times once for multiple users
+- Improves performance by avoiding redundant database calls
+- Maintains the same functionality while optimizing query execution
+- Particularly beneficial for team and collective scheduling types with many members
+
+## Testing
+
+- Verified that all type checks pass with `yarn type-check:ci`
+
+Link to Devin run: https://app.devin.ai/sessions/5ef101ff0af14ab19d58e29583f13453
+Requested by: keith@cal.com
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-06T14:08:17Z,2025-05-06T18:47:07Z,2025-05-06T18:47:07Z,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/21137,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""perf: Optimize team bookings query by fetching data for multiple users at once"". The body describes reducing number of database queries, improving performance. So it's performance. So output 'performance'.assistantfinalperformance",31,1.0,False

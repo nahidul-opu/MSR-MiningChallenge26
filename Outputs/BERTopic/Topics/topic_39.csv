@@ -1,0 +1,227 @@
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
+3201598720,253,build: Add optional build tags to reduce binary size,"This PR implements conditional compilation using Go build tags to make optional features truly optional, allowing users to choose between a smaller binary and full functionality.
+
+## Results
+
+| Build Configuration | Binary Size | Reduction |
+|---------------------|-------------|-----------|
+| Original (with go-git) | 16.7 MiB | - |
+| Current full build | 8.1M | 51.5% |
+| **New lite build** | **7.4M** | **55.7%** |
+
+**Total reduction: 9.3 MiB (44% smaller binary)**
+
+## Changes Made
+
+### Build Tags Implementation
+- **`fuzzy` tag**: Controls fuzzy search and path indexing functionality
+  - Dependencies: `goleveldb`, `sahilm/fuzzy` (~500KB)
+  - Features: `--fuzzy` flag, path indexing commands
+  
+- **`mounts` tag**: Controls mount point detection  
+  - Dependencies: `gopsutil` (~200KB)
+  - Features: `--mounts` flag for mount details
+
+### Build Options
+
+**Lite build (default)** - Recommended for most users:
+```bash
+go build -ldflags=""-s -w"" .
+```
+- Size: 7.4M
+- All core functionality including git status, display options, sorting, filtering
+
+**Full build** - For power users:
+```bash
+go build -ldflags=""-s -w"" -tags=""fuzzy mounts"" .
+```
+- Size: 8.1M  
+- All features including fuzzy search and mount detection
+
+**Custom builds**:
+```bash
+# Only fuzzy search
+go build -tags=""fuzzy"" .
+
+# Only mount details
+go build -tags=""mounts"" .
+```
+
+### Backwards Compatibility
+
+- Default build provides 95% of functionality most users need
+- Optional features degrade gracefully when disabled (no errors)
+- All command-line flags remain functional
+- Core git integration via CLI preserved in all builds
+
+### Documentation
+
+- Added `docs/BUILD_OPTIONS.md` with detailed build instructions
+- Added `docs/SIZE_REDUCTION_SUMMARY.md` with results summary
+- Updated `justfile` with new build targets (`build-lite`, `build-full`, etc.)
+
+This approach allows users to choose between binary size and optional functionality based on their needs, while maintaining full backwards compatibility.
+
+Fixes #237.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-04T07:06:35Z,2025-07-04T21:56:21Z,2025-07-04T21:56:21Z,631466180,https://api.github.com/repos/Equationzhao/g,https://github.com/Equationzhao/g/pull/253,"analysisWe need to classify as performance or non-performance. The PR is about reducing binary size via build tags. It's about binary size reduction, which is a performance improvement? The instruction says performance-related PRs may contain keywords like latency, optimization, slow, memory, speed, etc. Binary size reduction is a performance improvement in terms of resource usage. But does it count? The instruction says ""performance-related pull requests may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs."" Binary size reduction is about efficiency, but the keywords list doesn't include ""size"" or ""binary"". However, ""performance"" is included. The PR title: ""build: Add optional build tags to reduce binary size"". The body: ""This PR implements conditional compilation using Go build tags to make optional features truly optional, allowing users to choose between a smaller binary and full functionality."" It mentions binary size reduction. That is a performance improvement. The instruction says performance-related PRs may contain keywords such as... or any other terms referring to how faster and efficiently software runs. Binary size is a measure of efficiency. So likely classify as performance. The PR is about reducing binary size, which is a performance improvement. So classification: performance.assistantfinalperformance",39,1.0,True
+3181044499,2406,Remove testing libraries from production environments,"This PR addresses the issue of testing libraries being included in production builds, which unnecessarily increases binary size.
+
+## Problem
+The `github.com/stretchr/testify` library was being imported by non-test files, causing it to be included in production builds even though it's only needed for testing.
+
+## Changes Made
+
+### 1. Renamed test utility files to follow Go conventions
+- `block/test_utils.go` → `block/test_utils_test.go`
+- `execution/evm/test_helpers.go` → `execution/evm/test_helpers_test.go`
+
+Files with the `_test.go` suffix are automatically excluded from production builds by the Go compiler.
+
+### 2. Added build tags to exclude mock files from production
+- Added `//go:build test` tag to `da/internal/mocks/da.go`
+
+This ensures mock files are only included when building with the `test` tag.
+
+## Verification
+
+### Production builds no longer include testify:
+```bash
+# Production build works without testify
+go build ./...
+
+# Verify no testify imports in production code
+go mod why github.com/stretchr/testify
+# Output: (main module does not need package github.com/stretchr/testify)
+```
+
+### Tests continue to work:
+```bash
+# Regular tests pass
+go test ./...
+
+# DA module tests with mocks
+cd da && go test -tags=test ./...
+```
+
+## Impact
+- **Reduced binary size**: Testing libraries are excluded from production builds
+- **Clean separation**: Clear distinction between test and production code  
+- **No breaking changes**: All existing tests continue to pass
+- **Development workflow preserved**: No impact on testing or development
+
+The mock files in the `test/` directory are naturally excluded from production builds due to their location, while the renamed utility files and tagged mock files ensure complete separation of test dependencies from production code.
+
+Fixes #2350.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-27T01:51:13Z,2025-06-30T08:49:36Z,,335571729,https://api.github.com/repos/evstack/ev-node,https://github.com/evstack/ev-node/pull/2406,"analysisWe need to classify as performance or non-performance. The PR removes testing libraries from production builds, reducing binary size. That is a performance improvement (binary size). The description mentions ""Reduced binary size"". That is a performance improvement. So classify as 'performance'.assistantfinalperformance",39,1.0,True
+3214900515,6612,Add slow tag for archived packages,"## Summary
+- mark archived packages with `//go:build slow` so they are skipped on normal test runs
+- mark `cmd/ft2mochi` as slow because it imports archived code
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686e17683f98832093e194c877fe0d39",OpenAI_Codex,1218621,tamnd,closed,2025-07-09T07:48:24Z,2025-07-09T11:16:21Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/6612,"analysisWe need to classify as performance or non-performance. The PR adds a slow tag for archived packages, marking them with //go:build slow so they are skipped on normal test runs. This is about test performance? It's about skipping slow tests. The title: ""Add slow tag for archived packages"". The body: ""mark archived packages with //go:build slow so they are skipped on normal test runs"". This is about test performance, but is it a performance improvement? It's about skipping slow tests to speed up test runs. That is a performance improvement. The guidelines: performance-related PRs may contain keywords such as latency, optimization, slow, etc. The PR contains ""slow"" and ""skipped on normal test runs"". So it's performance. So classify as 'performance'.assistantfinalperformance",39,1.0,False
+3225673491,8163,Fix slow build scripts tests,"## Summary
+- mark `compile_tpch_go.go` as slow
+- add a small `doc.go` so the scripts package has buildable source
+
+## Testing
+- `go test ./scripts`
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6872acd4009c83208ca84d6c41cc902f",OpenAI_Codex,1218621,tamnd,closed,2025-07-12T18:52:20Z,2025-07-12T18:52:32Z,2025-07-12T18:52:32Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/8163,"analysisWe need to classify as performance or non-performance. The PR title: ""Fix slow build scripts tests"". Summary: mark compile_tpch_go.go as slow, add doc.go so scripts package has buildable source. This is about build scripts tests, marking a file as slow. It's about test performance? The description: ""Fix slow build scripts tests"". That indicates performance improvement. The keywords: slow, performance. So classification: performance.assistantfinalperformance",39,1.0,False
+3209397522,6114,Add slow build tags to compiler,"## Summary
+- mark `compiler/x/go` and `compiler/x/python` sources as `slow`
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686bdfafd950832086d4e4a7f76ba723",OpenAI_Codex,1218621,tamnd,closed,2025-07-07T15:12:50Z,2025-07-07T15:13:04Z,2025-07-07T15:13:04Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/6114,"analysisWe need to classify the pull request as performance or non-performance. The title: ""Add slow build tags to compiler"". The body: ""mark compiler/x/go and compiler/x/python sources as slow"". This is about marking slow build tags. It's about build performance? The tags indicate slow builds. It's about performance? The tags are for slow builds, which is about build performance. The PR is to add slow build tags to compiler. That is a performance-related change: marking slow builds. So classification: performance.assistantfinalperformance",39,1.0,False
+3189971928,7990,Build tag to exclude Cloud archiver providers,"## What changed?
+
+Added a build tag to exclude cloud archiver providers. The filesystem one is unaffected (as it is needed for tests).
+
+## Why?
+
+Reduce binary size by 24MB for when cloud archiver providers are not needed.
+
+
+
+**Before** (without `disable_grpc_modules`)
+
+```
+-rwxr-xr-x@ 1 stephan  staff   119M Jun 30 16:35 temporal-server
+```
+
+**After**
+
+```
+-rwxr-xr-x@ 1 stephan  staff    95M Jun 30 16:23 temporal-server
+```
+",OpenAI_Codex,159852,stephanos,open,2025-06-30T21:58:41Z,,,215654064,https://api.github.com/repos/temporalio/temporal,https://github.com/temporalio/temporal/pull/7990,"analysisWe need to classify as performance or non-performance. The PR reduces binary size by 24MB. That is a performance improvement? It's about binary size, which is a performance metric (size, load time). The description: ""Reduce binary size by 24MB for when cloud archiver providers are not needed."" That is a performance improvement. So classify as 'performance'.assistantfinalperformance",39,1.0,True
+3153792462,1359,Disable slow tests,"## Summary
+- disable interpreter tests
+- disable LeetCode example tests for all compilers
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68517e964bd4832084704719dca6a72e",OpenAI_Codex,1218621,tamnd,closed,2025-06-17T14:50:02Z,2025-06-17T14:51:51Z,2025-06-17T14:51:51Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/1359,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Disable slow tests"". Body: ""disable interpreter tests, disable LeetCode example tests for all compilers"". This is about disabling tests that are slow, not performance improvement of code. It's about test suite speed, but the classification is about performance improvement of software. The PR is about disabling tests to speed up test runs, but is that considered performance? The instruction says performance-related PRs may contain keywords like speed, perf, etc. This PR mentions ""slow tests"" and disabling them. That is about test performance, but the primary purpose is to reduce test time, not to improve code performance. The classification likely ""non-performance"". The guidelines: ""Performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" The PR mentions ""slow tests"" which is a keyword ""slow"". But the primary purpose is to disable tests, not to improve performance of the code. But the instruction says ""primary purpose of the pull request is to improve performance."" This PR is about disabling slow tests to speed up test runs. That is a performance improvement of the test suite. But is that considered performance? The guidelines mention ""slow"" as a keyword. So maybe it's performance. But the PR is about disabling tests, not optimizing code. But the test suite speed is a performance aspect. The classification might be ""performance"" because it addresses slow tests. However, the guidelines might consider that disabling tests is not a performance improvement of the code, but a test suite optimization. But the guidelines say ""performance-related pull requests may contain keywords such as... slow"". So it might be considered performance. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The primary purpose is to disable slow tests, which is to improve test performance. So yes, it's performance. So classify as 'performance'.assistantfinalperformance",39,1.0,False
+3273294047,14608,Mark a2mochi packages as slow,"## Summary
+- exclude tools/a2mochi from default builds by adding `//go:build slow` tags
+
+## Testing
+- `go test ./...`
+- `go build ./...`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6888b00f0adc83209cb42d91470da470",OpenAI_Codex,1218621,tamnd,closed,2025-07-29T11:39:15Z,2025-07-29T11:39:28Z,2025-07-29T11:39:28Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/14608,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Mark a2mochi packages as slow"". Summary: exclude tools/a2mochi from default builds by adding //go:build slow tags. This is about marking packages as slow, likely to exclude them from default builds to avoid slow tests. It's about performance, but is it a performance improvement? It's marking packages as slow to avoid them in default builds. That is a performance-related change: it's about test speed. The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. The PR includes ""slow"" keyword. So it's performance. So classify as 'performance'.assistantfinalperformance",39,1.0,False
+3134947414,7896,[PoC] Build tag for lightweight test build,"Build tag that removes the 3 dependencies from the test binary:
+
+- github.com/aws/aws-sdk-go
+- cloud.google.com/go
+- github.com/jackc/pgx
+
+**Before: ~13.6s build time**
+
+```
+hyperfine --warmup 1 ""rm -f test_binary && go test -tags test_dep -count=1 -c -o test_binary ./tests""    
+
+Benchmark 1: rm -f test_binary && go test -tags test_dep -count=1 -c -o test_binary ./tests
+  Time (mean ± σ):     13.616 s ±  0.215 s    [User: 13.757 s, System: 3.726 s]
+  Range (min … max):   13.269 s … 14.046 s    10 runs
+```
+
+
+**After: ~9.3s build time**
+
+```
+hyperfine --warmup 1 ""rm -f test_binary && go test -tags test_dep,lite -count=1 -c -o test_binary ./tests""
+
+Benchmark 1: rm -f test_binary && go test -tags test_dep,lite -count=1 -c -o test_binary ./tests
+  Time (mean ± σ):      9.314 s ±  0.138 s    [User: 9.803 s, System: 3.450 s]
+  Range (min … max):    9.038 s …  9.529 s    10 runs
+```
+
+=> 32% speedup.",OpenAI_Codex,159852,stephanos,closed,2025-06-10T22:04:49Z,2025-06-11T20:18:37Z,,215654064,https://api.github.com/repos/temporalio/temporal,https://github.com/temporalio/temporal/pull/7896,"analysisWe need to classify as performance or non-performance. The PR is about build tag to remove dependencies, resulting in faster build time. That is performance improvement. So label 'performance'.assistantfinalperformance",39,1.0,False
+3209767267,6160,Mark compiler packages as slow,"## Summary
+- label Cobol and Rust compiler packages with `//go:build slow`
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686bff36d0b883209e0d13642ea34c0d",OpenAI_Codex,1218621,tamnd,closed,2025-07-07T17:26:05Z,2025-07-07T17:26:20Z,2025-07-07T17:26:20Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/6160,"analysisWe need to classify the pull request as performance or non-performance. The title: ""Mark compiler packages as slow"". The body: ""label Cobol and Rust compiler packages with `//go:build slow`"". Testing: go test./... The PR is about marking compiler packages as slow. That is a performance-related change: marking packages as slow indicates they are slow to compile or run tests. The keywords: slow. So it's performance. So classification: performance.assistantfinalperformance",39,1.0,False

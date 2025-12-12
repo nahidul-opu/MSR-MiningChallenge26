@@ -1,0 +1,588 @@
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
+3158935716,5425,Add ESLint rule for slow CSS properties that may impact GPU rendering,"This PR adds a new ESLint rule `@remotion/slow-css-property` that warns developers when they use CSS properties that may slow down rendering on machines without a GPU.
+
+## What it does
+
+The rule detects usage of the following CSS properties in React style objects:
+- `boxShadow` - Box shadow effects
+- `textShadow` - Text shadow effects  
+- `filter` - CSS filter effects (blur, brightness, etc.)
+
+When any of these properties are used, the rule displays a warning:
+```
+This GPU effect may slow down the render on machines which don't have a GPU.
+See: https://remotion.dev/docs/gpu
+```
+
+## Examples
+
+❌ **Invalid** (triggers warning):
+```javascript
+const style = {
+  boxShadow: ""0 0 5px red"",
+  textShadow: ""1px 1px 1px black"",
+  filter: ""blur(5px)""
+};
+```
+
+✅ **Valid** (no warning):
+```javascript
+const style = {
+  color: ""red"",
+  backgroundColor: ""blue"",
+  margin: 10,
+  // String keys don't trigger the rule
+  ""box-shadow"": ""0 0 5px red""
+};
+```
+
+## Implementation Details
+
+- Added new rule file: `src/rules/slow-css-property.ts`
+- Added comprehensive tests: `src/tests/slow-css-property.test.ts`
+- Updated main index to export the rule and include it in recommended config as a ""warn"" level rule
+- Follows existing code patterns and ESLint plugin conventions
+- All existing tests continue to pass
+
+The rule is automatically included when using `@remotion/eslint-plugin` with the recommended configuration.
+
+Fixes #5424.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-19T04:57:31Z,2025-06-19T08:10:04Z,2025-06-19T08:10:04Z,274495425,https://api.github.com/repos/remotion-dev/remotion,https://github.com/remotion-dev/remotion/pull/5425,analysisWe need to classify whether the primary purpose of the PR is to improve performance. The PR adds an ESLint rule to warn about slow CSS properties that may impact GPU rendering. This is about performance: it warns about properties that may slow rendering. So it's performance-related. The classification: 'performance'.assistantfinalperformance,34,1.0,False
+3245889248,496,Implement MeshData API and Job System optimization for UMA mesh combiners,"This PR implements high-performance mesh combiners that leverage Unity's newer MeshData API and Job System to significantly improve the performance of UMA's mesh combining operations.
+
+## Performance Improvements
+
+The new optimized combiners provide substantial performance gains:
+- **Large meshes** (5000+ vertices): **60-200% faster**
+- **Medium meshes** (1000-5000 vertices): **30-60% faster**
+- **Reduced memory allocations** and GC pressure through NativeArray usage
+- **Parallel processing** across multiple CPU cores with Burst compilation
+
+## Implementation
+
+### New Components
+
+1. **`UMAMeshDataCombiner`** (Recommended)
+   - Uses Unity's MeshData API for direct buffer access
+   - Job-based parallel vertex processing with `IJobParallelFor`
+   - Supports Unity 2020.1+ with automatic fallback
+   - Comprehensive vertex attribute support (positions, normals, tangents, UVs, colors)
+
+2. **`UMAJobifiedMeshCombiner`**
+   - Basic job-based processing structure
+   - Compatible with Unity 2019.3+
+   - Foundation for incremental optimization
+
+3. **`UMAOptimizedMeshCombinerExample`**
+   - Performance testing and comparison component
+   - Runtime switching between combiner types
+   - Built-in benchmarking tools
+
+### Technical Approach
+
+Uses a **hybrid architecture** that maximizes performance while maintaining full compatibility:
+
+```csharp
+// Optimized operations (new)
+- Parallel vertex position copying with expandAlongNormal support
+- Parallel normal/tangent/UV/color processing
+- Direct MeshData buffer access
+- Burst-compiled native code execution
+
+// Complex operations (existing)
+- Bone weight processing and remapping
+- Blend shape handling
+- Triangle index processing
+- Material and submesh management
+```
+
+### Key Features
+
+- **Zero breaking changes**: Drop-in replacements for existing combiners
+- **Full UMA compatibility**: Supports all features (blend shapes, bone weights, materials, etc.)
+- **Graceful fallback**: Automatically handles unsupported platforms/versions
+- **Memory efficient**: Proper NativeArray disposal and minimal allocations
+- **Error handling**: Comprehensive try-catch blocks with detailed logging
+
+## Usage
+
+### Quick Integration
+```csharp
+// Replace existing combiner with optimized version
+var oldCombiner = GetComponent<UMAMeshCombiner>();
+if (oldCombiner != null) DestroyImmediate(oldCombiner);
+
+gameObject.AddComponent<UMAMeshDataCombiner>();
+```
+
+### Performance Testing
+```csharp
+// Use the provided example component
+var example = gameObject.AddComponent<UMAOptimizedMeshCombinerExample>();
+example.PerformanceTest(); // Compare all combiner types
+```
+
+## Compatibility
+
+- **Unity Versions**: 2020.1+ (MeshData API), 2019.3+ (Jobs only)
+- **Platforms**: All platforms supporting Unity's Job System and Burst compilation
+- **UMA Features**: 100% compatible with existing functionality
+
+## Documentation
+
+Includes comprehensive documentation:
+- Performance analysis and benchmarking guide
+- Usage instructions and examples
+- Troubleshooting and platform-specific notes
+- Technical implementation details
+- Future enhancement roadmap
+
+This implementation provides immediate performance benefits while establishing a foundation for future optimizations, ensuring UMA remains performant as character complexity continues to grow.
+
+Fixes #495.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,open,2025-07-20T03:07:04Z,,,85005919,https://api.github.com/repos/umasteeringgroup/UMA,https://github.com/umasteeringgroup/UMA/pull/496,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Implement MeshData API and Job System optimization for UMA mesh combiners"". Body describes performance improvements, speed, memory, etc. So it's performance. So output 'performance'.assistantfinalperformance",34,1.0,False
+3238704789,1074,Implement terrain patches to reduce GPU load for large terrains,"This PR implements a terrain patch system that splits large terrains into smaller, manageable chunks to significantly reduce GPU performance issues when rendering large terrains.
+
+## Problem
+Currently, rendering large terrains generates massive vertex/index arrays that overwhelm the GPU, causing performance bottlenecks. The entire terrain was rendered as a single geometry object regardless of size.
+
+## Solution
+The patch system divides terrains into configurable sub-sections (patches) that are rendered individually:
+
+### Core Changes
+- **New `TerrainPatch` type** - Represents a subdivision of terrain with its own bounds and resolution
+- **Extended terrain descriptors** - Added `PatchSize` property to `TerrainGeometryDescriptor` and `TerrainDescriptor`
+- **Patch-based geometry generation** - New `tryCreatePhysicallyBasedTerrainPatchGeometry` function creates geometry for individual patches
+- **Updated rendering pipeline** - Modified terrain categorization, shadow rendering, and main rendering to handle patch arrays
+
+### TerrainFacet Integration
+- Added `PatchSize` property to `TerrainFacet` with default value of 64×64 height map samples
+- Seamless integration with existing terrain creation workflow
+- Backward compatibility maintained
+
+### Material System Support
+The patch system fully supports the existing terrain material pipeline:
+- Normal map extraction for patch regions
+- Tint image processing per patch
+- Blend weight computation
+- Proper vertex format matching
+
+### Performance Benefits
+- **Reduced GPU load** - Smaller geometry chunks instead of massive single meshes
+- **Future optimization ready** - Enables per-patch frustum culling and LOD
+- **Configurable granularity** - Adjustable patch sizes for different use cases
+- **Fallback support** - Automatically uses single patch for small terrains
+
+### Example Usage
+```fsharp
+// Default patch size (64x64 samples)
+terrain ""MyTerrain"" [
+    TerrainMaterial <| BlendMaterial { /* material config */ }
+    HeightMap <| RawHeightMap { Resolution = v2i 1025 1025; /* config */ }
+]
+
+// Custom patch size for very large terrains
+terrain ""LargeTerrain"" [
+    TerrainMaterial <| BlendMaterial { /* material config */ }
+    HeightMap <| RawHeightMap { Resolution = v2i 2049 2049; /* config */ }
+    PatchSize <| v2i 128 128  // Larger patches for huge terrains
+]
+```
+
+This addresses the performance concern mentioned in the issue about enabling proximity debug drawing for height maps without killing performance.
+
+Fixes #747.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `esm.ubuntu.com`
+>   - Triggering command: `/usr/lib/apt/methods/https` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-17T08:46:08Z,2025-07-24T16:31:01Z,,11965691,https://api.github.com/repos/bryanedds/Nu,https://github.com/bryanedds/Nu/pull/1074,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Implement terrain patches to reduce GPU load for large terrains"". Body describes reducing GPU load, performance benefits, etc. It's clearly performance. So label 'performance'.assistantfinalperformance",34,1.0,True
+3238286297,1073,Implement terrain patches for improved GPU performance,"This PR implements terrain patches to address GPU performance issues when rendering large terrains. The solution automatically subdivides large terrains into smaller, cullable chunks without breaking existing APIs.
+
+## Problem
+Currently, rendering large terrains consumes excessive GPU resources because the entire terrain is rendered as a single mesh. This prevents efficient frustum culling and makes proximity debug drawing for height maps impractical due to performance concerns.
+
+## Solution
+The implementation adds an automatic terrain patching system that:
+
+- **Automatically subdivides large terrains** (>64x64 vertices) into 64x64 vertex patches
+- **Maintains full backwards compatibility** - existing terrain code works unchanged
+- **Enables per-patch frustum culling** for better GPU utilization
+- **Uses configurable patch size** via `Constants.Render.TerrainPatchSize`
+
+## Key Changes
+
+### Core Infrastructure
+- Added `TerrainPatchSize` constant (64 vertices) in `Constants.fs`
+- Added `TerrainPatch` type to represent terrain subdivisions
+- Extended `TerrainGeometryDescriptor` and `TerrainDescriptor` with optional patch information
+
+### Smart Patch System
+- `TerrainPatch.calculateTerrainPatches` function handles subdivision logic
+- Edge patches correctly handle non-even divisions (e.g., 200x200 terrain creates 4x4 patches with 8-vertex edge patches)
+- Small terrains (<64x64) continue using single-mesh rendering
+
+### Rendering Pipeline Updates
+- Modified `categorizeTerrain` to detect when patches should be used
+- Updated terrain geometry creation to handle both single-mesh and patch-based rendering
+- Each patch is treated as independent geometry with its own bounds for culling
+
+## Testing
+Created validation scripts that confirm:
+- 200x200 terrain correctly generates 16 patches (4x4 grid)
+- Edge patches handle remainder vertices properly (8x64, 64x8, 8x8 for edges/corners)
+- Small terrains (32x32) use single patch as expected
+- All patch bounds calculations are accurate
+
+## Performance Benefits
+- **Reduced GPU load**: Only visible terrain patches are rendered
+- **Better memory utilization**: Patches enable more efficient GPU processing
+- **Enables proximity debug drawing**: Height map debugging can now be used without performance concerns
+- **Automatic optimization**: No code changes needed - patches activate automatically for large terrains
+
+## Example
+```fsharp
+// Before: 512x512 terrain renders as single 262,144 vertex mesh
+// After: Same terrain automatically splits into 64 patches of 64x64 vertices each
+//        Only visible patches are rendered based on frustum culling
+```
+
+This change directly addresses the core issue while maintaining complete API compatibility. Developers can now enable proximity debug drawing for height maps without performance penalties.
+
+Fixes #747.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-17T06:19:52Z,2025-07-17T08:45:05Z,,11965691,https://api.github.com/repos/bryanedds/Nu,https://github.com/bryanedds/Nu/pull/1073,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Implement terrain patches for improved GPU performance"". Body describes GPU performance improvements, culling, etc. It's clearly performance. So output 'performance'.assistantfinalperformance",34,1.0,True
+3224573615,279,Add Raspberry Pi 4 hardware acceleration support and debugging utilities,"This PR addresses video playback performance issues on Raspberry Pi 4 by implementing comprehensive hardware acceleration support and debugging tools.
+
+## Problem
+Users reported poor video performance on Raspberry Pi 4:
+- 1080p 30fps videos lagging without widgets
+- 720p 30fps videos lagging with animated widgets overlay
+- High CPU usage indicating software decoding instead of hardware acceleration
+- Lack of clear guidance for enabling hardware acceleration
+
+## Solution
+
+### 📚 Enhanced Documentation
+Added comprehensive Raspberry Pi 4 setup guide with:
+- Step-by-step instructions for removing bundled FFmpeg libraries
+- System FFmpeg installation with V4L2 hardware acceleration
+- Performance optimization tips (elinux, GPU memory, desktop environment)
+- Troubleshooting section for common issues
+
+### 🔍 Runtime Detection & Warnings
+Implemented automatic Pi4 detection that:
+- Warns when bundled `libffmpeg.so.*` files block hardware acceleration
+- Checks for V4L2 video devices availability
+- Provides specific file paths for library removal
+- Logs hardware-optimized decoder selection
+
+### 🛠️ Debug Utilities
+Added new utility methods for troubleshooting:
+
+```dart
+import 'package:fvp/fvp.dart' as fvp;
+
+// Check system hardware support
+final systemInfo = await fvp.FVPUtils.checkSystemHardwareSupport();
+print('Hardware acceleration blocked: ${systemInfo['hardwareAccelerationBlocked']}');
+
+// Get current decoder configuration  
+final decoderInfo = fvp.FVPUtils.getDecoderInfo();
+print('Pi4 detected: ${decoderInfo['isRaspberryPi']}');
+
+// Check per-player acceleration status
+final hwInfo = controller.getHardwareAccelerationInfo();
+print('Video codec: ${hwInfo['mediaInfo']['videoCodec']}');
+```
+
+### 🎯 Enhanced Example App
+Added ""Debug Info"" tab demonstrating:
+- Real-time hardware acceleration status
+- System information display with color-coded warnings
+- Interactive troubleshooting interface
+
+## Key Features
+- **Automatic Pi4 Detection**: Uses `/dev/vchiq` presence for reliable identification
+- **Bundled FFmpeg Detection**: Scans common library directories and warns users
+- **V4L2 Device Verification**: Checks for hardware decoder availability
+- **Comprehensive Logging**: Enhanced debug information for decoder selection
+- **Zero Breaking Changes**: All new functionality is additive and optional
+
+## Technical Implementation
+- **Runtime Warnings**: `_checkRaspberryPiSetup()` provides actionable guidance
+- **Debug Utilities**: `FVPUtils` class with static methods for system analysis
+- **Controller Extensions**: `getHardwareAccelerationInfo()` for per-player status
+- **Error Handling**: Safe file system operations with graceful fallbacks
+
+## Usage Example
+The new tools help users quickly identify and resolve acceleration issues:
+
+```dart
+// Enable debug logging and check system
+fvp.registerWith(options: {
+  'video.decoders': ['V4L2M2M', 'FFmpeg:hwcontext=drm', 'FFmpeg'],
+  'global': {'log': 'debug'}
+});
+
+// Runtime will now warn: 
+// ""Raspberry Pi detected: Bundled FFmpeg libraries found in /path/to/lib""
+// ""For hardware acceleration, remove bundled FFmpeg: rm /path/to/libffmpeg.so.6""
+```
+
+This transforms Pi4 hardware acceleration from a trial-and-error process into a guided procedure with built-in validation and comprehensive troubleshooting capabilities.
+
+Fixes #276.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-12T00:40:28Z,2025-07-12T03:17:43Z,,540673185,https://api.github.com/repos/wang-bin/fvp,https://github.com/wang-bin/fvp/pull/279,"analysisWe need to classify as 'performance' or 'non-performance'. The PR is about adding Raspberry Pi 4 hardware acceleration support and debugging utilities to improve video playback performance. It explicitly mentions performance issues, lag, CPU usage, hardware acceleration, etc. So it's performance.assistantfinalperformance",34,1.0,False
+3230709333,1071,Optimize billboard rendering for 3D particles with specialized batched render path,"This PR implements an optimized billboard rendering system specifically designed for 3D particle systems, addressing the need for efficient batched billboard rendering with blend and flip support.
+
+## Changes Made
+
+### 1. New Render Message Type
+Added `RenderStaticBillboards` type that supports batched rendering of multiple billboards with shared material properties but individual:
+- Color and emission values per billboard
+- Blend modes (Transparent, Additive, Overwrite) 
+- Flip options (FlipNone, FlipH, FlipV, FlipHV)
+- Transform matrices
+
+### 2. Fast Path API
+Implemented `World.renderStaticBillboardFast` method that provides a high-performance rendering path by:
+- Bypassing normal message allocation overhead
+- Batching billboards with the same material
+- Supporting individual per-billboard properties
+
+```fsharp
+World.renderStaticBillboardFast(
+    &modelMatrix, castShadow, presence, insetOpt, orientUp, planar,
+    &materialProperties, &material, &color, &emission, 
+    blend, flip, shadowOffset, depthTest, renderType, renderPass, world)
+```
+
+### 3. Blend Mode Support
+Added infrastructure for blend modes in 3D billboard rendering:
+- **Transparent**: Standard alpha blending for particles
+- **Additive**: Bright glowing effects for sparks/fire
+- **Overwrite**: Solid billboard rendering
+
+### 4. Flip Support
+Full texture flipping support for billboard variety:
+- Individual flip control per billboard
+- Supports horizontal, vertical, and combined flipping
+
+## Performance Benefits
+
+1. **Batched Rendering**: Multiple billboards sharing materials are rendered efficiently
+2. **Fast Path**: Eliminates message allocation overhead for high-frequency particle updates
+3. **Particle Optimized**: Designed specifically for particle system use cases with hundreds/thousands of billboards
+
+## Example Usage
+
+```fsharp
+// Fire particle with additive blending and emission
+let modelMatrix = Matrix4x4.CreateTranslation(particlePosition)
+let color = Color(1.0f, 0.5f, 0.0f, alpha) // Orange with fade
+let emission = Color(1.0f, 0.3f, 0.0f, 1.0f) // Glowing orange
+
+World.renderStaticBillboardFast(
+    &modelMatrix, false, Presence.Present, ValueNone, true, false,
+    &materialProps, &material, &color, &emission, 
+    Additive, FlipNone, 0.0f, LessThanOrEqualTest,
+    ForwardRenderType(0.0f, 0.0f), NormalPass, world)
+```
+
+This implementation provides the foundation for high-performance 3D particle systems while maintaining compatibility with existing billboard rendering infrastructure.
+
+Fixes #700.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-15T04:23:51Z,2025-07-15T04:53:59Z,,11965691,https://api.github.com/repos/bryanedds/Nu,https://github.com/bryanedds/Nu/pull/1071,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Optimize billboard rendering for 3D particles with specialized batched render path"". Body describes optimized billboard rendering, batched rendering, fast path, eliminating message allocation overhead, performance benefits. Contains keywords: optimize, performance, batched, fast path, high-performance, efficient. So it's performance.assistantfinalperformance",34,1.0,False
+3232691904,259,Add Intel/AMD GPU hardware acceleration support for video conversion,"## Summary
+
+This PR adds support for Intel and AMD GPU hardware acceleration to the video conversion module, extending the existing NVIDIA GPU support. The implementation provides hardware-accelerated video encoding for Intel GPUs (via VAAPI) and AMD GPUs (via AMF), with automatic fallback to CPU encoding when needed.
+
+## Changes Made
+
+### Core Implementation
+- **Intel GPU (VAAPI) Support**: Added complete VAAPI implementation with device initialization and hardware upload filters
+- **AMD GPU (AMF) Support**: Added AMF encoder support with simplified setup
+- **Hardware Priority System**: Implemented priority-based selection: NVIDIA > Intel > AMD > CPU fallback
+- **Codec Mappings**: Added H.264 and H.265 support for both Intel and AMD GPUs
+
+### Configuration
+- Added `INTEL_GPU_AVAILABLE` environment variable for Intel GPU detection
+- Added `AMD_GPU_AVAILABLE` environment variable for AMD GPU detection
+- Extended settings configuration to include new GPU availability flags
+- Maintained full backward compatibility with existing NVIDIA settings
+
+### Command Generation Examples
+
+**Intel GPU (VAAPI)**:
+```bash
+ffmpeg -init_hw_device vaapi=intel:/dev/dri/renderD128 \
+       -filter_hw_device intel \
+       -i input.mkv \
+       -vf format=nv12,hwupload \
+       -c:v h264_vaapi \
+       -qp 22 \
+       output.mkv
+```
+
+**AMD GPU (AMF)**:
+```bash
+ffmpeg -i input.mkv \
+       -c:v h264_amf \
+       -qp 22 \
+       output.mkv
+```
+
+**NVIDIA GPU (CUDA)** (unchanged):
+```bash
+ffmpeg -hwaccel cuda \
+       -hwaccel_output_format cuda \
+       -i input.mkv \
+       -c:v h264_nvenc \
+       -preset fast \
+       -cq 22 \
+       output.mkv
+```
+
+## Key Features
+
+- **Automatic Hardware Detection**: System automatically selects the best available GPU acceleration
+- **Graceful Fallback**: Unsupported codecs automatically fall back to CPU encoding
+- **Minimal Changes**: Surgical implementation that extends existing patterns without breaking changes
+- **Comprehensive Testing**: Added validation scripts and test infrastructure
+- **Documentation**: Updated comments to reflect implemented VAAPI support
+
+## Technical Details
+
+### Hardware Acceleration Priority
+1. **NVIDIA GPU (CUDA)** - if available and enabled
+2. **Intel GPU (VAAPI)** - if available and enabled  
+3. **AMD GPU (AMF)** - if available and enabled
+4. **CPU Fallback** - software encoding
+
+### Supported Codecs
+- **Intel VAAPI**: H.264 (`h264_vaapi`), H.265 (`hevc_vaapi`)
+- **AMD AMF**: H.264 (`h264_amf`), H.265 (`hevc_amf`)
+- **Fallback**: VP8, VP9, AV1 automatically use CPU encoding
+
+## Testing
+
+- All existing tests continue to pass
+- Created comprehensive validation scripts
+- Verified codec mappings and command structures
+- Validated hardware acceleration priority logic
+- Confirmed fallback mechanisms work correctly
+
+## Backward Compatibility
+
+✅ **Fully backward compatible**
+- All existing NVIDIA GPU functionality unchanged
+- No breaking changes to existing APIs
+- New GPU types are additional options, not replacements
+- Existing environment variables and settings preserved
+
+## Usage
+
+No code changes required for existing functionality. The system automatically uses the best available acceleration method based on:
+
+- Available GPU hardware
+- `TRAILER_HARDWARE_ACCELERATION` setting (global toggle)
+- Individual GPU availability flags
+- Codec support for the selected GPU type
+
+To enable the new GPU types, simply set the appropriate environment variables:
+```bash
+INTEL_GPU_AVAILABLE=true   # Enable Intel GPU acceleration
+AMD_GPU_AVAILABLE=true     # Enable AMD GPU acceleration
+```
+
+Resolves the issue mentioned in the problem statement about implementing Intel/AMD GPU hardware acceleration options that were previously commented out as ""not implementing.""
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,open,2025-07-15T15:16:53Z,,,768813127,https://api.github.com/repos/nandyalu/trailarr,https://github.com/nandyalu/trailarr/pull/259,analysisWe need to classify whether the primary purpose is performance improvement. The PR adds Intel/AMD GPU hardware acceleration support for video conversion. This is about performance: hardware acceleration speeds up video encoding. So it's performance. The classification: 'performance'.assistantfinalperformance,34,1.0,True
+3112822851,27,Add viewer and adaptive resolution,"## Summary
+- add a simple WebRTC `viewer.html`
+- document remote viewer and adaptive mode in README
+- implement adaptive resolution toggle in `j360.ts`
+- expose `toggleAdaptive` in type declarations
+- support `--adaptive` option in CLI
+- update CLI and encoder tests
+- provide test stubs for TypeScript and ffmpeg
+
+## Testing
+- `npm test`
+
+------
+https://chatgpt.com/codex/tasks/task_e_683e862c544c8328adca501270226361",OpenAI_Codex,843228,imgntn,closed,2025-06-03T07:38:24Z,2025-06-03T07:39:25Z,2025-06-03T07:39:25Z,76519330,https://api.github.com/repos/imgntn/j360,https://github.com/imgntn/j360/pull/27,"analysisWe need to classify whether the primary purpose is performance improvement. The PR adds viewer and adaptive resolution, implements adaptive resolution toggle, support CLI option, update tests. The focus is on adaptive resolution, which is about performance? Adaptive resolution toggling can improve performance by reducing resolution to improve speed. But is the primary purpose performance? The PR adds viewer and adaptive resolution, but the main change is adding adaptive resolution toggle. That is a performance improvement feature. The description: ""implement adaptive resolution toggle in j360.ts"" and ""support --adaptive option in CLI"". Adaptive resolution is about performance. So likely performance. The guidelines: performance-related PR may contain keywords like performance, speed, etc. The title: ""Add viewer and adaptive resolution"". The body: ""implement adaptive resolution toggle"". That is a performance improvement. So classify as 'performance'.assistantfinalperformance",34,1.0,False
+3119420084,33,Add GPU shader plugins and adaptive capture improvements,"## Summary
+- support GPU-powered plugins via `createWebGLProcessor`
+- expose adaptive resolution range flags in the CLI
+- show capture metrics in VR HUD and remote pages
+- add sample invert shader plugin
+- update docs and tests for new CLI options
+
+## Testing
+- `npm test`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68402244f90083288d96066790094c14",OpenAI_Codex,843228,imgntn,closed,2025-06-04T23:57:32Z,2025-06-04T23:58:23Z,2025-06-04T23:58:23Z,76519330,https://api.github.com/repos/imgntn/j360,https://github.com/imgntn/j360/pull/33,"analysisWe need to classify whether the primary purpose is performance. The PR adds GPU shader plugins and adaptive capture improvements. It mentions GPU-powered plugins, adaptive resolution range flags, capture metrics. This seems performance-related: GPU shaders can improve performance, adaptive capture improvements likely performance. So classify as 'performance'.assistantfinalperformance",34,1.0,False
+3120480438,40,Add GPU little planet support,"## Summary
+- add shader and `toLittlePlanetGpu()` in `CubemapToEquirectangular`
+- call the new method from `downloadLittlePlanet()` when GPU is available
+- document GPU little planet feature in README and docs
+- include definition in TypeScript declarations
+- add regression test for little planet output size
+- wire new test in npm script
+
+## Testing
+- `npm test`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68415cf2cb908328a9d6d334d1a4dff3",OpenAI_Codex,843228,imgntn,closed,2025-06-05T09:23:11Z,2025-06-05T09:26:25Z,2025-06-05T09:26:25Z,76519330,https://api.github.com/repos/imgntn/j360,https://github.com/imgntn/j360/pull/40,"analysisWe need to classify as performance or non-performance. The PR adds GPU support for little planet, adding shader, GPU method, etc. This is about performance? GPU acceleration likely improves performance. But the primary purpose is to add GPU support, not necessarily performance improvement. However, GPU acceleration is a performance optimization. The description: ""Add GPU little planet support"" - adding GPU shader to accelerate conversion. That is a performance improvement. The keywords: GPU, shader, performance. The classification: performance. So output ""performance"".assistantfinalperformance",34,1.0,False
+3241713269,1236,Implement texture atlas,"## Summary
+- add `TextureAtlas` class to manage shared texture space
+- track atlas membership inside `Texture`
+- insert textures into atlas when GL IDs are generated
+- draw from atlas in DrawPool and DrawPoolManager
+- include new source file in build system
+",OpenAI_Codex,2267386,mehah,closed,2025-07-18T03:26:47Z,2025-07-18T03:31:53Z,,273278110,https://api.github.com/repos/mehah/otclient,https://github.com/mehah/otclient/pull/1236,"analysisWe need to classify whether the primary purpose is performance. The PR adds a texture atlas to manage shared texture space, track atlas membership, insert textures into atlas when GL IDs are generated, draw from atlas in DrawPool and DrawPoolManager, include new source file. This is about performance: texture atlases reduce draw calls, improve rendering performance. So classification: 'performance'.assistantfinalperformance",34,1.0,False

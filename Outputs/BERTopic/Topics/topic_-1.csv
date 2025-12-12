@@ -1,0 +1,2261 @@
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
+3147147049,3862,Add unified performance message support to ntttcp test cases,"This PR implements unified performance message support for ntttcp test cases, following the patterns established in PRs #3734 and #3753. The changes enable the `perf_tcp_ntttcp_128_connections_synthetic` test case and all other ntttcp-based performance tests to send both original performance messages and individual unified performance messages for key metrics.
+
+## Changes Made
+
+### 1. **lisa/tools/ntttcp.py**
+- Added import for `send_unified_perf_message`
+- Added `send_ntttcp_tcp_unified_perf_messages()` method that sends 11 key TCP performance metrics as unified messages:
+  - `throughput_in_gbps`, `latency_us`, `connections_num`, `buffer_size`, `retrans_segments`
+  - `connections_created_time`, `rx_packets`, `tx_packets`, `pkts_interrupts`
+  - `sender_cycles_per_byte`, `receiver_cycles_per_byte`
+- Added `send_ntttcp_udp_unified_perf_messages()` method that sends 7 key UDP performance metrics as unified messages:
+  - `tx_throughput_in_gbps`, `rx_throughput_in_gbps`, `data_loss`, `connections_num`
+  - `send_buffer_size`, `connections_created_time`, `receiver_cycles_per_byte`
+
+### 2. **microsoft/testsuites/performance/common.py**
+- Updated `perf_ntttcp()` function to call the new unified message methods after creating original performance messages
+- Maintains complete backward compatibility by preserving all existing functionality
+
+## Pattern Compliance
+
+The implementation follows the exact same pattern established in PR #3753:
+1. Create and notify original performance message (e.g., `NetworkTCPPerformanceMessage`)
+2. Send individual unified performance messages for each key metric using `send_unified_perf_message`
+
+## Testing
+
+Created comprehensive unit tests that verify:
+- All expected TCP metrics are sent as unified messages
+- All expected UDP metrics are sent as unified messages
+- Correct tool name and test case names are passed
+- Proper number of unified messages are generated
+
+## Backward Compatibility
+
+✅ All existing functionality is preserved  
+✅ Original performance messages continue to be sent  
+✅ No breaking changes to existing APIs  
+✅ Minimal, surgical code changes (97 lines added, 0 lines modified)
+
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-06-15T06:01:35Z,2025-06-16T01:27:49Z,,174629277,https://api.github.com/repos/microsoft/lisa,https://github.com/microsoft/lisa/pull/3862,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Add unified performance message support to ntttcp test cases"". Body describes adding unified performance messages, sending performance metrics, etc. It's clearly performance-related. So classification: performance.assistantfinalperformance",-1,0.9902274491706652,False
+3148267777,3863,Add unified performance message support to ntttcp test cases,"This PR implements unified performance message support for ntttcp test cases, enabling standardized performance metric reporting alongside the existing specific network performance messages.
+
+## Changes Made
+
+### Modified `lisa/tools/ntttcp.py`
+
+- **Added imports**: `send_unified_perf_message` and `MetricRelativity` for unified message support
+- **Enhanced TCP message creation**: Modified `create_ntttcp_tcp_performance_message` to send unified performance messages for 9 key metrics
+- **Enhanced UDP message creation**: Modified `create_ntttcp_udp_performance_message` to send unified performance messages for 5 key metrics
+- **Added helper methods**:
+  - `_send_tcp_unified_messages()`: Sends 9 unified metrics for TCP tests
+  - `_send_udp_unified_messages()`: Sends 5 unified metrics for UDP tests
+
+## Unified Metrics Sent
+
+### TCP Tests (9 metrics)
+- `throughput_in_gbps` (Gbps, HigherIsBetter) - Network throughput
+- `latency_us` (microseconds, LowerIsBetter) - Network latency  
+- `connections_created_time` (microseconds, LowerIsBetter) - Connection setup time
+- `retrans_segments` (count, LowerIsBetter) - Retransmitted segments
+- `rx_packets` (packets, HigherIsBetter) - Received packets
+- `tx_packets` (packets, HigherIsBetter) - Transmitted packets
+- `pkts_interrupts` (packets/interrupt, HigherIsBetter) - Packets per interrupt
+- `sender_cycles_per_byte` (cycles/byte, LowerIsBetter) - CPU efficiency on sender
+- `receiver_cycles_per_byte` (cycles/byte, LowerIsBetter) - CPU efficiency on receiver
+
+### UDP Tests (5 metrics)
+- `tx_throughput_in_gbps` (Gbps, HigherIsBetter) - Transmit throughput
+- `rx_throughput_in_gbps` (Gbps, HigherIsBetter) - Receive throughput
+- `connections_created_time` (microseconds, LowerIsBetter) - Connection setup time
+- `data_loss` (percentage, LowerIsBetter) - Packet loss percentage
+- `receiver_cycles_per_byte` (cycles/byte, LowerIsBetter) - CPU efficiency on receiver
+
+## Backward Compatibility
+
+This implementation maintains full backward compatibility:
+- Existing `NetworkTCPPerformanceMessage` and `NetworkUDPPerformanceMessage` are still created and sent as before
+- No changes to test case interfaces or execution flows
+- Unified messages are sent automatically alongside existing messages
+
+## Test Coverage
+
+The implementation includes comprehensive testing:
+- Unit tests for individual unified message methods
+- Integration tests for complete message creation workflow
+- Edge case and error handling verification
+- Metric description and unit validation
+
+## Impact
+
+This change enables the `perf_tcp_ntttcp_128_connections_synthetic` test case and all other ntttcp test cases to support unified performance message reporting, improving data analysis capabilities and standardizing performance metrics across the LISA framework.
+
+Fixes #3861.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-06-16T01:28:09Z,2025-06-19T23:43:02Z,2025-06-19T23:43:02Z,174629277,https://api.github.com/repos/microsoft/lisa,https://github.com/microsoft/lisa/pull/3863,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Add unified performance message support to ntttcp test cases"". The body describes adding unified performance messages, metrics like throughput, latency, etc. It's clearly performance-related. So classification: 'performance'.assistantfinalperformance",-1,0.9902274491706652,False
+3181433167,3898,Add unified performance message support to FIO cases,"This PR implements unified performance message support for FIO cases, enabling standardized performance metrics reporting alongside the existing disk performance messages.
+
+## Changes
+
+### lisa/tools/fio.py
+- Added imports for `MetricRelativity` and `send_unified_perf_message`
+- Implemented new `send_fio_unified_perf_messages()` method that:
+  - Groups FIO results by queue depth using the same logic as existing implementation
+  - Sends IOPS metrics with `HigherIsBetter` relativity and ""IOPS"" unit
+  - Sends latency metrics with `LowerIsBetter` relativity and ""microseconds"" unit
+  - Includes configuration details in metric names (block_size, core_count, disk_count)
+  - Supports all FIO modes: read, randread, write, randwrite
+
+### microsoft/testsuites/performance/common.py
+- Updated `perf_disk()` function to call both traditional `DiskPerformanceMessage` and new unified performance messaging
+- Maintains full backward compatibility - existing functionality unchanged
+- All storage performance tests automatically benefit from unified messages
+
+## Example Metrics Generated
+
+For a FIO test with queue depth 4, block size 4K, 8 cores, 2 disks:
+```
+qdepth_4_bs_4k_cores_8_disks_2_randread_iops: 15000 IOPS (HigherIsBetter)
+qdepth_4_bs_4k_cores_8_disks_2_randread_latency: 25.3 microseconds (LowerIsBetter)
+qdepth_4_bs_4k_cores_8_disks_2_randwrite_iops: 12000 IOPS (HigherIsBetter)
+qdepth_4_bs_4k_cores_8_disks_2_randwrite_latency: 35.7 microseconds (LowerIsBetter)
+```
+
+## Validation
+
+- ✅ Code passes flake8 linting with project's style guidelines
+- ✅ Syntax validation confirms all imports and method calls are correct
+- ✅ Implementation follows established patterns from other tools (ntttcp.py)
+- ✅ All FIO performance tests automatically inherit unified messaging through `perf_disk()`
+- ✅ Backward compatibility maintained - existing `DiskPerformanceMessage` still sent
+
+## Impact
+
+This change enables FIO performance data to be consumed by unified performance analysis tools while preserving existing functionality. All storage performance test suites in `microsoft/testsuites/performance/storageperf.py` will now generate both traditional and unified performance metrics.
+
+Fixes #3897.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-06-27T05:36:51Z,2025-07-01T09:57:58Z,2025-07-01T09:57:58Z,174629277,https://api.github.com/repos/microsoft/lisa,https://github.com/microsoft/lisa/pull/3898,"analysisWe need to classify as 'performance' or 'non-performance'. The PR adds unified performance message support to FIO cases. It deals with performance metrics, IOPS, latency, etc. It's clearly performance-related. So label 'performance'.assistantfinalperformance",-1,0.9902274491706652,False
+3166183819,25,Add source generator for compile-time extraction plan compilation,"This PR implements a C# source generator to eliminate runtime reflection overhead by generating compile-time extraction plans for types with `REGEXTRACT_REGEX_PATTERN` constants.
+
+## What's Added
+
+### Source Generator Infrastructure
+- **New project**: `RegExtract.SourceGenerator` - A .NET Standard 2.0 source generator
+- **Syntax receiver**: Detects types with `REGEXTRACT_REGEX_PATTERN` fields at compile time
+- **Code generation**: Creates pre-compiled extraction plans as static classes
+- **Project integration**: Properly configured as an analyzer for supported target frameworks
+
+### Generated Code Structure
+For a type like:
+```csharp
+public record TestRecord(int Number, string Text)
+{
+    public const string REGEXTRACT_REGEX_PATTERN = @""(\d+): (.+)"";
+}
+```
+
+The generator creates:
+```csharp
+public static class TestRecordExtractionPlan
+{
+    private static readonly Regex _regex = new Regex(@""(\d+): (.+)"");
+    private static readonly ExtractionPlan<TestRecord> _plan = ExtractionPlan<TestRecord>.CreatePlan(_regex);
+    
+    public static TestRecord? Extract(string input) => _plan.Extract(input);
+    public static TestRecord? Extract(Match match) => _plan.Extract(match);
+    public static ExtractionPlan<TestRecord> Plan => _plan;
+}
+```
+
+### Test Infrastructure
+- **Comprehensive tests**: Verify both reflection-based and generated approaches
+- **Debug capabilities**: Extensive logging to troubleshoot generator execution
+- **Backward compatibility**: Existing reflection-based extraction continues to work
+
+## Current Status
+
+The source generator infrastructure is complete and compiles successfully. However, the generator is not currently executing during the build process, which requires further investigation of MSBuild configuration or version compatibility issues.
+
+The reflection-based approach remains fully functional, ensuring no breaking changes while this enhancement is being completed.
+
+## Benefits (When Complete)
+
+- **Performance**: Eliminates runtime reflection overhead
+- **Compile-time safety**: Regex patterns validated at build time  
+- **Backward compatibility**: Existing code continues to work unchanged
+- **Opt-in**: Only types with `REGEXTRACT_REGEX_PATTERN` get generated plans
+
+Addressing #24.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-06-22T18:59:23Z,,,318049537,https://api.github.com/repos/sblom/RegExtract,https://github.com/sblom/RegExtract/pull/25,"analysisWe need to classify as performance or non-performance. The PR adds a source generator to eliminate runtime reflection overhead, generating compile-time extraction plans. This is a performance improvement. So label 'performance'.assistantfinalperformance",-1,0.9902274491706652,False
+3071077909,81,Add event trigger source generator,"## Summary
+- introduce `EventGenerator` project with a Roslyn source generator
+- reference the generator from `Avalonia.Xaml.Interactions`
+- rework `EventTriggerBehavior` to use generated handlers instead of reflection
+
+## Testing
+- `git status --short`",OpenAI_Codex,2297442,wieslawsoltes,closed,2025-05-17T21:31:28Z,2025-05-19T11:09:27Z,,792160692,https://api.github.com/repos/wieslawsoltes/Xaml.Behaviors,https://github.com/wieslawsoltes/Xaml.Behaviors/pull/81,"analysisWe need to classify whether the primary purpose is performance improvement. The PR adds an event trigger source generator, reworks EventTriggerBehavior to use generated handlers instead of reflection. This is likely to improve performance by avoiding reflection. The description mentions ""rework EventTriggerBehavior to use generated handlers instead of reflection"". That is a performance improvement. So classify as 'performance'.assistantfinalperformance",-1,0.9902274491706652,False
+3076627678,102,Add ExecuteCompiledScriptAction source generator,"## Summary
+- add ExecuteCompiledScriptActionGenerator to compile scripts at build time
+- document generator usage
+
+## Testing
+- `dotnet test --no-build` *(fails: `dotnet: command not found`)*",OpenAI_Codex,2297442,wieslawsoltes,closed,2025-05-20T11:09:56Z,2025-05-20T11:10:49Z,,792160692,https://api.github.com/repos/wieslawsoltes/Xaml.Behaviors,https://github.com/wieslawsoltes/Xaml.Behaviors/pull/102,"analysisWe need to classify whether the primary purpose of the PR is to improve performance. The PR adds a source generator to compile scripts at build time. That likely improves performance by reducing runtime compilation overhead. The description: ""Add ExecuteCompiledScriptAction source generator"" and ""compile scripts at build time"". That is a performance improvement. So classification: 'performance'.assistantfinalperformance",-1,0.9902274491706652,False
+3175374768,3170,Enable predicate pushdown in TS compiler,"## Summary
+- push query filters/skip/take into `_load` calls in the TypeScript compiler
+- add dataset predicate pushdown test
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_685bce6b45c08320839868835ce28706",OpenAI_Codex,1218621,tamnd,closed,2025-06-25T11:57:33Z,2025-06-25T13:06:17Z,2025-06-25T13:06:17Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3170,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Enable predicate pushdown in TS compiler"". Summary: push query filters/skip/take into `_load` calls in the TypeScript compiler, add dataset predicate pushdown test. This is about optimizing query execution by pushing down predicates to reduce data loaded. That is a performance improvement. So classification: performance.assistantfinalperformance",-1,0.9858544027703953,False
+3175124105,3166,Implement simple predicate pushdown,"## Summary
+- push down `where` predicates in query planner when they reference a single alias
+- add helper to determine aliases used in an expression
+
+## Testing
+- `go test ./runtime/data`
+- `go vet ./...`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_685bce3405ac8320be39b633ad79ab7c",OpenAI_Codex,1218621,tamnd,closed,2025-06-25T10:32:27Z,2025-06-25T10:55:52Z,2025-06-25T10:55:51Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3166,"analysisWe need to classify the pull request as performance or non-performance. The PR title: ""Implement simple predicate pushdown"". Summary: push down where predicates in query planner when they reference a single alias; add helper to determine aliases used in an expression. This is about query planner optimization, likely performance improvement. The description: push down predicates to improve query performance. So it's a performance PR. There's no mention of memory, speed, etc. But it's about query planner optimization, which is performance. So classification: 'performance'.assistantfinalperformance",-1,0.9858544027703953,False
+3175438448,3171,Add dataset query pushdown tests for C backend,"## Summary
+- optimize C compiler query loops by skipping limit bookkeeping when not needed
+- add golden tests covering dataset queries with skip/take
+
+## Testing
+- `go test ./compile/x/c -tags slow -run TestCCompiler_GoldenOutput -count=1`
+- `go test ./... -tags slow` *(fails: parse error in other packages)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_685bcead768c8320a42d3e0245e52b51",OpenAI_Codex,1218621,tamnd,closed,2025-06-25T12:18:17Z,2025-06-25T13:06:24Z,2025-06-25T13:06:24Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3171,"analysisWe need to classify as performance or non-performance. The PR title: ""Add dataset query pushdown tests for C backend"". Summary: ""optimize C compiler query loops by skipping limit bookkeeping when not needed"". That is a performance optimization. So classification: performance.assistantfinalperformance",-1,0.9858544027703953,False
+3175666211,3201,Add predicate pushdown and update Scala goldens,"## Summary
+- introduce preWhere optimization in Scala _query helper
+- emit preWhere in Scala compiler when no join sides are used
+- register `to_json` as a builtin for type checking
+- update Scala golden files
+
+## Testing
+- `go test -tags slow ./compile/x/scala -run TestScalaCompiler_GoldenOutput`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_685be392aef48320997ebba66da1728f",OpenAI_Codex,1218621,tamnd,closed,2025-06-25T13:31:04Z,2025-06-25T13:31:26Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3201,"analysisWe need to classify whether the primary purpose of the pull request is to improve performance. The PR title: ""Add predicate pushdown and update Scala goldens"". Summary: ""introduce preWhere optimization in Scala _query helper, emit preWhere in Scala compiler when no join sides are used, register to_json as a builtin for type checking, update Scala golden files"". This is about adding predicate pushdown optimization, which is a performance optimization. So it's performance. The classification: 'performance'.assistantfinalperformance",-1,0.9858544027703953,False
+3175446140,3177,Optimize C# dataset query loops with predicate pushdown,"## Summary
+- add expression variable scanner helpers
+- push down `where` predicates in C# query loops
+- add golden test for predicate pushdown
+
+## Testing
+- `go test ./... | head`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_685bcf63f0fc832082387be0c71b0bb4",OpenAI_Codex,1218621,tamnd,closed,2025-06-25T12:20:57Z,2025-06-25T13:31:49Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3177,"analysisWe need to classify as performance or non-performance. The title: ""Optimize C# dataset query loops with predicate pushdown"". Summary: add expression variable scanner helpers, push down where predicates in C# query loops, add golden test for predicate pushdown. This is about optimizing query loops, likely performance improvement. Keywords: optimize, pushdown, predicate, query loops. It's about performance. So classification: performance.assistantfinalperformance",-1,0.9858544027703953,False
+3175374251,3169,Implement predicate pushdown in Go compiler,"## Summary
+- optimize Go compiler query loops by pushing down `where` filters
+- collect identifier usage in expressions to compute earliest filter step
+- add golden test showing optimized join filtering
+
+## Testing
+- `go test -tags slow ./compile/go -run TestGoCompiler_GoldenOutput -update`
+- `go test -tags slow ./compile/go -run TestGoCompiler_SubsetPrograms -update`
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_685bce5649cc83209c2a6dd5fd8bcfeb",OpenAI_Codex,1218621,tamnd,closed,2025-06-25T11:57:22Z,2025-06-25T13:06:10Z,2025-06-25T13:06:10Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3169,"analysisWe need to classify the pull request as performance or non-performance. The title: ""Implement predicate pushdown in Go compiler"". The body: ""optimize Go compiler query loops by pushing down where filters, collect identifier usage in expressions to compute earliest filter step, add golden test showing optimized join filtering"". This is about optimizing compiler query loops, pushing down filters, presumably to improve performance. The description mentions ""optimize Go compiler query loops"". That is a performance improvement. So classification: 'performance'.assistantfinalperformance",-1,0.9858544027703953,False
+3175127708,3168,Optimize dataset query loops,"## Summary
+- detect variables referenced by query predicates
+- push down WHERE filters in dataset query loops
+- test cross join predicate pushdown
+
+## Testing
+- `go test ./tests/vm -update`
+
+------
+https://chatgpt.com/codex/tasks/task_e_685bce1554e4832083407ebbd706ba6e",OpenAI_Codex,1218621,tamnd,closed,2025-06-25T10:33:48Z,2025-06-25T10:56:06Z,2025-06-25T10:56:06Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3168,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize dataset query loops"". Summary: detect variables referenced by query predicates, push down WHERE filters in dataset query loops, test cross join predicate pushdown. This is about optimizing query loops, likely performance improvement. Keywords: optimize, push down WHERE filters, cross join predicate pushdown. It's about performance. So classification: performance.assistantfinalperformance",-1,0.9858544027703953,False
+3242396116,9550,Improve Prolog compiler map indexing,"## Summary
+- specialize map indexing/field access using `get_dict`
+- prefer mutable lookups in `lookupVar`
+- regenerate Prolog machine outputs for `map_assign` and `map_nested_assign`
+- document progress and update checklist
+
+## Testing
+- `go test ./compiler/x/pl -run TestPrologCompiler/map_assign -tags slow -count=1`
+- `go test ./compiler/x/pl -run TestPrologCompiler/map_nested_assign -tags slow -count=1`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_687a004856e883209b48df619026c16e",OpenAI_Codex,1218621,tamnd,closed,2025-07-18T08:33:43Z,2025-07-18T08:38:03Z,2025-07-18T08:38:03Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9550,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Prolog compiler map indexing"". Summary: specialize map indexing/field access using get_dict, prefer mutable lookups in lookupVar, regenerate Prolog machine outputs for map_assign and map_nested_assign, document progress and update checklist. This seems to be about improving map indexing, which is likely performance improvement. Keywords: indexing, field access, get_dict, mutable lookups. It's about compiler optimization. So classify as 'performance'.assistantfinalperformance",-1,0.943067582125218,False
+3245967758,10549,Improve Prolog transpiler docs and folding,"## Summary
+- enhance Prolog transpiler with boolean constant folding
+- reintroduce `style_check(-singleton)` in generated code
+- add script to update Prolog README and TASKS automatically
+- regenerate README and TASKS for Prolog
+
+## Testing
+- `go test -tags=slow ./transpiler/x/pl`
+
+------
+https://chatgpt.com/codex/tasks/task_e_687c613773688320acd9c67e869d243d",OpenAI_Codex,1218621,tamnd,closed,2025-07-20T04:13:15Z,2025-07-20T04:13:29Z,2025-07-20T04:13:29Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/10549,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Improve Prolog transpiler docs and folding"". Body: ""enhance Prolog transpiler with boolean constant folding"" - constant folding is a performance optimization. Also reintroduce style_check, add script to update README, regenerate README. The main focus seems to be boolean constant folding, which is a compile-time optimization to improve performance. So classification: 'performance'.assistantfinalperformance",-1,0.9430675821252179,False
+3244959039,10010,Extend ST transpiler and add progress docs,"## Summary
+- add constant folding to Smalltalk transpiler so simple arithmetic and variables work
+- generate README checklist for Smalltalk transpiler outputs
+- track git history in `TASKS.md`
+- helper scripts to update README and tasks
+
+## Testing
+- `go test ./transpiler/x/st -run TestTranspile_PrintHello -count=1 -v`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_687b2bd14ed4832092964db07752d909",OpenAI_Codex,1218621,tamnd,closed,2025-07-19T05:51:25Z,2025-07-19T05:51:36Z,2025-07-19T05:51:36Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/10010,"analysisWe need to classify whether the primary purpose is performance improvement. The PR description: ""Extend ST transpiler and add progress docs"" includes adding constant folding to Smalltalk transpiler so simple arithmetic and variables work, generate README checklist, track git history, helper scripts. Constant folding is an optimization that improves performance by evaluating expressions at compile time. That is a performance improvement. So classification: 'performance'.assistantfinalperformance",-1,0.9430675821252179,False
+3252596861,11961,Improve Prolog transpiler constant folding,"## Summary
+- enable constant folding for `str()` calls
+- better emitting for `str()` expressions
+- fold string concatenation
+- update generated Rosetta outputs and checklist
+
+## Testing
+- `go test ./transpiler/x/pl -run Rosetta -tags slow -count=1` *(fails: unsupported features)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_687f7319182c83208de8db41999758f1",OpenAI_Codex,1218621,tamnd,closed,2025-07-22T12:59:08Z,2025-07-22T12:59:30Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/11961,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Improve Prolog transpiler constant folding"". Summary: enable constant folding for str() calls, better emitting for str() expressions, fold string concatenation, update generated Rosetta outputs and checklist. This is about constant folding, which is a compile-time optimization. It's about performance? Constant folding reduces runtime cost, but it's a compile-time optimization. The description mentions ""constant folding"" which is an optimization. The keywords: ""fold"", ""constant folding"", ""string concatenation"". This is about performance improvement. So classify as 'performance'.assistantfinalperformance",-1,0.9430675821252179,False
+3246020947,10651,Improve Prolog transpiler,"## Summary
+- transpiler/pl: fold trivial zero-arg functions during compilation
+- add bool_chain golden test output for Prolog
+- update Prolog README checklist and progress log
+
+## Testing
+- `go test -tags slow ./transpiler/x/pl` *(fails: output mismatch)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_687c7e75ce7c8320bb66ad6a23777359",OpenAI_Codex,1218621,tamnd,closed,2025-07-20T05:54:22Z,2025-07-20T05:55:03Z,2025-07-20T05:55:03Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/10651,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Improve Prolog transpiler"". Summary: ""fold trivial zero-arg functions during compilation"", ""add bool_chain golden test output for Prolog"", ""update Prolog README checklist and progress log"". The changes: folding trivial zero-arg functions during compilation. That is an optimization, likely performance improvement. The test fails due to output mismatch. But the primary purpose: performance improvement. So classification: 'performance'.assistantfinalperformance",-1,0.9430675821252179,False
+3250413855,11642,Improve Prolog transpiler,"## Summary
+- transpiler/pl: treat const variables as literals to enable compile-time folding
+- add golden test output for `while_loop`
+- regenerate README checklist and TASKS for Prolog transpiler
+
+## Testing
+- `go test ./transpiler/x/pl -tags=slow -run TestTranspile_PrintHello`
+- `go vet -tags=slow ./transpiler/x/pl`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_687ecc47c4748320aa99316fa397db76",OpenAI_Codex,1218621,tamnd,closed,2025-07-21T23:49:51Z,2025-07-21T23:50:26Z,2025-07-21T23:50:26Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/11642,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Improve Prolog transpiler"". Body: mentions treat const variables as literals to enable compile-time folding, add golden test output for while_loop, regenerate README checklist and TASKS. The key is compile-time folding: that is optimization, performance. The mention of compile-time folding is a performance improvement. So classify as 'performance'.assistantfinalperformance",-1,0.9430675821252179,False
+3238723742,9253,Improve Erlang compiler field inference,"## Summary
+- optimize Erlang compiler field access using `maps:get`
+- regenerate Erlang machine outputs
+- document progress in `TASKS.md`
+
+## Testing
+- `go test ./...`
+- `go test ./compiler/x/erlang -run TestCompilePrograms -tags slow`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6878b739f7ec8320874c9be27b8251a2",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T08:51:53Z,2025-07-17T08:52:05Z,2025-07-17T08:52:05Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9253,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Erlang compiler field inference"". Summary: optimize Erlang compiler field access using maps:get, regenerate outputs, document progress. This is about compiler optimization, field inference. It mentions ""optimize"" but not explicitly performance. However ""optimize"" could be performance. But the description: ""optimize Erlang compiler field access using maps:get"" - that likely improves performance of compiler. So it's a performance improvement. So classify as 'performance'.assistantfinalperformance",-1,0.9430675821252179,False
+3153529915,1333,Rewrite Erlang compiler,"## Summary
+- implement a real Erlang compiler that emits native code instead of delegating to Python
+- add minimal runtime helpers for printing
+- adjust tests to use new golden files
+- add golden data for `two-sum` example
+
+## Testing
+- `go test ./compile/erlang -run TestErlangCompiler_GoldenOutput -update`
+- `go test ./...`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_68516b527eac832092f96da77649e9b3",OpenAI_Codex,1218621,tamnd,closed,2025-06-17T13:30:58Z,2025-06-17T13:43:00Z,2025-06-17T13:43:00Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/1333,"analysisWe need to classify whether the primary purpose of the pull request is to improve performance. The PR is about rewriting Erlang compiler to emit native code instead of delegating to Python, adding runtime helpers, adjusting tests, adding golden data. This is a major change: implementing a real Erlang compiler that emits native code. That likely improves performance, as native code is faster than Python. The description says ""implement a real Erlang compiler that emits native code instead of delegating to Python"". That is a performance improvement. So classify as 'performance'.
+
+Check keywords: ""native code"" implies performance. Also ""emit native code"" vs Python. So yes performance. So output 'performance'.assistantfinalperformance",-1,0.9430675821252179,False
+2918518626,1061,fix: improve deploy history performance and code quality,"Closes #1050
+
+This PR implements performance improvements for the deploy history screen in the channel page:
+
+## Improvements
+- Enhanced database indexes with composite indexes for common query patterns
+- Optimized the record_deployment_history trigger to avoid unnecessary updates
+- Implemented server-side search in HistoryTable component
+- Added debounce for search input to prevent excessive API calls
+- Optimized data fetching by selecting only necessary fields
+- Improved error handling in update_metadata endpoint
+- Fixed URL validation in update_metadata.ts
+- Added loading state for search in HistoryTable
+
+## Testing
+- Tested locally with Supabase and frontend server
+- Verified that the deploy history screen loads faster with optimized queries
+- Confirmed that search functionality works correctly with server-side filtering
+- Tested pagination and sorting functionality
+- Verified mobile responsiveness
+
+**Note**: There's a linting issue with an unused variable in the catch block that needs to be fixed.
+
+Link to Devin run: https://app.devin.ai/sessions/560c246e629a4ce5b6d51b93e60aa043
+Requested by: Cap-go",Devin,158243242,devin-ai-integration[bot],closed,2025-03-13T22:35:28Z,2025-03-14T03:04:47Z,,442321089,https://api.github.com/repos/Cap-go/capgo,https://github.com/Cap-go/capgo/pull/1061,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""fix: improve deploy history performance and code quality"". Body mentions performance improvements: database indexes, optimized trigger, server-side search, debounce, optimized data fetching, etc. So it's performance. So output 'performance'.assistantfinalperformance",-1,0.9206050963897736,False
+2914453633,1054,fix: performance improvements for deploy history screen,"# Performance Improvements for Deploy History Screen
+
+This PR addresses the performance and security issues in the deploy history screen implementation from Issue #1014 and PR #1050.
+
+## Database Optimizations
+
+- Added composite indexes for common query patterns to improve performance:
+  ```sql
+  CREATE INDEX IF NOT EXISTS deploy_history_channel_app_idx ON ""public"".""deploy_history"" (channel_id, app_id);
+  CREATE INDEX IF NOT EXISTS deploy_history_app_deployed_at_idx ON ""public"".""deploy_history"" (app_id, deployed_at);
+  ```
+
+- Optimized the `record_deployment_history` trigger function to only update records that are currently marked as current:
+  ```sql
+  UPDATE deploy_history
+  SET is_current = FALSE
+  WHERE channel_id = NEW.id
+  AND is_current = TRUE;
+  ```
+
+## Security Fixes
+
+- Fixed URL validation in `update_metadata.ts` to use a safer implementation:
+  ```typescript
+  function isValidUrl(url: string): boolean {
+    try {
+      void new URL(url)
+      return true
+    }
+    catch {
+      return false
+    }
+  }
+  ```
+
+## Test Improvements
+
+- Added missing `reset_app_data` database function that was causing test failures
+- Updated test utilities to include metadata fields in the `createAppVersions` function
+
+## Frontend Optimizations
+
+- Implemented optimized query to select only needed fields:
+  ```typescript
+  .select(`
+    id, 
+    deployed_at,
+    link,
+    comment,
+    is_current,
+    version_id,
+    version:version_id (
+      id,
+      name
+    )
+  `, { count: 'exact' })
+  ```
+
+## Testing
+
+The changes have been tested locally with:
+- Linting checks using `bun run lint-backend`
+- Database migrations applied with `supabase db reset`
+
+Link to Devin run: https://app.devin.ai/sessions/9941d6700a2841b98725e6b1b9dc420e
+Requested by: Cap-go
+",Devin,158243242,devin-ai-integration[bot],closed,2025-03-12T16:02:40Z,2025-03-13T22:33:14Z,,442321089,https://api.github.com/repos/Cap-go/capgo,https://github.com/Cap-go/capgo/pull/1054,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""fix: performance improvements for deploy history screen"". Body includes database optimizations, indexes, trigger function optimization, frontend query optimization. So definitely performance. So label 'performance'.assistantfinalperformance",-1,0.9206050963897736,False
+2914433643,1052,fix: improve deploy history performance and code quality,"Closes #1050
+
+This PR implements performance improvements for the deploy history screen in the channel page:
+
+## Improvements
+- Enhanced database indexes with composite indexes for common query patterns
+- Optimized the record_deployment_history trigger to avoid unnecessary updates
+- Implemented server-side search in HistoryTable component
+- Added debounce for search input to prevent excessive API calls
+- Optimized data fetching by selecting only necessary fields
+- Improved error handling in update_metadata endpoint
+- Fixed URL validation in update_metadata.ts
+- Added loading state for search in HistoryTable
+
+## Testing
+- Tested locally with Supabase and frontend server
+- Verified that the deploy history screen loads faster with optimized queries
+- Confirmed that search functionality works correctly with server-side filtering
+- Tested pagination and sorting functionality
+- Verified mobile responsiveness
+
+Link to Devin run: https://app.devin.ai/sessions/301eff9c3c0940d4a621aca5a3e57a1b
+Requested by: Cap-go",Devin,158243242,devin-ai-integration[bot],closed,2025-03-12T15:55:50Z,2025-03-13T22:25:25Z,,442321089,https://api.github.com/repos/Cap-go/capgo,https://github.com/Cap-go/capgo/pull/1052,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""fix: improve deploy history performance and code quality"". Body mentions performance improvements: database indexes, optimized trigger, server-side search, debounce, optimized data fetching, etc. So it's performance. So output 'performance'.assistantfinalperformance",-1,0.9206050963897736,False
+2965108973,1109,feat: Optimize default channel migration for performance,"# Performance Optimizations for Default Channel Migration
+
+## Summary
+This PR implements performance optimizations for the default channel migration in PR #1107. The optimizations focus on improving database operations and query efficiency.
+
+## Performance Improvements
+
+### 1. Migration Script Optimization
+- Replaced row-by-row processing with efficient set-based operations
+- Added indexes to improve query performance for default channel lookups
+- Eliminated unnecessary loops for better scalability with large datasets
+
+### 2. Channel API Optimization
+- Improved computation of 'public' property with more efficient checks
+- Used array filtering for faster default channel identification
+- Optimized type handling for better performance
+
+### 3. UI Operations Optimization
+- Consolidated multiple database operations into single operations
+- Reduced database round-trips when updating default channels
+- Improved error handling for better reliability
+
+## Testing
+These optimizations maintain the same functionality while significantly improving performance, especially for large databases with many apps and users.
+
+Link to Devin run: https://app.devin.ai/sessions/80306a71b65b49358504dfa8ecaf48fa
+Requested by: unknown",Devin,158243242,devin-ai-integration[bot],closed,2025-04-02T03:56:17Z,2025-04-10T14:43:00Z,,442321089,https://api.github.com/repos/Cap-go/capgo,https://github.com/Cap-go/capgo/pull/1109,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""feat: Optimize default channel migration for performance"". Body mentions performance improvements, optimization, speed, etc. So it's performance.assistantfinalperformance",-1,0.9206050963897736,False
+2965102818,1108,perf: Performance analysis for default channel migration,"# Performance Analysis for Default Channel Migration in PR #1107
+
+## Overview
+This PR provides a detailed performance analysis and recommendations for PR #1107 ""Move default channel to app table"" which implements moving default channel configurations from individual channel records to the application level.
+
+## Performance Concerns Identified
+
+1. **Migration Script Performance**:
+   - Row-by-row processing instead of set-based operations
+   - Scalability issues for large databases
+   - No batch processing
+
+2. **Channel API Performance**:
+   - Computed public property adds complexity
+   - Subqueries in SQL could be inefficient
+   - Multiple sequential database operations
+
+3. **UI Operations**:
+   - Multiple database operations when changing default channels
+   - No batching of operations
+   - Sequential operations instead of parallel
+
+## Recommendations
+
+The performance-analysis.md file contains detailed recommendations including:
+- Optimized migration script using set-based operations
+- Improved Channel API queries using JOINs instead of subqueries
+- Batched UI operations
+- Additional indexes for better query performance
+
+These recommendations will significantly improve the performance and scalability of the default channel migration, especially for large databases with many apps and users.
+
+Link to Devin run: https://app.devin.ai/sessions/bdc151dc81bb495990fd5404cec9b6da
+Requested by: unknown
+",Devin,158243242,devin-ai-integration[bot],closed,2025-04-02T03:50:33Z,2025-04-10T14:43:00Z,,442321089,https://api.github.com/repos/Cap-go/capgo,https://github.com/Cap-go/capgo/pull/1108,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""perf: Performance analysis for default channel migration"". Body describes performance analysis, recommendations, etc. It's clearly performance. So output 'performance'.assistantfinalperformance",-1,0.9206050963897736,False
+2914424485,1051,fix: improve deploy history performance and code quality,"# Fix: Improve Deploy History Performance and Code Quality
+
+Closes #1014
+
+This PR implements performance improvements for the deploy history screen in the channel page:
+
+## Improvements
+- Added database indexes for deploy_history table to improve query performance
+- Optimized the record_deployment_history trigger to only update necessary records
+- Enhanced update_metadata endpoint with URL validation and deploy_history updates
+- Implemented server-side search in HistoryTable component
+- Combined API calls to reduce network overhead
+- Added proper i18n for UI text
+- Moved DeployHistory interface to shared types
+- Fixed database migration issues with proper column types and function permissions
+- Removed unused imports and code
+
+## Testing
+- Tested locally with linting checks
+- Verified that the deploy history screen loads faster with optimized queries
+- Confirmed that search functionality works correctly with server-side filtering
+- Fixed CI test failures related to database migrations
+
+Link to Devin run: https://app.devin.ai/sessions/e7cd2982c76f49b597994abb3fb0385d
+Requested by: Cap-go
+",Devin,158243242,devin-ai-integration[bot],closed,2025-03-12T15:52:39Z,2025-03-13T22:32:04Z,,442321089,https://api.github.com/repos/Cap-go/capgo,https://github.com/Cap-go/capgo/pull/1051,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""fix: improve deploy history performance and code quality"". Body includes performance improvements: database indexes, optimized trigger, server-side search, combined API calls, etc. So it's performance. So output 'performance'.assistantfinalperformance",-1,0.9206050963897736,False
+2914387943,1050,fix: improve deploy history performance and code quality,"# Deploy History Screen Implementation
+
+Closes #1014
+
+This PR implements the deploy history screen in the channel page as requested in issue #1014, with significant performance optimizations and code quality improvements.
+
+## Features
+- Added a new 'History' tab to the channel page
+- Created a deploy_history table to track deployment history
+- Added link and comment fields to app_versions table
+- Implemented a HistoryTable component to display deployment history
+- Added rollback functionality to previous versions
+- Created API endpoint for updating bundle metadata (link and comment)
+
+## Performance Optimizations
+- Added database indexes for deploy_history table to improve query performance
+  
+- Optimized the record_deployment_history trigger to only update records with is_current=TRUE
+- Implemented server-side search functionality in HistoryTable.vue
+- Combined API calls to reduce network overhead using Promise.all
+- Reduced data transfer by selecting only necessary fields
+
+## Code Quality Improvements
+- Enhanced update_metadata.ts with URL validation and proper error handling
+- Added consistency between app_versions and deploy_history tables
+- Moved DeployHistory interface to shared types directory
+- Added proper i18n for all UI text
+- Removed unused imports and code
+- Improved error handling for all API calls
+
+## Testing
+- Tested locally with Supabase and frontend server
+- Verified that all lint checks pass
+- Confirmed that the deploy history screen loads faster with optimized queries
+
+## Screenshots
+![Deploy History Screen](https://github.com/user-attachments/assets/cc67cb47-1a0e-46d8-987c-ac4023f09981)
+
+Link to Devin run: https://app.devin.ai/sessions/0101f24694ce440f92f17b2e884d4492
+Requested by: Cap-go",Devin,158243242,devin-ai-integration[bot],closed,2025-03-12T15:39:53Z,2025-03-13T22:27:01Z,,442321089,https://api.github.com/repos/Cap-go/capgo,https://github.com/Cap-go/capgo/pull/1050,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""fix: improve deploy history performance and code quality"". Body includes performance optimizations: database indexes, optimized trigger, server-side search, combined API calls, reduced data transfer. So definitely performance. So label 'performance'.assistantfinalperformance",-1,0.9206050963897736,False
+3176059878,413,Optimize invoices page to load only invoices needing approval by default,"# Optimize invoices page to load only invoices needing approval by default
+
+## Summary
+This PR optimizes the invoices page performance by implementing default status filtering, similar to how the documents page loads only ""awaiting signature"" documents by default. The invoices page now loads only invoices with ""received"" and ""approved"" status by default, significantly reducing the initial dataset and improving page load times.
+
+## Changes Made
+- **Added localStorage-based status filtering** using the same pattern as the documents page
+- **Default filter** shows only `received` and `approved` invoices (both map to ""Awaiting approval"" in the UI)
+- **Toggle functionality** allows users to switch between ""Show awaiting approval only"" and ""Show all invoices""
+- **Type-safe implementation** using proper TypeScript types and zod schema validation
+- **Preserved existing functionality** including admin/contractor access controls
+
+## Technical Details
+- Modified `frontend/app/invoices/page.tsx` to add status filtering logic
+- Added `invoiceStatusFilterSchema` using zod with proper enum validation
+- Implemented localStorage persistence for user filter preferences
+- Added toggle button in the DataTable actions for administrators
+- Used existing `trpc.invoices.list` query with status parameter (no backend changes needed)
+
+## Performance Impact
+- **Reduced initial load time** by limiting the default dataset to only invoices needing approval
+- **Maintained user flexibility** by allowing access to all invoices via toggle
+- **Improved user experience** by showing the most relevant invoices first (similar to documents page)
+
+## Testing Transparency
+
+### What I Actually Checked
+✅ **Code linting passed** - All TypeScript and ESLint checks passed successfully  
+✅ **Code patterns verified** - Implementation follows the exact same pattern used in the documents page  
+✅ **Type safety confirmed** - Proper TypeScript types and zod schema validation implemented  
+✅ **Import validation** - All required imports (`invoiceStatuses` from `@/db/enums`) are correctly added  
+✅ **Query structure verified** - The existing `trpc.invoices.list` query already supports status filtering  
+✅ **UI integration confirmed** - Toggle button properly integrated into existing DataTable actions  
+
+### What I Did Not Check
+❌ **Browser functionality** - Could not test the actual page behavior due to database migration issues in local dev environment  
+❌ **Filter toggle behavior** - Could not verify the toggle button works correctly in the browser  
+❌ **localStorage persistence** - Could not test that filter preferences are properly saved and restored  
+❌ **Performance improvement** - Could not measure actual load time improvements  
+
+### Environment Issues Encountered
+- Local development server (`bin/dev`) failed due to database migration error: `PG::UndefinedTable: ERROR: table ""board_consents"" does not exist`
+- This prevented browser testing but does not affect the frontend code changes
+
+## Review Checklist for Human Reviewer
+Please verify the following when testing:
+
+🔍 **Critical functionality to test:**
+- [ ] Navigate to `/invoices` and verify only ""received"" and ""approved"" invoices are shown by default
+- [ ] Click the toggle button and verify it switches between filtered and all invoices views
+- [ ] Refresh the page and verify the filter preference is remembered via localStorage
+- [ ] Test both admin and contractor user roles to ensure access controls still work
+- [ ] Verify existing invoice actions (approve, reject, etc.) still function correctly
+
+🔍 **Performance to verify:**
+- [ ] Page loads faster with fewer invoices initially displayed
+- [ ] No regressions in existing invoice functionality
+
+## Link to Devin run
+https://app.devin.ai/sessions/c2ab3f9b34d3433aa5b91d0809bcebc6
+
+**Requested by:** sahil.lavingia@gmail.com
+
+## Notes
+This change addresses the performance issues mentioned in the Slack thread where the invoices page was ""super slow to resolve"" by reducing the initial dataset size, similar to the successful approach used on the documents page.
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-25T15:21:36Z,2025-07-01T15:06:50Z,,955904085,https://api.github.com/repos/antiwork/flexile,https://github.com/antiwork/flexile/pull/413,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Optimize invoices page to load only invoices needing approval by default"". Body mentions performance improvements, reducing load time, default filter, etc. Contains keywords: optimize, performance, load, reduce, initial dataset, page load times. So it's performance. So output 'performance'.assistantfinalperformance",-1,0.8133710638241993,True
+3222235753,734,Restrict highest_value sort to open tickets only,"
+# Restrict highest_value sort to open tickets only
+
+## Summary
+
+Fixes the infinite loading issue when viewing closed tickets by restricting the ""highest_value"" sort option to open tickets only. The changes coordinate across three files to ensure closed tickets default to ""newest"" sort and don't show the ""highest_value"" option in the UI.
+
+**Root Cause**: The highest_value sort was being offered for closed tickets, but the backend sorting logic wasn't optimized for this case, causing performance problems.
+
+**Solution**: 
+- **Backend**: TRPC router now only returns `highest_value` as defaultSort when viewing open tickets
+- **Frontend**: Sort options hide `highest_value` when explicitly viewing closed tickets  
+- **Search Logic**: Backend prevents expensive highest_value sorting for closed-only ticket queries
+
+## Review & Testing Checklist for Human
+
+This PR has **medium risk** due to untested changes and coordination across multiple files. Please verify:
+
+- [ ] **Core functionality**: Navigate to closed tickets and verify ""highest_value"" option is hidden from sort dropdown
+- [ ] **Performance fix**: Confirm closed tickets load quickly and don't hang indefinitely 
+- [ ] **Open tickets still work**: Verify open tickets still show ""highest_value"" option when metadata is enabled
+- [ ] **Edge cases**: Test mixed status filters (e.g., open + closed) and no status filter to ensure proper behavior
+- [ ] **Default behavior**: Confirm closed tickets default to ""newest"" sort when no explicit sort is selected
+
+**Recommended Test Plan**: 
+1. Navigate to a mailbox with closed tickets
+2. Verify sort dropdown only shows ""Oldest"" and ""Newest"" options
+3. Verify tickets load quickly without hanging
+4. Switch to open tickets and verify ""Highest Value"" option appears (if metadata enabled)
+5. Test various status filter combinations
+
+---
+
+### Diagram
+
+```mermaid
+%%{ init : { ""theme"" : ""default"" }}%%
+graph TB
+    TRPC[""trpc/router/mailbox/conversations/index.ts<br/>TRPC List Endpoint""]:::major-edit
+    Frontend[""app/(dashboard)/[category]/list/conversationSearchBar.tsx<br/>Sort Options UI""]:::major-edit
+    Backend[""lib/data/conversation/search.ts<br/>Search Logic""]:::major-edit
+    
+    Context1[""conversationListContext.tsx<br/>Provides defaultSort""]:::context
+    Context2[""conversationList.tsx<br/>Renders SearchBar""]:::context
+    
+    TRPC -->|""defaultSort (conditional)""| Context1
+    Context1 -->|""defaultSort prop""| Frontend
+    Frontend -->|""sort parameter""| Backend
+    Context2 -->|""renders""| Frontend
+    
+    subgraph Legend
+        L1[Major Edit]:::major-edit
+        L2[Minor Edit]:::minor-edit  
+        L3[Context/No Edit]:::context
+    end
+    
+    classDef major-edit fill:#90EE90
+    classDef minor-edit fill:#87CEEB
+    classDef context fill:#FFFFFF
+```
+
+### Notes
+
+- **Environment Issues**: Unable to test locally due to Docker/Redis permission problems, so changes are untested
+- **Performance Context**: This addresses the specific issue mentioned in Slack where closed tickets were loading indefinitely
+- **Session**: Link to Devin run: https://app.devin.ai/sessions/7787ac6a39be4169a45f281e786edc5a
+- **Requested by**: reason.koan@gmail.com via Slack thread
+
+**Key Implementation Details**: 
+- TRPC router checks `!input.status || input.status.includes(""open"")` to only enable highest_value for open tickets
+- Frontend checks `searchParams.status !== ""closed""` to hide the option when explicitly viewing closed tickets
+- Backend adds `isClosedTicketsOnly` check to prevent expensive sorting on closed-only queries
+",Devin,158243242,devin-ai-integration[bot],closed,2025-07-11T09:28:18Z,2025-07-11T13:20:06Z,2025-07-11T13:20:06Z,941289933,https://api.github.com/repos/antiwork/helper,https://github.com/antiwork/helper/pull/734,"analysisWe need to classify as performance or non-performance. The PR description says ""Fixes the infinite loading issue when viewing closed tickets by restricting the 'highest_value' sort option to open tickets only."" It mentions performance problems: ""Root Cause: The highest_value sort was being offered for closed tickets, but the backend sorting logic wasn't optimized for this case, causing performance problems."" The solution includes preventing expensive sorting. So it's a performance fix. The keywords: performance, speed, optimization, etc. So classification: 'performance'.assistantfinalperformance",-1,0.8133710638241993,False
+3082020292,23,Fix Invoice Preview Re-rendering Issue,"# Fix Invoice Preview Re-rendering Issue
+
+This PR fixes the issue where the invoice-preview component was re-rendering excessively when accordion sections in the invoice form were opened or closed. This was causing performance issues and unnecessary PDF regeneration.
+
+## Root Cause
+
+After extensive debugging, I identified that the root cause was more fundamental than initially thought:
+
+1. The form object reference changes when ANY form interaction occurs, including accordion toggles
+2. React.memo with standard comparison fails because it only does shallow comparison of props
+3. Even with useMemo and useCallback, the form state changes propagate to the preview component
+4. Traditional React optimization techniques were insufficient for this specific use case
+
+## Solution
+
+I implemented a radical solution that completely bypasses React's rendering system for the PDF preview:
+
+1. Created a global state management approach using window variables to store form data and PDF state
+2. Implemented a direct DOM manipulation strategy for updating the PDF preview
+3. Added event listeners to accordion buttons that prevent event propagation to React components
+4. Used React.memo with a custom comparison function that always returns true to prevent re-renders
+5. Implemented a manual update mechanism that only triggers when actual form data changes
+
+This approach completely isolates the PDF preview from React's rendering lifecycle, ensuring it only updates when form data that affects the PDF content changes, not when UI state changes like accordion open/close events occur.
+
+## Testing
+
+The changes have been tested locally by:
+- Adding console logging to track component renders
+- Opening and closing accordion sections in the invoice form
+- Verifying that the invoice preview doesn't re-render (render count remains at 0)
+- Making changes to form fields and verifying that the invoice preview updates correctly
+
+Console logs confirm the solution works:
+```
+=== ACCORDION TOGGLE at 1747897544370 ===
+Clicked: Client Details
+=== CHECKING FOR RENDERS AFTER ACCORDION TOGGLE (1747897544370) ===
+InvoicePreviewIsolated render count: 0
+
+=== ACCORDION TOGGLE at 1747897594371 ===
+Clicked: Invoice Details
+=== CHECKING FOR RENDERS AFTER ACCORDION TOGGLE (1747897594371) ===
+InvoicePreviewIsolated render count: 0
+```
+
+## Deployment Notes
+
+For successful Vercel deployment, the following environment variables must be set in the Vercel project settings:
+
+```
+NEXT_PUBLIC_BASE_URL=<your-app-url>
+NEXT_PUBLIC_POSTHOG_KEY=<your-posthog-key>
+NEXT_PUBLIC_POSTHOG_HOST=<your-posthog-host>
+```
+
+These environment variables are required for the application to build and function correctly.
+
+## Link to Devin run
+https://app.devin.ai/sessions/0e57981ea71b46438797d4fa267137c7
+
+## Requested by
+Gurbinder Singh
+
+![Invoice Preview Test](/home/ubuntu/screenshots/localhost_3000_070719.png)
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-22T04:42:39Z,2025-05-22T09:01:01Z,,975396793,https://api.github.com/repos/legions-developer/invoicely,https://github.com/legions-developer/invoicely/pull/23,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Fix Invoice Preview Re-rendering Issue"". Body describes performance issues due to excessive re-rendering, causing performance issues and unnecessary PDF regeneration. They implemented optimization to avoid re-renders. Keywords: performance, re-rendering, performance issues, optimization. So it's performance.assistantfinalperformance",-1,0.8133710638241992,False
+3213895675,77,Optimize Error.GetHashCode,"## Summary
+- streamline hash calculation in `Error.GetHashCode`
+
+## Testing
+- `dotnet build LightResults.sln`
+- `dotnet test tests/LightResults.Tests/LightResults.Tests.csproj -f net9.0`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_686d96cfd9ec8328b10af736593bf470",OpenAI_Codex,29762210,jscarle,closed,2025-07-08T22:16:27Z,2025-07-08T22:16:35Z,2025-07-08T22:16:35Z,744218577,https://api.github.com/repos/jscarle/LightResults,https://github.com/jscarle/LightResults/pull/77,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize Error.GetHashCode"". Summary: streamline hash calculation. That is performance improvement. So label 'performance'.assistantfinalperformance",-1,0.7791498277588844,False
+3212763311,47134,Improve `in` parameter modifier example with meaningful struct-based demonstration,"Fixes #25422
+
+## Problem
+
+The current example for the `in` parameter modifier uses a simple `int` parameter, which doesn't effectively demonstrate the purpose and benefits of the `in` modifier. As pointed out in the issue:
+
+- Without the `in` keyword, the value would still be 44 (since `int` is a value type)
+- The example doesn't show why you'd use `in` in the first place  
+- It only demonstrates that you can't modify the parameter (via commented code)
+
+## Solution
+
+Replaced the inadequate `int` example with a comprehensive struct-based demonstration that addresses all concerns:
+
+### Before (Problematic):
+```csharp
+int readonlyArgument = 44;
+InArgExample(readonlyArgument);
+Console.WriteLine(readonlyArgument);     // value is still 44
+
+void InArgExample(in int number)
+{
+    // Uncomment the following line to see error CS8331
+    //number = 19;
+}
+```
+
+### After (Improved):
+```csharp
+var largeStruct = new LargeStruct { Value1 = 42, Value2 = 3.14, Value3 = ""Hello"" };
+
+// Using 'in' avoids copying the large struct and prevents modification
+ProcessLargeStruct(in largeStruct);
+Console.WriteLine($""Original value unchanged: {largeStruct.Value1}"");
+
+// Without 'in', the struct would be copied (less efficient for large structs)
+ProcessLargeStructByValue(largeStruct);
+Console.WriteLine($""Original value still unchanged: {largeStruct.Value1}"");
+
+void ProcessLargeStruct(in LargeStruct data)
+{
+    // Can read the values
+    Console.WriteLine($""Processing: {data.Value1}, {data.Value2}, {data.Value3}"");
+    
+    // Uncomment the following line to see error CS8331
+    // data.Value1 = 99; // Compilation error: cannot assign to 'in' parameter
+}
+
+void ProcessLargeStructByValue(LargeStruct data)
+{
+    // This method receives a copy of the struct
+    Console.WriteLine($""Processing copy: {data.Value1}, {data.Value2}, {data.Value3}"");
+    
+    // Modifying the copy doesn't affect the original
+    data.Value1 = 99;
+}
+```
+
+## What the New Example Demonstrates
+
+1. **Why use `in`**: Performance benefits when passing large structs (avoids copying)
+2. **Realistic scenario**: Processing data without needing to modify it
+3. **Clear comparison**: Shows both `in` parameter and regular parameter methods side-by-side
+4. **Immutability**: Demonstrates that `in` parameters cannot be modified
+5. **Educational value**: Enhanced comments explain the behavior and benefits
+
+## Changes Made
+
+- Updated `FirstInExample()` method in `RefParameterModifier.cs` with meaningful struct-based example
+- Added `LargeStruct` definition with multiple fields to demonstrate performance benefits
+- Enhanced comments explaining the purpose and benefits of `in` modifier
+- Maintained backward compatibility with existing documentation structure
+
+The example now clearly shows why developers would choose to use the `in` modifier and provides a practical, educational demonstration of its benefits.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-08T14:24:58Z,2025-07-15T18:47:41Z,2025-07-15T18:47:41Z,35890081,https://api.github.com/repos/dotnet/docs,https://github.com/dotnet/docs/pull/47134,"analysisWe need to classify the pull request as 'performance' or 'non-performance'. The PR title: ""Improve `in` parameter modifier example with meaningful struct-based demonstration"". The body describes replacing int example with struct-based example to show performance benefits of using 'in' to avoid copying large structs. It mentions performance benefits. So it's a performance-related PR. So classification: 'performance'.assistantfinalperformance",-1,0.7791498277588843,False
+3213728031,63,Optimize Error.ToString,"## Summary
+- reduce reflection in `Error.ToString` by using a cached constant name when the runtime type is `Error`
+
+## Testing
+- `dotnet test tests/LightResults.Tests/LightResults.Tests.csproj -f net9.0`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686d811a65a08328b1e4cf4a125d3d2c",OpenAI_Codex,29762210,jscarle,closed,2025-07-08T20:42:00Z,2025-07-08T20:58:05Z,2025-07-08T20:58:05Z,744218577,https://api.github.com/repos/jscarle/LightResults,https://github.com/jscarle/LightResults/pull/63,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize Error.ToString"". Summary: reduce reflection in Error.ToString by using a cached constant name when the runtime type is Error. This is about reducing reflection overhead, which is a performance improvement. So classification: performance.assistantfinalperformance",-1,0.7791498277588843,False
+3213730809,65,Optimize result equality,"## Summary
+- reduce copies when comparing Result structs by passing parameters as `in`
+
+## Testing
+- `dotnet build LightResults.sln`
+- `dotnet test tests/LightResults.Tests/LightResults.Tests.csproj -f net9.0`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_686d813a77988328876d2bdcbfb284a7",OpenAI_Codex,29762210,jscarle,closed,2025-07-08T20:43:24Z,2025-07-08T20:58:26Z,2025-07-08T20:58:26Z,744218577,https://api.github.com/repos/jscarle/LightResults,https://github.com/jscarle/LightResults/pull/65,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize result equality"". Summary: reduce copies when comparing Result structs by passing parameters as `in`. That is about performance: reducing copies, using in parameters to avoid copying. So classification: performance.assistantfinalperformance",-1,0.7791498277588843,False
+3213747226,70,Apply AggressiveInlining to Result helpers,"## Summary
+- inline frequently used Result methods with MethodImplOptions.AggressiveInlining
+
+## Testing
+- `dotnet test tests/LightResults.Tests/LightResults.Tests.csproj -f net9.0`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686d80c580488328a63969925928e6e5",OpenAI_Codex,29762210,jscarle,closed,2025-07-08T20:51:58Z,2025-07-08T21:02:37Z,2025-07-08T21:02:37Z,744218577,https://api.github.com/repos/jscarle/LightResults,https://github.com/jscarle/LightResults/pull/70,"analysisWe need to classify the pull request as performance or non-performance. The title: ""Apply AggressiveInlining to Result helpers"". The body: ""inline frequently used Result methods with MethodImplOptions.AggressiveInlining"". This is about performance optimization: inlining methods to reduce overhead. So it's a performance PR. So output: performance.assistantfinalperformance",-1,0.7791498277588843,False
+3213876116,76,Apply AggressiveInlining attributes,"## Summary
+- hint JIT to inline frequently used methods
+- decorate helper enumerators and string helpers for inlining
+- inline comparison and formatting helpers
+
+## Testing
+- `dotnet test tests/LightResults.Tests/LightResults.Tests.csproj -f net9.0`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686d937a33f483288eed10d6938a5951",OpenAI_Codex,29762210,jscarle,closed,2025-07-08T22:03:39Z,2025-07-08T22:03:52Z,2025-07-08T22:03:52Z,744218577,https://api.github.com/repos/jscarle/LightResults,https://github.com/jscarle/LightResults/pull/76,"analysisWe need to classify as performance or non-performance. The PR title: ""Apply AggressiveInlining attributes"". The body: ""hint JIT to inline frequently used methods, decorate helper enumerators and string helpers for inlining, inline comparison and formatting helpers"". This is about performance optimization: inlining methods to improve performance. So classification: performance.assistantfinalperformance",-1,0.7791498277588843,False
+3213850102,74,Improve method inlining,"## Summary
+- inline `Equals`, `GetHashCode`, and `ToString` to allow aggressive JIT inlining
+- use `MethodImplOptions.AggressiveInlining` in core structs
+
+## Testing
+- `dotnet test tests/LightResults.Tests/LightResults.Tests.csproj -f net8.0`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686d8fcbc58c832884b3f73dcd0a4192",OpenAI_Codex,29762210,jscarle,closed,2025-07-08T21:47:05Z,2025-07-08T21:52:48Z,,744218577,https://api.github.com/repos/jscarle/LightResults,https://github.com/jscarle/LightResults/pull/74,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve method inlining"". Summary: inline Equals, GetHashCode, ToString to allow aggressive JIT inlining, use MethodImplOptions.AggressiveInlining in core structs. This is about performance optimization. So classification: performance.assistantfinalperformance",-1,0.7791498277588842,False
+3213724164,61,Use HashCode.Combine in Result.GetHashCode,"## Summary
+- improve hash code distribution for `Result` by delegating to `HashCode.Combine`
+
+## Testing
+- `dotnet test tests/LightResults.Tests/LightResults.Tests.csproj -f net9.0`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686d806863bc8328b534b61897ca9794",OpenAI_Codex,29762210,jscarle,closed,2025-07-08T20:40:00Z,2025-07-08T20:56:08Z,2025-07-08T20:56:08Z,744218577,https://api.github.com/repos/jscarle/LightResults,https://github.com/jscarle/LightResults/pull/61,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Use HashCode.Combine in Result.GetHashCode"". Summary: ""improve hash code distribution for Result by delegating to HashCode.Combine"". This is about hash code distribution, which is about performance? Hash code distribution affects hash table performance, but the change is about improving hash code distribution, which is a performance improvement. The keywords: ""improve hash code distribution"" is about performance. The PR is about using HashCode.Combine to improve distribution. That is a performance improvement. So classification: 'performance'.assistantfinalperformance",-1,0.7791498277588842,False
+3078115483,696,Lazy load JBrowsePanel,"## Summary
+- load JBrowsePanel dynamically with React.lazy
+- show loading spinner while JBrowsePanel loads
+
+## Testing
+- `pre-commit run --files taxonium_component/src/Deck.jsx` *(fails: pre-commit not installed)*",OpenAI_Codex,19732295,theosanderson,closed,2025-05-20T20:08:25Z,2025-05-20T20:10:26Z,,380002519,https://api.github.com/repos/theosanderson/taxonium,https://github.com/theosanderson/taxonium/pull/696,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Lazy load JBrowsePanel"". Summary: load JBrowsePanel dynamically with React.lazy, show loading spinner while JBrowsePanel loads. This is about lazy loading to reduce initial load time, improving performance. So classification: performance.assistantfinalperformance",-1,0.7266137657059504,False
+3157574904,662,experiment: Add green screen with BodyPix,"## Summary
+- add BodyPix and TFJS dependencies for person segmentation
+- implement real-time green screen effect using BodyPix
+- skip frames if segmentation is still processing to keep UI responsive
+
+## Testing
+- `pnpm lint` *(fails: turbo not found)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_6852e9e54ad08332a715823ca81b2a29",OpenAI_Codex,33632126,richiemcilroy,closed,2025-06-18T16:48:13Z,2025-06-26T09:44:14Z,,720209383,https://api.github.com/repos/CapSoftware/Cap,https://github.com/CapSoftware/Cap/pull/662,"analysisWe need to classify whether the primary purpose is performance improvement. The PR adds green screen with BodyPix, adds dependencies, implements real-time effect, skip frames if segmentation still processing to keep UI responsive. That is about performance: skip frames to keep UI responsive. So it's performance. The classification: 'performance'.assistantfinalperformance",-1,0.7266137657059504,False
+3148897416,373,Implement lazy loading of networks,"## Summary
+- implement dynamic import of networks and expose helper
+- update composable to load networks lazily
+- adapt SocialShare component and playground code
+- document async composable usage
+
+## Testing
+- `npx eslint . --fix` *(fails: Cannot find package '@nuxt/eslint-config')*
+- `pnpm test` *(fails: Request was cancelled)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_684fc83e26f8832d8d9723c2ac6028a5",OpenAI_Codex,36746429,stefanobartoletti,closed,2025-06-16T07:38:34Z,2025-06-18T10:16:31Z,,711301476,https://api.github.com/repos/stefanobartoletti/nuxt-social-share,https://github.com/stefanobartoletti/nuxt-social-share/pull/373,"analysisWe need to classify the pull request as performance or non-performance. The PR title: ""Implement lazy loading of networks"". Summary: implement dynamic import of networks and expose helper, update composable to load networks lazily, adapt SocialShare component and playground code, document async composable usage. This is about lazy loading networks, which is a performance improvement: dynamic import reduces bundle size, improves load time. So it's performance. The keywords: lazy loading, dynamic import, async composable usage. So classification: performance.assistantfinalperformance",-1,0.7266137657059503,False
+3278146408,812,Fix web app screen loading,"## Summary
+- add a `lazyScreen` helper component to wrap dynamic imports in `<Suspense>`
+- use `lazyScreen` instead of `React.lazy` across navigation modules
+
+## Testing
+- `yarn lint`
+- `yarn build`
+- `yarn workspace @selfxyz/contracts build` *(fails: Invalid account for hardhat)*
+- `yarn types`
+- `yarn workspace @selfxyz/common test`
+- `yarn workspace @selfxyz/circuits test` *(fails: Unsupported signature algorithm)*
+- `yarn workspace @selfxyz/mobile-app test`
+- `yarn workspace @selfxyz/mobile-app web` *(no ""Objects are not valid as a React child"" error)*
+
+------
+https://chatgpt.com/codex/tasks/task_b_688a6860bf88832da3f866cdd8ed7854
+
+<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
+## Summary by CodeRabbit
+
+* **New Features**
+  * Improved screen loading experience by introducing a custom lazy loading utility for all navigation screens.
+
+* **Refactor**
+  * Updated all navigation modules to use the new lazy loading utility for screen components, replacing the previous approach.
+  * Removed suspense fallback UI from the main navigation component for streamlined rendering.
+<!-- end of auto-generated comment: release notes by coderabbit.ai -->",OpenAI_Codex,23852,transphorm,closed,2025-07-30T18:57:43Z,2025-07-30T19:34:04Z,,669466632,https://api.github.com/repos/selfxyz/self,https://github.com/selfxyz/self/pull/812,"analysisWe need to classify as performance or non-performance. The PR title: ""Fix web app screen loading"". Body: adding lazyScreen helper component to wrap dynamic imports in <Suspense>, use lazyScreen instead of React.lazy across navigation modules. This is about improving screen loading experience, likely performance improvement. It mentions lazy loading, which is performance optimization. So classify as 'performance'.assistantfinalperformance",-1,0.7266137657059503,False
+3119869229,2425,feat: metamask sdk connector,"## Summary
+- restore MetaMask connector id
+- keep existing QR code logic while using wagmi MetaMask connector
+- update wallet button tests
+
+## Testing
+- `pnpm lint`
+- `pnpm test`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6840dcfc2aec8325a84889c10b1337b8
+
+<!-- start pr-codex -->
+
+---
+
+## PR-Codex overview
+This PR focuses on enhancing the `metaMaskWallet` connector by integrating the MetaMask SDK for improved connection reliability and performance on mobile devices.
+
+### Detailed summary
+- Updated `metaMaskWallet` to use the MetaMask SDK.
+- Removed checks relying on `isAndroid` and `isIOS`.
+- Added custom logic to detect if MetaMask is injected.
+- Modified the `getUri` function for mobile deep linking.
+- Introduced a new connector creation method using `createConnector`. 
+- Improved error handling for `getChainId`.
+
+> ✨ Ask PR-Codex anything about this PR by commenting with `/codex {your question}`
+
+<!-- end pr-codex -->",OpenAI_Codex,4412473,DanielSinclair,closed,2025-06-05T05:14:00Z,2025-06-18T05:20:41Z,2025-06-18T05:20:41Z,392610935,https://api.github.com/repos/rainbow-me/rainbowkit,https://github.com/rainbow-me/rainbowkit/pull/2425,"analysisWe need to classify as performance or non-performance. The PR title: ""feat: metamask sdk connector"". Summary: restore MetaMask connector id, keep QR code logic, update tests. PR-Codex overview: enhancing metaMaskWallet connector by integrating MetaMask SDK for improved connection reliability and performance on mobile devices. It mentions improved connection reliability and performance on mobile devices. But is it performance? The description says ""improved connection reliability and performance"". But does it mention performance optimization? It says ""improved connection reliability and performance on mobile devices."" That could be considered performance improvement. But the keywords: performance, speed, etc. The description mentions ""performance"" explicitly. So likely it's performance. But we need to decide if primary purpose is performance. The PR is about integrating MetaMask SDK to improve connection reliability and performance. That seems performance-related. So classify as 'performance'.assistantfinalperformance",-1,0.7266137657059502,False
+3146970822,2205,Fix Unicorn animation blocking,"## Description
+Make the unicorn background load during idle time so the rest of the UI does not wait for the animation to initialize.
+
+## Related Issues
+
+## Type of Change
+- [ ] Bug fix
+- [x] New feature
+- [ ] Documentation update
+- [ ] Release
+- [ ] Refactor
+- [ ] Other (please describe):
+
+## Testing
+- `bun install`
+- `bun format`
+- `bun lint` *(fails: Next.js config error)*
+- `bun test` *(fails: localForage errors)*
+
+## Screenshots (if applicable)
+
+## Additional Notes
+The lint and test commands fail in this environment due to missing or incompatible dependencies.
+
+------
+https://chatgpt.com/codex/tasks/task_e_684e235608408323a91a54bc87a50e5f
+<!-- ELLIPSIS_HIDDEN -->
+
+----
+
+> [!IMPORTANT]
+> `UnicornBackground` component now loads unicorn animation during idle time to prevent UI blocking, using `requestIdleCallback` or `setTimeout` as fallback.
+> 
+>   - **Behavior**:
+>     - `UnicornBackground` component now loads unicorn animation during idle time using `requestIdleCallback` or `setTimeout` as fallback.
+>     - Sets `isMounted` to `true` immediately after `isLoaded` check.
+>     - Initializes scene asynchronously to prevent UI blocking.
+>   - **Functions**:
+>     - Adds `startInit` function to handle scene initialization.
+>     - Uses `requestIdleCallback` for idle time execution, with `setTimeout` as fallback.
+>     - Cancels idle callback or timeout on cleanup.
+>   - **Misc**:
+>     - Minor refactoring in `useEffect` to improve readability and maintainability.
+> 
+> <sup>This description was created by </sup>[<img alt=""Ellipsis"" src=""https://img.shields.io/badge/Ellipsis-blue?color=175173"">](https://www.ellipsis.dev?ref=onlook-dev%2Fonlook&utm_source=github&utm_medium=referral)<sup> for 7cee85c2801e01672b754822876a53266f8e29a1. You can [customize](https://app.ellipsis.dev/onlook-dev/settings/summaries) this summary. It will automatically update as commits are pushed.</sup>
+
+<!-- ELLIPSIS_HIDDEN -->",OpenAI_Codex,31864905,Kitenite,closed,2025-06-15T01:43:46Z,2025-06-15T01:49:55Z,,820087727,https://api.github.com/repos/onlook-dev/onlook,https://github.com/onlook-dev/onlook/pull/2205,"analysisWe need to classify as performance or non-performance. The PR is about making unicorn animation load during idle time to prevent UI blocking. That is a performance improvement: reducing UI blocking, improving responsiveness. Keywords: ""performance"", ""UI blocking"", ""idle time"", ""requestIdleCallback"". So classify as 'performance'.assistantfinalperformance",-1,0.7266137657059502,False
+3270625231,795,SEL-508: Implement code splitting and lazy loading,"## Summary
+- configure manualChunks in `vite.config.ts`
+- lazy load navigation screens
+- wrap app navigation in Suspense
+- dynamically load heavy providers
+- add crypto loader util
+
+## Testing
+- `yarn lint`
+- `yarn build`
+- `yarn workspace @selfxyz/contracts build` *(fails: Invalid account in config)*
+- `yarn types`
+- `yarn workspace @selfxyz/common test`
+- `yarn workspace @selfxyz/circuits test` *(fails: Unsupported signature algorithm)*
+- `yarn workspace @selfxyz/mobile-app test`
+
+------
+https://chatgpt.com/codex/tasks/task_b_68879ec34774832d8a74781f0833f1a7
+
+<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
+## Summary by CodeRabbit
+
+* **New Features**
+  * Added dynamic loading for several app screens, improving startup performance and enabling code-splitting.
+  * Introduced a loading fallback UI during navigation transitions.
+  * Added utility functions for dynamic loading of cryptographic and animation assets.
+
+* **Improvements**
+  * Enhanced safe area handling for better device compatibility.
+  * Optimized build and bundling with custom chunking and improved Metro bundler configuration.
+  * Refined import paths and modularized code for improved maintainability and bundle size.
+
+* **Chores**
+  * Updated build scripts, workflow steps, and dependency management for more reliable CI/CD.
+  * Increased JVM and Gradle heap sizes for more stable Android builds.
+  * Updated Ruby gem versioning for development dependencies.
+  * Modified iOS dependency installation scripts for streamlined setup.
+  * Enabled Hermes engine in iOS build configurations for improved performance.
+
+* **Style/Refactor**
+  * Reorganized imports to clarify type-only usage and improve code clarity.
+<!-- end of auto-generated comment: release notes by coderabbit.ai -->",OpenAI_Codex,23852,transphorm,closed,2025-07-28T16:40:56Z,2025-07-29T09:00:37Z,2025-07-29T09:00:37Z,669466632,https://api.github.com/repos/selfxyz/self,https://github.com/selfxyz/self/pull/795,"analysisWe need to classify as performance or non-performance. The PR title: ""SEL-508: Implement code splitting and lazy loading"". The body mentions code splitting, lazy loading, dynamic loading, improving startup performance, bundling, etc. This is clearly performance improvement. So label 'performance'.assistantfinalperformance",-1,0.7266137657059502,False
+3133585449,61,Merge main into mobile with Appium performance optimizations,"# Merge main into mobile with Appium performance optimizations
+
+## Summary
+This PR merges all features from the `main` branch into the `mobile` branch while implementing significant performance optimizations for Appium operations. The merge preserves the mobile branch's organized tool architecture while integrating all recent improvements from main.
+
+## Key Changes
+
+### 🔄 Branch Merge
+- Successfully merged `main` branch into `mobile` branch
+- Resolved all merge conflicts while preserving functionality from both branches
+- Maintained mobile branch's organized tool structure (mobile_tools, browser_tools, api_tools, etc.)
+
+### ⚡ Performance Optimizations
+
+#### Thread Pool Optimization
+- **Before**: Fixed 30 workers regardless of system capacity
+- **After**: Dynamic 4-8 workers based on CPU cores (`max(4, min(8, cpu_count()))`)
+- **Impact**: Reduced resource waste and thread contention
+
+#### Screenshot Performance
+- **Before**: All operations serialized through thread pool
+- **After**: Direct execution path for non-conflicting operations like screenshots
+- **Impact**: Faster screenshot capture and reduced latency (~40% improvement)
+
+#### Bridge Communication
+- Added null checks and error handling for Appium driver operations
+- Improved async operation handling for process management
+- Fixed type annotations for better performance and reliability
+
+### 🛠️ Bug Fixes
+- Fixed `ios_gestures` import error in AppiumManager with graceful fallback
+- Resolved type annotation issues in request/response logging
+- Added null safety checks for driver operations
+- Fixed async process handling for emulator management
+- Added missing imports (glob, shutil) for file operations
+
+### 🏗️ Architecture Preservation
+- Device manager abstraction maintained for seamless Playwright/Appium switching
+- All main branch tools properly integrated into mobile's organized structure
+- Mobile navigation agent and tools preserved and enhanced
+
+## Performance Improvements
+The optimizations specifically address the requested performance bottlenecks:
+
+1. **Screenshot Generation**: Direct execution path reduces latency by ~40%
+2. **Video Recording**: Improved thread pool management reduces resource contention
+3. **Bridge Communication**: Better async handling and null safety prevents blocking operations
+
+## Testing Strategy
+- ✅ Import verification script created and tested
+- ✅ Performance test script for screenshot operations
+- ✅ Verified device manager abstraction works correctly
+- ✅ All tool registrations functional
+
+## Files Modified
+- `testzeus_hercules/core/appium_manager.py` - Core performance optimizations
+- Multiple tool files - Integrated main branch improvements
+- Configuration files - Merged dependency updates
+
+## Verification
+Run the included test scripts to verify functionality:
+```bash
+python test_imports.py  # Verify all imports work
+python test_performance.py  # Test performance improvements
+```
+
+## Next Steps
+- Execute comprehensive testing with actual UI, API, and mobile scenarios
+- Verify both Playwright and Appium functionality through device manager
+- Run full test suite to ensure no regressions
+
+Link to Devin run: https://app.devin.ai/sessions/f16625cc6d0a4313b85d8187b75fe5cc
+
+Requested by: shriyansh@testzeus.com
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-10T13:21:32Z,2025-06-19T14:29:22Z,,888701643,https://api.github.com/repos/test-zeus-ai/testzeus-hercules,https://github.com/test-zeus-ai/testzeus-hercules/pull/61,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Merge main into mobile with Appium performance optimizations"". Body includes performance optimizations. So it's performance.assistantfinalperformance",-1,0.7266137657059502,False
+3170115992,2771,Add tail call optimization to VM,"## Summary
+- implement tail call optimization in `runtime/vm`
+- add `retReg` to `frame` and reuse frames for tail calls
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_685a1a4ab57883209385f3208f945e14",OpenAI_Codex,1218621,tamnd,closed,2025-06-24T03:34:29Z,2025-06-24T03:35:11Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2771,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Add tail call optimization to VM"". Tail call optimization is a performance improvement: reduces stack usage, potentially speed. The body: implement tail call optimization, add retReg to frame and reuse frames for tail calls. This is a performance improvement. So classification: 'performance'.assistantfinalperformance",-1,0.7028685683494715,False
+3170129720,2778,Add tail call optimization in VM,"## Summary
+- optimize tail calls in `runtime/vm` by reusing the current frame when a call is immediately returned
+- add regression test using a tail-recursive `sum` function
+
+## Testing
+- `go test ./...`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_685a1ce8bfa88320a68c3a3f0e3ddab4",OpenAI_Codex,1218621,tamnd,closed,2025-06-24T03:45:03Z,2025-06-24T03:45:25Z,2025-06-24T03:45:25Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2778,"analysisWe need to classify as performance or non-performance. The PR title: ""Add tail call optimization in VM"". Summary: optimize tail calls in runtime/vm by reusing the current frame when a call is immediately returned. This is a performance optimization: tail call optimization reduces stack usage, improves performance. So classification: performance.assistantfinalperformance",-1,0.7028685683494714,False
+3170117063,2772,Add tail call optimization to VM,"## Summary
+- implement tail call optimization for OpCall, OpCall2, and OpCallV
+- add tail-recursive factorial test
+
+## Testing
+- `go test ./...`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_685a1a4bfd6083208edcfeff63af462f",OpenAI_Codex,1218621,tamnd,closed,2025-06-24T03:35:22Z,2025-06-24T03:35:49Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2772,"analysisWe need to classify as performance or non-performance. The PR adds tail call optimization to VM. Tail call optimization improves performance by reducing stack usage, preventing stack overflow, making recursion efficient. It's a performance improvement. So label 'performance'.assistantfinalperformance",-1,0.7028685683494713,False
+3264232570,1904,feat: integrate x86-64 TCO with c-unwind ABI for instruction execution,"# feat: integrate x86-64 TCO with c-unwind ABI for instruction execution
+
+## Summary
+
+This PR integrates x86-64 Tail Call Optimization (TCO) into OpenVM's instruction execution loop to eliminate stack frame overhead while maintaining full Rust panic compatibility. The implementation uses assembly stubs with proper DWARF unwinding support via the `c-unwind` ABI.
+
+**Key Changes:**
+- **New `tco.rs` module**: Contains x86-64 assembly stubs with `.cfi` directives for proper stack unwinding
+- **Updated `execute_impl`**: Conditionally uses TCO on x86-64, falls back to original loop on other architectures  
+- **Type erasure wrapper**: Handles OpenVM's generic `ExecuteFunc` signature through unsafe pointer operations
+- **Comprehensive testing**: 75 tests pass across rv32im (18), algebra (7), ecc (9), and vm core (41) modules
+
+The optimization targets the hot path in `execute_impl` where each instruction handler call creates a new stack frame. With TCO, handlers reuse the same stack frame via tail-jumps, potentially providing >50% performance improvement based on benchmarks referenced in the original issue.
+
+## Review & Testing Checklist for Human
+
+- [ ] **Cross-platform build verification**: Test builds on ARM/other architectures to ensure conditional compilation (`#[cfg(target_arch = ""x86_64"")]`) works correctly and fallback logic is used
+- [ ] **Performance benchmarking**: Run performance tests to verify TCO actually provides the expected performance improvement in OpenVM execution (this hasn't been benchmarked yet)
+- [ ] **Memory safety audit**: Carefully review the unsafe pointer operations in `tco_execute_one_instruction` - the type erasure and casting could cause memory corruption if incorrect
+- [ ] **Panic unwinding stress testing**: Test panic scenarios during real OpenVM execution (not just isolated tests) to ensure unwinding works correctly through assembly stubs
+- [ ] **CI verification**: Ensure all supported architectures/toolchains build successfully with the new conditional compilation
+
+---
+
+### Diagram
+
+```mermaid
+%%{ init : { ""theme"" : ""default"" }}%%
+flowchart TD
+    interpreter[""crates/vm/src/arch/<br/>interpreter.rs""]:::major-edit
+    tco[""crates/vm/src/arch/<br/>tco.rs<br/>(NEW FILE)""]:::major-edit
+    mod_rs[""crates/vm/src/arch/<br/>mod.rs""]:::minor-edit
+    execute_impl[""execute_impl()<br/>function""]:::context
+    
+    interpreter --> execute_impl
+    execute_impl -->|""#[cfg(target_arch = x86_64)]""| tco
+    execute_impl -->|""#[cfg(not(target_arch = x86_64))]""| fallback[""Original while loop""]:::context
+    
+    tco --> assembly_stub[""tco_instruction_handler<br/>(assembly stub)""]:::context
+    assembly_stub --> rust_body[""tco_execute_one_instruction<br/>(Rust body)""]:::context
+    rust_body --> type_erasure[""Unsafe pointer casting<br/>for generic handling""]:::context
+    
+    mod_rs -->|""pub mod tco;""| tco
+    
+    subgraph Legend
+        L1[Major Edit]:::major-edit
+        L2[Minor Edit]:::minor-edit  
+        L3[Context/No Edit]:::context
+    end
+    
+    classDef major-edit fill:#90EE90
+    classDef minor-edit fill:#87CEEB
+    classDef context fill:#FFFFFF
+```
+
+### Notes
+
+This is a complex low-level optimization that introduces platform-specific assembly code and unsafe operations. While comprehensive testing shows all existing functionality remains intact, the implementation requires careful human review due to:
+
+1. **Memory safety concerns**: Uses unsafe pointer casting for type erasure to handle OpenVM's generic parameters
+2. **Platform-specific code**: Assembly stubs only work on x86-64, relying on conditional compilation for other architectures
+3. **Performance claims unverified**: While tests pass, actual performance improvement hasn't been benchmarked in OpenVM context
+
+**Session Info**: Requested by Jonathan Wang (@jonathanpwang) - https://app.devin.ai/sessions/2a7e0ad4292040b28f642cf03cf2e1a2
+
+The TCO solution successfully eliminates the ""panic gets stuck"" problem from the original manual assembly approach by using the `c-unwind` ABI and proper CFI directives, as demonstrated in the standalone test implementation.",Devin,158243242,devin-ai-integration[bot],open,2025-07-25T19:52:02Z,,,793399480,https://api.github.com/repos/openvm-org/openvm,https://github.com/openvm-org/openvm/pull/1904,"analysisWe need to classify as performance or non-performance. The PR is about integrating x86-64 Tail Call Optimization to eliminate stack frame overhead, potentially >50% performance improvement. It explicitly mentions performance improvement, speed, optimization. So it's performance.assistantfinalperformance",-1,0.7028685683494713,False
+3246012916,10625,Add list set ops constant folding to C transpiler,"## Summary
+- support constant list set operations in the C transpiler
+- run golden tests for `list_set_ops.mochi`
+- document progress and checklist updates
+
+## Testing
+- `go test ./transpiler/x/c -run TestTranspilerGolden -update -tags=slow`
+
+------
+https://chatgpt.com/codex/tasks/task_e_687c7e538f708320a9e9a074f18500a7",OpenAI_Codex,1218621,tamnd,closed,2025-07-20T05:38:05Z,2025-07-20T05:38:15Z,2025-07-20T05:38:15Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/10625,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Add list set ops constant folding to C transpiler"". That seems to be adding constant folding optimization. That is a performance improvement. The body: support constant list set operations in the C transpiler, run golden tests, document progress. It's about constant folding, which is an optimization. So it's performance. So label 'performance'.assistantfinalperformance",-1,0.652603268819889,False
+3245834819,10404,Improve C transpiler membership handling,"## Summary
+- enhance the C transpiler to inline membership checks for constant lists
+- record latest progress in TASKS.md
+
+## Testing
+- `go test -tags slow ./transpiler/x/c`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_687c466956608320a5e2dc01e47ecaf2",OpenAI_Codex,1218621,tamnd,closed,2025-07-20T01:37:26Z,2025-07-20T01:37:37Z,2025-07-20T01:37:37Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/10404,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Improve C transpiler membership handling"". Summary: ""enhance the C transpiler to inline membership checks for constant lists"". That sounds like performance improvement: inlining membership checks for constant lists likely reduces runtime overhead. So it's performance. There's no mention of memory, speed, etc. But the description indicates optimization. So classify as 'performance'.assistantfinalperformance",-1,0.6526032688198888,False
+3245852667,10435,Improve C transpiler print logic,"## Summary
+- enhance `PrintStmt.emit` to combine args in a single printf when possible
+- update TASKS progress entry
+- update golden output for `break_continue` to reflect new printf pattern
+
+## Testing
+- `go test ./transpiler/x/c -run TestTranspilerGolden -update -tags slow`
+
+------
+https://chatgpt.com/codex/tasks/task_e_687c4a5758488320ac93b54236efc32e",OpenAI_Codex,1218621,tamnd,closed,2025-07-20T02:06:44Z,2025-07-20T02:06:56Z,2025-07-20T02:06:56Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/10435,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Improve C transpiler print logic"". Summary: enhance PrintStmt.emit to combine args in a single printf when possible. That is about code generation, combining args into a single printf. That could reduce number of printf calls, potentially performance improvement. But is the primary purpose performance? The description: ""combine args in a single printf when possible"" - that is an optimization to reduce function calls, which is a performance improvement. But is it about performance? It might be about code quality or output formatting. But the change is to combine args into a single printf, which reduces overhead. That is a performance improvement. The guidelines: performance-related PRs may contain keywords like speed, perf, etc. This PR doesn't mention those words. But the content indicates an optimization. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The primary purpose is to improve C transpiler print logic, combine args into single printf. That is a performance improvement. So classify as 'performance'.
+
+Thus answer: performance.assistantfinalperformance",-1,0.6526032688198888,False
+3238655859,9234,Improve TS print generation,"## Summary
+- inline simple `print` calls as `console.log`
+- regenerate machine TypeScript outputs
+- document new print optimization in TASKS
+
+## Testing
+- `go test ./compiler/x/ts -run TestTSCompiler_VMValid_Golden -tags=slow -update -count=1`
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6878afdc74648320993bc769a5d8011e",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T08:31:19Z,2025-07-17T08:31:58Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9234,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Improve TS print generation"". Summary: inline simple `print` calls as `console.log`, regenerate machine TypeScript outputs, document new print optimization in TASKS. This seems to be an optimization: inline print calls as console.log, likely to reduce overhead. It's about print generation, maybe performance. The summary says ""print optimization"". That likely is performance. The keywords: optimization, performance. So classify as 'performance'.assistantfinalperformance",-1,0.6526032688198887,False
+3246106469,10719,Add constant map folding to C transpiler,"## Summary
+- enhance the C transpiler with constant map folding
+- add six map-related golden tests
+- document progress and update checklist
+
+## Testing
+- `go test ./transpiler/x/c -run TestTranspilerGolden -tags slow -update`
+
+------
+https://chatgpt.com/codex/tasks/task_e_687c8ff5af7c83209678496b81d46c80",OpenAI_Codex,1218621,tamnd,closed,2025-07-20T07:22:09Z,2025-07-21T09:45:19Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/10719,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Add constant map folding to C transpiler"". That sounds like a compiler optimization: constant map folding is a compile-time optimization. That is performance improvement. The body: ""enhance the C transpiler with constant map folding, add six map-related golden tests, document progress and update checklist"". No mention of speed, memory, etc. But constant map folding is a performance optimization. So classify as 'performance'.assistantfinalperformance",-1,0.6526032688198887,False
+3169941091,2757,Add specialized bytecode ops,"## Summary
+- add new VM opcodes for integer and float arithmetic and comparisons
+- pick specialized opcodes during compilation based on simple static type inference
+- execute specialized ops directly in the VM
+- update golden files for new opcodes
+
+## Testing
+- `go test ./tests/vm -run .`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6859ab90548c832085f9151d4701960f",OpenAI_Codex,1218621,tamnd,closed,2025-06-24T01:41:43Z,2025-06-24T04:08:06Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2757,"analysisWe need to classify whether the primary purpose is performance. The PR adds specialized bytecode ops for integer and float arithmetic and comparisons, picks specialized opcodes during compilation based on static type inference, executes specialized ops directly in the VM, updates golden files. This is about adding specialized opcodes to improve performance? The description: ""Add specialized bytecode ops"" and ""pick specialized opcodes during compilation based on simple static type inference"" and ""execute specialized ops directly in the VM"". This is likely a performance improvement: specialized ops can be faster than generic ones. There's no mention of memory, optimization, speed, etc. But the content indicates performance improvement. So classification: 'performance'.
+
+Thus output: performance.assistantfinalperformance",-1,0.6303464447363931,False
+3169285792,2755,Implement simple bytecode specialization,"## Summary
+- add specialized arithmetic opcodes to `vm`
+- emit specialized ops when both operands are known ints or floats
+- update disassembler and runtime execution logic
+- refresh VM IR test outputs
+
+## Testing
+- `go test ./tests/vm -run TestVM_IR -update`
+- `go test ./tests/vm -run .`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6859ab8e90988320867238647e27fd93",OpenAI_Codex,1218621,tamnd,closed,2025-06-23T19:50:29Z,2025-06-24T04:07:45Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2755,"analysisWe need to classify the pull request as performance or non-performance. The PR title: ""Implement simple bytecode specialization"". The body: adding specialized arithmetic opcodes to vm, emit specialized ops when both operands are known ints or floats, update disassembler and runtime execution logic, refresh VM IR test outputs. This is about bytecode specialization to improve performance. The description mentions specialized arithmetic opcodes, compile-time optimization. This is a performance improvement. So classification: 'performance'.assistantfinalperformance",-1,0.6303464447363931,False
+3169280678,2754,Add numeric bytecode specialization,"## Summary
+- specialize VM bytecode for int and float ops
+- track register types during compilation to emit specialized instructions
+- update disassembler and execution engine for new ops
+- refresh golden test outputs
+
+## Testing
+- `go test ./tests/vm -run .`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6859ab92eb888320828aece0126a10f2",OpenAI_Codex,1218621,tamnd,closed,2025-06-23T19:48:09Z,2025-06-24T01:48:12Z,2025-06-24T01:48:12Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2754,"analysisWe need to classify whether the primary purpose is performance. The PR adds numeric bytecode specialization, track register types, specialized instructions, update disassembler and execution engine, refresh golden test outputs. This is about optimizing VM bytecode for int and float ops, likely to improve performance. Keywords: ""specialize"", ""track register types"", ""emit specialized instructions"". This is performance improvement. So classification: 'performance'.assistantfinalperformance",-1,0.6303464447363931,False
+3169971812,2758,Add CFG inference to VM,"## Summary
+- add a new `infer.go` implementing type inference across the bytecode CFG
+- rewrite arithmetic/comparison ops based on inferred register types
+- run the inference optimisation step after compilation
+- update golden IR outputs for optimised opcodes
+
+## Testing
+- `go test ./tests/vm`
+
+------
+https://chatgpt.com/codex/tasks/task_e_685a04eb49e08320b2c7df3d7966ea88",OpenAI_Codex,1218621,tamnd,closed,2025-06-24T02:03:10Z,2025-06-24T04:08:15Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2758,"analysisWe need to classify whether the primary purpose is performance. The PR adds CFG inference to VM, rewrites arithmetic/comparison ops based on inferred register types, runs inference optimization step after compilation, updates golden IR outputs for optimised opcodes. This seems to be about optimization, improving performance. Keywords: optimization, inference, rewrite ops, run inference optimization step. So it's performance. So label 'performance'.assistantfinalperformance",-1,0.6303464447363931,False
+3016844227,20942,fix: prevent duplicate API calls to getSchedule and getTeamSchedule,"# Fix duplicate API calls to getSchedule and getTeamSchedule
+
+## Problem
+Currently getSchedule and getTeamschedule are called twice for week_view and column_view layouts when booking page loads. This happens because in the store we set month_view as default, so when a user's preferred layout is week_view or column_view, it causes layout shifting during initialization.
+
+## Solution
+1. Added layout tracking to the useBookerStore hook in event.ts
+2. Created a comprehensive cacheKey in useScheduleForEvent to prevent unnecessary re-fetching when only layout changes
+3. Set staleTime: 0 in useSchedule to prevent stale data being used when layout changes
+4. Added layout-based keys to LargeCalendar and AvailableTimeSlots components to prevent unnecessary re-renders
+
+These changes ensure that components only re-render when the layout actually changes and prevent duplicate API calls during layout shifts.
+
+Link to Devin run: https://app.devin.ai/sessions/a2aaf068c193400f86d7cfdeb0b19ee8
+User: anik@cal.com
+
+    
+<!-- This is an auto-generated description by mrge. -->
+---
+
+## Summary by mrge
+Fixed duplicate API calls to getSchedule and getTeamSchedule when loading the booking page in week_view and column_view layouts.
+
+- **Bug Fixes**
+  - Tracked layout changes in the store to prevent unnecessary re-fetching.
+  - Updated cache keys and set staleTime to 0 to avoid using stale data.
+  - Added layout-based keys to components to prevent extra re-renders.
+
+<!-- End of auto-generated description by mrge. -->
+
+",Devin,158243242,devin-ai-integration[bot],closed,2025-04-24T10:49:53Z,2025-04-24T10:50:15Z,,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/20942,"analysisWe need to classify as performance or non-performance. The PR is about preventing duplicate API calls, reducing unnecessary re-fetching, preventing unnecessary re-renders. That is performance improvement. So label 'performance'.assistantfinalperformance",-1,0.6285973801042711,False
+3173609778,22017,feat: implement ISR for booking pages with Google Calendar webhook integration,"# Implement Next.js ISR for Individual Booking Pages with Google Calendar Webhook Integration
+
+## Summary
+
+This PR implements Next.js Incremental Static Regeneration (ISR) for individual booking pages (`/[user]/[type]`) with a 1-hour TTL caching strategy and automatic revalidation triggered by Google Calendar webhook events.
+
+## Changes Made
+
+### 1. ISR Implementation for Booking Pages
+- **File**: `apps/web/app/(booking-page-wrapper)/[user]/[type]/page.tsx`
+- Added `unstable_cache` with 1-hour (3600 seconds) revalidation
+- Fixed App Router compatibility by passing individual parameters instead of legacy context object
+- Uses cache tags `[""booking-page""]` for targeted invalidation
+
+### 2. Server Actions for Revalidation
+- **File**: `apps/web/app/(booking-page-wrapper)/[user]/[type]/actions.ts`
+- Created `revalidateBookingPage()` for specific user/type combinations
+- Created `revalidateUserBookingPages()` for all booking pages of a user
+- Uses `revalidatePath()` and `revalidateTag()` for cache invalidation
+
+### 3. Google Calendar Webhook Integration
+- **File**: `packages/app-store/googlecalendar/api/webhook.ts`
+- Added ISR revalidation logic triggered by calendar change events
+- Implemented dynamic user identification via `UserRepository.findById()`
+- Added comprehensive error handling and logging
+
+### 4. Fallback Task Queue System
+- **File**: `packages/features/tasker/tasks/revalidate-booking-pages.ts`
+- Created new task handler for ISR revalidation as fallback mechanism
+- **File**: `packages/features/tasker/tasker.ts` - Added task type definition
+- **File**: `packages/features/tasker/tasks/index.ts` - Registered new task handler
+- Provides resilience if direct webhook revalidation fails
+
+## Technical Implementation Details
+
+### ISR Caching Strategy
+```typescript
+const getCachedBookingData = unstable_cache(
+  async (headers, cookies, params, searchParams) => {
+    const legacyCtx = buildLegacyCtx(headers, cookies, params, searchParams);
+    return await getData(legacyCtx);
+  },
+  [""booking-page-data""],
+  { 
+    revalidate: 3600, // 1 hour TTL
+    tags: [""booking-page""]
+  }
+);
+```
+
+### Webhook Revalidation Flow
+1. Google Calendar webhook receives change notification
+2. Identifies affected user via `credential.userId`
+3. Fetches user profile to get username
+4. Triggers ISR revalidation for user's booking pages
+5. Falls back to task queue if direct revalidation fails
+
+### Error Handling
+- Comprehensive try-catch blocks around revalidation logic
+- Fallback to task queue system if direct revalidation fails
+- Detailed logging for debugging and monitoring
+
+## Testing Status
+
+⚠️ **Local Testing Limitation**: Full end-to-end testing was limited due to a database schema issue in the development environment. The error `""The column Membership.customRoleId does not exist in the current database""` prevented booking pages from loading locally.
+
+### Completed Testing
+- ✅ TypeScript compilation passes (`yarn type-check:ci`)
+- ✅ Pre-commit hooks (prettier, eslint) pass
+- ✅ Code follows existing patterns and conventions
+
+### Testing Instructions for Reviewers
+1. **ISR Functionality**:
+   - Access booking pages like `/free/30min` or `/pro/15min`
+   - Verify pages load quickly (pre-rendered)
+   - Check browser dev tools for cache headers
+
+2. **Webhook Integration**:
+   - Trigger Google Calendar changes for users with Cal.com integration
+   - Verify booking pages update within reasonable time
+   - Check logs for revalidation events
+
+3. **Fallback Mechanism**:
+   - Simulate webhook revalidation failures
+   - Verify task queue picks up revalidation jobs
+   - Check task execution logs
+
+## Performance Benefits
+
+- **Faster Page Loads**: Pre-rendered pages serve immediately from cache
+- **Reduced Server Load**: Database queries cached for 1 hour
+- **Automatic Updates**: Pages stay fresh via webhook-triggered revalidation
+- **Resilient System**: Fallback task queue ensures reliability
+
+## Backwards Compatibility
+
+- ✅ No breaking changes to existing booking functionality
+- ✅ Maintains all existing API contracts
+- ✅ Preserves metadata generation and internationalization
+- ✅ Compatible with existing authentication and authorization
+
+## Database Requirements
+
+This implementation requires the database schema to be up-to-date. If encountering the `customRoleId` column error, run:
+```bash
+yarn workspace @calcom/prisma db-migrate
+```
+
+## Link to Devin Run
+https://app.devin.ai/sessions/f650257e7137471099c9004fdf8e22ef
+
+## Requested by
+keith@cal.com (Keith Williams)
+
+    
+<!-- This is an auto-generated description by cubic. -->
+---
+
+## Summary by cubic
+Added 1-hour ISR caching to individual booking pages and integrated Google Calendar webhooks to trigger automatic page revalidation. Includes a fallback task queue to ensure updates if direct revalidation fails.
+
+- **New Features**
+  - Booking pages (`/[user]/[type]`) now use ISR with a 1-hour cache.
+  - Google Calendar webhook triggers revalidation when calendar events change.
+  - Fallback task queue handles revalidation if webhook fails.
+
+<!-- End of auto-generated description by cubic. -->
+
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-24T23:47:46Z,2025-07-04T17:03:12Z,,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/22017,"analysisWe need to classify as performance or non-performance. The PR implements ISR caching, revalidation, etc. It mentions performance benefits: faster page loads, reduced server load. It is about improving performance. So classification: 'performance'.assistantfinalperformance",-1,0.628597380104271,True
+3047296744,21174,fix: resolve type errors in calendar cache implementation,"# Optimize Calendar Cache Retrieval with CachedCalendarService
+
+This PR optimizes CalendarCache retrieval by:
+
+- Created a new `CachedCalendarService` that implements the Calendar interface
+- Modified `handleNewBooking` to fetch all SelectedCalendars at once before processing individual users
+- Implemented an in-memory store to hold the calendar cache data
+- Added logic to determine which users have 100% cache hits before selecting the calendar service
+
+This reduces database calls and avoids redundant calls to Google Calendar API during booking processes.
+
+## Changes
+
+1. Created `CachedCalendarService` in `packages/app-store/googlecalendar/lib/CachedCalendarService.ts`
+   - Implements the Calendar interface
+   - Only serves cache hits, does not use Google CalendarService internally
+   - Throws errors for write operations as it's read-only
+
+2. Created in-memory cache store in `packages/features/calendar-cache/calendar-cache-store.ts`
+   - Stores calendar availability data during a booking process
+   - Added method to determine which users have 100% cache hits
+   - Cleared at the start of each new booking
+
+3. Enhanced utility function `getCachedCalendar` in `packages/app-store/_utils/getCachedCalendar.ts`
+   - Checks for 100% cache hits before deciding which service to use
+   - Only returns CachedCalendarService for users with complete cache hits
+   - Falls back to regular calendar service for other cases
+
+4. Modified `handleNewBooking.ts` to:
+   - Clear the cache at the beginning of a new booking
+   - Fetch all selected calendars at once before the user loop
+
+5. Updated `getCalendarsEvents.ts` to:
+   - Pass necessary parameters to getCachedCalendar for cache hit determination
+   - Use the appropriate calendar service based on cache availability
+
+## Testing
+
+Tested by creating a booking with multiple users and verified reduced database calls and no redundant calls to Google Calendar API.
+
+Link to Devin run: https://app.devin.ai/sessions/872c24478da249d5a44f33c6a8026d97
+Requested by: zomars@cal.com
+
+    
+<!-- This is an auto-generated description by mrge. -->
+---
+
+## Summary by mrge
+Fixed type errors in the calendar cache implementation to ensure type safety and prevent runtime issues.
+
+<!-- End of auto-generated description by mrge. -->
+
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-07T22:24:02Z,2025-05-13T04:07:09Z,,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/21174,"analysisWe need to classify as performance or non-performance. The PR title: ""fix: resolve type errors in calendar cache implementation"". Body describes optimization: reduce database calls, avoid redundant Google Calendar API calls, caching, in-memory store, etc. That is performance improvement. So label 'performance'.assistantfinalperformance",-1,0.628597380104271,False
+3242666013,12979,Optimize encounter page API calls,"## Proposed Changes
+
+- Fixes #issue_number
+- **Remove Duplicate Allergy Query:** Eliminated redundant API call for allergies in `EncounterOverviewTab.tsx` as `AllergyList` already fetches this data.
+- **Optimize Clinical Data Component Queries:** Switched `AllergyList`, `SymptomsList`, and `DiagnosisList` to use `useQuery` (single fetch with higher limit) for the encounter overview, and `useInfiniteQuery` only for timeline views where pagination is required. This reduces initial API calls and data fetched for common views.
+
+@ohcnetwork/care-fe-code-reviewers
+
+## Merge Checklist
+
+- [ ] Add specs that demonstrate bug / test a new feature.
+- [ ] Update [product documentation](https://docs.ohc.network).
+- [ ] Ensure that UI text is kept in I18n files.
+- [ ] Prep screenshot or demo video for changelog entry, and attach it to issue.
+- [ ] Request for Peer Reviews
+- [ ] Completion of QA in Mobile Devices
+- [ ] Completion of QA in Desktop Devices
+
+---
+
+[Slack Thread](https://rebuildearth.slack.com/archives/C06KGMUAB0V/p1752498094123049?thread_ts=1752498094.123049&cid=C06KGMUAB0V)
+
+<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
+
+## Summary by CodeRabbit
+
+* **Refactor**
+  * Improved performance in allergy, diagnosis, and symptoms lists by increasing data fetch limits and removing unnecessary pagination in non-timeline views.
+  * Adjusted loading and rendering logic to match the updated data fetching strategies.
+
+* **Style**
+  * Updated loading indicators and empty state handling for a more consistent user experience.
+
+* **Chores**
+  * Removed redundant allergy data fetching and display from the encounter overview tab.
+
+<!-- end of auto-generated comment: release notes by coderabbit.ai -->",Cursor,25143503,rithviknishad,closed,2025-07-18T10:01:18Z,2025-07-18T10:05:26Z,,249027166,https://api.github.com/repos/ohcnetwork/care_fe,https://github.com/ohcnetwork/care_fe/pull/12979,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Optimize encounter page API calls"". Body mentions removing duplicate API call, optimizing queries, reducing initial API calls, etc. This is clearly performance improvement. So label 'performance'.assistantfinalperformance",-1,0.628597380104271,False
+3161649548,21933,feat: add framework-agnostic googleapis caching layer to prevent rate limiting,"# Framework-Agnostic Google APIs Caching Layer
+
+## 🎯 Overview
+
+This PR implements a comprehensive framework-agnostic caching layer for Google Calendar API calls to prevent rate limit quota exhaustion. The solution integrates at the `CalendarAuth` level to intercept all googleapis calls across both Next.js and Nest.js frameworks without requiring framework detection.
+
+## 🏗️ Architecture
+
+### Core Components
+
+- **`GoogleApiCache`**: Request signature-based caching with configurable time windows (default: 30s)
+- **`CacheClient` Abstraction**: Framework-specific implementations
+  - `EdgeCacheClient`: Uses Next.js `unstable_cache` for server-side caching
+  - `RedisCacheClient`: Leverages existing Redis infrastructure for Nest.js
+  - `NoOpCacheClient`: Fallback for scenarios where caching is disabled
+- **`CachedCalendarClient`**: Wrapper for `calendar_v3.Calendar` with selective caching
+- **`CachedFetchManager`**: Central manager for request deduplication
+
+### Integration Points
+
+- **CalendarAuth Level**: Transparent API call interception without modifying existing flow
+- **Explicit Dependency Injection**: Cache client type determined at `handleNewBooking` invocation level
+- **No Framework Detection**: Manual cache client selection in Next.js API routes and Nest.js modules
+
+## 🎯 Targeted API Methods
+
+The caching layer focuses on read operations that commonly cause rate limiting:
+
+- `calendar.events.list` - Event listing queries
+- `calendar.events.get` - Individual event retrieval  
+- `calendar.events.instances` - Recurring event instances
+- `calendar.freebusy.query` - Availability checking
+- `calendar.calendarList.list` - Calendar enumeration
+
+Write operations (`insert`, `update`, `delete`) bypass caching to prevent data consistency issues.
+
+## 🔧 Implementation Details
+
+### Request Signature Generation
+- SHA-256 hash of method + normalized parameters
+- Removes timestamp-sensitive fields (`requestId`, `quotaUser`)
+- Sorts object keys for consistent hashing
+- Per-credential isolation to prevent data leakage
+
+### Cache Management
+- Automatic cleanup of expired entries
+- Configurable cache window (default: 30 seconds)
+- Maximum cache size limits (default: 1000 entries per credential)
+- Comprehensive logging for monitoring and debugging
+
+## 🚀 Integration Examples
+
+### Next.js API Route
+```typescript
+// apps/web/pages/api/book/event.ts
+import { GoogleApiCacheFactory } from ""@calcom/app-store/_utils/googleapis"";
+
+const cacheClient = GoogleApiCacheFactory.createEdgeCacheClient();
+const result = await handleNewBooking({ 
+  ...bookingData, 
+  cacheClient 
+});
+```
+
+### Nest.js Module
+```typescript
+// apps/api/v2/src/ee/bookings/2024-08-13/bookings.module.ts
+@Module({
+  providers: [
+    {
+      provide: 'CACHE_CLIENT',
+      useFactory: () => GoogleApiCacheFactory.createRedisCacheClient(),
+    },
+  ],
+})
+```
+
+## 📊 Benefits
+
+- **Rate Limit Prevention**: Eliminates duplicate API calls within configurable time windows
+- **Performance Improvement**: Cached responses reduce API latency
+- **Framework Agnostic**: Works identically in Next.js and Nest.js contexts
+- **Minimal Disruption**: Integrates transparently with existing booking flow
+- **Security**: Per-credential cache isolation prevents data leakage
+- **Monitoring**: Comprehensive logging and cache statistics
+
+## 🧪 Testing
+
+- **Type Safety**: All TypeScript compilation passes (`yarn type-check:ci`)
+- **Request Deduplication**: Identical API calls within cache window return cached responses
+- **Parameter Normalization**: Different parameter order produces same cache key
+- **Write Operation Bypass**: Insert/update/delete operations skip caching
+- **Cache Expiration**: Entries automatically expire after configured time window
+
+## 📚 Documentation
+
+Comprehensive documentation included:
+- `ARCHITECTURE.md`: System design and component relationships
+- `INTEGRATION.md`: Framework-specific integration guides
+- `DEPLOYMENT.md`: Production deployment considerations
+- `TESTING.md`: Testing strategies and verification steps
+
+## 🔗 Related
+
+- Addresses rate limiting issues in Google Calendar API integration
+- Complements existing `CalendarCache` system without interference
+- Maintains compatibility with current `OAuthManager` and authentication flows
+
+## 🎉 Link to Devin run
+https://app.devin.ai/sessions/37cfda9d9abb43f8a2ee493f50d87417
+
+**Requested by**: zomars@cal.com
+
+    
+<!-- This is an auto-generated description by cubic. -->
+---
+
+## Summary by cubic
+Added a framework-agnostic caching layer for Google Calendar API calls to prevent rate limiting, with support for both Next.js and Nest.js through explicit cache client injection.
+
+- **New Features**
+  - Caches read operations like `events.list`, `events.get`, and `freebusy.query` using a request signature-based cache with a default 30-second window.
+  - Integrates at the CalendarAuth level for transparent API call interception without changing existing flows.
+  - Supports both Next.js (edge cache) and Nest.js (Redis) environments without framework detection.
+  - Includes per-credential cache isolation, automatic cleanup, and detailed logging.
+  - Adds documentation and testing guides for integration and deployment.
+
+<!-- End of auto-generated description by cubic. -->
+
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-20T01:17:08Z,2025-07-01T18:46:17Z,,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/21933,"analysisWe need to classify as performance or non-performance. The PR adds caching layer to prevent rate limiting, which improves performance by reducing API latency and avoiding duplicate calls. It is performance improvement. So label 'performance'.assistantfinalperformance",-1,0.628597380104271,True
+3047109765,21172,feat: optimize calendar cache retrieval with CachedCalendarService,"# Optimize Calendar Cache Retrieval with CachedCalendarService
+
+This PR optimizes CalendarCache retrieval by:
+
+- Created a new `CachedCalendarService` that implements the Calendar interface
+- Modified `handleNewBooking` to fetch all SelectedCalendars at once before processing individual users
+- Implemented an in-memory store to hold the calendar cache data
+- Ensured proper fallback to original CalendarService for cache misses
+
+This reduces database calls and avoids redundant calls to Google Calendar API during booking processes.
+
+## Changes
+
+1. Created `CachedCalendarService` in `packages/app-store/googlecalendar/lib/CachedCalendarService.ts`
+   - Implements the Calendar interface
+   - Only serves cache hits, falls back to original service for misses
+   - Delegates most methods to the original calendar service
+
+2. Created in-memory cache store in `packages/features/calendar-cache/calendar-cache-store.ts`
+   - Stores calendar availability data during a booking process
+   - Cleared at the start of each new booking
+
+3. Added utility function `getCachedCalendar` in `packages/app-store/_utils/getCachedCalendar.ts`
+   - Returns CachedCalendarService for Google Calendar credentials
+   - Falls back to regular calendar service for other types
+
+4. Modified `handleNewBooking.ts` to:
+   - Clear the cache at the beginning of a new booking
+   - Fetch all selected calendars at once before the user loop
+
+5. Updated `getCalendarsEvents.ts` to use cached calendar when appropriate
+
+## Testing
+
+Tested by creating a booking with multiple users and verified reduced database calls and no redundant calls to Google Calendar API.
+
+Link to Devin run: https://app.devin.ai/sessions/872c24478da249d5a44f33c6a8026d97
+Requested by: zomars@cal.com
+
+    
+<!-- This is an auto-generated description by mrge. -->
+---
+
+## Summary by mrge
+Added CachedCalendarService to cache calendar availability during bookings, reducing database and Google Calendar API calls.
+
+- **New Features**
+  - Introduced an in-memory calendar cache store.
+  - Created CachedCalendarService to serve cached data and fall back to the original service on cache misses.
+  - Updated booking flow to fetch all selected calendars at once and clear the cache at the start of each booking.
+  - Modified calendar event retrieval to use the cache when possible.
+
+<!-- End of auto-generated description by mrge. -->
+
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-07T20:34:40Z,2025-05-17T15:47:10Z,,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/21172,"analysisWe need to classify as performance or non-performance. The PR title: ""feat: optimize calendar cache retrieval with CachedCalendarService"". The body describes optimization, caching, reducing database calls, avoiding redundant calls to Google Calendar API. This is clearly performance improvement. So label 'performance'.assistantfinalperformance",-1,0.628597380104271,False
+3046871630,21168,feat: implement streaming schedule loading for faster initial render,"This PR refactors the schedule loading to initially load 1 week of availability first, then use streaming to pull in the remaining 3 weeks of availability. The UI updates seamlessly as new data becomes available, and the initial load is at least 3x faster.
+
+**Changes:**
+- Modified `useTimesForSchedule.ts` to support calculating time ranges for different loading phases
+- Updated `useSchedule.ts` to implement a two-phase loading approach
+- Changed the default value for `BOOKER_NUMBER_OF_DAYS_TO_LOAD` from 0 to 7
+- Fixed TypeScript errors in LargeCalendar components
+
+**Testing:**
+- Verified type checking passes
+- Implementation loads 1 week of data first, then streams in the remaining 3 weeks
+- UI updates seamlessly as new data arrives
+
+Link to Devin run: https://app.devin.ai/sessions/f76f5d56f12b4e9d922b34b354307710
+Requested by: keith@cal.com
+    
+<!-- This is an auto-generated description by mrge. -->
+---
+
+## Summary by mrge
+Schedule loading now streams data, showing the first week of availability right away and loading the rest in the background for a much faster initial render.
+
+- **Refactors**
+  - Loads 1 week of schedule data first, then streams in the next 3 weeks.
+  - Updated hooks and constants to support phased loading.
+  - Fixed related TypeScript errors in calendar components.
+
+<!-- End of auto-generated description by mrge. -->
+
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-07T18:42:52Z,2025-05-17T15:47:12Z,,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/21168,"analysisWe need to classify as performance or non-performance. The PR title: ""feat: implement streaming schedule loading for faster initial render"". Body mentions ""initial load is at least 3x faster"". Keywords: faster, initial render, streaming, 3x faster. So it's performance. So label 'performance'.assistantfinalperformance",-1,0.628597380104271,False
+3106031006,411,Improve clock performance,"## Summary
+- optimize `clock::now` and duration helpers using shell arithmetic
+- use these optimised values in runner
+- adjust unit tests for the new behaviour
+- add a new test to cover `EPOCHREALTIME`
+",OpenAI_Codex,5256287,Chemaclass,closed,2025-05-31T21:04:14Z,2025-06-03T22:40:20Z,,686916383,https://api.github.com/repos/TypedDevs/bashunit,https://github.com/TypedDevs/bashunit/pull/411,"analysisWe need to classify as performance or non-performance. The title: ""Improve clock performance"". Body: mentions optimizing clock::now and duration helpers using shell arithmetic, use these optimized values in runner, adjust unit tests, add new test. This is clearly performance improvement. So label 'performance'.assistantfinalperformance",-1,0.6192979104302073,False
+3117720862,37,Add TS benchmark via compiler,"## Summary
+- add Mochi -> TypeScript compilation step to benchmarks
+- run TypeScript benchmark via Deno
+- drop manually written TypeScript templates
+
+## Testing
+- `go test ./...`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_68403eee0bdc832081c6876c6178ce89",OpenAI_Codex,1218621,tamnd,closed,2025-06-04T12:49:07Z,2025-06-04T12:49:23Z,2025-06-04T12:49:23Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/37,"analysisWe need to classify as performance or non-performance. The PR adds TS benchmark via compiler, adds Mochi -> TypeScript compilation step to benchmarks, run TS benchmark via Deno, drop manually written TS templates. This is about adding a benchmark, likely to measure performance. The title: ""Add TS benchmark via compiler"". The body: adding TS compilation step to benchmarks. This is performance-related: adding a benchmark to measure performance. So classification: performance.assistantfinalperformance",-1,0.6192979104302073,False
+3117777345,39,Improve ts benchmarks timing,"## Summary
+- use `performance.now()` for `now()` in TS
+- update generated benchmark outputs
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6840443a5db483209d77f6eb8823bf9d",OpenAI_Codex,1218621,tamnd,closed,2025-06-04T13:07:39Z,2025-06-04T13:08:06Z,2025-06-04T13:08:06Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/39,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve ts benchmarks timing"". Summary: use performance.now() for now() in TS, update generated benchmark outputs. This is about improving benchmark timing, likely performance. The keywords: ""performance.now()"", ""timing"". It's about measuring performance, but is it improving performance of the code? It says ""Improve ts benchmarks timing"" - that is about the benchmark itself, not the code under test. But the instruction: ""Performance-related pull requests may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs."" The PR includes ""timing"" and ""performance.now()"". That is about measuring performance, but not necessarily improving the code. However, the instruction says ""primary purpose of the pull request is to improve performance."" This PR is about improving the benchmark timing, not the code's performance. But the keywords include ""tim"" which is a substring of ""timing"". So it might be considered performance. But the primary purpose is to improve the benchmark's timing accuracy, not the code's performance. But the instruction says ""performance-related pull requests may contain keywords such as... or any other terms referring to how faster and efficiently software runs."" ""timing"" is about measuring performance, but not necessarily improving performance. However, the PR is about improving the benchmark's timing, which is a performance measurement improvement. The classification might be ambiguous. But likely it's performance because it deals with performance measurement. The instruction says ""primary purpose of the pull request is to improve performance."" The PR is about improving the benchmark's timing, which is a performance measurement improvement. That could be considered performance. I'd classify as performance.assistantfinalperformance",-1,0.6192979104302073,False
+3124089438,12,Optimize interrupt polling,"## Summary
+- clean up halt release comment and remove TODO
+- prefetch interrupt flags and reuse for halt and handler checks
+- use pending flags to branch on interrupts instead of multiple MMU calls
+
+## Testing
+- `cargo bench --bench cpu --quiet` before change: ~1.86 ms
+- `cargo bench --bench cpu --quiet` after change: ~1.90 ms
+
+Codex couldn't run certain commands due to environment limitations. Consider configuring a setup script or internet access in your Codex environment to install dependencies.
+
+------
+https://chatgpt.com/codex/tasks/task_e_684086e0bca883289b871c522e3a259e
+
+<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
+## Summary by CodeRabbit
+
+- **New Features**
+  - Added a new CPU benchmarking tool to measure CPU cycle performance.
+
+- **Refactor**
+  - Improved and simplified CPU interrupt handling logic for better efficiency and clarity.
+
+- **Tests**
+  - Introduced unit tests to verify interrupt handling and CPU halt state behavior.
+<!-- end of auto-generated comment: release notes by coderabbit.ai -->",OpenAI_Codex,25441,joamag,closed,2025-06-06T08:43:51Z,2025-06-07T11:40:44Z,2025-06-07T11:40:44Z,565750987,https://api.github.com/repos/joamag/boytacean,https://github.com/joamag/boytacean/pull/12,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize interrupt polling"". Body mentions cleaning up comments, prefetch interrupt flags, use pending flags to branch on interrupts instead of multiple MMU calls. Testing shows bench before change ~1.86 ms, after ~1.90 ms. Actually after change is slightly slower? But the intent is optimization. Keywords: optimize, performance, benchmarking. So it's performance. So label 'performance'.assistantfinalperformance",-1,0.6192979104302073,False
+3155310952,2057,feat: switch lint:tsc from tsc to tsgo (@typescript/native-preview),"# Switch TypeScript linter from tsc to tsgo (@typescript/native-preview)
+
+This PR migrates the TypeScript linting from the traditional `tsc` compiler to the new native TypeScript implementation `tsgo` from `@typescript/native-preview`.
+
+## Changes Made
+
+### Package Installation
+- Added `@typescript/native-preview` as a devDependency at the root level
+
+### Script Updates
+Updated `lint:tsc` scripts in 12 packages to use `tsgo --noEmit` instead of `tsc --noEmit`:
+- `@liam-hq/app`
+- `@liam-hq/docs` 
+- `@liam-hq/cli`
+- `@liam-hq/db-structure`
+- `@liam-hq/erd-core`
+- `@liam-hq/ui`
+- `@liam-hq/pglite-server`
+- `@liam-hq/agent`
+- `@liam-hq/db`
+- `@liam-hq/github`
+- `@liam-hq/jobs`
+- `@liam-hq/mcp-server`
+
+### TypeScript Configuration Updates
+Removed `baseUrl: "".""` configurations from 3 tsconfig.json files as tsgo doesn't support this setting:
+- `frontend/apps/docs/tsconfig.json`
+- `frontend/packages/pglite-server/tsconfig.json`
+- `frontend/packages/erd-core/tsconfig.json`
+
+## Benefits
+
+- **Performance**: tsgo provides up to 10x speed improvement on most projects
+- **Native Implementation**: Uses a natively-compiled TypeScript compiler
+- **Future-Ready**: Aligns with Microsoft's direction for TypeScript tooling
+
+## Testing
+
+- Verified `tsgo --version` works correctly
+- Tested individual `pnpm lint:tsc` commands in sample packages
+- All existing TypeScript configurations remain compatible
+
+## References
+
+- [TypeScript Native Previews Announcement](https://devblogs.microsoft.com/typescript/announcing-typescript-native-previews/)
+- Related to GitHub issue #4607
+
+## Link to Devin run
+https://app.devin.ai/sessions/e5e9b9944a764bccaf8cdf3932f6d8a9
+
+**Requested by:** hirotaka.miyagi@route06.co.jp
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-18T03:08:18Z,2025-06-19T08:53:38Z,,839216423,https://api.github.com/repos/liam-hq/liam,https://github.com/liam-hq/liam/pull/2057,"analysisWe need to classify as performance or non-performance. The PR title: ""feat: switch lint:tsc from tsc to tsgo (@typescript/native-preview)"". Body: mentions migrating linting from tsc to tsgo, and benefits: ""Performance: tsgo provides up to 10x speed improvement on most projects"". So it's a performance improvement. So classification: performance.assistantfinalperformance",-1,0.6192979104302072,False
+3116788481,11,Implement HBlank DMA timing,"## Summary
+- implement proper HBlank DMA transfers
+- expose HDMA_CYCLES_PER_BLOCK constant
+- enable HBlank DMA in MMU clock
+- add unit test covering timing behaviour
+
+## Testing
+- `cargo test`
+
+------
+https://chatgpt.com/codex/tasks/task_e_683ff1db20848328bba9144784fc3419
+
+<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
+## Summary by CodeRabbit
+
+- **New Features**
+	- Improved HBlank DMA handling to accurately transfer data in 16-byte blocks during HBlank periods, aligning with expected timing behavior.
+	- Added a screen clearing function with optional full frame buffer reset for better display control.
+- **Bug Fixes**
+	- Corrected bitmask usage for HDMA mode selection to ensure proper operation.
+- **Tests**
+	- Added tests to verify timing and correctness of HBlank DMA transfers.
+	- Added tests for General DMA transfer timing and completion.
+<!-- end of auto-generated comment: release notes by coderabbit.ai -->",OpenAI_Codex,25441,joamag,closed,2025-06-04T07:23:22Z,2025-06-04T17:32:24Z,2025-06-04T17:32:24Z,565750987,https://api.github.com/repos/joamag/boytacean,https://github.com/joamag/boytacean/pull/11,"analysisWe need to classify whether the primary purpose of the pull request is to improve performance. The PR implements HBlank DMA timing, exposes constant, enables HBlank DMA in MMU clock, adds unit test covering timing behavior. This is about timing and performance of DMA transfers. It seems performance-related: HBlank DMA timing, ensuring efficient transfer, exposing constant for cycles per block. The description mentions ""implement proper HBlank DMA transfers"" and ""add unit test covering timing behaviour"". This is about performance optimization of DMA. So classification: 'performance'.
+
+Check keywords: ""timing"", ""performance"", ""latency"", ""speed"". The PR is about improving timing of DMA, which is performance. So label 'performance'.
+
+Thus output: performance.assistantfinalperformance",-1,0.6192979104302072,False
+3168894363,2745,Update benchmark with PyPy and Cython,"## Summary
+- add PyPy and Cython benchmarks
+- ensure PyPy and Cython are available before running benchmarks
+- generate Cython programs and run them
+- compute globals inside main for TypeScript compiler
+- rerun benchmark with new languages
+
+## Testing
+- `go run ./cmd/mochi-bench`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6859872341a08320a0aa8188683e05c7",OpenAI_Codex,1218621,tamnd,closed,2025-06-23T17:19:52Z,2025-06-23T17:20:06Z,2025-06-23T17:20:06Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2745,"analysisWe need to classify as performance or non-performance. The PR title: ""Update benchmark with PyPy and Cython"". The body: adding benchmarks, ensuring availability, generating Cython programs, compute globals, rerun benchmark. This is about benchmarking, performance measurement. It is about adding new benchmarks for PyPy and Cython. It's performance-related. So classification: performance.assistantfinalperformance",-1,0.4305159096108808,False
+3153056941,1277,Add C compiler via Cython,"## Summary
+- add `compile/c` package to compile Mochi to C via Cython
+- verify on LeetCode example `examples/leetcode/1`
+
+## Testing
+- `go test ./compile/c -run TestCCompiler_LeetCode1 -count=1`
+- `go test ./...`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_685148315e848320ba00dced4a6662ec",OpenAI_Codex,1218621,tamnd,closed,2025-06-17T10:58:19Z,2025-06-17T11:59:36Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/1277,"analysisWe need to classify whether the primary purpose of the PR is to improve performance. The PR adds a C compiler via Cython, presumably to compile Mochi to C. That likely improves performance. The description: ""add C compiler via Cython"" and ""verify on LeetCode example"". This is about adding a new compiler, likely to improve performance. The keywords: ""C compiler"", ""Cython"", ""compile Mochi to C"". This is a performance improvement. So classification: 'performance'.assistantfinalperformance",-1,0.4305159096108808,False
+3168819278,2736,Regenerate benchmarks and adjust Go label,"## Summary
+- rerun benchmarks and update BENCHMARK.md
+- regenerate benchmark output files
+- rename Go benchmark label to `Mochi (Go)`
+
+## Testing
+- `go test ./types`
+- `go run ./cmd/mochi-bench > /tmp/bench.log`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68598306e0948320be0f9896b90076ec",OpenAI_Codex,1218621,tamnd,closed,2025-06-23T16:47:41Z,2025-06-23T16:47:57Z,2025-06-23T16:47:57Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2736,"analysisWe need to classify as performance or non-performance. The PR title: ""Regenerate benchmarks and adjust Go label"". Summary: rerun benchmarks and update BENCHMARK.md, regenerate benchmark output files, rename Go benchmark label. This is about benchmarks, performance. So classification: performance.assistantfinalperformance",-1,0.4305159096108808,False
+3168877771,2744,Add PyPy and Cython benchmark modes,"## Summary
+- add EnsurePyPy and EnsureCython helpers
+- compile Mochi benchmarks to PyPy and Cython targets
+- regenerate BENCHMARK.md with new results
+
+## Testing
+- `go run ./cmd/mochi-bench`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68598721fc808320a400caa6c9ef73d6",OpenAI_Codex,1218621,tamnd,closed,2025-06-23T17:12:21Z,2025-06-23T17:22:57Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2744,"analysisWe need to classify as performance or non-performance. The PR adds benchmark modes for PyPy and Cython, compile benchmarks, regenerate BENCHMARK.md with new results. This is about performance measurement. The primary purpose is to add benchmark modes, compile benchmarks, regenerate benchmark results. It's performance-related. So label 'performance'.assistantfinalperformance",-1,0.4305159096108807,False
+3213723251,60,Share static empty metadata,"## Summary
+- reuse `EmptyMetaData` for `Error.Empty` and `DefaultErrorList` to reduce allocations
+
+## Testing
+- `dotnet test tests/LightResults.Tests/LightResults.Tests.csproj -f net9.0`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686d7f9f169c8328892add17a8fe4897",OpenAI_Codex,29762210,jscarle,closed,2025-07-08T20:39:32Z,2025-07-08T20:56:00Z,2025-07-08T20:56:00Z,744218577,https://api.github.com/repos/jscarle/LightResults,https://github.com/jscarle/LightResults/pull/60,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Share static empty metadata"". Summary: reuse EmptyMetaData for Error.Empty and DefaultErrorList to reduce allocations. That is about reducing allocations, which is a performance improvement. So classify as 'performance'.assistantfinalperformance",-1,0.41620035345518624,False
+3213733919,66,Improve small metadata allocations,"## Summary
+- add `SingleItemReadOnlyDictionary` optimized for single key/value pairs
+- use the new dictionary in `Error` constructors
+- apply it to `Result` and `Result<TValue>` helpers
+
+## Testing
+- `dotnet test tests/LightResults.Tests/LightResults.Tests.csproj -f net9.0`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686d7fa9151883289e8b57da6661129e",OpenAI_Codex,29762210,jscarle,closed,2025-07-08T20:45:03Z,2025-07-08T20:59:35Z,2025-07-08T20:59:35Z,744218577,https://api.github.com/repos/jscarle/LightResults,https://github.com/jscarle/LightResults/pull/66,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve small metadata allocations"". Summary: add SingleItemReadOnlyDictionary optimized for single key/value pairs, use in Error constructors, apply to Result helpers. This is about memory allocation optimization, reducing allocations. That is performance improvement. So label 'performance'.assistantfinalperformance",-1,0.416200353455186,False
+3213750237,71,Optimize enumerable error conversion,"## Summary
+- avoid extra allocation when `Result`/`Result<T>` receive `IEnumerable<IError>`
+- verify list instance is reused in enumerable overload
+- update interface tests to expect list reuse
+
+## Testing
+- `dotnet test tests/LightResults.Tests/LightResults.Tests.csproj -f net9.0`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686d80e2fda08328a5211858055522a7",OpenAI_Codex,29762210,jscarle,closed,2025-07-08T20:53:29Z,2025-07-08T21:03:24Z,2025-07-08T21:03:24Z,744218577,https://api.github.com/repos/jscarle/LightResults,https://github.com/jscarle/LightResults/pull/71,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize enumerable error conversion"". Summary: avoid extra allocation when Result/Result<T> receive IEnumerable<IError>; verify list instance is reused in enumerable overload; update interface tests to expect list reuse. This is about avoiding extra allocation, reusing list instance. That is performance optimization. So classify as 'performance'.assistantfinalperformance",-1,0.416200353455186,False
+3213857892,75,Optimize metadata dictionary,"## Summary
+- specialize the single item dictionary for metadata
+- update error and result helpers to use the new type
+
+## Testing
+- `dotnet test tests/LightResults.Tests/LightResults.Tests.csproj -f net9.0`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686d915e80f0832882617ad202f51a08",OpenAI_Codex,29762210,jscarle,closed,2025-07-08T21:51:59Z,2025-07-08T21:52:57Z,2025-07-08T21:52:57Z,744218577,https://api.github.com/repos/jscarle/LightResults,https://github.com/jscarle/LightResults/pull/75,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Optimize metadata dictionary"". Summary: ""specialize the single item dictionary for metadata, update error and result helpers to use the new type"". This seems like a code change to use a specialized dictionary type for metadata. Is that performance? It might be to improve performance by using a specialized dictionary for single item. The description: ""Optimize metadata dictionary"". That suggests performance improvement. The summary: ""specialize the single item dictionary for metadata"". That could be to reduce overhead, memory usage, or speed. The update error and result helpers to use the new type. So it's a performance optimization. So classification: 'performance'.assistantfinalperformance",-1,0.416200353455186,False
+3107327866,1342,[alpha_factory] Enforce Insight bundle size,"## Summary
+- fail the Insight Browser build if bundle exceeds 180000 bytes
+- remind contributors about the 180 KB limit in the PR template
+
+## Testing
+- `python check_env.py --auto-install`
+- `pytest -q` *(fails: ValueError: Duplicated timeseries in CollectorRegistry)*
+- `pre-commit run --files .github/pull_request_template.md alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/.github/workflows/demo.yml` *(fails to fetch hooks)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_683c607a6db083338e1992b8f000e0c0",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-01T14:19:27Z,2025-06-01T14:19:42Z,2025-06-01T14:19:42Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1342,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""[alpha_factory] Enforce Insight bundle size"". Summary: fail the Insight Browser build if bundle exceeds 180000 bytes, remind contributors about 180 KB limit. This is about bundle size limit. That is a performance-related change? It's about limiting bundle size to improve performance? It's about ensuring bundle size stays under a limit. That is a performance optimization measure. The keywords: ""size"", ""bundle"", ""limit"", ""performance""? The description mentions ""bundle size"" and ""fail build if bundle exceeds 180000 bytes"". This is about performance. So classify as 'performance'.assistantfinalperformance",-1,0.41583713875722994,False
+3185047320,2708,[alpha_factory] open gallery links in new tab,"## Summary
+- open demo links in new tab
+- load preview images lazily for faster gallery rendering
+
+## Testing
+- `python scripts/check_python_deps.py` *(fails: Missing packages: numpy, yaml, pandas)*
+- `python check_env.py --auto-install`
+- `pytest -q` *(fails: 44 errors during collection)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_685ffc463f408333a5dae308b8441862",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-28T14:48:13Z,2025-06-28T14:48:22Z,2025-06-28T14:48:22Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/2708,"analysisWe need to classify the pull request as performance or non-performance. The title: ""[alpha_factory] open gallery links in new tab"". Summary: open demo links in new tab, load preview images lazily for faster gallery rendering. That includes ""load preview images lazily for faster gallery rendering"" - lazy loading is performance improvement. So it's performance. Also mention ""faster gallery rendering"". So classification: performance.assistantfinalperformance",-1,0.41583713875722983,False
+3254472084,3678,fix duplicate d3 in Insight PWA,"## Summary
+- avoid bundling d3 in insight.bundle.js
+- keep d3 script tag in generated Insight docs
+
+## Testing
+- `pre-commit run --files alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/build.js docs/alpha_agi_insight_v1/index.html`
+- `python check_env.py --auto-install`
+- `python scripts/verify_insight_offline.py` *(fails: integrity check for insight.bundle.js)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_68802ac9e95083339f0f080d4f47f106",OpenAI_Codex,24208299,MontrealAI,closed,2025-07-23T00:55:49Z,2025-07-23T00:56:22Z,2025-07-23T00:56:22Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/3678,"analysisWe need to classify as performance or non-performance. The PR title: ""fix duplicate d3 in Insight PWA"". Summary: avoid bundling d3 in insight.bundle.js, keep d3 script tag in generated Insight docs. This is about reducing bundle size, removing duplicate d3. That is performance improvement: reducing bundle size, likely improves load time. Keywords: ""duplicate d3"", ""avoid bundling"", ""script tag"". It's about performance. So classify as 'performance'.assistantfinalperformance",-1,0.4158371387572297,False
+3172149812,2554,[alpha_factory] drain in-memory event queues,"## Summary
+- start an in-memory consumer loop when AgentManager starts
+- stop the consumer loop on shutdown
+- add a regression test for EventBus consumer management
+
+## Testing
+- `python scripts/check_python_deps.py` *(fails: Missing packages: yaml)*
+- `python check_env.py --auto-install`
+- `pytest -q tests/test_agent_manager_consumer.py tests/test_eventbus.py tests/test_kafka_service.py`
+
+------
+https://chatgpt.com/codex/tasks/task_e_685aadc47f888333ad63e795105739ab",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-24T14:04:55Z,2025-06-24T14:06:15Z,2025-06-24T14:06:15Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/2554,"analysisWe need to classify as performance or non-performance. The PR title: ""[alpha_factory] drain in-memory event queues"". Summary: start an in-memory consumer loop when AgentManager starts, stop the consumer loop on shutdown, add regression test for EventBus consumer management. This seems about event queue draining, consumer loop, not explicitly about performance. It's about draining in-memory event queues, maybe to avoid memory growth. But the keywords: memory, leak, etc. It mentions in-memory event queues. Could be about memory usage. But the primary purpose? It seems to add a consumer loop to drain event queues, likely to prevent memory buildup. That could be performance/memory improvement. But is it about performance? The description: ""drain in-memory event queues"" - that is about memory usage, but not necessarily performance. It might be about preventing memory leaks. The classification: performance if it's about speed, memory, optimization. The mention of memory is a keyword. But the PR is about draining event queues to avoid memory buildup. That is memory usage improvement. That could be considered performance. The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, etc. This PR contains ""in-memory event queues"" and ""drain"". That could be memory. So likely performance. But is it about performance? It might be about memory usage, but not necessarily speed. But memory is a performance aspect. The guidelines say memory is a keyword. So classify as performance.assistantfinalperformance",-1,0.4158371387572297,False
+3112047147,1470,[alpha_factory] tighten insight bundle size checks,"## Summary
+- enable explicit treeShaking in `build.js`
+- shrink gzip max size to 2 MiB in `build.js`
+- enforce 2 MiB limit in `test_bundle_size.py`
+- apply same 2 MiB gzip check in `manual_build.py`
+
+## Testing
+- `python check_env.py --auto-install`
+- `pytest -q` *(fails: ValueError: Duplicated timeseries in CollectorRegistry)*
+- `pre-commit run --files alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/build.js alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/manual_build.py alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/tests/test_bundle_size.py` *(fails to fetch hooks due to no network)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_683e492a82a88333ac63e88d9db12e8b",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-03T01:05:43Z,2025-06-03T01:05:54Z,2025-06-03T01:05:54Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1470,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""[alpha_factory] tighten insight bundle size checks"". Summary: enable explicit treeShaking, shrink gzip max size to 2 MiB, enforce 2 MiB limit in tests, apply same check in manual build. This is about bundle size, which is performance-related (bundle size affects load time). So it's performance. The classification: 'performance'.assistantfinalperformance",-1,0.4158371387572297,False
+3154327250,2307,[alpha_factory] add memory limit to MemoryAgent,"## Summary
+- limit stored records using `AGI_INSIGHT_MEMORY_LIMIT`
+- trim history when the cap is reached and save the truncated list
+- test cap behaviour and env var handling
+
+## Testing
+- `python scripts/check_python_deps.py` *(fails: Missing packages)*
+- `python check_env.py --auto-install` *(fails: No network connectivity)*
+- `pre-commit run --files alpha_factory_v1/demos/alpha_agi_insight_v1/src/agents/memory_agent.py tests/test_memory_agent_file_persistence.py` *(fails: proto-verify, verify requirements)*
+- `PYTHONPATH=$(pwd) pytest -q tests/test_memory_agent_file_persistence.py` *(fails: Environment check failed)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_6851aaf597448333bb0d8d720c021c70",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-17T18:01:39Z,2025-06-17T18:01:59Z,2025-06-17T18:01:59Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/2307,"analysisWe need to classify as performance or non-performance. The PR title: ""[alpha_factory] add memory limit to MemoryAgent"". Summary: limit stored records using AGI_INSIGHT_MEMORY_LIMIT, trim history when cap reached, test cap behavior and env var handling. This is about limiting memory usage, adding a memory limit. That is about memory usage, but is it performance? It's about limiting memory usage, which is about resource usage, but not necessarily performance improvement. However, memory limit could reduce memory consumption, but not necessarily speed. The description: ""limit stored records using AGI_INSIGHT_MEMORY_LIMIT"" and ""trim history when the cap is reached"". This is about memory usage, not performance. The keywords: memory, limit. The classification: performance if it improves speed or efficiency. This is about memory usage, but not necessarily performance. It's more about resource usage. The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, etc. Memory is included. But memory can be about performance. But the description is about limiting memory usage, not necessarily improving performance. But memory usage can be considered performance. The guidelines say ""performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" So memory is included. So this PR is about memory limit, which is about memory usage. That could be considered performance. But is it improving performance? It might reduce memory usage, but not necessarily speed. But memory usage is a performance metric. The guidelines say memory is a keyword. So we should classify as performance. The PR is about adding a memory limit to MemoryAgent. That is about limiting memory usage, which is a performance improvement. So classification: performance.assistantfinalperformance",-1,0.4158371387572296,False
+3111305843,1453,[alpha_factory] add gzip size test,"## Summary
+- check gzip size of `dist/app.js` in the Insight browser demo
+
+## Testing
+- `pytest -q alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/tests/test_bundle_size.py`
+- `pytest -q` *(fails: ValueError: Duplicated timeseries in CollectorRegistry)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_683df5435f008333932fe0ecb6f1d9f8",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-02T19:07:10Z,2025-06-02T19:07:18Z,2025-06-02T19:07:18Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1453,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""[alpha_factory] add gzip size test"". Summary: check gzip size of dist/app.js in the Insight browser demo. It's about testing gzip size, which is a performance metric. The body mentions test failures. It's about measuring size, which is performance. So classify as 'performance'.assistantfinalperformance",-1,0.4158371387572296,False
+3115244905,1510,[alpha_factory] embed libs in bundle,"## Summary
+- embed library code and remove legacy script tags
+- test that the built demo only makes one JS request
+
+## Testing
+- `python check_env.py --auto-install`
+- `pre-commit run --files alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/build.js alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/manual_build.py alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/tests/test_single_network_request.py` *(fails: unable to access 'https://github.com/psf/black/' due to network)*
+- `pytest -q alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/tests/test_single_network_request.py` *(fails: BrowserType.launch executable doesn't exist)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_683f4fe33fbc833393ab683467939387",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-03T19:49:05Z,2025-06-03T19:49:12Z,2025-06-03T19:49:12Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1510,"analysisWe need to classify as performance or non-performance. The PR title: ""[alpha_factory] embed libs in bundle"". Summary: embed library code and remove legacy script tags, test that built demo only makes one JS request. This is about bundling, reducing network requests, potentially performance improvement. But is the primary purpose to improve performance? It seems to embed libs in bundle to reduce network requests, which is a performance improvement. However, the main goal might be to simplify deployment, not necessarily performance. But the test ensures only one JS request. That is a performance improvement. The description doesn't mention speed, latency, etc. But embedding libs reduces network overhead. The classification guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. The text doesn't contain those keywords. But the intent is performance improvement. The guidelines say ""may contain keywords"" but not required. We need to decide. The primary purpose: embed libs in bundle to reduce network requests. That is a performance improvement. So classify as 'performance'.assistantfinalperformance",-1,0.4158371387572296,False
+3246105987,522,Improve indexing and sharing performance,"## Summary
+- reduce O(n^2) scans in ReportService and DatasetService
+- batch DOM updates when loading shares
+- cache Context Chat availability lookup
+- document changes in CHANGELOG
+
+## Testing
+- `phpunit -c phpunit.xml tests` *(fails: command not found)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_687bffd7d0548333832157bcfc576eee",OpenAI_Codex,13385119,Rello,closed,2025-07-20T07:21:15Z,2025-07-20T07:23:39Z,2025-07-20T07:23:39Z,213728552,https://api.github.com/repos/Rello/analytics,https://github.com/Rello/analytics/pull/522,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Improve indexing and sharing performance"". The body mentions reducing O(n^2) scans, batch DOM updates, cache lookup, etc. This is clearly performance improvement. So label 'performance'.assistantfinalperformance",-1,0.30305840792233807,False
+3204638990,13695,Improve lab data loading and update efficiency,"## Summary
+- enable lazy loading on sample management table
+- update patient report item saving to persist only changed values
+
+## Testing
+- `mvn test` *(fails: `mvn: command not found`)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_6868edae2178832f92a5220337f0df24",OpenAI_Codex,1226946,buddhika75,closed,2025-07-05T09:23:11Z,2025-07-05T09:29:28Z,2025-07-05T09:29:28Z,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/13695,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve lab data loading and update efficiency"". Summary: enable lazy loading on sample management table, update patient report item saving to persist only changed values. This is about performance: lazy loading reduces data loading, persisting only changed values reduces writes. So performance.assistantfinalperformance",-1,0.30305840792233796,False
+3128644658,43,Optimize role flattening,"## Summary
+- refactor role-flattening logic to reduce array allocations
+- precompute permission maps and glob lists in a single pass
+- aggressively refactor permission lookup paths for performance
+- update benchmark numbers
+
+## Testing
+- `npm run build`
+- `npm test`
+- `npm run bench`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6845d8686838832587ccb3284e7c93a0",OpenAI_Codex,12415350,phellipeandrade,closed,2025-06-08T19:39:45Z,2025-06-09T13:52:52Z,2025-06-09T13:52:52Z,144407057,https://api.github.com/repos/phellipeandrade/rbac,https://github.com/phellipeandrade/rbac/pull/43,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize role flattening"". Summary: refactor role-flattening logic to reduce array allocations, precompute permission maps and glob lists in a single pass, aggressively refactor permission lookup paths for performance, update benchmark numbers. This is clearly performance improvement. So label 'performance'.assistantfinalperformance",-1,0.30305840792233796,False
+3127976847,21,Release 2.0,"## Summary
+- bump version to 2.0.0
+- document v2.0 in README
+- improve README table
+- refactor permission check for better readability
+- precompute glob patterns for performance
+
+## Testing
+- `npm run build`
+- `npm test`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_684528aca7a0832582e0a143693e532a",OpenAI_Codex,12415350,phellipeandrade,closed,2025-06-08T06:16:37Z,2025-06-08T06:25:12Z,2025-06-08T06:25:12Z,144407057,https://api.github.com/repos/phellipeandrade/rbac,https://github.com/phellipeandrade/rbac/pull/21,"analysisWe need to classify as performance or non-performance. The PR includes ""precompute glob patterns for performance"". That is a performance improvement. So classification: performance.assistantfinalperformance",-1,0.30305840792233796,False
+3104378127,326,Improve config loader performance,"## Summary
+- optimize ConfigLoader::loadAll by removing intermediate arrays
+",OpenAI_Codex,5256287,Chemaclass,open,2025-05-30T22:15:08Z,,,348491018,https://api.github.com/repos/gacela-project/gacela,https://github.com/gacela-project/gacela/pull/326,"analysisWe need to classify as performance or non-performance. The title: ""Improve config loader performance"". Body: ""optimize ConfigLoader::loadAll by removing intermediate arrays"". This is clearly performance improvement. So label 'performance'.assistantfinalperformance",-1,0.30305840792233796,False
+3128593850,42,Optimize inherited role checks,"## Summary
+- precompute merged permissions for each role
+- rebuild merged map when roles change
+- cover edge cases like cycles and missing parents
+- refresh benchmark data and readme
+
+## Testing
+- `npm run build`
+- `npm test`
+- `npm run bench`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6845cdc8408483259984ba0919ee412c",OpenAI_Codex,12415350,phellipeandrade,closed,2025-06-08T18:19:01Z,2025-06-08T18:28:31Z,2025-06-08T18:28:31Z,144407057,https://api.github.com/repos/phellipeandrade/rbac,https://github.com/phellipeandrade/rbac/pull/42,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize inherited role checks"". Summary: precompute merged permissions for each role, rebuild merged map when roles change, cover edge cases, refresh benchmark data and readme. This is about performance optimization: precomputing merged permissions to speed up role checks. So it's performance. So output 'performance'.assistantfinalperformance",-1,0.30305840792233785,False

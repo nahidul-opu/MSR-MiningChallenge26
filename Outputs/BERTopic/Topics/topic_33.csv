@@ -1,0 +1,122 @@
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
+3104768514,1251,[alpha_factory] add multi-objective metrics and pareto filter,"## Summary
+- add evaluate_agent to compute accuracy, novelty_simhash and latency
+- implement fast Pareto front selection in MATS
+- test NSGA-II Pareto frontier under 50 ms
+
+## Testing
+- `python check_env.py --auto-install`
+- `pytest -q tests/test_multi_objective.py`
+- `pre-commit run --files src/eval/fitness.py alpha_factory_v1/demos/alpha_agi_insight_v1/src/simulation/mats.py tests/test_multi_objective.py` *(fails: Failed to connect to proxy port 8080)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_683a74de58348333a7cdeda58fba2c03",OpenAI_Codex,24208299,MontrealAI,closed,2025-05-31T03:26:34Z,2025-05-31T03:26:42Z,2025-05-31T03:26:42Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1251,"analysisWe need to classify as performance or non-performance. The PR title: ""[alpha_factory] add multi-objective metrics and pareto filter"". Summary: add evaluate_agent to compute accuracy, novelty_simhash and latency; implement fast Pareto front selection in MATS; test NSGA-II Pareto frontier under 50 ms. So includes latency, fast Pareto front selection, test under 50 ms. That is performance improvement. So label 'performance'.assistantfinalperformance",33,1.0,False
+3169508590,2526,[alpha_factory] enhance meta refinement,"## Summary
+- parse orchestrator logs for latency/error metrics and target slow modules
+- verify decreased metric before merging
+- adapt tests for new metric rules
+
+## Testing
+- `pre-commit run --files alpha_factory_v1/core/agents/meta_refinement_agent.py alpha_factory_v1/core/self_evolution/harness.py tests/test_self_evolution.py tests/test_meta_refinement_agent.py` *(failed: environment setup interrupted)*
+- `python scripts/check_python_deps.py`
+- `python check_env.py --auto-install`
+- `pytest -q` *(failed: 50 failed, 76 passed, 30 skipped, 5 errors)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_6859c22dfb408333a87ac97cf278a7cc",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-23T21:27:35Z,2025-06-23T21:27:42Z,2025-06-23T21:27:42Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/2526,"analysisWe need to classify the pull request as performance or non-performance. The title: ""[alpha_factory] enhance meta refinement"". Body: mentions parse orchestrator logs for latency/error metrics and target slow modules, verify decreased metric before merging, adapt tests for new metric rules. So it's about performance metrics, targeting slow modules, verifying decreased metric. That is performance improvement. So label 'performance'.assistantfinalperformance",33,1.0,True
+3169784411,2532,[alpha_factory] document placeholder and add cycle heuristic,"## Summary
+- mark evaluate_agent placeholder in docs
+- mention placeholder behaviour in changelog
+- tweak MetaRefinementAgent to detect slow cycles
+- test cycle adjustment heuristic
+
+## Testing
+- `pre-commit run --files alpha_factory_v1/core/agents/meta_refinement_agent.py docs/ARCHITECTURE.md docs/CHANGELOG.md tests/test_meta_refinement_agent.py` *(fails: proto-verify; verify-requirements-lock)*
+- `python scripts/check_python_deps.py` *(fails: Missing packages numpy, yaml, pandas)*
+- `python check_env.py --auto-install` *(fails: Operation cancelled)*
+- `pytest -q` *(fails: KeyboardInterrupt during environment setup)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_6859e5ed11b08333b5b8bfaedf01487d",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-24T00:01:56Z,2025-06-24T00:02:06Z,2025-06-24T00:02:06Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/2532,"analysisWe need to classify whether the primary purpose of the PR is to improve performance. The PR title: ""[alpha_factory] document placeholder and add cycle heuristic"". Summary: mark evaluate_agent placeholder in docs, mention placeholder behaviour in changelog, tweak MetaRefinementAgent to detect slow cycles, test cycle adjustment heuristic. So it mentions ""detect slow cycles"" and ""cycle adjustment heuristic"". That seems performance-related: detecting slow cycles, adjusting heuristics to improve performance. The PR is about documentation and adding a heuristic to detect slow cycles. The primary purpose: performance improvement? The description: ""tweak MetaRefinementAgent to detect slow cycles"" - that is a performance improvement. So classify as 'performance'.
+
+Thus output: performance.assistantfinalperformance",33,1.0,True
+3115315767,152,Fix busy wait in vllm test client,"## Summary
+- avoid high CPU usage in `test_client` by sleeping when server is unreachable
+
+## Testing
+- `pytest -q`
+
+------
+https://chatgpt.com/codex/tasks/task_e_683f56c119f4832b8731c6db6fa962eb",OpenAI_Codex,4875137,bradhilton,closed,2025-06-03T20:14:06Z,2025-06-03T20:14:38Z,2025-06-03T20:14:38Z,946178371,https://api.github.com/repos/OpenPipe/ART,https://github.com/OpenPipe/ART/pull/152,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Fix busy wait in vllm test client"". Summary: avoid high CPU usage in test_client by sleeping when server is unreachable. This is about reducing CPU usage, performance improvement. So classification: 'performance'.assistantfinalperformance",33,1.0,False
+3123330256,1651,[alpha_factory] disable grad in MiniMu,"## Summary
+- disable gradient tracking during inference in minimuzero
+- type hints for `MiniMu.policy` and `MiniMu.reset`
+
+## Testing
+- `python check_env.py --auto-install`
+- `pytest -q` *(fails: 69 failed, 188 passed, 28 skipped)*
+- `pre-commit run --files alpha_factory_v1/demos/muzero_planning/minimuzero.py` *(fails: proto-verify)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_684242c095188333b3d6a4b68bf227ad",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-06T01:37:24Z,2025-06-06T01:37:33Z,2025-06-06T01:37:33Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1651,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""[alpha_factory] disable grad in MiniMu"". Summary: disable gradient tracking during inference in minimuzero, type hints. This is about disabling gradient tracking to improve performance during inference. That is a performance improvement. So label 'performance'.assistantfinalperformance",33,1.0,False
+3081857693,512,Add Codex setup script and update contributor guidelines,"## Summary
+- refine `.codex/setup.sh` for a fast Codex environment
+- simplify repository guidelines in `AGENTS.md`
+
+## Testing
+- `python check_env.py --auto-install`
+- `pytest -q` *(fails: ImportError from pydantic)*",OpenAI_Codex,24208299,MontrealAI,closed,2025-05-22T02:34:00Z,2025-05-22T02:34:22Z,2025-05-22T02:34:22Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/512,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Add Codex setup script and update contributor guidelines"". Body: refine.codex/setup.sh for a fast Codex environment, simplify guidelines. The focus is on making environment fast. That is performance improvement. Keywords: fast. So classify as 'performance'.assistantfinalperformance",33,1.0,False
+3206837211,113,Implement pass@k evaluation,"## Summary
+- add pass@k metric in `EnvStateManager.get_rollout_states`
+
+## Testing
+- `pytest -q` *(fails: ModuleNotFoundError: No module named 'omegaconf')*
+
+------
+https://chatgpt.com/codex/tasks/task_e_686ab45f4fd88321a60eaa4db56120d5",OpenAI_Codex,112086423,ZihanWang314,closed,2025-07-06T17:52:29Z,2025-07-06T18:05:19Z,2025-07-06T18:05:19Z,922278962,https://api.github.com/repos/RAGEN-AI/RAGEN,https://github.com/RAGEN-AI/RAGEN/pull/113,"analysisWe need to classify the pull request as performance or non-performance. The PR title: ""Implement pass@k evaluation"". Summary: add pass@k metric in EnvStateManager.get_rollout_states. Testing fails due to missing omegaconf. The content is about adding a metric, pass@k evaluation. That is a performance metric? Pass@k is a metric for evaluating performance of models, measuring success within top-k predictions. It's a performance metric. So classification: performance.assistantfinalperformance",33,1.0,False
+3253657829,3666,[alpha_factory] improve metrics server polling,"## Summary
+- add restart logic for metrics test server
+- show subprocess output when the server fails to start
+- poll server readiness every 50ms for faster startup
+
+## Testing
+- `python scripts/check_python_deps.py`
+- `python check_env.py --auto-install` *(failed: openai_agents missing __version__)*
+- `pre-commit run --files tests/test_metrics.py` *(failed to initialize environment)*
+- `pytest -k test_metrics -q` *(failed: Environment check failed)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_687fd345af4c83338719b90b78f13115",OpenAI_Codex,24208299,MontrealAI,closed,2025-07-22T18:21:24Z,2025-07-22T18:21:34Z,2025-07-22T18:21:34Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/3666,"analysisWe need to classify as performance or non-performance. The PR title: ""[alpha_factory] improve metrics server polling"". Body: add restart logic, show subprocess output, poll server readiness every 50ms for faster startup. The phrase ""poll server readiness every 50ms for faster startup"" indicates performance improvement. So classification: performance.assistantfinalperformance",33,1.0,True
+3107735616,1377,[alpha_factory] Speed up Pareto front,"## Summary
+- speed up Pareto front computation with a single scan
+- increase performance test population size
+
+## Testing
+- `python check_env.py --auto-install`
+- `pytest -q` *(fails: `tests/test_llm_cache.py` ValueError: Duplicated timeseries in CollectorRegistry)*
+- `pre-commit run --files alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/src/utils/pareto.js alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/tests/test_plot_perf.py` *(failed to fetch hooks due to no network)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_683caafc60688333b384bf4cebb229ef",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-01T19:38:02Z,2025-06-01T19:38:09Z,2025-06-01T19:38:09Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1377,"analysisWe need to classify as performance or non-performance. The PR title: ""[alpha_factory] Speed up Pareto front"". Summary: speed up Pareto front computation with a single scan, increase performance test population size. That is clearly performance improvement. So label 'performance'.assistantfinalperformance",33,1.0,False
+3117019425,7,Enhance tracker efficiency and add tests,"## Summary
+- improve LK tracker efficiency and move timing logic
+- ensure docstrings and comments use English only
+- add simple unit tests for helper functions
+- document how to run the tests
+
+## Testing
+- `python -m py_compile main.py common.py video.py tst_scene_render.py tests/test_common.py`
+- `python -m unittest discover -s tests`
+
+------
+https://chatgpt.com/codex/tasks/task_e_684006eeb38c832dba4be4830d551514",OpenAI_Codex,46466469,swhan0329,closed,2025-06-04T08:47:45Z,2025-06-04T08:48:38Z,2025-06-04T08:48:38Z,307616074,https://api.github.com/repos/swhan0329/vehicle_speed_estimation,https://github.com/swhan0329/vehicle_speed_estimation/pull/7,"analysisWe need to classify as performance or non-performance. The PR title: ""Enhance tracker efficiency and add tests"". Summary: ""improve LK tracker efficiency and move timing logic"". That is performance improvement. So label 'performance'.assistantfinalperformance",33,1.0,False
+3240693840,1458,Disable uv-run,"## Summary
+- disable uv-run since it causes OOM by reinstalling CUDA torch every run
+
+## Testing
+- `make test` *(fails: Plugin errors and network calls to huggingface.co blocked)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_68794cf6dfb48331b0f78adc90010675",OpenAI_Codex,9633,dlwh,closed,2025-07-17T19:33:10Z,2025-07-18T04:53:42Z,2025-07-18T04:53:42Z,775839592,https://api.github.com/repos/marin-community/marin,https://github.com/marin-community/marin/pull/1458,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Disable uv-run"". Summary: ""disable uv-run since it causes OOM by reinstalling CUDA torch every run"". OOM is out-of-memory, memory usage. This is about memory usage, which is performance-related? The guidelines: performance-related PRs may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs.
+
+Memory usage is a performance aspect. The PR is disabling uv-run to avoid OOM. That is a memory optimization. So it's performance. So label 'performance'.assistantfinalperformance",33,0.15446139663081898,False
