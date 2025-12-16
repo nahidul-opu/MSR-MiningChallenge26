@@ -1,0 +1,119 @@
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,Topic,Probability,Representative_document
+3152089491,1242,Fix list literal type inference in Go compiler,"## Summary
+- keep argument type when a list literal is compiled with a type hint
+- this prevents unnecessary slice conversions
+
+## Testing
+- `go test ./...`
+- `make -C examples/leetcode run-go ID=23`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6850ef5650588320a1841f4070ac1380",OpenAI_Codex,1218621,tamnd,closed,2025-06-17T05:14:05Z,2025-06-17T05:22:15Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/1242,47,1.0,False
+3169971812,2758,Add CFG inference to VM,"## Summary
+- add a new `infer.go` implementing type inference across the bytecode CFG
+- rewrite arithmetic/comparison ops based on inferred register types
+- run the inference optimisation step after compilation
+- update golden IR outputs for optimised opcodes
+
+## Testing
+- `go test ./tests/vm`
+
+------
+https://chatgpt.com/codex/tasks/task_e_685a04eb49e08320b2c7df3d7966ea88",OpenAI_Codex,1218621,tamnd,closed,2025-06-24T02:03:10Z,2025-06-24T04:08:15Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2758,47,1.0,True
+3169280678,2754,Add numeric bytecode specialization,"## Summary
+- specialize VM bytecode for int and float ops
+- track register types during compilation to emit specialized instructions
+- update disassembler and execution engine for new ops
+- refresh golden test outputs
+
+## Testing
+- `go test ./tests/vm -run .`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6859ab92eb888320828aece0126a10f2",OpenAI_Codex,1218621,tamnd,closed,2025-06-23T19:48:09Z,2025-06-24T01:48:12Z,2025-06-24T01:48:12Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2754,47,1.0,False
+3169285792,2755,Implement simple bytecode specialization,"## Summary
+- add specialized arithmetic opcodes to `vm`
+- emit specialized ops when both operands are known ints or floats
+- update disassembler and runtime execution logic
+- refresh VM IR test outputs
+
+## Testing
+- `go test ./tests/vm -run TestVM_IR -update`
+- `go test ./tests/vm -run .`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6859ab8e90988320867238647e27fd93",OpenAI_Codex,1218621,tamnd,closed,2025-06-23T19:50:29Z,2025-06-24T04:07:45Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2755,47,1.0,True
+3150133933,1134,Improve union field inference in Go compiler,"## Summary
+- refine Go compiler type inference for selectors on union types
+- add `unionFieldPathType` helper to check field consistency across variants
+
+## Testing
+- `go test ./... --vet=off -run ^$`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6850218a97208320a8faa27bc6a5bacb",OpenAI_Codex,1218621,tamnd,closed,2025-06-16T13:57:16Z,2025-06-16T14:02:44Z,2025-06-16T14:02:44Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/1134,47,1.0,False
+3118597570,66,Remove runtime arithmetic helpers in Go compiler,"## Summary
+- inline arithmetic operations for unknown types in Go compiler
+- drop deprecated runtime helper functions
+- raise compile errors if operand types are ambiguous
+
+## Testing
+- `go test ./...`
+- `go run ./cmd/mochi-bench | head -n 20`
+
+------
+https://chatgpt.com/codex/tasks/task_e_684082172ccc832098f8500278d9d9f6",OpenAI_Codex,1218621,tamnd,closed,2025-06-04T17:40:45Z,2025-06-04T17:40:56Z,2025-06-04T17:40:56Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/66,47,1.0,False
+3152159948,1258,Refactor Go compiler variable tracking,"## Summary
+- refine variable usage tracking with typed maps
+- avoid runtime conversions when fetch, load and save options already map[string]any
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68510159a954832087b36cca0e0b929d",OpenAI_Codex,1218621,tamnd,closed,2025-06-17T05:55:08Z,2025-06-17T05:57:58Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/1258,47,1.0,False
+3142986664,484,Improve iterator type inference,"## Summary
+- infer `map` iteration more effectively in Go/TS/Python compilers
+- regenerate Python compiler golden outputs after loop change
+
+## Testing
+- `go test ./compile/py -run TestPyCompiler_GoldenOutput -update`
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_684bef46dc308320b5654a8fb63738e0",OpenAI_Codex,1218621,tamnd,closed,2025-06-13T09:50:36Z,2025-06-13T09:53:00Z,2025-06-13T09:53:00Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/484,47,1.0,False
+3169941091,2757,Add specialized bytecode ops,"## Summary
+- add new VM opcodes for integer and float arithmetic and comparisons
+- pick specialized opcodes during compilation based on simple static type inference
+- execute specialized ops directly in the VM
+- update golden files for new opcodes
+
+## Testing
+- `go test ./tests/vm -run .`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6859ab90548c832085f9151d4701960f",OpenAI_Codex,1218621,tamnd,closed,2025-06-24T01:41:43Z,2025-06-24T04:08:06Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2757,47,1.0,True
+3117664754,34,Refactor Go compiler type handling,"## Summary
+- reduce runtime helpers by using simple type inference in Go codegen
+- infer primitive types for binary operators and emit native ops when possible
+- update golden files for Go compiler
+
+## Testing
+- `go test ./compile/go -update`
+- `go test ./...`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_684035b079348320b8412381b3eea96a",OpenAI_Codex,1218621,tamnd,closed,2025-06-04T12:29:21Z,2025-06-04T12:29:36Z,2025-06-04T12:29:36Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/34,47,1.0,False
+3216548273,6882,Improve Go concat type inference,"## Summary
+- improve type inference for `concat` when compiling to Go
+- avoid `_concat` helper for typed lists and use `append` instead
+
+## Testing
+- `go test ./... --vet=off`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686e970d2b808320b337cd75d70f759b",OpenAI_Codex,1218621,tamnd,closed,2025-07-09T16:46:52Z,2025-07-09T16:47:06Z,2025-07-09T16:47:06Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/6882,47,1.0,False

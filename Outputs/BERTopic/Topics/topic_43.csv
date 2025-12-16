@@ -1,0 +1,180 @@
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,Topic,Probability,Representative_document
+3212763311,47134,Improve `in` parameter modifier example with meaningful struct-based demonstration,"Fixes #25422
+
+## Problem
+
+The current example for the `in` parameter modifier uses a simple `int` parameter, which doesn't effectively demonstrate the purpose and benefits of the `in` modifier. As pointed out in the issue:
+
+- Without the `in` keyword, the value would still be 44 (since `int` is a value type)
+- The example doesn't show why you'd use `in` in the first place  
+- It only demonstrates that you can't modify the parameter (via commented code)
+
+## Solution
+
+Replaced the inadequate `int` example with a comprehensive struct-based demonstration that addresses all concerns:
+
+### Before (Problematic):
+```csharp
+int readonlyArgument = 44;
+InArgExample(readonlyArgument);
+Console.WriteLine(readonlyArgument);     // value is still 44
+
+void InArgExample(in int number)
+{
+    // Uncomment the following line to see error CS8331
+    //number = 19;
+}
+```
+
+### After (Improved):
+```csharp
+var largeStruct = new LargeStruct { Value1 = 42, Value2 = 3.14, Value3 = ""Hello"" };
+
+// Using 'in' avoids copying the large struct and prevents modification
+ProcessLargeStruct(in largeStruct);
+Console.WriteLine($""Original value unchanged: {largeStruct.Value1}"");
+
+// Without 'in', the struct would be copied (less efficient for large structs)
+ProcessLargeStructByValue(largeStruct);
+Console.WriteLine($""Original value still unchanged: {largeStruct.Value1}"");
+
+void ProcessLargeStruct(in LargeStruct data)
+{
+    // Can read the values
+    Console.WriteLine($""Processing: {data.Value1}, {data.Value2}, {data.Value3}"");
+    
+    // Uncomment the following line to see error CS8331
+    // data.Value1 = 99; // Compilation error: cannot assign to 'in' parameter
+}
+
+void ProcessLargeStructByValue(LargeStruct data)
+{
+    // This method receives a copy of the struct
+    Console.WriteLine($""Processing copy: {data.Value1}, {data.Value2}, {data.Value3}"");
+    
+    // Modifying the copy doesn't affect the original
+    data.Value1 = 99;
+}
+```
+
+## What the New Example Demonstrates
+
+1. **Why use `in`**: Performance benefits when passing large structs (avoids copying)
+2. **Realistic scenario**: Processing data without needing to modify it
+3. **Clear comparison**: Shows both `in` parameter and regular parameter methods side-by-side
+4. **Immutability**: Demonstrates that `in` parameters cannot be modified
+5. **Educational value**: Enhanced comments explain the behavior and benefits
+
+## Changes Made
+
+- Updated `FirstInExample()` method in `RefParameterModifier.cs` with meaningful struct-based example
+- Added `LargeStruct` definition with multiple fields to demonstrate performance benefits
+- Enhanced comments explaining the purpose and benefits of `in` modifier
+- Maintained backward compatibility with existing documentation structure
+
+The example now clearly shows why developers would choose to use the `in` modifier and provides a practical, educational demonstration of its benefits.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-08T14:24:58Z,2025-07-15T18:47:41Z,2025-07-15T18:47:41Z,35890081,https://api.github.com/repos/dotnet/docs,https://github.com/dotnet/docs/pull/47134,43,1.0,True
+3213723251,60,Share static empty metadata,"## Summary
+- reuse `EmptyMetaData` for `Error.Empty` and `DefaultErrorList` to reduce allocations
+
+## Testing
+- `dotnet test tests/LightResults.Tests/LightResults.Tests.csproj -f net9.0`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686d7f9f169c8328892add17a8fe4897",OpenAI_Codex,29762210,jscarle,closed,2025-07-08T20:39:32Z,2025-07-08T20:56:00Z,2025-07-08T20:56:00Z,744218577,https://api.github.com/repos/jscarle/LightResults,https://github.com/jscarle/LightResults/pull/60,43,1.0,False
+3213724164,61,Use HashCode.Combine in Result.GetHashCode,"## Summary
+- improve hash code distribution for `Result` by delegating to `HashCode.Combine`
+
+## Testing
+- `dotnet test tests/LightResults.Tests/LightResults.Tests.csproj -f net9.0`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686d806863bc8328b534b61897ca9794",OpenAI_Codex,29762210,jscarle,closed,2025-07-08T20:40:00Z,2025-07-08T20:56:08Z,2025-07-08T20:56:08Z,744218577,https://api.github.com/repos/jscarle/LightResults,https://github.com/jscarle/LightResults/pull/61,43,1.0,False
+3213747226,70,Apply AggressiveInlining to Result helpers,"## Summary
+- inline frequently used Result methods with MethodImplOptions.AggressiveInlining
+
+## Testing
+- `dotnet test tests/LightResults.Tests/LightResults.Tests.csproj -f net9.0`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686d80c580488328a63969925928e6e5",OpenAI_Codex,29762210,jscarle,closed,2025-07-08T20:51:58Z,2025-07-08T21:02:37Z,2025-07-08T21:02:37Z,744218577,https://api.github.com/repos/jscarle/LightResults,https://github.com/jscarle/LightResults/pull/70,43,1.0,False
+3213876116,76,Apply AggressiveInlining attributes,"## Summary
+- hint JIT to inline frequently used methods
+- decorate helper enumerators and string helpers for inlining
+- inline comparison and formatting helpers
+
+## Testing
+- `dotnet test tests/LightResults.Tests/LightResults.Tests.csproj -f net9.0`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686d937a33f483288eed10d6938a5951",OpenAI_Codex,29762210,jscarle,closed,2025-07-08T22:03:39Z,2025-07-08T22:03:52Z,2025-07-08T22:03:52Z,744218577,https://api.github.com/repos/jscarle/LightResults,https://github.com/jscarle/LightResults/pull/76,43,1.0,True
+3213850102,74,Improve method inlining,"## Summary
+- inline `Equals`, `GetHashCode`, and `ToString` to allow aggressive JIT inlining
+- use `MethodImplOptions.AggressiveInlining` in core structs
+
+## Testing
+- `dotnet test tests/LightResults.Tests/LightResults.Tests.csproj -f net8.0`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686d8fcbc58c832884b3f73dcd0a4192",OpenAI_Codex,29762210,jscarle,closed,2025-07-08T21:47:05Z,2025-07-08T21:52:48Z,,744218577,https://api.github.com/repos/jscarle/LightResults,https://github.com/jscarle/LightResults/pull/74,43,1.0,False
+3213857892,75,Optimize metadata dictionary,"## Summary
+- specialize the single item dictionary for metadata
+- update error and result helpers to use the new type
+
+## Testing
+- `dotnet test tests/LightResults.Tests/LightResults.Tests.csproj -f net9.0`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686d915e80f0832882617ad202f51a08",OpenAI_Codex,29762210,jscarle,closed,2025-07-08T21:51:59Z,2025-07-08T21:52:57Z,2025-07-08T21:52:57Z,744218577,https://api.github.com/repos/jscarle/LightResults,https://github.com/jscarle/LightResults/pull/75,43,1.0,False
+3213730809,65,Optimize result equality,"## Summary
+- reduce copies when comparing Result structs by passing parameters as `in`
+
+## Testing
+- `dotnet build LightResults.sln`
+- `dotnet test tests/LightResults.Tests/LightResults.Tests.csproj -f net9.0`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_686d813a77988328876d2bdcbfb284a7",OpenAI_Codex,29762210,jscarle,closed,2025-07-08T20:43:24Z,2025-07-08T20:58:26Z,2025-07-08T20:58:26Z,744218577,https://api.github.com/repos/jscarle/LightResults,https://github.com/jscarle/LightResults/pull/65,43,1.0,False
+3213733919,66,Improve small metadata allocations,"## Summary
+- add `SingleItemReadOnlyDictionary` optimized for single key/value pairs
+- use the new dictionary in `Error` constructors
+- apply it to `Result` and `Result<TValue>` helpers
+
+## Testing
+- `dotnet test tests/LightResults.Tests/LightResults.Tests.csproj -f net9.0`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686d7fa9151883289e8b57da6661129e",OpenAI_Codex,29762210,jscarle,closed,2025-07-08T20:45:03Z,2025-07-08T20:59:35Z,2025-07-08T20:59:35Z,744218577,https://api.github.com/repos/jscarle/LightResults,https://github.com/jscarle/LightResults/pull/66,43,1.0,False
+3213750237,71,Optimize enumerable error conversion,"## Summary
+- avoid extra allocation when `Result`/`Result<T>` receive `IEnumerable<IError>`
+- verify list instance is reused in enumerable overload
+- update interface tests to expect list reuse
+
+## Testing
+- `dotnet test tests/LightResults.Tests/LightResults.Tests.csproj -f net9.0`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686d80e2fda08328a5211858055522a7",OpenAI_Codex,29762210,jscarle,closed,2025-07-08T20:53:29Z,2025-07-08T21:03:24Z,2025-07-08T21:03:24Z,744218577,https://api.github.com/repos/jscarle/LightResults,https://github.com/jscarle/LightResults/pull/71,43,1.0,True
+3213895675,77,Optimize Error.GetHashCode,"## Summary
+- streamline hash calculation in `Error.GetHashCode`
+
+## Testing
+- `dotnet build LightResults.sln`
+- `dotnet test tests/LightResults.Tests/LightResults.Tests.csproj -f net9.0`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_686d96cfd9ec8328b10af736593bf470",OpenAI_Codex,29762210,jscarle,closed,2025-07-08T22:16:27Z,2025-07-08T22:16:35Z,2025-07-08T22:16:35Z,744218577,https://api.github.com/repos/jscarle/LightResults,https://github.com/jscarle/LightResults/pull/77,43,1.0,False
+3213728031,63,Optimize Error.ToString,"## Summary
+- reduce reflection in `Error.ToString` by using a cached constant name when the runtime type is `Error`
+
+## Testing
+- `dotnet test tests/LightResults.Tests/LightResults.Tests.csproj -f net9.0`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686d811a65a08328b1e4cf4a125d3d2c",OpenAI_Codex,29762210,jscarle,closed,2025-07-08T20:42:00Z,2025-07-08T20:58:05Z,2025-07-08T20:58:05Z,744218577,https://api.github.com/repos/jscarle/LightResults,https://github.com/jscarle/LightResults/pull/63,43,1.0,False

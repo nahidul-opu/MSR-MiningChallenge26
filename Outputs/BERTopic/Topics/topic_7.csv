@@ -1,484 +1,1701 @@
-id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
-3254645443,12213,Update F# transpiler for array usage,"## Summary
-- attempt to use F# arrays instead of lists in transpiler
-- adjust index updates and list operations
-- regenerate 100-prisoners artifacts
-
-## Testing
-- `go vet ./...`
-- `MOCHI_ROSETTA_INDEX=4 MOCHI_NOW_SEED=1 go test ./transpiler/x/fs -run Rosetta -tags=slow -count=1` *(fails)*
-
-
-------
-https://chatgpt.com/codex/tasks/task_e_6880424d7eec8320a9721716b76d39b7",OpenAI_Codex,1218621,tamnd,closed,2025-07-23T02:51:08Z,2025-07-23T02:51:32Z,2025-07-23T02:51:32Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12213,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Update F# transpiler for array usage"". Summary: attempt to use F# arrays instead of lists in transpiler, adjust index updates and list operations, regenerate artifacts. This is about using arrays instead of lists, which can improve performance. But is the primary purpose performance? It seems to be about changing data structures to arrays for performance. The description mentions adjusting index updates and list operations. It might be to improve performance. The keywords: ""array usage"" vs ""list usage"". The change likely improves performance. There's no explicit mention of performance, but the change is to use arrays instead of lists, which is a performance improvement. The classification: performance.assistantfinalperformance",7,1.0,False
-3263193319,13119,Fix Zig transpiler printing and benchmark stats,"## Summary
-- update Zig codegen to use new `std.io.getStdOut().writer()` API
-- add Linux memory stats for benchmark mode
-- let rosetta tests use real time when benchmarking
-- regenerate Zig output and bench data for first Rosetta programs
-- refresh durations in `ROSETTA.md`
-
-## Testing
-- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=true go test -tags slow ./transpiler/x/zig -run TestZigTranspiler_Rosetta -count=1 -v`
-- `MOCHI_ROSETTA_INDEX=2 MOCHI_BENCHMARK=true go test -tags slow ./transpiler/x/zig -run TestZigTranspiler_Rosetta -count=1 -v`
-- `MOCHI_ROSETTA_INDEX=1 go test -tags slow ./transpiler/x/zig -run TestZigTranspiler_Rosetta -count=1`
-
-
-------
-https://chatgpt.com/codex/tasks/task_e_68837cab0d688320b7b096f7d5bfe12b",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T13:11:54Z,2025-07-25T13:12:08Z,2025-07-25T13:12:07Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/13119,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Fix Zig transpiler printing and benchmark stats"". Summary: update Zig codegen to use new std.io API, add Linux memory stats for benchmark mode, let rosetta tests use real time when benchmarking, regenerate Zig output and bench data for first Rosetta programs, refresh durations in ROSETTA.md. This includes adding memory stats for benchmark mode, updating benchmark stats. That is performance related. The changes are about benchmark stats, memory stats, real time usage, durations. So it's performance. So label 'performance'.assistantfinalperformance",7,1.0,False
-3261928697,12955,Add benchmark support for transpiler and VM tests,"## Summary
-- allow wrapping generated main in benchmark block via `benchMainFlag`
-- record benchmark outputs for Go transpiler examples
-- support Rosetta benchmarking in the VM tests
-- generate VM Rosetta checklist with durations and memory usage
-
-## Testing
-- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=1 go test -tags slow ./transpiler/x/go -run Rosetta -count=1`
-- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=1 go test -tags slow ./runtime/vm -run Rosetta -count=1`
-
-------
-https://chatgpt.com/codex/tasks/task_e_6883020b17188320b6159714612d08c5",OpenAI_Codex,1218621,tamnd,open,2025-07-25T04:17:24Z,,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12955,"analysisWe need to classify as performance or non-performance. The PR adds benchmark support for transpiler and VM tests. It mentions benchmark outputs, durations, memory usage. It's about performance measurement. So it's performance.assistantfinalperformance",7,1.0,False
-3261822593,12900,Update PHP benchmark logic,"## Summary
-- avoid MOCHI_NOW_SEED when benchmarking PHP rosetta programs so timing is real
-- regenerate benchmark result for program 1
-- update README, TASKS, and rosetta checklist timestamp
-
-## Testing
-- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=1 go test ./transpiler/x/php -run Rosetta -count=1 -tags=slow`
-- `UPDATE=1 MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=1 go test ./transpiler/x/php -run Rosetta -count=1 -tags=slow`
-
-
-------
-https://chatgpt.com/codex/tasks/task_e_6882e86aa2e48320a2b2f8b9e05c0742",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T02:57:48Z,2025-07-25T03:01:44Z,2025-07-25T03:01:44Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12900,"analysisWe need to classify as performance or non-performance. The PR title: ""Update PHP benchmark logic"". Summary: avoid MOCHI_NOW_SEED when benchmarking PHP rosetta programs so timing is real; regenerate benchmark result; update README, TASKS, and rosetta checklist timestamp. This is about benchmarking logic, ensuring real timing. It's about performance measurement. The keywords: benchmark, timing, real. It's about performance. So classification: performance.assistantfinalperformance",7,1.0,False
-3261767764,12892,Add benchmark flag to Go transpiler,"## Summary
-- add benchMain flag for Go transpiler
-- update Go transpiler rosetta tests to use benchmark flag
-- generate benchmark output for `100-doors-2`
-- add VM Rosetta test suite and progress report
-
-## Testing
-- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=true go test ./transpiler/x/go -run Rosetta -tags slow -count=1`
-- `MOCHI_ROSETTA_INDEX=1 go test ./runtime/vm -run Rosetta -tags slow -count=1`
-
-------
-https://chatgpt.com/codex/tasks/task_e_6882e782c9448320afd442e1b69c10c6",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T02:25:27Z,2025-07-25T02:26:03Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12892,"analysisWe need to classify as performance or non-performance. The PR adds benchmark flag to Go transpiler, updates tests to use benchmark flag, generate benchmark output, add VM Rosetta test suite and progress report. This is about benchmarking, performance measurement. The primary purpose is to add benchmark flag, not necessarily performance improvement. But the description: ""Add benchmark flag to Go transpiler"" and ""generate benchmark output for `100-doors-2`"". It's about benchmarking, not necessarily improving performance. But the classification criteria: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, etc. This PR contains ""benchmark"" which is a performance measurement. The question: is it performance? The guidelines: ""Performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" Benchmark is a performance measurement. The PR is about adding a benchmark flag, not necessarily improving performance. But it's about measuring performance. The classification might be ""performance"" because it's about performance measurement. The guidelines say ""performance-related pull requests may contain keywords such as... or any other terms referring to how faster and efficiently software runs."" Benchmark is a term referring to performance measurement. So likely classify as performance. The primary purpose: to add benchmark flag, update tests to use benchmark flag, generate benchmark output. That is about performance measurement. So classification: performance.assistantfinalperformance",7,1.0,False
-3261691643,12846,Enable bench-mode in Elixir transpiler,"## Summary
-- add `benchMain` option to Elixir transpiler so `main` can be wrapped in a benchmarking block
-- run benchmark mode when `MOCHI_BENCHMARK=true`
-- record benchmark results in Rosetta progress table
-- update Rosetta progress table format
-- regenerate `100-doors-2` Elixir output with benchmark metrics
-
-## Testing
-- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=true go test ./transpiler/x/ex -tags slow -run Rosetta -count=1`
-
-------
-https://chatgpt.com/codex/tasks/task_e_6882dcdc911083209e54a09d6ea333a9",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T01:38:25Z,2025-07-25T01:38:39Z,2025-07-25T01:38:38Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12846,"analysisWe need to classify as performance or non-performance. The PR adds bench-mode, benchmarking, records results, updates progress table. It's about benchmarking, performance measurement. The primary purpose is to enable bench-mode, record benchmark results. It's about performance measurement, not necessarily optimization. But the instruction says performance-related PR may contain keywords like benchmark, performance, etc. This PR is about enabling bench-mode, which is performance measurement. So classify as 'performance'.assistantfinalperformance",7,1.0,True
-3261682254,12844,Add CS benchmark mode and update Rosetta,"## Summary
-- add benchmark block option to CS transpiler
-- capture durations and memory in Rosetta tests
-- skip MOCHI_NOW_SEED when benchmarking
-- parse JSON results from the output
-- regenerate code/output for `100-doors-2`
-
-## Testing
-- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=1 go test -tags slow ./transpiler/x/cs -run Rosetta -count=1 -v`
-
-------
-https://chatgpt.com/codex/tasks/task_e_6882dc5bbf748320816593903b0c59e5",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T01:32:25Z,2025-07-25T01:32:39Z,2025-07-25T01:32:39Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12844,"analysisWe need to classify as performance or non-performance. The PR adds CS benchmark mode, captures durations and memory, skip seed, parse JSON results, regenerate code. This is about benchmarking, measuring performance. So it's performance.assistantfinalperformance",7,1.0,False
-3261702887,12852,Add benchmark wrapper for F# transpiler,"## Summary
-- support benchmark wrapping for main function in fs transpiler
-- update fs stub and rosetta tests for benchmark mode
-- regenerate benchmarked output for `100-doors-2`
-- reformat F# Rosetta checklist with timing/memory columns
-- fix benchmark seeding so runtime uses real clock
-
-## Testing
-- `MOCHI_ROSETTA_INDEX=1 UPDATE=1 MOCHI_BENCHMARK=1 go test -tags=slow ./transpiler/x/fs -run Rosetta -count=1 -v`
-
-
-------
-https://chatgpt.com/codex/tasks/task_e_6882dcf114b08320ba0474680fcdce3f",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T01:45:26Z,2025-07-25T01:45:38Z,2025-07-25T01:45:38Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12852,"analysisWe need to classify as performance or non-performance. The PR title: ""Add benchmark wrapper for F# transpiler"". Summary: support benchmark wrapping for main function in fs transpiler, update tests, regenerate benchmarked output, reformat checklist with timing/memory columns, fix benchmark seeding so runtime uses real clock. This is clearly performance-related: adding benchmark wrapper, timing/memory columns, etc. So classification: performance.assistantfinalperformance",7,1.0,False
-3261705783,12854,Add benchmark support to Fortran transpiler,"## Summary
-- add benchmark mode flag to Fortran transpiler
-- generate timing/memory JSON when enabled
-- record benchmark info in ROSETTA checklist table
-- update Fortran rosetta tests to handle benchmark mode
-- include generated output for first program
-
-## Testing
-- `go test ./transpiler/x/fortran -tags slow -run TestFortranTranspiler_Rosetta -count=1 -v`
-- `MOCHI_BENCHMARK=1 go test ./transpiler/x/fortran -tags slow -run TestFortranTranspiler_Rosetta -count=1 -v || true`
-
-------
-https://chatgpt.com/codex/tasks/task_e_6882ddafb1fc83209eef216895909b60",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T01:47:11Z,2025-07-25T01:47:31Z,2025-07-25T01:47:31Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12854,"analysisWe need to classify as performance or non-performance. The PR adds benchmark support, generating timing/memory JSON, record benchmark info, etc. It's about benchmarking, measuring performance. The primary purpose is to add benchmark support, not necessarily to improve performance. But the instruction: ""Performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" The PR includes ""benchmark mode flag"", ""generate timing/memory JSON"", ""record benchmark info"". It references memory, timing. That is performance-related. The primary purpose is to add benchmark support, but that is performance measurement. The classification likely ""performance"". So output: performance.assistantfinalperformance",7,1.0,True
-3261747303,12879,Update FS transpiler benchmark support,"## Summary
-- update F# transpiler to allow bench block wrapping
-- regenerate Rosetta benchmark output for first programs
-- update ROSETTA readme table with durations
-
-## Testing
-- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=1 go test -tags slow ./transpiler/x/fs -run Rosetta -count=1 -v`
-
-
-------
-https://chatgpt.com/codex/tasks/task_e_6882e32973c08320878cb7e86f73be9e",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T02:12:08Z,2025-07-25T02:12:20Z,2025-07-25T02:12:20Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12879,"analysisWe need to classify as performance or non-performance. The PR title: ""Update FS transpiler benchmark support"". Summary: update F# transpiler to allow bench block wrapping, regenerate Rosetta benchmark output for first programs, update ROSETTA readme table with durations. Testing includes running benchmark tests. This is about benchmark support, likely performance. The keywords: benchmark, durations, performance. So classify as 'performance'.assistantfinalperformance",7,1.0,False
-3261733844,12871,Improve Elixir transpiler benchmarking,"## Summary
-- wrap generated main with benchmark helper when requested
-- fix input builtin to avoid crashes on EOF
-- update ROSETTA progress table with checkmark status and benchmark stats
-- regenerate Elixir output for `100-doors-2` with benchmark info
-
-## Testing
-- `MOCHI_ROSETTA_INDEX=1 go test ./transpiler/x/ex -run Rosetta -tags slow -count=1`
-- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=true go test ./transpiler/x/ex -run Rosetta -tags slow -count=1`
-- `go test ./transpiler/x/ex -run ^$ -tags slow`
-
-------
-https://chatgpt.com/codex/tasks/task_e_6882e047998883208582d1f75a7a7d3b",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T02:04:19Z,2025-07-25T02:04:32Z,2025-07-25T02:04:32Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12871,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Elixir transpiler benchmarking"". The body: mentions wrap generated main with benchmark helper, fix input builtin to avoid crashes on EOF, update progress table with checkmark status and benchmark stats, regenerate output with benchmark info. This is about benchmarking, performance measurement. It seems performance-related. So classify as 'performance'.assistantfinalperformance",7,1.0,False
-3261869159,12928,Update Dart transpiler benchmarking,"## Summary
-- add WrapMain flag to Dart transpiler and wrap statements in a benchmark block when requested
-- output absolute memory usage in benchmark code
-- write `.bench` files and update benchmark handling in Dart Rosetta tests
-- update Dart ROSETTA checklist format
-- regenerate benchmark for `100-doors-2` in Dart
-
-## Testing
-- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=true go test ./transpiler/x/dart -run Rosetta -tags=slow -count=1 -v`
-- `go test ./transpiler/x/dart -run UpdateRosetta -tags=slow -v`
-- `go test ./transpiler/x/dart -run TestTranspile_PrintHello -tags=slow -count=1`
-
-
-------
-https://chatgpt.com/codex/tasks/task_e_6882f3e204088320a3a4d1956ebcd684",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T03:31:01Z,2025-07-25T03:35:49Z,2025-07-25T03:35:49Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12928,"analysisWe need to classify as performance or non-performance. The PR title: ""Update Dart transpiler benchmarking"". Body: adding WrapMain flag, benchmark block, output memory usage, write.bench files, update benchmark handling, regenerate benchmark. This is about benchmarking, performance measurement. It includes memory usage, benchmarking. So it's performance. So label 'performance'.assistantfinalperformance",7,1.0,False
-3261868679,12926,Add bench mode toggle to C# transpiler,"## Summary
-- add `SetBenchMain` flag for wrapping main function in benchmark block
-- update C# transpiler to avoid negative RNG values and fix substring
-- generate Rosetta output for program 1 with benchmark metrics
-- adjust C# rosetta tests to handle benchmark mode
-
-## Testing
-- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=1 go test ./transpiler/x/cs -run TestCSTranspiler_Rosetta_Golden -tags slow -count=1 -timeout=0`
-
-
-------
-https://chatgpt.com/codex/tasks/task_e_6882f3df3d80832089a082e988ae7514",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T03:30:36Z,2025-07-25T03:34:32Z,2025-07-25T03:34:32Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12926,"analysisWe need to classify whether the primary purpose is performance. The PR adds bench mode toggle to C# transpiler, adds SetBenchMain flag for wrapping main function in benchmark block, update transpiler to avoid negative RNG values and fix substring, generate Rosetta output for program 1 with benchmark metrics, adjust tests to handle benchmark mode. The focus is adding benchmark mode, generating benchmark metrics. This is about performance measurement, not necessarily performance improvement. But the classification is about whether the primary purpose is to improve performance. The PR adds a bench mode toggle, which is for benchmarking, not necessarily improving performance. However, it might be used to measure performance. The instruction says performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. This PR includes ""bench mode toggle"", ""benchmark metrics"", ""benchmark block"". That is about performance measurement. The question: is that considered performance? The classification is about improving performance. The PR is adding a benchmark mode, not necessarily improving performance. But the presence of ""benchmark"" might be considered performance. The instruction says performance-related PRs may contain keywords such as... or any other terms referring to how faster and efficiently software runs. Benchmark is a term used to measure performance. So likely classify as performance. The primary purpose is to add bench mode toggle to C# transpiler. That is to measure performance. So classification: performance.assistantfinalperformance",7,1.0,False
-3266937953,13718,Run call-a-function-2 with benchmark,"## Summary
-- transpile call-a-function-2 with benchmark enabled
-- record timing and memory usage in ROSETTA checklist
-
-## Testing
-- `ROSETTA_INDEX=155 MOCHI_BENCHMARK=1 go test ./transpiler/x/cpp -tags slow -run TestCPPTranspiler_Rosetta_Golden -count=1`
-
-------
-https://chatgpt.com/codex/tasks/task_e_6885f08bb2bc8320be78fd0fceeb6d3e",OpenAI_Codex,1218621,tamnd,closed,2025-07-27T09:39:17Z,2025-07-27T09:40:00Z,2025-07-27T09:40:00Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/13718,"analysisWe need to classify as performance or non-performance. The PR title: ""Run call-a-function-2 with benchmark"". Summary: ""transpile call-a-function-2 with benchmark enabled, record timing and memory usage"". Testing includes benchmark. So it's about performance measurement. So classification: performance.assistantfinalperformance",7,0.36264937266186215,False
-3261616089,12819,Add bench block golden test for F#,"## Summary
-- add BenchStmt code generation for F# transpiler
-- capture memory and time for bench blocks
-- enable deterministic bench output in tests
-- track bench_block test in README/TASKS
-- commit generated bench_block.fs
-
-## Testing
-- `go vet ./...`
-- `go test ./transpiler/x/fs -c -tags slow`
-- `go test ./transpiler/x/fs -run VMValid/bench_block -tags slow -count=1`
-
-
-------
-https://chatgpt.com/codex/tasks/task_e_688280a4fc448320a5abd06c94656355",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T00:54:51Z,2025-07-25T00:55:03Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12819,"analysisWe need to classify whether the primary purpose is performance. The PR adds bench block golden test for F#. It adds BenchStmt code generation, capture memory and time for bench blocks, deterministic bench output, track bench_block test. The title: ""Add bench block golden test for F#"". The body mentions capturing memory and time for bench blocks. That is performance measurement. The primary purpose seems to add a benchmark test, capturing memory and time. That is performance. So classify as 'performance'.assistantfinalperformance",7,0.32761809062420477,False
-3261684960,12845,Add benchmark support to C++ transpiler tests,"## Summary
-- allow wrapping main function in C++ output with a benchmark block
-- record benchmark results in rosetta tests when `MOCHI_BENCHMARK` is set
-- update rosetta checklist format with duration and memory columns
-- regenerate C++ output for `100-doors-2` and store benchmark results
-
-## Testing
-- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=true go test ./transpiler/x/cpp -run Rosetta -count=1 -tags slow -update-rosetta-cpp`
-
-------
-https://chatgpt.com/codex/tasks/task_e_6882dc06d5b083208a174d283b31314c",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T01:34:00Z,2025-07-25T01:34:35Z,2025-07-25T01:34:35Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12845,"analysisWe need to classify as performance or non-performance. The PR adds benchmark support to C++ transpiler tests, record benchmark results, update checklist format with duration and memory columns, regenerate output. This is about adding benchmarking, measuring performance. The primary purpose is to add benchmark support, not necessarily to improve performance. But the description: ""Add benchmark support to C++ transpiler tests"" - it's adding benchmarking, not necessarily performance improvement. But the keywords: benchmark, duration, memory, performance. The classification: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, etc. This PR includes memory, duration, benchmark. It is about adding benchmark support, not necessarily improving performance. But the classification is about whether the primary purpose is to improve performance. The PR is adding benchmark support, which is about measuring performance, not necessarily improving it. But the guidelines: ""Performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" This PR includes memory, benchmark, duration. It is about measuring performance. The primary purpose is to add benchmark support, not to improve performance. But the classification might still be 'performance' because it's about performance measurement. The guidelines say ""performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" This PR includes memory, benchmark, duration. So it qualifies. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The PR is adding benchmark support, not improving performance. But the guidelines might still classify as performance because it's about performance measurement. The phrase ""primary purpose of the pull request is to improve performance"" - this PR is not improving performance, it's adding benchmarking. So maybe it's non-performance. But the guidelines mention that performance-related PRs may contain keywords. But the classification is about improvement, not measurement. The guidelines: ""Performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" So if it contains those keywords, it's performance. But the phrase ""primary purpose of the pull request is to improve performance"" might be ambiguous. The guidelines say ""Performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" So if it contains those, it's performance. This PR contains memory, benchmark, duration. So it's performance. I'd classify as 'performance'.assistantfinalperformance",7,0.3156450143462471,False
-3261822428,12899,Add Pascal bench mode,"## Summary
-- improve Pascal transpiler with benchmark mode and memory helper
-- support MOCHI_BENCHMARK in Pascal rosetta tests
-- update Pascal Rosetta checklist
-- regenerate Pascal output for `100-doors-2`
-
-## Testing
-- `MOCHI_BENCHMARK=1 ROSETTA_INDEX=1 go test ./transpiler/x/pas -run Rosetta -tags=slow -count=1 -update-rosetta-pas -v`
-
-------
-https://chatgpt.com/codex/tasks/task_e_6882e39b345c8320acb4847e2da4b723",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T02:57:40Z,2025-07-25T03:01:55Z,2025-07-25T03:01:55Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12899,"analysisWe need to classify as performance or non-performance. The PR title: ""Add Pascal bench mode"". Summary: ""improve Pascal transpiler with benchmark mode and memory helper"". It mentions benchmark mode, memory helper. It's about performance. So classify as 'performance'.assistantfinalperformance",7,0.31118288599355604,False
-3261752051,12881,Add Python benchmark wrapper,"## Summary
-- update Python transpiler to wrap programs without a main function in a benchmark block
-- record memory usage via `resource.getrusage`
-- update rosetta progress table to use check mark status and show benchmark stats
-- regenerate `100-doors-2` Python output with benchmark info
-
-## Testing
-- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=true go test -tags=slow -run TestPyTranspiler_Rosetta_Golden/001 -update-rosetta-py -count=1`
-- `python3 tests/rosetta/transpiler/Python/100-doors-2.py > tests/rosetta/transpiler/Python/100-doors-2.bench`
-
-------
-https://chatgpt.com/codex/tasks/task_e_6882e402dff88320839a16af24da66cd",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T02:14:35Z,2025-07-25T02:14:49Z,2025-07-25T02:14:49Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12881,"analysisWe need to classify as performance or non-performance. The PR adds a Python benchmark wrapper, records memory usage, updates progress table, regenerates output with benchmark info. This is about benchmarking, measuring performance, memory usage. So it's performance. The classification: 'performance'.assistantfinalperformance",7,0.30571842249221354,False
-3261650840,12838,Enhance Python transpiler bench mode,"## Summary
-- add bench mode support to the Python transpiler
-- propagate MOCHI_BENCHMARK into tests and tools
-- write benchmark results to `.bench` files
-- track benchmark data in ROSETTA progress table
-- regenerate Python code for `100-doors-2.mochi`
-
-## Testing
-- `go test -c -tags slow ./transpiler/x/py > /tmp/test.bin`
-- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=true go test ./transpiler/x/py -tags slow -run Rosetta -update-rosetta-py -count=1`
-
-
-------
-https://chatgpt.com/codex/tasks/task_e_6882d784a7e08320bbc45efeb29c04c9",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T01:17:30Z,2025-07-25T01:17:42Z,2025-07-25T01:17:42Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12838,"analysisWe need to classify as performance or non-performance. The PR title: ""Enhance Python transpiler bench mode"". Summary: add bench mode support, propagate MOCHI_BENCHMARK into tests and tools, write benchmark results to.bench files, track benchmark data in ROSETTA progress table, regenerate Python code for 100-doors-2.mochi. This is about benchmarking, performance measurement. The primary purpose is to improve performance? It adds bench mode support, but is it to improve performance or just to measure? The description: ""Enhance Python transpiler bench mode"" - adding bench mode support. It writes benchmark results, track data. It doesn't explicitly say it's optimizing code. But it's about benchmarking. The instruction says performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, etc. This PR contains ""bench mode"", ""benchmark results"", ""track benchmark data"". That is about performance measurement. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The PR is about adding bench mode support, not necessarily improving performance. But it's about measuring performance. The classification likely ""performance"" because it's about performance measurement. The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. This PR includes ""bench mode"", ""benchmark results"", ""track benchmark data"". That is about performance measurement. So classify as 'performance'.assistantfinalperformance",7,0.29017115749925193,False
-3261888593,12942,Update Java benchmark handling,"## Summary
-- adjust benchmark env parsing for Java tests
-- regenerate Java rosetta outputs with benchmark info
-- update docs and progress tables
-
-## Testing
-- `UPDATE=1 MOCHI_BENCHMARK=1 go test -tags slow ./transpiler/x/java -run Rosetta -index 1 -count=1`
-
-
-------
-https://chatgpt.com/codex/tasks/task_e_6882fbca330c8320aba20e29cf392a68",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T03:46:19Z,2025-07-25T03:46:36Z,2025-07-25T03:46:36Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12942,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Update Java benchmark handling"". Summary: adjust benchmark env parsing for Java tests, regenerate Java rosetta outputs with benchmark info, update docs and progress tables. This is about benchmark handling, likely performance. The keywords: benchmark, performance. So classify as 'performance'.assistantfinalperformance",7,0.2804156238765904,False
-3263100548,13095,Update scala rosetta outputs 11-25,"## Summary
-- run Scala transpiler on Rosetta tasks 11–25 in benchmark mode
-- update Scala Rosetta checklist with timings
-- add benchmark output files
-
-## Testing
-- `MOCHI_ROSETTA_INDEX=11 MOCHI_BENCHMARK=1 go test ./transpiler/x/scala -run Rosetta -tags slow -count=1`
-- `MOCHI_ROSETTA_INDEX=12 MOCHI_BENCHMARK=1 go test ./transpiler/x/scala -run Rosetta -tags slow -count=1`
-- `MOCHI_ROSETTA_INDEX=13 MOCHI_BENCHMARK=1 go test ./transpiler/x/scala -run Rosetta -tags slow -count=1`
-- `MOCHI_ROSETTA_INDEX=14 MOCHI_BENCHMARK=1 go test ./transpiler/x/scala -run Rosetta -tags slow -count=1`
-- `MOCHI_ROSETTA_INDEX=15 MOCHI_BENCHMARK=1 go test ./transpiler/x/scala -run Rosetta -tags slow -count=1`
-- `MOCHI_ROSETTA_INDEX=16 MOCHI_BENCHMARK=1 go test ./transpiler/x/scala -run Rosetta -tags slow -count=1`
-- `MOCHI_ROSETTA_INDEX=17 MOCHI_BENCHMARK=1 go test ./transpiler/x/scala -run Rosetta -tags slow -count=1`
-- `MOCHI_ROSETTA_INDEX=18 MOCHI_BENCHMARK=1 go test ./transpiler/x/scala -run Rosetta -tags slow -count=1`
-- `MOCHI_ROSETTA_INDEX=19 MOCHI_BENCHMARK=1 go test ./transpiler/x/scala -run Rosetta -tags slow -count=1`
-- `MOCHI_ROSETTA_INDEX=20 MOCHI_BENCHMARK=1 go test ./transpiler/x/scala -run Rosetta -tags slow -count=1`
-- `MOCHI_ROSETTA_INDEX=21 MOCHI_BENCHMARK=1 go test ./transpiler/x/scala -run Rosetta -tags slow -count=1`
-- `MOCHI_ROSETTA_INDEX=22 MOCHI_BENCHMARK=1 go test ./transpiler/x/scala -run Rosetta -tags slow -count=1`
-- `MOCHI_ROSETTA_INDEX=23 MOCHI_BENCHMARK=1 go test ./transpiler/x/scala -run Rosetta -tags slow -count=1`
-- `MOCHI_ROSETTA_INDEX=24 MOCHI_BENCHMARK=1 go test ./transpiler/x/scala -run Rosetta -tags slow -count=1`
-- `MOCHI_ROSETTA_INDEX=25 MOCHI_BENCHMARK=1 go test ./transpiler/x/scala -run Rosetta -tags slow -count=1`
-
-------
-https://chatgpt.com/codex/tasks/task_e_688374fdd4dc83209515dd89afa56bc6",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T12:42:58Z,2025-07-25T12:43:18Z,2025-07-25T12:43:18Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/13095,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Update scala rosetta outputs 11-25"". Summary: run Scala transpiler on Rosetta tasks 11–25 in benchmark mode, update checklist with timings, add benchmark output files. This is about benchmarking, measuring performance. It seems performance-related. The keywords: benchmark, timings. So classify as 'performance'.assistantfinalperformance",7,0.26388551195476767,False
-3261746125,12878,Enable bench mode flag in Haskell transpiler,"## Summary
-- add `benchMain` flag to Haskell transpiler
-- update tests and CLI helpers for new parameter
-- record benchmark runs without seeding time
-- generate progress table header in `ROSETTA.md`
-- regenerate code/output for `100-doors-2` example
-
-## Testing
-- `CGO_ENABLED=0 ROSETTA_INDEX=1 MOCHI_BENCHMARK=1 go test ./transpiler/x/hs -tags slow -run Rosetta -count=1`
-- `CGO_ENABLED=0 ROSETTA_INDEX=1 go test ./transpiler/x/hs -tags slow -run Rosetta -count=1`
-
-------
-https://chatgpt.com/codex/tasks/task_e_6882e2e1208483208bfcfa367ef4446e",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T02:11:24Z,2025-07-25T02:11:35Z,2025-07-25T02:11:35Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12878,"analysisWe need to classify whether the primary purpose is performance. The PR adds bench mode flag, updates tests, records benchmark runs, generates progress table header, regenerates code. The focus is enabling bench mode flag, recording benchmark runs, generating progress table header. This is about benchmarking, performance measurement. The keywords: bench, benchmark, performance. So it's performance. So label 'performance'.assistantfinalperformance",7,0.24480185432529764,False
-3261765113,12890,Enable bench mode for Kotlin Rosetta tests,"## Summary
-- add benchmark environment toggle to rosetta tests
-- regenerate Kotlin README, ROSETTA checklist and TASKS docs
-- run first Rosetta program in benchmark mode
-
-## Testing
-- `MOCHI_BENCHMARK=true ROSETTA_INDEX=1 go test -tags slow ./transpiler/x/kt -run RosettaKotlin -count=1`
-
-
-------
-https://chatgpt.com/codex/tasks/task_e_6882e663359c832099a0e863c62823c7",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T02:23:58Z,2025-07-25T02:24:11Z,2025-07-25T02:24:11Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12890,"analysisWe need to classify as performance or non-performance. The PR title: ""Enable bench mode for Kotlin Rosetta tests"". Summary: add benchmark environment toggle to rosetta tests, regenerate docs, run first Rosetta program in benchmark mode. This is about enabling benchmark mode, likely to measure performance. The content mentions ""bench mode"" and ""benchmark"". That is performance-related. So classification: performance.assistantfinalperformance",7,0.23784040553189825,False
-3261756685,12883,Enhance Racket benchmark mode,"## Summary
-- support benchmark mode for Racket transpiler
-- generate real timing in microseconds
-- run rosetta golden tests without NOW seed when benchmarking
-- update Racket transpiler progress
-- regenerate output for `100-doors-2`
-
-## Testing
-- `ROSETTA_INDEX=1 MOCHI_BENCHMARK=1 go test ./transpiler/x/rkt -tags slow -run Rosetta -count=1 -v`
-
-------
-https://chatgpt.com/codex/tasks/task_e_6882e46af1588320ae2ae7fb086c3721",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T02:17:23Z,2025-07-25T02:17:33Z,2025-07-25T02:17:33Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12883,"analysisWe need to classify as performance or non-performance. The PR title: ""Enhance Racket benchmark mode"". Summary: support benchmark mode for Racket transpiler, generate real timing in microseconds, run rosetta golden tests without NOW seed when benchmarking, update Racket transpiler progress, regenerate output for `100-doors-2`. This is about benchmarking, generating timing, performance measurement. It's about performance. So classification: performance.assistantfinalperformance",7,0.23556810357932617,False
-3261724373,12865,Add benchmark mode to scheme transpiler,"## Summary
-- support benchmarking in the Scheme transpiler
-- update Scheme rosetta tests to handle benchmark mode
-- update golden output with benchmark data
-
-## Testing
-- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=1 go test -tags=slow ./transpiler/x/scheme -run Rosetta -count=1`
-
-------
-https://chatgpt.com/codex/tasks/task_e_6882de5ac9b8832097347de04ffae021",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T01:58:29Z,2025-07-25T01:58:48Z,2025-07-25T01:58:48Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12865,"analysisWe need to classify as performance or non-performance. The PR adds benchmark mode to scheme transpiler, updates tests, golden output with benchmark data. This is about benchmarking, performance measurement. The primary purpose is to add benchmark mode, which is performance-related. So classify as 'performance'.assistantfinalperformance",7,0.22526285837451626,False
-3118042228,73,Restore benchmark test,"## Summary
-- bring back `#![feature(test)]` and `extern crate test` in `vm_test.rs`
-- reintroduce the `bench_fibo` benchmark
-
-## Testing
-- `cargo test` *(fails: `#[feature]` may not be used on the stable release channel)*
-
-------
-https://chatgpt.com/codex/tasks/task_b_683fc5b8cfd0832499845f7bcd52a534",OpenAI_Codex,9913176,maekawatoshiki,closed,2025-06-04T14:23:52Z,2025-06-04T14:26:23Z,,138584142,https://api.github.com/repos/maekawatoshiki/rapidus,https://github.com/maekawatoshiki/rapidus/pull/73,"analysisWe need to classify the pull request as performance or non-performance. The PR title: ""Restore benchmark test"". The body: ""bring back `#![feature(test)]` and `extern crate test` in `vm_test.rs` reintroduce the `bench_fibo` benchmark"". It's about restoring a benchmark test. Benchmarks are performance tests. So it's performance. The classification: 'performance'.assistantfinalperformance",7,0.2249133122148259,False
-3261697837,12849,Add Kotlin benchmark wrapping and checklist table,"## Summary
-- add benchMain flag to Kotlin transpiler and wrap main body in a Bench block
-- update rosetta helpers to keep progress in a table format with duration/memory stats
-- support MOCHI_BENCHMARK env in Kotlin rosetta and golden tests
-- update CLI generation logic for kotlin
-- regenerate golden files and progress data
-
-## Testing
-- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=1 go test ./transpiler/x/kt -run TestRosettaKotlin -count=1 -tags=slow`
-
-------
-https://chatgpt.com/codex/tasks/task_e_6882ddcf0f648320aabbede07fc2893d",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T01:42:13Z,2025-07-25T01:42:29Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12849,"analysisWe need to classify as performance or non-performance. The PR adds Kotlin benchmark wrapping, progress table with duration/memory stats, support MOCHI_BENCHMARK env, etc. It's about benchmarking, measuring performance, adding benchMain flag, etc. So it's performance.assistantfinalperformance",7,0.22156361572384076,False
-3225129469,7936,Enable C++ backend for TPCH q1-q2,"## Summary
-- regenerate C++ sources for TPCH q1 and q2
-- update expected runtime outputs for TPCH q1 and q2
-
-## Testing
-- `g++ /tmp/q1.cpp -std=c++17 -o /tmp/q1 && /tmp/q1 > /tmp/q1.out`
-- `g++ /tmp/q2.cpp -std=c++17 -o /tmp/q2 && /tmp/q2 > /tmp/q2.out`
-
-------
-https://chatgpt.com/codex/tasks/task_e_68722d236a708320b67141b144338d38",OpenAI_Codex,1218621,tamnd,closed,2025-07-12T09:47:33Z,2025-07-12T09:48:52Z,2025-07-12T09:48:52Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7936,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Enable C++ backend for TPCH q1-q2"". Summary: regenerate C++ sources for TPCH q1 and q2, update expected runtime outputs. This is about enabling C++ backend, likely to improve performance. The body mentions generating C++ sources, updating outputs. It's about performance? The keywords: ""runtime outputs"" but not explicitly performance. However enabling C++ backend likely improves performance. The classification: performance.assistantfinalperformance",7,0.22145967606058495,False
-3261710160,12857,Add benchmark support to Haskell transpiler,"## Summary
-- implement benchmark mode for Haskell transpiler
-- update golden tests to accept benchmark flag
-- record benchmark results in `ROSETTA.md`
-- run the first Rosetta program in benchmark mode
-
-## Testing
-- `MOCHI_ROSETTA_INDEX=1 go test ./transpiler/x/hs -tags slow -run Rosetta -count=1`
-- `MOCHI_ROSETTA_INDEX=1 MOCHI_BENCHMARK=1 go test ./transpiler/x/hs -tags slow -run Rosetta -count=1`
-
-------
-https://chatgpt.com/codex/tasks/task_e_6882dcfafb448320b32587c89ea8e3c3",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T01:49:57Z,2025-07-25T01:50:11Z,2025-07-25T01:50:11Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12857,"analysisWe need to classify as performance or non-performance. The PR adds benchmark support, updates golden tests, records benchmark results, runs benchmark mode. This is about measuring performance, adding benchmark mode. It's performance-related. So label 'performance'.assistantfinalperformance",7,0.2098610253176964,False
-3125799000,628,test: box rebuild performance test,"## Summary
-- add performance benchmark for rebuilding a `Box` with style overrides
-
-## Testing
-- `flutter test packages/mix/test/bechmarks/widget_build_test.dart` *(fails: `flutter` not found)*
-
-------
-https://chatgpt.com/codex/tasks/task_e_684318723bac832bbc92ef8e817e5301",OpenAI_Codex,62367544,tilucasoli,closed,2025-06-06T20:28:54Z,2025-06-06T20:35:53Z,,378459401,https://api.github.com/repos/btwld/mix,https://github.com/btwld/mix/pull/628,"analysisWe need to classify as performance or non-performance. The PR title: ""test: box rebuild performance test"". Summary: add performance benchmark for rebuilding a Box with style overrides. So it's about performance benchmark. So classification: performance.assistantfinalperformance",7,0.18552242618866877,False
-3155815373,641,Make benchmarks only run with release builds,"This PR enforces that benchmarks can only be run with release builds, preventing execution with debug builds which would provide inconsistent and misleading performance data.
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,Topic,Probability,Representative_document
+3147503921,5375,docs: Upgrade Docusaurus from 3.7.0 to 3.8.1,"This PR upgrades Docusaurus dependencies from version 3.7.0 to 3.8.1 (latest stable) to improve performance, security, and provide access to the latest features and bug fixes.
 
 ## Changes Made
 
-### 1. Updated Justfile Commands
-- Removed `target` parameter from `bench` and `bench-ci` commands
-- Hard-coded both commands to use `--profile=release`
-- Added explanatory comments about release-only requirement
+### 📦 Dependencies Updated
+- `@docusaurus/core`: 3.7.0 → 3.8.1
+- `@docusaurus/plugin-content-blog`: 3.7.0 → 3.8.1  
+- `@docusaurus/plugin-google-gtag`: 3.7.0 → 3.8.1
+- `@docusaurus/preset-classic`: 3.7.0 → 3.8.1
+- `@docusaurus/theme-common`: 3.7.0 → 3.8.1
+- `@docusaurus/faster`: 3.7.0 → 3.8.1
+- `@docusaurus/types`: 3.7.0 → 3.8.1
 
-**Before:**
-```just
-bench target=default-target features="""":
-    cargo bench --profile={{ if target == ""debug"" { ""dev"" } else { target } }} {{ if features =="""" {''} else { ""--features "" + features } }} -- --verbose
+### 🔧 Configuration Changes
+Added required `future.v4.removeLegacyPostBuildHeadAttribute: true` flag to `docusaurus.config.js`:
+
+```javascript
+future: {
+    experimental_faster: true,
+    v4: {
+        removeLegacyPostBuildHeadAttribute: true,
+    },
+},
 ```
 
-**After:**
-```just
-# Benchmarks only run with release builds for performance consistency  
-bench features="""":
-    cargo bench --profile=release {{ if features =="""" {''} else { ""--features "" + features } }} -- --verbose
-```
+This flag is required when using the `experimental_faster` feature in Docusaurus 3.8.x and prepares the site for Docusaurus v4 compatibility.
 
-### 2. Added Compile-Time Enforcement
-Added a compile-time check in the benchmark source code that prevents compilation in debug mode:
+## Testing
 
-```rust
-// Benchmarks are only meaningful and should only run with release builds.
-// Debug builds have different performance characteristics and would not provide
-// useful benchmarking data for performance regression testing.
-#[cfg(debug_assertions)]
-compile_error!(""Benchmarks must be run with release builds only. Use `cargo bench --release` or `just bench`."");
-```
+✅ **Development server** - Starts and runs successfully  
+✅ **Production build** - Initiates without configuration errors  
+✅ **CLI commands** - All Docusaurus commands functional  
+✅ **Site functionality** - No breaking changes to existing features  
 
-### 3. Updated GitHub Workflows
-- **Benchmarks.yml**: Removed `release` parameter from `bench-ci` call (now defaults to release)
-- **dep_rust.yml**: Removed `${{ matrix.config }}` parameter from `bench-ci` call (already had release-only guard)
+## Migration Notes
 
-### 4. Updated Documentation
-Updated `docs/benchmarking-hyperlight.md` to reflect that only release builds are supported, removing references to debug benchmark support.
+The upgrade from 3.7.0 to 3.8.1 was largely non-breaking. The only configuration change required was adding the v4 future flag. No changes were needed to:
+- Sidebar configuration
+- Plugin configurations  
+- Custom components
+- Content structure
+- Build scripts
 
-## Validation
+This upgrade provides improved performance and bug fixes while maintaining full backward compatibility with the existing documentation site.
 
-All changes have been tested to ensure:
-- ✅ Debug benchmark compilation fails with clear error message
-- ✅ Release benchmark compilation succeeds  
-- ✅ `just bench` and `just bench-ci` commands use release profile
-- ✅ GitHub workflows updated correctly
-- ✅ All existing functionality preserved
+## Breaking Changes Addressed
 
-This ensures benchmarks provide consistent, meaningful performance data for regression testing while preventing accidental execution with debug builds.
+- **Future flag requirement**: Docusaurus 3.8.x requires the `v4.removeLegacyPostBuildHeadAttribute` flag when using `experimental_faster`
+- **Lockfile updates**: Updated `pnpm-lock.yaml` to reflect new dependency versions
 
-Fixes #638.
+The upgrade is ready for production deployment with no additional migration steps required.
 
 <!-- START COPILOT CODING AGENT TIPS -->
 ---
 
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-06-18T07:37:33Z,2025-07-29T23:00:13Z,,883829350,https://api.github.com/repos/hyperlight-dev/hyperlight,https://github.com/hyperlight-dev/hyperlight/pull/641,"analysisWe need to classify the pull request as 'performance' or 'non-performance'. The PR is about making benchmarks only run with release builds, ensuring performance data consistency. It is about performance measurement, but the primary purpose is to enforce that benchmarks run only with release builds. This is about performance measurement consistency. The classification guidelines: performance-related PRs may contain keywords like performance, speed, etc. This PR includes ""performance"" in the description: ""Make benchmarks only run with release builds"". It is about performance data. So classify as 'performance'.assistantfinalperformance",7,0.1792406891954076,True
-3261618278,12821,Add bench block support in Java transpiler,"## Summary
-- support `bench` blocks in the Java transpiler
-- emit helper function `_mem` for memory usage
-- update golden test harness to seed timestamps
-- include golden output for `bench_block.mochi`
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-06-15T13:00:43Z,2025-06-16T08:06:10Z,2025-06-16T08:06:10Z,274495425,https://api.github.com/repos/remotion-dev/remotion,https://github.com/remotion-dev/remotion/pull/5375,7,1.0,False
+3153634298,5403,Update remotion.dev/convert to Tailwind 4,"Upgraded `packages/convert` from Tailwind CSS v3.4.13 to v4.1.1, following the same pattern used in `packages/promo-pages`.
+
+## Changes Made
+
+- **Dependencies**: Updated to Tailwind 4.1.1 with `@tailwindcss/cli` and `@tailwindcss/vite`
+- **CSS Migration**: Converted `app/tailwind.css` from v3 to v4 syntax:
+  - Replaced `@tailwind` directives with `@import 'tailwindcss/theme'` and `@import 'tailwindcss/utilities'`
+  - Added `@layer theme, base, components, utilities`
+  - Converted custom styles to use `@theme inline` for CSS-based configuration
+  - Replaced `@apply` utilities with direct CSS properties where needed
+- **Build Configuration**: 
+  - Added `@tailwindcss/vite` plugin to `vite.config.ts`
+  - Removed `tailwindcss` from `postcss.config.js` (now handled by Vite plugin)
+- **Configuration**: Removed `tailwind.config.ts` as Tailwind 4 uses CSS-based configuration
+
+## Benefits
+
+- Uses the latest Tailwind CSS features and improved performance
+- Consistent with the Tailwind 4 setup already used in `packages/promo-pages`
+- CSS-based configuration provides better type safety and editor support
+- Simplified build pipeline with native Vite integration
+
+All builds, linting, and tests continue to pass after the upgrade.
+
+Fixes #5402.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-06-17T14:02:18Z,2025-06-18T05:38:46Z,,274495425,https://api.github.com/repos/remotion-dev/remotion,https://github.com/remotion-dev/remotion/pull/5403,7,1.0,False
+3084907353,2209,[SymbolReader] Make symbol server timeout configurable and remove dead server mechanism,"## Changes Made
+
+This PR addresses two issues with symbol server resolution in PerfView:
+
+1. Makes the symbol server timeout configurable by adding a new `ServerTimeout` property to the `SymbolReader` class with a default value of 60 seconds (matching the previous hard-coded behavior).
+
+2. Removes the ""mark as dead"" functionality for servers, which means that subsequent requests will still go through after a timeout, rather than blocking a server for 5 minutes after a failure.
+
+These changes will significantly improve PerfView's behavior in slower network environments by:
+- Allowing users to increase the timeout duration for symbol resolution
+- Preventing symbol servers from being blocked after a timeout, which improves the chance of resolving symbols on subsequent attempts
+
+### Implementation Details
+
+- Added a new `ServerTimeout` property to control the timeout behavior
+- Removed code that maintained a list of ""dead servers"" along with their tracking timestamps
+- Updated log messages to reflect the new behavior
+- Made minimal changes to maintain compatibility with existing code
+
+Fixes #1895.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `crl3.digicert.com`
+>   - Triggering command: `dotnet build /p:Configuration=Release ` (dns block)
+>   - Triggering command: `dotnet build src/TraceEvent/TraceEvent.csproj /p:Configuration=Release ` (dns block)
+> - `crl4.digicert.com`
+>   - Triggering command: `dotnet build /p:Configuration=Release ` (dns block)
+>   - Triggering command: `dotnet build src/TraceEvent/TraceEvent.csproj /p:Configuration=Release ` (dns block)
+> - `ocsp.digicert.com`
+>   - Triggering command: `dotnet build /p:Configuration=Release ` (dns block)
+>   - Triggering command: `dotnet build src/TraceEvent/TraceEvent.csproj /p:Configuration=Release ` (dns block)
+> - `s.symcb.com`
+>   - Triggering command: `dotnet build /p:Configuration=Release ` (dns block)
+>   - Triggering command: `dotnet build src/TraceEvent/TraceEvent.csproj /p:Configuration=Release ` (dns block)
+> - `s.symcd.com`
+>   - Triggering command: `dotnet build /p:Configuration=Release ` (dns block)
+>   - Triggering command: `dotnet build src/TraceEvent/TraceEvent.csproj /p:Configuration=Release ` (dns block)
+> - `ts-crl.ws.symantec.com`
+>   - Triggering command: `dotnet build /p:Configuration=Release ` (dns block)
+>   - Triggering command: `dotnet build src/TraceEvent/TraceEvent.csproj /p:Configuration=Release ` (dns block)
+> - `ts-ocsp.ws.symantec.com`
+>   - Triggering command: `dotnet build /p:Configuration=Release ` (dns block)
+>   - Triggering command: `dotnet build src/TraceEvent/TraceEvent.csproj /p:Configuration=Release ` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-05-23T01:35:35Z,2025-05-27T15:36:02Z,2025-05-27T15:36:01Z,33010673,https://api.github.com/repos/microsoft/perfview,https://github.com/microsoft/perfview/pull/2209,7,1.0,False
+3223241855,705,Implement byPrototype filter with improved type safety and performance,"This PR implements the missing `byPrototype` functionality for webpack module filtering while addressing several performance and type safety issues in the existing codebase.
+
+## Overview
+
+Adds a new filter function to find modules by checking properties on their prototype chain, which is particularly useful for finding class constructors and React components.
+
+## New Functionality
+
+### byPrototype Filter
+```javascript
+// Find React class components
+const ReactClass = webpack.getByPrototype([""render"", ""setState""]);
+
+// Find components with lifecycle methods  
+const Component = webpack.getByPrototype([""componentDidMount""]);
+
+// Use with getModule for advanced options
+const modules = webpack.getModule(webpack.filters.byPrototype(""render""), { all: true });
+```
+
+### Async Support
+```javascript
+// Wait for components to load
+const AsyncComponent = await webpack.waitForPrototype([""render""]);
+```
+
+## Issues Addressed
+
+### 1. Type Safety Improvements
+- ✅ Added proper null checks when accessing `prototype` properties
+- ✅ Safe iteration with try-catch blocks for property access
+- ✅ Enhanced type definitions with `PrototypeProperties<T>` and `WithPrototype<T>`
+
+### 2. Code Organization
+- ✅ Simplified argument parsing with reusable helper functions
+- ✅ Consolidated option handling across all filter functions
+- ✅ Improved existing `getByProps()` implementation
+
+### 3. Performance Optimizations
+- ✅ Added configurable depth limit to `iterateModuleExports` (default: 1 level)
+- ✅ Reduced unnecessary object iteration in module searching
+- ✅ Extracted `hasAllProps` helper to avoid code duplication
+
+### 4. API Consistency
+- ✅ Consistent overload patterns matching existing `getByProps()` function
+- ✅ Unified option passing between `getByPrototype()` and `waitForPrototype()`
+- ✅ Comprehensive JSDoc documentation
+
+## Files Modified
+
+- **`src/renderer/modules/webpack/filters.ts`** - Added `byPrototype` filter with safe prototype checking
+- **`src/renderer/modules/webpack/helpers.ts`** - Added `getByPrototype()` and `waitForPrototype()` with simplified argument parsing
+- **`src/renderer/modules/webpack/get-modules.ts`** - Performance improvements and better null safety
+- **`src/types/webpack.ts`** - Enhanced type definitions for prototype-based filtering
+
+## Backward Compatibility
+
+All changes maintain full backward compatibility. Existing code continues to work unchanged while new functionality is available through the existing export structure.
 
 ## Testing
-- `go test -tags slow ./transpiler/x/java -run TestJavaTranspiler_VMValid_Golden/bench_block -count=1`
+
+- ✅ TypeScript compilation passes
+- ✅ All ESLint rules satisfied  
+- ✅ Prettier formatting applied
+- ✅ Build process successful
+- ✅ Manual testing confirms functionality works with mock data
+- ✅ Integration tests verify proper API exports
+
+*This pull request was created as a result of the following prompt from Copilot chat.*
+> # Refactor byPrototype Implementation
+> 
+> Based on review of PR #507, there are several areas where we can improve the `byPrototype` implementation:
+> 
+> ## Issues to Address:
+> 
+> ### 1. Type Safety Issues
+> - Missing null checks when accessing `exported.prototype`
+> - Potential runtime errors if prototype is undefined
+> - Inconsistent type assertions
+> 
+> ### 2. Code Organization Issues
+> - Complex argument parsing logic in multiple places
+> - Duplicated prototype checking logic
+> - Unclear variable names and flow
+> 
+> ### 3. Performance Concerns
+> - Inefficient second-level iteration in `iterateModuleExports`
+> - Unnecessary object creation in some paths
+> - Redundant prototype checks
+> 
+> ### 4. API Consistency
+> - The `byProps` filter function has complex argument parsing
+> - Inconsistent option passing between functions
+> - Type definitions could be clearer
+> 
+> ## Proposed Improvements:
+> 
+> 1. **Add proper null checks** for prototype access
+> 2. **Simplify argument parsing** with helper functions
+> 3. **Optimize iteration logic** to avoid unnecessary loops
+> 4. **Improve type definitions** for better IntelliSense
+> 5. **Add JSDoc documentation** for the new functionality
+> 6. **Consolidate option handling** across all functions
+> 
+> ## Files to Modify:
+> - `src/types/webpack.ts` - Improve type definitions
+> - `src/renderer/modules/webpack/get-modules.ts` - Fix iteration and null checks
+> - `src/renderer/modules/webpack/helpers.ts` - Simplify argument parsing
+> - `src/renderer/modules/webpack/filters.ts` - Clean up filter logic
+> 
+> The refactored code should maintain full backward compatibility while being more robust, performant, and maintainable.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-11T15:09:01Z,2025-07-11T15:12:15Z,,517492055,https://api.github.com/repos/replugged-org/replugged,https://github.com/replugged-org/replugged/pull/705,7,1.0,True
+3214086292,2609,Update Async Tests Under Dependencies Extension to Use the Modern AsyncQueue Pattern,"This PR modernizes all async unit tests in the `extensions/applicationinsights-dependencies-js` directory by migrating from the deprecated `testCaseAsync` pattern to the modern `asyncQueue` pattern.
+
+## Changes Made
+
+- **Converted 28 testCaseAsync instances** to use `testCase` with `this._asyncQueue()`
+- **Updated all polling asserts** from `PollingAssert.createPollingAssert` to `PollingAssert.asyncTaskPollingAssert`
+- **Removed deprecated properties**: `stepDelay`, `autoComplete`, and `testContext.testDone()` calls
+- **Implemented Promise-based flow** with `.waitComplete()` for proper async handling
+- **Maintained test functionality** while improving performance and error handling
+
+## Migration Pattern
+
+**Before:**
+```typescript
+this.testCaseAsync({
+    name: ""Test name"",
+    stepDelay: 10,
+    autoComplete: false,
+    steps: [(testContext) => {
+        // test logic
+        testContext.testDone();
+    }]
+});
+```
+
+**After:**
+```typescript
+this.testCase({
+    name: ""Test name"",
+    test: () => {
+        return this._asyncQueue()
+            .add(() => {
+                // test logic
+            })
+            .waitComplete();
+    }
+});
+```
+
+## Benefits
+
+- **Better performance** through improved async task scheduling
+- **Enhanced error handling** and reporting capabilities  
+- **Future-proof** test infrastructure aligned with framework best practices
+- **Automatic detection** by test framework for async test cases
+
+All tests maintain their original functionality while benefiting from the modern async infrastructure.
+
+Fixes #2608.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,open,2025-07-09T00:27:50Z,,,33373292,https://api.github.com/repos/microsoft/ApplicationInsights-JS,https://github.com/microsoft/ApplicationInsights-JS/pull/2609,7,1.0,False
+3137902575,5212,Build: Use --follow-symlinks in VSCE,"This PR implements support for the new `--follow-symlinks` flag in VSCE to eliminate the unnecessary copying of PowerShell Editor Services (PSES) modules during builds, as requested in #5169.
+
+## What Changed
+
+**Package.json Scripts:**
+- Added `--follow-symlinks` flag to both `vsce package` and `vsce publish` commands
+- This allows VSCE to handle symbolic links natively instead of requiring file copies
+
+**Build Script Simplification:**
+- Removed complex symlink-to-copy conversion logic from the Package task (eliminated 8 lines)
+- Modified Release configuration to use symlinks consistently with Debug mode
+- Removed the ""dumb task of copying PSES to vscode for a build"" as mentioned in the issue
+- Added explanatory comments about the new VSCE symlink support
+
+## Benefits
+
+- ✅ **Faster builds** - No more file copying during packaging
+- ✅ **Simplified logic** - Consistent symlink handling between Debug and Release modes  
+- ✅ **Reduced complexity** - Net reduction of 10+ lines of build script code
+- ✅ **Better maintainability** - VSCE now handles symlinks natively
+
+## Before/After Comparison
+
+**Before:** Build script would detect symlinks and convert them to copies before packaging:
+```powershell
+if ((Get-Item ./modules -ErrorAction SilentlyContinue).LinkType -eq ""SymbolicLink"") {
+    Write-Build DarkRed ""PSES is a symbolic link, replacing with copy!""
+    Remove-BuildItem ./modules
+    Copy-Item -Recurse -Force ""$(Split-Path (Get-EditorServicesPath))/module"" ./modules
+}
+```
+
+**After:** VSCE handles symlinks directly with `--follow-symlinks` flag:
+```json
+""package"": ""vsce package --out out/ --no-gitHubIssueLinking --follow-symlinks""
+```
+
+This change leverages the symlink following support added to VSCE in October 2024 ([microsoft/vscode-vsce@51e122a](https://github.com/microsoft/vscode-vsce/commit/51e122af452144b12c5231a2615a81404fda32a1)).
+
+Fixes #5169.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `0t3vsblobprodcus362.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `11vvsblobprodcus336.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `1javsblobprodcus364.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `1k9vsblobprodcus379.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `1oavsblobprodcus350.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `1p7vsblobprodcus324.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `1s1vsblobprodcus386.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `2kmvsblobprodcus39.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `2zrvsblobprodcus388.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `37bvsblobprodcus311.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `37cvsblobprodcus359.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `4m6vsblobprodcus384.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+> - `4myvsblobprodcus32.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `4vyvsblobprodcus361.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `4zjvsblobprodcus390.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+> - `51yvsblobprodcus36.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `5dkvsblobprodcus355.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+> - `5rqvsblobprodcus385.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `6s7vsblobprodcus313.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+> - `7devsblobprodcus323.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `7k6vsblobprodcus337.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `7tjvsblobprodcus341.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+> - `80zvsblobprodcus35.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `8xbvsblobprodcus382.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `96bvsblobprodcus338.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `ajhvsblobprodcus363.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `bcnvsblobprodcus378.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `c50vsblobprodcus330.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `c78vsblobprodcus322.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+> - `cflvsblobprodcus383.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `/home/REDACTED/work/_temp/ghcca-node/node/bin/node /home/REDACTED/work/_temp/copilot-developer-action-main/dist/index.js ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `ckzvsblobprodcus347.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+> - `d0svsblobprodcus381.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `dlbvsblobprodcus316.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+> - `e7bvsblobprodcus348.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `fdpvsblobprodcus345.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+> - `frdvsblobprodcus327.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `gbsvsblobprodcus365.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `gervsblobprodcus329.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `h6tvsblobprodcus346.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `i1qvsblobprodcus353.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `ibzvsblobprodcus369.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+> - `imzvsblobprodcus368.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `jd4vsblobprodcus366.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `josvsblobprodcus372.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `jrqvsblobprodcus343.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `k0ivsblobprodcus356.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `k4kvsblobprodcus344.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `kgfvsblobprodcus314.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `kh4vsblobprodcus325.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `kijvsblobprodcus387.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `kmuvsblobprodcus389.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `kxqvsblobprodcus376.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `l49vsblobprodcus358.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `l7avsblobprodcus319.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `ljcvsblobprodcus317.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `lylvsblobprodcus31.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `m16vsblobprodcus374.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+> - `m6xvsblobprodcus342.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `m8dvsblobprodcus37.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `mfjvsblobprodcus373.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `n3kvsblobprodcus335.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+> - `nn8vsblobprodcus340.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `o3svsblobprodcus318.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `ofvvsblobprodcus315.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `p2ovsblobprodcus312.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+> - `pc2vsblobprodcus360.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `pdfvsblobprodcus380.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `pe3vsblobprodcus354.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+> - `pe4vsblobprodcus351.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `pkvvsblobprodcus321.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `rcxvsblobprodcus328.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `s4uvsblobprodcus326.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `s8mvsblobprodcus38.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `/home/REDACTED/work/_temp/ghcca-node/node/bin/node /home/REDACTED/work/_temp/copilot-developer-action-main/dist/index.js ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `sc4vsblobprodcus331.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `se1vsblobprodcus349.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `sqdvsblobprodcus333.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `st8vsblobprodcus339.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `tphvsblobprodcus375.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `u3hvsblobprodcus371.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `u6ovsblobprodcus377.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `ukkvsblobprodcus352.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `uy6vsblobprodcus34.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `v53vsblobprodcus320.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `vb4vsblobprodcus33.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `vwvvsblobprodcus334.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `x3yvsblobprodcus370.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `xupvsblobprodcus332.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+> - `yluvsblobprodcus367.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `yttvsblobprodcus357.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+> - `ytvvsblobprodcus310.vsblob.vsassets.io`
+>   - Triggering command: `npm ci                                        ` (dns block)
+>   - Triggering command: `npm ci                                     ` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
 
 
-------
-https://chatgpt.com/codex/tasks/task_e_688280c88ae48320b6771db3a342085d",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T00:56:55Z,2025-07-25T00:57:08Z,2025-07-25T00:57:08Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12821,"analysisWe need to classify whether the primary purpose is performance. The PR adds bench block support, emits helper function _mem for memory usage, updates golden test harness to seed timestamps, includes golden output. The title: ""Add bench block support in Java transpiler"". Bench block likely for benchmarking. The body mentions memory usage helper, golden test harness. This is about benchmarking, performance measurement. The primary purpose is to add bench block support, which is for performance measurement. So classification: 'performance'.assistantfinalperformance",7,0.16047583392065948,False
-3261612045,12814,Add memory tracking for bench blocks in C++ transpiler,"## Summary
-- implement `_mem()` helper that returns process memory usage via `getrusage`
-- capture memory before and after `bench` blocks and print the difference
-- enable `UseMem` tracking through the transpiler
-- commit generated `bench_block.cpp`
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-06-11T19:33:46Z,,,42131201,https://api.github.com/repos/PowerShell/vscode-powershell,https://github.com/PowerShell/vscode-powershell/pull/5212,7,1.0,False
+3275415903,12599,linter: implement pattern-based Jest validation following Vitest approach for binary size optimization,"## Summary
+
+This PR implements pattern-based Jest validation using the same algorithmic approach as Vitest (PR #11384) to achieve binary size reduction while maintaining proper validation of Jest function call chains.
+
+## Problem
+
+The binary size investigation in #9998 identified that `VALID_JEST_FN_CALL_CHAINS` was storing Jest function call patterns inefficiently. The initial approach of completely removing validation was too permissive and could allow invalid Jest chaining patterns.
+
+## Solution
+
+**Pattern-based Jest validation** (following PR #11384 approach):
+```rust
+// Before: static array with 52 entries and binary search lookup
+const VALID_JEST_FN_CALL_CHAINS: [&str; 52] = [
+    ""describe.each"", ""it.concurrent.only.each"", ""test"", // ... 49 more
+];
+
+// After: algorithmic pattern validation
+fn is_valid_jest_call(members: &[Cow<str>]) -> bool {
+    match first {
+        ""describe"" | ""fdescribe"" | ""xdescribe"" => {
+            // Validate modifiers: only, skip, each
+        }
+        ""it"" | ""test"" | ""fit"" | ""xit"" | ""xtest"" => {
+            // Validate modifiers: only, skip, each, concurrent, failing, todo
+        }
+        ""beforeAll"" | ""afterAll"" | ""beforeEach"" | ""afterEach"" | ""bench"" => {
+            // No modifiers allowed
+        }
+        _ => false,
+    }
+}
+```
+
+**Static array optimization**:
+```rust
+// Before
+const JEST_METHOD_NAMES: [&str; 18] = [...];
+
+// After  
+static JEST_METHOD_NAMES: [&str; 18] = [...];
+```
+
+## Benefits
+
+1. **Binary size reduction**: Eliminates 52 validation strings while maintaining validation logic
+2. **Proper validation**: Prevents invalid Jest chaining patterns like `describe.invalidMethod()`
+3. **Better memory efficiency**: Static arrays have better memory layout than const arrays
+4. **Maintainable**: Algorithmic validation is easier to extend than maintaining large static lists
+5. **Consistent approach**: Uses same pattern as Vitest validation (PR #11384)
+
+## Validation Coverage
+
+- ✅ Root functions: `describe`, `it`, `test`, `beforeAll`, `afterAll`, `beforeEach`, `afterEach`, `bench`
+- ✅ Prefixed variants: `fdescribe`, `xdescribe`, `fit`, `xit`, `xtest`
+- ✅ Valid modifiers: `only`, `skip`, `each`, `concurrent`, `failing`, `todo`
+- ✅ Proper chaining rules for each function type
+- ✅ Rejects invalid patterns while accepting all valid Jest calls
 
 ## Testing
-- `go test -tags slow ./transpiler/x/cpp -run TestCPPTranspiler_VMValid_Golden/bench_block -count=1`
+
+- ✅ `cargo check -p oxc_linter` passes without warnings
+- ✅ Comprehensive test suite validates all supported Jest patterns
+- ✅ Invalid chaining patterns correctly rejected
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,open,2025-07-30T01:38:39Z,,,599431918,https://api.github.com/repos/oxc-project/oxc,https://github.com/oxc-project/oxc/pull/12599,7,1.0,False
+3219932316,2108,Add Get-SqlDscServerProtocol public command with CIM support,"## Summary
+
+Implements the enhancement requested in issue #2104 by creating a new public command `Get-SqlDscServerProtocol` that provides access to SQL Server protocol information using CIM instances with SMO fallback support.
+
+## Changes Made
+
+### New Public Command
+- **`Get-SqlDscServerProtocol`**: New public command that replaces the need to use the private `Get-ServerProtocolObject` function directly
+- Supports all three SQL Server network protocols: `TcpIp`, `NamedPipes`, and `SharedMemory`
+- Includes comprehensive comment-based help with examples
+
+### CIM Instance Implementation
+- **`Get-ServerProtocolObjectByCim`**: New private function implementing CIM-based approach as suggested in the issue
+- Automatically detects SQL Server version and uses appropriate namespace (supports SQL Server 2008-2022)
+- Uses `Get-CimInstance -ClassName 'ServerNetworkProtocol'` for better performance
+
+### SMO Fallback Support
+- **`Get-ServerProtocolObjectBySmo`**: Extracted existing SMO logic into separate private function
+- Provides automatic fallback when CIM instances are unavailable
+- Maintains full backward compatibility
+
+### Enhanced Features
+- **Intelligent Fallback**: Automatically tries CIM first, falls back to SMO if needed
+- **`-UseCim` Parameter**: Allows forcing CIM usage when desired
+- **Multiple Namespace Support**: Tries multiple SQL Server CIM namespaces for version compatibility
+- **Comprehensive Error Handling**: Proper error messages with localization support
+
+## Usage Examples
+
+```powershell
+# Basic usage - get TCP/IP protocol for default instance
+Get-SqlDscServerProtocol -InstanceName 'MSSQLSERVER' -ProtocolName 'TcpIp'
+
+# Get Named Pipes protocol for named instance on remote server
+Get-SqlDscServerProtocol -ServerName 'RemoteServer' -InstanceName 'SQL2019' -ProtocolName 'NamedPipes'
+
+# Force CIM usage
+Get-SqlDscServerProtocol -InstanceName 'MSSQLSERVER' -ProtocolName 'SharedMemory' -UseCim
+```
+
+## Backward Compatibility
+
+✅ **No breaking changes** - All existing DSC resources continue to work unchanged as the original private `Get-ServerProtocolObject` function remains available and unmodified.
+
+## Testing
+
+- Added comprehensive unit tests following Pester v5 syntax and SqlServerDsc conventions
+- Tests cover CIM approach, SMO fallback, error handling, and parameter validation
+- All tests pass and follow existing module patterns
+
+## Documentation
+
+- Added 10 new localized strings for all function messages
+- Complete comment-based help with synopsis, description, parameters, examples, and notes
+- Following all SqlServerDsc documentation standards
+
+## Files Added/Modified
+
+### Added Files
+- `source/Public/Get-SqlDscServerProtocol.ps1`
+- `source/Private/Get-ServerProtocolObjectByCim.ps1`
+- `source/Private/Get-ServerProtocolObjectBySmo.ps1`
+- `tests/Unit/Public/Get-SqlDscServerProtocol.Tests.ps1`
+
+### Modified Files
+- `source/en-US/SqlServerDsc.strings.psd1` (added localized strings)
+- `source/prefix.ps1` (added CIM preference variable)
+
+## Benefits
+
+1. **Better Performance**: CIM instances provide better performance than SMO objects
+2. **Modern Approach**: Uses current PowerShell and CIM standards
+3. **Public API**: Now available for broader community use beyond DSC resources
+4. **Future-Proof**: Automatic detection of SQL Server versions
+5. **Reliable Fallback**: Works in environments where CIM may not be available
+
+Resolves #2104
+
+## Type of Change
+- [x] New feature (non-breaking change which adds functionality)
+- [x] Enhancement (improvement to existing functionality)
+
+## Checklist
+- [x] Code follows the project's coding standards
+- [x] Self-review of code completed
+- [x] Code has been commented, particularly in hard-to-understand areas
+- [x] Corresponding changes to documentation have been made
+- [x] Unit tests added that prove the fix is effective or that the feature works
+- [x] New and existing unit tests pass locally
+- [x] No breaking changes introduced
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `www.powershellgallery.com`
+>   - Triggering command: `pwsh -c ./build.ps1 -Tasks &#39;build&#39;` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
 
 
-------
-https://chatgpt.com/codex/tasks/task_e_6882807000348320b142c69603e39e65",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T00:51:34Z,2025-07-25T00:51:48Z,2025-07-25T00:51:48Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12814,"analysisWe need to classify as performance or non-performance. The PR adds memory tracking for bench blocks, capturing memory before and after, printing difference. This is about memory usage, performance. So classification: performance.assistantfinalperformance",7,0.13695933074727248,False
-3175920300,16571,wip: memory metrics,"<!--
-Contributions welcome! See https://github.com/ethereum-optimism/.github/blob/master/CONTRIBUTING.md
--->
 
-**Description**
+<!-- START COPILOT CODING AGENT TIPS -->
+---
 
-Implement a simple way to measure memory exposed as a metric that can be used by any service",OpenAI_Codex,6626818,tynes,closed,2025-06-25T14:39:12Z,2025-07-28T09:24:47Z,,238797860,https://api.github.com/repos/ethereum-optimism/optimism,https://github.com/ethereum-optimism/optimism/pull/16571,"analysisWe need to classify as performance or non-performance. The PR title: ""wip: memory metrics"". Body: ""Implement a simple way to measure memory exposed as a metric that can be used by any service"". This is about memory metrics, not necessarily performance improvement. It's about exposing memory usage metrics. That is not necessarily a performance improvement, but it's about monitoring memory usage. The classification: performance? The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs.
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.
 
-Memory is a keyword. But memory metrics is about measuring memory usage, not necessarily improving performance. But the guidelines say memory is a keyword. But the context matters. The guidelines: ""Performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" So memory is a keyword. But is measuring memory usage considered performance? It could be considered performance monitoring. But the primary purpose is to measure memory usage, not to improve performance. The classification might be ambiguous. But guidelines say memory is a keyword. But the phrase ""memory metrics"" is about metrics, not necessarily improvement. But the guidelines might treat memory as a performance keyword. But we need to decide. The PR is about adding a metric for memory usage. That is a performance metric. It might be considered performance. But the primary purpose is to expose memory metrics, not to optimize memory usage. But it's still performance-related. The guidelines: ""Performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" So memory is a keyword. So we classify as performance. But is it ""performance"" or ""non-performance""? The guidelines say memory is a keyword. So likely performance. So answer: performance.assistantfinalperformance",7,0.0938922476075915,False
-3023248867,246,feat: allow configuring metrics to reduce cardinality,"# Refactor metrics to reduce cardinality
+<!-- Reviewable:start -->
+- - -
+This change is [<img src=""https://reviewable.io/review_button.svg"" height=""34"" align=""absmiddle"" alt=""Reviewable""/>](https://reviewable.io/reviews/dsccommunity/SqlServerDsc/2108)
+<!-- Reviewable:end -->
+",Copilot,198982749,Copilot,open,2025-07-10T16:11:24Z,,,34022262,https://api.github.com/repos/dsccommunity/SqlServerDsc,https://github.com/dsccommunity/SqlServerDsc/pull/2108,7,1.0,True
+3200433499,4495,Migrate eBPF for Windows from packages.config to PackageReference NuGet style,"This PR migrates eBPF for Windows from the legacy `packages.config` NuGet format to the modern `PackageReference` format, improving dependency management and build performance.
 
-This PR reduces the cardinality of metrics by:
+## Changes Made
 
-1. Adding a configurable error label mode (""compact"" or ""verbose"") 
-   - In ""compact"" mode, only the error type is used as a label
-   - In ""verbose"" mode (default for backward compatibility), the full error message is used
+### 🔄 Package Reference Migrations
+- **libs/elf_spec/elf_spec.vcxproj**: Converted EverParse package to PackageReference and updated tool path to use `$(PkgEverParse)` variable
+- **installer/ebpf-for-windows.wixproj**: Converted WiX toolset package to PackageReference and updated import paths to use `$(PkgWiX)` variable
+- **Directory.Build.props**: Added centralized PackageReference declarations for all Windows SDK and WDK packages
 
-2. Adding configurable histogram buckets for all duration metrics
-   - Users can specify their own buckets to reduce the number of time series
+### 🛠️ Build System Updates
+- **wdk.props**: Updated to use PackageReference variables (`$(PkgMicrosoft_Windows_*)`) instead of hardcoded packages directory paths
+- **tests/sample/sample.vcxproj**: Updated PowerShell script parameters to use project-relative paths instead of solution-level packages directory
+
+### 🗑️ Cleanup
+Removed all `packages.config` files:
+- `libs/elf_spec/packages.config`
+- `installer/packages.config`
+- `scripts/setup_build/packages.config`
+- `scripts/setup_build/packages.config.template`
+
+### 📚 Documentation
+- Updated `docs/GettingStarted.md` to reflect new package cache directory structure
+
+## Package References Added
+
+All packages now use version `10.0.26100.3323`:
+- `Microsoft.Windows.SDK.CPP`
+- `Microsoft.Windows.SDK.CPP.arm64`
+- `Microsoft.Windows.SDK.CPP.x64`
+- `Microsoft.Windows.SDK.CPP.x86`
+- `Microsoft.Windows.WDK.ARM64`
+- `Microsoft.Windows.WDK.x64`
+- `Microsoft.Windows.WDK.x86`
+
+Plus individual packages:
+- `EverParse` (2022.6.13)
+- `WiX` (3.14.1)
+
+## Benefits
+
+✅ **Simplified dependency management** - Packages automatically restored and cached globally  
+✅ **Better build performance** - Eliminates solution-level packages directory  
+✅ **Improved CI/CD** - More reliable package restore in build pipelines  
+✅ **Modern tooling alignment** - Follows current .NET ecosystem best practices  
+✅ **Reduced repository size** - No more committed packages directory
+
+## Testing
+
+The migration maintains backward compatibility where possible. Key areas to verify:
+- Package restore works correctly on clean builds
+- WDK/SDK tools are accessible via new paths
+- PowerShell build scripts function with updated parameters
+- All project configurations build successfully
+
+Fixes #4494.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-03T19:28:42Z,2025-07-03T20:34:15Z,,355718757,https://api.github.com/repos/microsoft/ebpf-for-windows,https://github.com/microsoft/ebpf-for-windows/pull/4495,7,1.0,False
+3183326458,715,Replace node-sass with sass (Dart Sass) for improved compatibility and build stability,"This PR migrates the project from the deprecated `node-sass` package to the modern `sass` package (Dart Sass) to resolve build failures and improve long-term compatibility.
+
+## Problem
+The project was experiencing build failures due to missing `node-sass` vendor binaries:
+```
+Error: ENOENT: no such file or directory, scandir '/node_modules/node-sass/vendor'
+```
+
+`node-sass` is deprecated and has known compatibility issues with newer Node.js versions and different architectures.
+
+## Solution
+- Replaced `node-sass ^9.0.0` with `sass ^1.83.0` in package.json
+- The existing `sass-loader ^16.0.4` automatically detects and uses Dart Sass when available
+- No configuration changes required - sass-loader handles the transition seamlessly
+
+## Benefits
+- ✅ **Build now succeeds** - eliminates the vendor directory errors
+- ✅ **Better performance** - Dart Sass is faster than node-sass
+- ✅ **Improved compatibility** - works across all Node.js versions and architectures
+- ✅ **Future-proof** - Dart Sass is actively maintained while node-sass is deprecated
+- ✅ **Same functionality** - all SCSS files compile identically
+
+## Testing
+- [x] Production build completes successfully
+- [x] Development server starts and hot-reloads correctly  
+- [x] All SCSS files compile without errors
+- [x] Element-UI styles render properly
+- [x] No lint errors introduced
+
+The deprecation warnings visible during build are from element-ui's internal SCSS files using legacy syntax (`@import` and division with `/`). These warnings don't affect functionality and will be addressed when element-ui updates for Dart Sass 2.0+.
+
+Fixes #555.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `download.cypress.io`
+>   - Triggering command: `node index.js --exec install ` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-06-27T16:05:29Z,2025-06-28T06:17:28Z,,148820496,https://api.github.com/repos/johnsusek/praeco,https://github.com/johnsusek/praeco/pull/715,7,1.0,False
+3183328458,716,Migrate from Vue CLI (webpack) to Vite build system,"This PR migrates Praeco from Vue CLI with webpack to Vite for improved build performance and modern tooling, addressing the migration request in issue #478.
+
+## 🚀 Key Improvements
+
+- **60% faster builds**: Build time reduced from ~50s to ~18s
+- **Instant dev server**: Near-instant startup and Hot Module Replacement
+- **Modern tooling**: Native ES modules, better tree shaking, improved developer experience
+
+## 📋 Changes Made
+
+### Core Migration
+- **`vite.config.js`**: New Vite configuration replicating all webpack functionality
+  - Dev server with proxy configuration for API endpoints
+  - Environment variable handling
+  - SCSS preprocessing
+  - Alias configuration (`@` → `src/`)
+
+- **`package.json`**: Updated build scripts and dependencies
+  - Added: `vite@^4.5.3`, `vite-plugin-vue2@^2.0.3`, `sass@^1.81.1`
+  - Scripts: `dev`, `serve`, `build`, `preview` now use Vite
+  - Legacy scripts preserved for testing/linting compatibility
+
+- **`index.html`**: Moved to root directory with Vite-compatible module script
+
+### Environment Variables
+Updated environment variable usage throughout codebase:
+- `process.env.BASE_URL` → `import.meta.env.VITE_BASE_URL`
+- `process.env.NODE_ENV === 'development'` → `import.meta.env.DEV`
+- Added `.env` file with examples
+
+### Import Resolution
+- Added `.vue` extensions to all component imports for Vite compatibility
+- Updated SCSS imports: `~element-ui/...` → `element-ui/...`
+- Fixed all relative imports in Vue components
+
+### Compatibility & Cleanup
+- Added `.vite` to `.gitignore` for build cache
+- Preserved Vue CLI configuration files for test/lint compatibility
+- Created comprehensive migration documentation (`VITE_MIGRATION.md`)
+
+## ✅ Testing Results
+
+All functionality verified working:
+- ✅ Development server: `npm run dev`
+- ✅ Production build: `npm run build` 
+- ✅ Build preview: `npm run preview`
+- ✅ Linting: `npm run lint`
+- ✅ API proxies functioning correctly
+- ✅ Environment variables working
+- ✅ All Vue components and styles loading properly
+
+## 🔧 Dependency Issues Resolved
+
+The problematic dependencies mentioned in the issue comments have been addressed:
+- `vue-cron-editor-buefy` was already replaced with `@vue-js-cron/light` 
+- No `later-cov` resolution issues encountered (using `@breejs/later`)
+
+## 📊 Build Output Comparison
+
+**Before (webpack)**:
+- Build time: ~50 seconds
+- Bundle size: ~3.2MB JS, ~275KB CSS
+
+**After (Vite)**:
+- Build time: ~18 seconds
+- Bundle size: ~3.4MB JS, ~401KB CSS (slightly larger due to better optimization)
+- Significantly faster development experience
+
+## 🔄 Backward Compatibility
+
+- All existing functionality preserved
+- Vue 2.7.16 compatibility maintained
+- Element UI, FontAwesome, and all dependencies work seamlessly
+- Legacy configuration files kept for gradual migration of testing infrastructure
+
+Fixes #478.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `download.cypress.io`
+>   - Triggering command: `node index.js --exec install ` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,open,2025-06-27T16:06:13Z,,,148820496,https://api.github.com/repos/johnsusek/praeco,https://github.com/johnsusek/praeco/pull/716,7,1.0,False
+3132024225,1623,"fix: refactor EBS snapshots module (issue #665, #1414)","## Summary
+- migrate snapshots intel module to datamodel, fixing perf and stability issues in #665 and #1414
+- add datamodel for EBSSnapshot
+- update integration tests
+- update AGENTS.md guidance
+
+Testing and proof this works:
+<img width=""547"" height=""788"" alt=""Screenshot 2025-07-17 at 9 25 34 PM"" src=""https://github.com/user-attachments/assets/5e799fc1-37df-458c-96ea-0a13261f0832"" />
+
+<img width=""1060"" height=""562"" alt=""image"" src=""https://github.com/user-attachments/assets/a23e4506-fec6-440a-a075-e7de47f816e9"" />
+",OpenAI_Codex,46503781,achantavy,closed,2025-06-10T03:26:37Z,2025-07-18T17:26:45Z,2025-07-18T17:26:45Z,172811550,https://api.github.com/repos/cartography-cncf/cartography,https://github.com/cartography-cncf/cartography/pull/1623,7,1.0,False
+3193778499,8624,Migrate dashboard to rolldown-vite,"%23%23%23 What changed%3F Why was the change needed%3F
+
+This PR migrates the `apps/dashboard` application from standard Vite to **rolldown-vite**.
+
+The change was needed to leverage `rolldown-vite`'s Rust-based architecture for improved build performance and a unified bundling experience.
+
+Key changes include:
+- **Root Configuration**: Added a pnpm override in `package.json` to use `rolldown-vite@latest`.
+- **React Plugin**: Switched to `@vitejs/plugin-react-oxc` in `apps/dashboard/package.json` for better performance with rolldown.
+- **Vite Configuration**: Updated `apps/dashboard/vite.config.ts` to ensure PostCSS compatibility and explicitly set `cssMinify: 'esbuild'` to resolve a CSS minification issue with Lightning CSS and complex Tailwind selectors.
+
+%23%23%23 Screenshots
+
+N/A (Build system migration)
+
+<details>
+<summary><strong>Expand for optional sections</strong></summary>
+
+%23%23%23 Related enterprise PR
+
+N/A
+
+%23%23%23 Special notes for your reviewer
+
+- The development server runs successfully after the migration.
+- A production build completes successfully in approximately 10 seconds.
+- During the migration, a CSS minification issue with Lightning CSS (rolldown-vite's default) was encountered due to complex Tailwind selectors. This was resolved by configuring the build to use the `esbuild` CSS minifier.
+- Some minor CSS nesting syntax warnings from esbuild might appear, but they do not affect functionality.
+- Some peer dependency warnings might exist in the broader workspace but do not impact `rolldown-vite` functionality.
+
+</details>",Cursor,8872447,scopsy,closed,2025-07-01T20:51:58Z,2025-07-02T07:23:06Z,,400215964,https://api.github.com/repos/novuhq/novu,https://github.com/novuhq/novu/pull/8624,7,1.0,False
+3234904891,3083,Review qiankun webpack plugin implementation,"##### Description of change
+
+- **Enhancement**: Comprehensive refactor and optimization of `@qiankunjs/webpack-plugin`.
+- **Webpack 5 Optimization**: Eliminated deprecation warnings by adopting modern Webpack 5 APIs (e.g., `processAssets` hook).
+- **Improved Robustness**: Addressed type safety issues, refined regex handling, and enhanced error management.
+- **Increased Configurability**: Introduced new options for `entryAttributeName` and `chunkLoadingGlobalPrefix`.
+- **Expanded Test Coverage**: Significantly increased test cases from 4 to 56, covering various real-world scenarios, edge cases, and performance aspects, ensuring full Webpack 4/5 compatibility.
+- **Documentation**: Updated `README.md` and `README-zh.md` to reflect new features and configurations.",Cursor,5206843,kuitos,open,2025-07-16T07:57:43Z,,,186754830,https://api.github.com/repos/umijs/qiankun,https://github.com/umijs/qiankun/pull/3083,7,1.0,False
+3195908841,128,Modernize repository to use vite,"Modernize the repository to use Vite, migrating from Webpack 4 and converting AMD modules to ES6 for improved development experience and performance.
+
+This PR updates the build system, dependencies, and module format, including a migration from Karma to Vitest for testing. A detailed summary of changes and benefits is available in `MODERNIZATION_SUMMARY.md`.",Cursor,237819,rlamana,closed,2025-07-02T13:21:57Z,2025-07-04T11:35:43Z,2025-07-04T11:35:43Z,6794287,https://api.github.com/repos/rlamana/ventus,https://github.com/rlamana/ventus/pull/128,7,1.0,False
+3197078069,13,Update to latest react-router version,Update all dependencies and migrate to `react-router` to align with latest React Router v7 recommendations and improve performance.,Cursor,1500684,kentcdodds,closed,2025-07-02T20:16:30Z,2025-07-02T20:18:14Z,2025-07-02T20:18:14Z,724808133,https://api.github.com/repos/epicweb-dev/restore-scroll,https://github.com/epicweb-dev/restore-scroll/pull/13,7,1.0,False
+3128226642,8473,feat(root): migrate from ESLint and Prettier to Biome,"# Migrate from ESLint and Prettier to Biome
+
+## Summary
+This PR migrates the entire Novu monorepo from ESLint and Prettier to Biome, providing faster linting and formatting with a unified toolchain.
+
+## Changes Made
+
+### Core Migration
+- ✅ Installed `@biomejs/biome` v1.9.4 as development dependency
+- ✅ Created comprehensive `biome.json` configuration using `biome migrate eslint --write` and `biome migrate prettier --write`
+- ✅ Removed all ESLint dependencies (40+ packages including eslint, typescript-eslint, and all eslint-plugin-* packages)
+- ✅ Removed Prettier dependencies (`prettier`, `prettier-plugin-tailwindcss`)
+
+### Configuration Cleanup
+- ✅ Deleted `eslint.config.mjs` (root ESLint flat config)
+- ✅ Deleted `apps/dashboard/eslint.config.js`
+- ✅ Deleted `libs/internal-sdk/eslint.config.mjs`
+- ✅ Deleted `eslint-local-rules.js` (custom JSX class validation rule)
+- ✅ Deleted `.prettierrc` and `.prettierignore`
+- ✅ Deleted `packages/framework/.prettierrc`
+
+### Package Scripts Update
+- ✅ Updated root `lint` script to use `biome check --write`
+- ✅ Updated lint scripts across 29+ packages to use `biome check` instead of `eslint`
+- ✅ Updated lint:fix scripts to use `biome check --write` instead of `eslint --fix`
+
+### CI/CD Integration
+- ✅ Updated `nx.json` to replace `@nx/eslint:lint` target with `biome:check`
+- ✅ Updated GitHub Actions workflow (`.github/workflows/on-pr.yml`) to use `biome:check` target
+- ✅ Updated OpenAPI validation action to use Biome
+- ✅ Updated lint-staged configuration to use `biome format --write` instead of Prettier
+- ✅ Updated Docker files to copy `biome.json` instead of Prettier configs
+
+## Breaking Changes
+
+### Custom ESLint Rules
+- **Removed**: Custom JSX class validation rule from `eslint-local-rules.js` that enforced `style()` function usage in JSX class attributes
+- **Impact**: This rule is not directly available in Biome and would need alternative implementation if still required
+- **Recommendation**: Consider TypeScript types or build-time checks for similar validation
+
+### Developer Commands
+- **Before**: `pnpm lint` (used ESLint via Nx)
+- **After**: `pnpm lint` (now uses `biome check --write`)
+- **Before**: Individual package lint scripts used `eslint`
+- **After**: Individual package lint scripts use `biome check`
+
+## Benefits
+- 🚀 **Performance**: Biome is significantly faster than ESLint + Prettier (written in Rust)
+- 🔧 **Simplified toolchain**: One tool instead of ESLint + Prettier + multiple plugins
+- 📦 **Reduced dependencies**: Removed 40+ ESLint-related packages
+- ⚡ **Faster CI**: Improved performance in GitHub Actions workflows
+- 🛠️ **Better DX**: Unified configuration and consistent behavior
+
+## Testing
+- ✅ All package.json lint scripts updated and verified
+- ✅ Dependencies successfully removed from lockfile
+- ✅ GitHub Actions workflow targets updated
+- ⏳ CI validation pending
+
+## Migration Notes
+The migration used Biome's official migration commands which automatically mapped ESLint rules to their Biome equivalents. The generated `biome.json` includes:
+- Comprehensive linting rules covering complexity, style, and suspicious patterns
+- Package-specific overrides for different project types (apps, libs, packages)
+- Proper ignore patterns and file type handling
+- Formatter configuration matching previous Prettier settings
+
+## Link to Devin run
+https://app.devin.ai/sessions/74c779f7bc00435eb947a3af95343628
+
+## Requested by
+Dima Grossman (dima@novu.co)
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-08T11:00:45Z,2025-06-08T13:00:23Z,,400215964,https://api.github.com/repos/novuhq/novu,https://github.com/novuhq/novu/pull/8473,7,1.0,False
+3201181526,6,Introduce the project,"Modernize the frontend project to enhance development experience, performance, and maintainability.
+
+This PR comprehensively upgrades the frontend stack to Vue 3.4.21, TypeScript 5.4.3, and Vite 5.2.6, replacing Vuex with Pinia and introducing Element Plus for UI. It also refactors the architecture with clear service and store layers, implements a robust CSS variable-based styling system with multi-theme support, and includes various performance optimizations like code splitting and lazy loading.",Cursor,26037703,liyupi,open,2025-07-04T03:27:32Z,,,970578570,https://api.github.com/repos/liyupi/yu-ai-agent,https://github.com/liyupi/yu-ai-agent/pull/6,7,1.0,False
+2973653748,874,Update esbuild to 0.25.2 and optimize SDK size,"- Updated esbuild from 0.14.13 to 0.25.2
+- Added size optimization options (treeShaking, drop, mangleProps, metafile)
+- Updated esbuild API implementation to work with version 0.25.2
+- Verified build works without issues
+
+Link to Devin run: https://app.devin.ai/sessions/11285192f45f4b66b3d0326ecef40f92
+Requested by: jerry@magic.link
+<!-- GITHUB_RELEASE PR BODY: canary-version -->
+<details>
+  <summary>📦 Published PR as canary version: <code>Canary Versions</code></summary>
+  <br />
+
+  :sparkles: Test out this PR locally via:
+  
+  ```bash
+  npm install @magic-ext/algorand@24.0.6-canary.874.14364251287.0
+  npm install @magic-ext/aptos@12.0.6-canary.874.14364251287.0
+  npm install @magic-ext/avalanche@24.0.6-canary.874.14364251287.0
+  npm install @magic-ext/bitcoin@24.0.6-canary.874.14364251287.0
+  npm install @magic-ext/conflux@22.0.6-canary.874.14364251287.0
+  npm install @magic-ext/cosmos@24.0.6-canary.874.14364251287.0
+  npm install @magic-ext/ed25519@20.0.6-canary.874.14364251287.0
+  npm install @magic-ext/farcaster@1.0.6-canary.874.14364251287.0
+  npm install @magic-ext/flow@24.0.6-canary.874.14364251287.0
+  npm install @magic-ext/gdkms@12.0.6-canary.874.14364251287.0
+  npm install @magic-ext/harmony@24.0.6-canary.874.14364251287.0
+  npm install @magic-ext/icon@24.0.6-canary.874.14364251287.0
+  npm install @magic-ext/kadena@1.0.6-canary.874.14364251287.0
+  npm install @magic-ext/near@24.0.6-canary.874.14364251287.0
+  npm install @magic-ext/oauth@23.0.7-canary.874.14364251287.0
+  npm install @magic-ext/oauth2@11.0.6-canary.874.14364251287.0
+  npm install @magic-ext/oidc@12.0.6-canary.874.14364251287.0
+  npm install @magic-ext/polkadot@24.0.6-canary.874.14364251287.0
+  npm install @magic-ext/react-native-bare-oauth@26.0.8-canary.874.14364251287.0
+  npm install @magic-ext/react-native-expo-oauth@26.0.7-canary.874.14364251287.0
+  npm install @magic-ext/solana@26.0.6-canary.874.14364251287.0
+  npm install @magic-ext/sui@1.0.6-canary.874.14364251287.0
+  npm install @magic-ext/taquito@21.0.6-canary.874.14364251287.0
+  npm install @magic-ext/terra@21.0.6-canary.874.14364251287.0
+  npm install @magic-ext/tezos@24.0.6-canary.874.14364251287.0
+  npm install @magic-ext/web3modal-ethers5@1.0.6-canary.874.14364251287.0
+  npm install @magic-ext/webauthn@23.0.6-canary.874.14364251287.0
+  npm install @magic-ext/zilliqa@24.0.6-canary.874.14364251287.0
+  npm install @magic-sdk/commons@25.0.6-canary.874.14364251287.0
+  npm install @magic-sdk/pnp@23.0.7-canary.874.14364251287.0
+  npm install @magic-sdk/provider@29.0.6-canary.874.14364251287.0
+  npm install @magic-sdk/react-native-bare@30.0.7-canary.874.14364251287.0
+  npm install @magic-sdk/react-native-expo@30.0.6-canary.874.14364251287.0
+  npm install magic-sdk@29.0.6-canary.874.14364251287.0
+  # or 
+  yarn add @magic-ext/algorand@24.0.6-canary.874.14364251287.0
+  yarn add @magic-ext/aptos@12.0.6-canary.874.14364251287.0
+  yarn add @magic-ext/avalanche@24.0.6-canary.874.14364251287.0
+  yarn add @magic-ext/bitcoin@24.0.6-canary.874.14364251287.0
+  yarn add @magic-ext/conflux@22.0.6-canary.874.14364251287.0
+  yarn add @magic-ext/cosmos@24.0.6-canary.874.14364251287.0
+  yarn add @magic-ext/ed25519@20.0.6-canary.874.14364251287.0
+  yarn add @magic-ext/farcaster@1.0.6-canary.874.14364251287.0
+  yarn add @magic-ext/flow@24.0.6-canary.874.14364251287.0
+  yarn add @magic-ext/gdkms@12.0.6-canary.874.14364251287.0
+  yarn add @magic-ext/harmony@24.0.6-canary.874.14364251287.0
+  yarn add @magic-ext/icon@24.0.6-canary.874.14364251287.0
+  yarn add @magic-ext/kadena@1.0.6-canary.874.14364251287.0
+  yarn add @magic-ext/near@24.0.6-canary.874.14364251287.0
+  yarn add @magic-ext/oauth@23.0.7-canary.874.14364251287.0
+  yarn add @magic-ext/oauth2@11.0.6-canary.874.14364251287.0
+  yarn add @magic-ext/oidc@12.0.6-canary.874.14364251287.0
+  yarn add @magic-ext/polkadot@24.0.6-canary.874.14364251287.0
+  yarn add @magic-ext/react-native-bare-oauth@26.0.8-canary.874.14364251287.0
+  yarn add @magic-ext/react-native-expo-oauth@26.0.7-canary.874.14364251287.0
+  yarn add @magic-ext/solana@26.0.6-canary.874.14364251287.0
+  yarn add @magic-ext/sui@1.0.6-canary.874.14364251287.0
+  yarn add @magic-ext/taquito@21.0.6-canary.874.14364251287.0
+  yarn add @magic-ext/terra@21.0.6-canary.874.14364251287.0
+  yarn add @magic-ext/tezos@24.0.6-canary.874.14364251287.0
+  yarn add @magic-ext/web3modal-ethers5@1.0.6-canary.874.14364251287.0
+  yarn add @magic-ext/webauthn@23.0.6-canary.874.14364251287.0
+  yarn add @magic-ext/zilliqa@24.0.6-canary.874.14364251287.0
+  yarn add @magic-sdk/commons@25.0.6-canary.874.14364251287.0
+  yarn add @magic-sdk/pnp@23.0.7-canary.874.14364251287.0
+  yarn add @magic-sdk/provider@29.0.6-canary.874.14364251287.0
+  yarn add @magic-sdk/react-native-bare@30.0.7-canary.874.14364251287.0
+  yarn add @magic-sdk/react-native-expo@30.0.6-canary.874.14364251287.0
+  yarn add magic-sdk@29.0.6-canary.874.14364251287.0
+  ```
+</details>
+<!-- GITHUB_RELEASE PR BODY: canary-version -->
+",Devin,158243242,devin-ai-integration[bot],closed,2025-04-05T00:52:56Z,2025-04-09T20:52:26Z,2025-04-09T20:52:26Z,239957242,https://api.github.com/repos/magiclabs/magic-js,https://github.com/magiclabs/magic-js/pull/874,7,1.0,False
+3108415971,257,feat: migrate tests from Bun to Vitest with parallel execution,"# Migrate Tests from Bun to Vitest with Parallel Execution
+
+This PR migrates all tests in the Alchemy repository from Bun's test framework to Vitest, enabling parallel test execution for improved performance.
+
+## Changes Made
+
+### Core Migration
+- **Created Vitest test helper** (`alchemy/src/test/vitest.ts`) that replicates the functionality of the existing Bun test helper without modifying the original
+- **Updated 50+ test files** to import from `vitest` instead of `bun:test`
+- **Added Vitest configuration** (`vitest.config.ts`) with parallel execution settings using thread pool
+
+### Test Infrastructure Updates
+- **Enhanced test runner** (`alchemy/src/test/prune.ts`) to support both Bun and Vitest modes
+- **Updated package.json scripts** to include both `test` (Bun) and `test:vitest` (Vitest) options
+- **Modified CI workflow** to use Vitest for test execution with `--vitest` flag
+
+### Compatibility Fixes
+- Fixed Vitest-specific matcher compatibility:
+  - `.toBeNumber()` → `.toBeTypeOf('number')`
+  - `.toBeEmpty()` → `.toHaveLength(0)`
+  - `.toBeArray()` → `.toBeInstanceOf(Array)`
+
+## Key Features
+
+### Parallel Execution
+- Configured Vitest with thread pool for concurrent test execution
+- Tests can now run in parallel across multiple threads
+- Maintains proper scope isolation and resource cleanup
+
+### Backward Compatibility
+- Original Bun test helper remains unchanged
+- Test runner supports both frameworks via command-line flag
+- Existing test patterns and scope management preserved
+
+### Performance Benefits
+- Parallel execution should significantly reduce test suite runtime
+- Thread-based concurrency for CPU-intensive test operations
+- Configurable timeout (120s) for infrastructure tests
+
+## Testing
+
+✅ **Verified test execution**: Successfully ran individual test files with Vitest
+✅ **Confirmed scope management**: Resource creation/cleanup working correctly  
+✅ **Lint checks passed**: All formatting and type issues resolved
+✅ **Parallel execution**: Tests running concurrently as expected
+
+## Usage
+
+```bash
+# Run tests with Vitest (new default)
+bun run test:vitest
+
+# Run tests with Bun (legacy)
+bun run test
+
+# Run specific tests with Vitest
+bun vitest run alchemy/test/specific-test.test.ts
+
+# Run tests since specific commit (CI usage)
+bun run test --since HEAD~1 --vitest
+```
+
+## Migration Notes
+
+- All existing test functionality preserved
+- Scope management and resource cleanup working identically
+- Test helper API remains the same for seamless migration
+- CI configured to use Vitest by default
+
+---
+
+**Link to Devin run**: https://app.devin.ai/sessions/5725bfed1a764ad5a5b16856689c52b6
+
+**Requested by**: sam (sam@alchemy.run)
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-02T03:38:52Z,2025-06-02T09:11:49Z,,917974798,https://api.github.com/repos/sam-goodwin/alchemy,https://github.com/sam-goodwin/alchemy/pull/257,7,1.0,False
+3080933474,8363,fix(api): Update mocha configuration to use SWC instead of ts-node,"# feat(api): Update API tests to use SWC instead of ts-node
+
+## Description
+This PR updates the mocha configuration in the API tests to use SWC instead of ts-node for compilation. This aligns the test environment with the existing NestJS runtime that already uses SWC, which should improve test execution speed.
 
 ## Changes
+- Updated `.mocharc.json` to use a custom SWC register script instead of ts-node/register
+- Updated `.vscode/settings.json` to use the custom SWC register script for the VS Code Mocha explorer
+- Updated test scripts in `package.json` to use the custom SWC register script instead of ts-node/register
+- Added @swc/register and @swc/core as dev dependencies in the API service
+- Created a custom SWC register script (swc-register.js) that uses:
+  - ts-node for .source directory files (which contain ES modules)
+  - SWC for all other TypeScript files
+- Refactored the code to break circular dependencies between PromoteNotificationTemplateChange, ApplyChange, and PromoteChangeToEnvironment classes:
+  - Created an interface (INotificationTemplateChangeService) to decouple the classes
+  - Updated the PromoteNotificationTemplateChange class to implement this interface
+  - Updated the PromoteChangeToEnvironment class to use the interface instead of direct imports
+  - Updated the change.module.ts file to provide the interface implementation
+- Fixed enterprise package imports in billing e2e tests to use require() instead of import for better SWC compatibility
+- Added S3 mocking in setup.ts to handle LocalStack connection issues during tests
+- Created a MockStorageService to use during tests instead of the real S3 service
+- Updated shared.module.ts to use the MockStorageService during tests
 
-- Added `errorLabelMode` and `histogramBuckets` fields to `MetricsConfig`
-- Modified `ErrorSummary` to support compact mode
-- Added a `SetHistogramBuckets` function to replace metrics with custom buckets
-- Added initialization in the `Init` function
-- Updated documentation
+## Technical Details
 
-Requested by: Aram Alipoor (aram@erpc.cloud)
+### Circular Dependencies
+SWC's handling of circular dependencies is different from ts-node. We resolved this by:
+- Creating an interface (`INotificationTemplateChangeService`)
+- Implementing the interface in `PromoteNotificationTemplateChange`
+- Using dependency injection with a provider token in `change.module.ts`
+- Updating `PromoteChangeToEnvironment` to inject the interface instead of the class
 
-Link to Devin run: https://app.devin.ai/sessions/11e4da16560e4af5b51861e97be3fe93
-",Devin,158243242,devin-ai-integration[bot],closed,2025-04-27T18:31:13Z,2025-04-28T13:44:36Z,2025-04-28T13:44:36Z,796633002,https://api.github.com/repos/erpc/erpc,https://github.com/erpc/erpc/pull/246,"analysisWe need to classify as performance or non-performance. The PR is about reducing cardinality of metrics, adding configurable error label mode, histogram buckets. This is about metrics cardinality, which can affect performance (storage, query). But is it primarily performance? The title: ""feat: allow configuring metrics to reduce cardinality"". The description: ""This PR reduces the cardinality of metrics by:..."". Cardinality reduction can improve performance of metrics storage and query. But is it a performance improvement? It reduces cardinality, which can reduce storage overhead and improve query performance. So yes, it's performance. The keywords: ""reduce cardinality"" is not explicitly performance keyword but it's about metrics cardinality. The guidelines mention performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. This PR does not contain those keywords. But the content is about reducing cardinality, which is a performance improvement. The guidelines say ""or any other terms referring to how faster and efficiently software runs."" Cardinality reduction is a performance improvement. So we should classify as 'performance'.
+### ES Module Compatibility
+SWC had issues with ES module syntax in the `.source` directory. We solved this with a hybrid approach:
+- Created a custom register script (`swc-register.js`) that uses ts-node for `.source` directory files
+- Used SWC for all other TypeScript files
+- Configured the SWC settings to optimize for circular dependencies and NestJS compatibility
 
-Thus answer: performance.assistantfinalperformance",7,0.08863371058941273,False
+### S3 Storage Mocking
+Tests were failing with ""connect ECONNREFUSED 127.0.0.1:4566"" errors when trying to connect to LocalStack S3. We addressed this by:
+- Mocking the S3Client in setup.ts to handle all S3 operations without requiring a real S3 service
+- Creating a MockStorageService that implements the StorageService interface for use during tests
+- Updating shared.module.ts to use the MockStorageService during tests
+
+This approach maintains compatibility with existing code while giving us the performance benefits of SWC for most of the codebase.
+
+## Known Issues
+- Some tests in trigger-event-topic.e2e.ts are still failing with ""expected +0 to equal 1"" errors. These tests expect messages and notifications to be created, but none are being created. This is likely due to issues with the worker service or the S3 mocking.
+
+## Testing
+The changes have been tested locally with the API e2e tests using the following command:
+```
+npm run test:e2e:novu-v2
+```
+
+## Link to Devin run
+https://app.devin.ai/sessions/b4082ec73d3a45bc9ce9cc7df897fe28
+
+## Requested by
+Dima Grossman (dima@novu.co)
+
+
+<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
+
+## Summary by CodeRabbit
+
+- **Breaking Changes**
+  - Removed several notification statistics, subscriber, and integration-related API functions and React Query hooks, including those for activity stats, chat OAuth, and paginated subscriber lists.
+  - The `feedId` field in notification feed items is now optional and can be null.
+  - The `dataSchema` and `variables` properties in some API responses are now generic objects, no longer strictly typed.
+- **Improvements**
+  - Expanded and clarified documentation across many SDK and React Query functions for better understanding of API usage and requirements.
+- **Bug Fixes**
+  - Increased test timeouts and improved test environment setup for more reliable automated testing.
+- **Chores**
+  - Updated SDK metadata and dependency versions. Added new spell-check dictionary entries.
+
+<!-- end of auto-generated comment: release notes by coderabbit.ai -->",Devin,158243242,devin-ai-integration[bot],closed,2025-05-21T17:17:57Z,2025-05-23T11:06:52Z,2025-05-23T11:06:52Z,400215964,https://api.github.com/repos/novuhq/novu,https://github.com/novuhq/novu/pull/8363,7,1.0,True
+3195541807,3876,Create Rslib executor for Nx,"## Description
+
+This PR introduces a comprehensive Nx plugin for Rslib, providing dedicated executors for building and developing Rslib-based libraries within an Nx workspace.
+
+**Key Changes:**
+
+*   **Rslib Nx Plugin (`tools/rslib-plugin`)**:
+    *   **`rslib:build` executor**: Integrates `rslib build` for production and development builds, including watch mode.
+    *   **`rslib:dev` executor**: Integrates `rslib mf-dev` for Module Federation development and `rslib build --watch` for general watch mode.
+    *   **`rslib:echo` executor**: A simple executor for testing plugin functionality.
+    *   **Schema Validation**: JSON schemas for all executor options.
+    *   **Package Structure**: Configured with proper `package.json` exports and `pnpm-workspace.yaml` inclusion for local resolution.
+*   **`runtime-core` Migration**: The `packages/runtime-core` project has been migrated from `@nx/rollup` to use the new `rslib:build` executor. This migration demonstrated significant performance improvements (build time reduced from ~2.6s to ~50ms).
+*   **Cleanup**: Removed the legacy `tools/rslib-old` directory and all associated references, along with temporary markdown files and test files created during development.
+*   **Executor Resolution Fix**: Addressed complex Nx local plugin resolution by using relative path references for executors (e.g., `../../tools/rslib-plugin:build`) in `project.json` files.
+*   **Rslib Compatibility**: Adjusted executor commands to be compatible with `rslib v0.10.4` (e.g., removed unsupported `--mode` option).
+
+**Why these changes?**
+
+To integrate Rslib as a first-class build tool within the Nx monorepo, leveraging its performance benefits, especially for Module Federation projects. This provides a streamlined and faster alternative to existing build processes.
+
+## Related Issue
+
+<!--- This project only accepts pull requests related to open issues -->
+<!--- If suggesting a new feature or change, please discuss it in an issue first -->
+<!--- If fixing a bug, there should be an issue describing it with steps to reproduce -->
+<!--- Please link to the issue here: -->
+
+N/A
+
+## Types of changes
+
+<!--- What types of changes does your code introduce? Put an `x` in all the boxes that apply: -->
+
+- [ ] Docs change / refactoring / dependency upgrade
+- [ ] Bug fix (non-breaking change which fixes an issue)
+- [x] New feature (non-breaking change which adds functionality)
+
+## Checklist
+
+<!--- Go over all the following points, and put an `x` in all the boxes that apply. -->
+<!--- If you're unsure about any of these, don't hesitate to ask. We're here to help! -->
+
+- [ ] I have added tests to cover my changes.
+- [ ] All new and existing tests passed.
+- [x] I have updated the documentation.",Cursor,25274700,ScriptedAlchemy,closed,2025-07-02T11:14:59Z,2025-07-22T00:53:39Z,2025-07-22T00:53:39Z,306976345,https://api.github.com/repos/module-federation/core,https://github.com/module-federation/core/pull/3876,7,0.29769603278700213,False
+3080621090,8360,feat(root): upgrade nx to latest version and remove legacy cache,"# Upgrade Nx to Latest Version and Remove Legacy Cache
+
+## Description
+This PR upgrades Nx from v20.3.0 to v21.0.4 and updates the nx.json configuration to not use legacy cache. The changes include:
+
+1. Updating Nx version in package.json to 21.0.4
+2. Updating nx-cloud package to 19.1.0
+3. Updating nx.json to use the modern format without legacy cache
+4. Updating the runner configuration in nx.json and libs/automation/nx.json to use nx-cloud
+
+## Motivation
+Upgrading to the latest version of Nx provides access to new features, performance improvements, and bug fixes. Removing the legacy cache configuration ensures compatibility with the latest Nx version and improves build performance.
+
+## Type of change
+- [x] New feature (non-breaking change which adds functionality)
+
+## How Has This Been Tested?
+The changes have been tested by running the build command locally.
+
+## Link to Devin run
+https://app.devin.ai/sessions/7d2756b931f042aa9a941adae8055d31
+
+## Requested by
+Dima Grossman (dima@novu.co)
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-21T15:23:07Z,2025-05-21T16:16:38Z,,400215964,https://api.github.com/repos/novuhq/novu,https://github.com/novuhq/novu/pull/8360,7,0.28028785603400325,False
+3081229432,8365,ci(api-service): remove --skip-nx-cache for optimized builds,"# Remove `--skip-nx-cache` for optimized builds
+
+## Description
+This PR removes the `--skip-nx-cache` flag from all build commands in the codebase to optimize CI builds by enabling NX caching. This change will allow the CI pipeline to reuse previously built artifacts when files haven't changed, resulting in faster builds.
+
+## Changes
+- Removed `--skip-nx-cache` flag from all GitHub workflow files
+- Removed `--skip-nx-cache` flag from Netlify configurations
+- Removed `--skip-nx-cache` flag from Docker build files
+- Removed `--skip-nx-cache` flag from build scripts
+
+## Testing
+- CI workflows should complete successfully with caching enabled
+- Build times should improve for subsequent runs due to caching
+
+Link to Devin run: https://app.devin.ai/sessions/6ee5d1d5df0544a593bbafa8787b5da2
+Requested by: Dima Grossman (dima@novu.co)
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-21T19:33:50Z,2025-05-21T19:48:10Z,2025-05-21T19:48:10Z,400215964,https://api.github.com/repos/novuhq/novu,https://github.com/novuhq/novu/pull/8365,7,0.26015829727928114,False
+2790868866,3850,feat(content-sidebar): remove react-router-dom in favor of custom router,"## Description
+Remove react-router-dom dependency and replace with custom NavRouter implementation to reduce bundle size and improve routing control.
+
+## Changes
+- Removed react-router-dom dependency
+- Added custom NavRouter implementation with history package
+- Converted relevant components to TypeScript
+- Updated tests to use react-testing-library
+- Added data-testid attributes for better test coverage
+
+## Testing
+- Ran unit tests: ✅ All tests passing
+- Verified navigation in Storybook: ✅ Components render correctly
+- Checked bundle size: ✅ Reduced by removing react-router-dom
+- Verified no unintended i18n changes
+
+## Link to Devin run
+https://app.devin.ai/sessions/eb002c1fb7e54520bb03d088d3d612aa
+",Devin,158243242,devin-ai-integration[bot],closed,2025-01-15T20:54:58Z,2025-01-23T20:09:25Z,,95743138,https://api.github.com/repos/box/box-ui-elements,https://github.com/box/box-ui-elements/pull/3850,7,0.2388508606615055,False
+3080755100,8361,feat(root): upgrade nx to v21.0.4 and update nx.json configuration,"# Upgrade Nx to Latest Version and Remove Legacy Cache
+
+## Description
+This PR upgrades Nx from v20.3.0 to v21.0.4 and updates the nx.json configuration to not use legacy cache. The changes include:
+
+1. Updating Nx version in package.json to 21.0.4
+2. Updating nx-cloud package to 19.1.0
+3. Updating nx.json to use the modern format without legacy cache
+4. Updating the runner configuration in nx.json and libs/automation/nx.json to use nx-cloud
+
+## Motivation
+Upgrading to the latest version of Nx provides access to new features, performance improvements, and bug fixes. Removing the legacy cache configuration ensures compatibility with the latest Nx version and improves build performance.
+
+## Type of change
+- [x] New feature (non-breaking change which adds functionality)
+
+## How Has This Been Tested?
+The changes have been tested by running the build command locally.
+
+## Link to Devin run
+https://app.devin.ai/sessions/7d2756b931f042aa9a941adae8055d31
+
+## Requested by
+Dima Grossman (dima@novu.co)
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-21T16:05:31Z,2025-05-21T16:22:27Z,2025-05-21T16:22:27Z,400215964,https://api.github.com/repos/novuhq/novu,https://github.com/novuhq/novu/pull/8361,7,0.23076404876885348,False
+2777919004,38561,feat: Used ShadowDOM in CustomWidget,"# Replace iFrame with ShadowDOM in CustomWidget
+
+This PR replaces the iFrame-based rendering with ShadowDOM for better isolation in the CustomWidget component.
+
+## Changes
+- Replaced iFrame-based rendering with ShadowDOM for better isolation
+- Updated event handling to use CustomEvents instead of postMessage
+- Added type safety with explicit interfaces
+- Improved performance by removing iFrame overhead
+
+## ⚠️ Important Note
+This is an experimental feature without backward compatibility guarantees. The ShadowDOM implementation may need further refinement based on review feedback.
+
+## Testing
+- [ ] Manual testing of widget rendering
+- [ ] Event handling verification needed
+- [ ] Cross-browser compatibility check required
+
+Link to Devin run: https://app.devin.ai/sessions/685f677d159545038d2d5428db0909e0
+
+## Automation
+
+/ok-to-test tags=""@tag.Widget""
+
+### :mag: Cypress test results
+<!-- This is an auto-generated comment: Cypress test results  -->
+> [!WARNING]
+> Tests have not run on the HEAD d609fd0bcaab3e4f35d671e8020225e5c874fa85 yet
+> <hr>Thu, 09 Jan 2025 18:16:22 UTC
+<!-- end of auto-generated comment: Cypress test results  -->
+",Devin,158243242,devin-ai-integration[bot],closed,2025-01-09T13:58:33Z,2025-01-17T04:56:06Z,,275993885,https://api.github.com/repos/appsmithorg/appsmith,https://github.com/appsmithorg/appsmith/pull/38561,7,0.17621289696119433,False
+2892884286,6775,chore: remove unused imports,"Removed approximately 20 lines of unused imports from the codebase to improve code quality and reduce bundle size. This PR does not modify any functionality, only removes unused code.
+
+Changes made:
+- Removed LoadURLOptions import in DesktopWebView.tsx
+- Removed useDialogInstance import in RenameDialog/index.tsx
+- Removed unused variable _ in NetworkSelectorTriggerDApp.tsx
+- Removed commented-out imports and unused displayName parameter in createLazyKitProvider.tsx
+- Removed commented-out code in useCreateQrWallet.tsx
+
+Link to Devin run: https://app.devin.ai/sessions/f80fc305ae8447269a994fe397ca198d
+User: 候耀
+",Devin,158243242,devin-ai-integration[bot],closed,2025-03-04T04:21:17Z,2025-03-04T05:32:06Z,,430749584,https://api.github.com/repos/OneKeyHQ/app-monorepo,https://github.com/OneKeyHQ/app-monorepo/pull/6775,7,0.10508516327435535,False
+3165098830,536,Remove unused code across Helper monorepo,"# Remove unused code across Helper monorepo
+
+This PR removes unused code identified by knip analysis across the Helper monorepo, significantly reducing bundle size and maintenance overhead while maintaining all core functionality.
+
+## What was removed
+
+### 🗂️ Unused Files (24 deleted)
+- **Database setup scripts**: `db/drizzle.config.ts`, `db/lib/cronUtils.ts`, `db/lib/debug.ts`, `db/seeds/index.ts`, `db/seeds/seedDatabase.ts`, `db/setupCron.ts`
+- **Test files**: `tests/evals/chat/*`, `tests/evals/support/*`, `tests/support/factories/messageNotifications.ts`
+- **Unused UI components**: `components/sortableList.tsx`, `components/ui/hover-card.tsx`, `components/ui/pagination.tsx`, `components/ui/panel.tsx`, `components/ui/slider.tsx`
+- **Dashboard components**: Status filter, trend indicator, view switcher, navigation buttons
+- **Scripts and utilities**: `scripts/deploy-helper-projects.ts`, `scripts/replGlobals.mts`, `lib/github/constants.ts`, `trpc/serverActions.ts`
+- **Type definitions**: `types/clerkMetadata.ts`, `packages/react/global.d.ts`
+
+### 📦 Unused Dependencies (37 removed)
+
+**Main package dependencies (15):**
+- `@openrouter/ai-sdk-provider`, `@radix-ui/react-hover-card`, `@slack/oauth`
+- `@tailwindcss/forms`, `@tailwindcss/typography`
+- `@tiptap/extension-bold`, `@tiptap/extension-bubble-menu`, `@tiptap/extension-italic`
+- `js-tiktoken`, `p-limit`, `react-hot-toast`, `react-sortablejs`
+- `tailwindcss-animate`, `tw-animate-css`, `ws`
+
+**Main package devDependencies (12):**
+- `@babel/core`, `@svgr/webpack`, `@testcontainers/postgresql`
+- `@types/dom-speech-recognition`, `@types/ws`, `@vercel/sdk`
+- `autoevals`, `dayjs`, `dotenv`, `eslint-config-next`, `evalite`, `heroku`, `react-email`, `vercel`
+
+**Workspace packages (10):**
+- `next-themes`, `@svgr/webpack`, `eslint-config-next`, `tailwindcss-animate` from marketing package
+- `crypto-js`, `@testing-library/user-event`, `@vitejs/plugin-react` from react package
+
+## Impact
+
+- **Reduced bundle size**: Removed 37 unused dependencies
+- **Cleaner codebase**: Deleted 24 unused files (1,809 lines removed)
+- **Lower maintenance overhead**: Fewer dependencies to manage and update
+- **Improved build performance**: Less code to process during builds
+
+## Verification
+
+This cleanup was identified using `npx knip` analysis across the entire monorepo. All removed code was confirmed to be unused through static analysis of:
+- Import/export relationships
+- Dependency usage patterns
+- File references across the codebase
+
+The application functionality remains intact - only truly unused code was removed.
+
+Link to Devin run: https://app.devin.ai/sessions/35f23c2680624c168406058263e1103b
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-21T13:39:27Z,2025-06-21T13:41:38Z,,941289933,https://api.github.com/repos/antiwork/helper,https://github.com/antiwork/helper/pull/536,7,0.09524207494933432,False
+3215328044,7994,Remove junderw-crc32c dependency and create PR,Remove unused `junderw-crc32c` dependency to reduce bundle size and clean up the dependency tree.,Cursor,1913337,Overtorment,closed,2025-07-09T10:03:37Z,2025-07-10T18:58:14Z,,117463191,https://api.github.com/repos/BlueWallet/BlueWallet,https://github.com/BlueWallet/BlueWallet/pull/7994,7,0.09385521117834647,False
+2830596110,39016,refactor: Replace moment.js with date-fns,"# Replace moment.js with date-fns
+
+## Description
+This PR replaces moment.js with date-fns across the codebase to reduce bundle size and improve maintainability.
+
+Changes made:
+- Remove moment and moment-timezone dependencies
+- Replace moment imports with date-fns functions
+- Update date formatting and parsing logic
+- Maintain existing functionality while using date-fns API
+
+## Type of change
+- [ ] Bug fix (non-breaking change which fixes an issue)
+- [x] Improvement (non-breaking change which improves existing functionality)
+
+## How Has This Been Tested?
+- [ ] Unit tests have been updated to use date-fns
+- [ ] Manual testing of date formatting and parsing functionality
+
+## Automation
+
+/ok-to-test tags=""@tag.All""
+
+### :mag: Cypress test results
+<!-- This is an auto-generated comment: Cypress test results  -->
+> [!WARNING]
+> Workflow run: <https://github.com/appsmithorg/appsmith/actions/runs/13214896231>
+> Commit: f9f291e7818fe68947d4d5e7d10e4609c2ef1226
+> <a href=""https://internal.appsmith.com/app/cypress-dashboard/rundetails-65890b3c81d7400d08fa9ee5?branch=master&workflowId=13214896231&attempt=1"" target=""_blank"">Cypress dashboard</a>.
+> Tags: @tag.All
+> Spec: 
+> It seems like **no tests ran** 😔. We are not able to recognize it, please check <a href=""https://github.com/appsmithorg/appsmith/actions/runs/13214896231"" target=""_blank"">workflow here</a>.
+> <hr>Sat, 08 Feb 2025 10:49:15 UTC
+<!-- end of auto-generated comment: Cypress test results  -->
+
+Link to Devin run: https://app.devin.ai/sessions/211d1377ac8d423cbfd80763dfb9c70a
+Requested by: Valera
+",Devin,158243242,devin-ai-integration[bot],closed,2025-02-04T15:28:23Z,2025-02-12T08:01:16Z,,275993885,https://api.github.com/repos/appsmithorg/appsmith,https://github.com/appsmithorg/appsmith/pull/39016,7,0.09220389671273216,False
+3077061912,21418,perf: remove unused tRPC routes to reduce type generation load,"# Remove unused tRPC routes to reduce type generation load
+
+This PR removes unused tRPC routes to help reduce the TypeScript type generation load. Specifically, it removes the following routes which are not being used in the codebase:
+
+- `loggedInViewerRouter.submitFeedback` (explicitly marked as unused in a comment)
+
+This should help reduce the number of types that TypeScript has to generate, addressing the issue where we're exceeding the maximum amount of types that TypeScript can generate on the pregenerated tRPC types.
+
+## Testing
+- Verified that the route is not used anywhere in the codebase
+- Ran type checking to ensure no regressions
+
+Link to Devin run: https://app.devin.ai/sessions/85c98fb2939d41b5aca8988f9802fc97
+Requested by: alex@cal.com
+
+    
+<!-- This is an auto-generated description by cubic. -->
+---
+
+## Summary by cubic
+Removed the unused submitFeedback tRPC route to lower TypeScript type generation load and improve build performance.
+
+<!-- End of auto-generated description by cubic. -->
+
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-20T13:36:19Z,2025-05-20T14:14:51Z,2025-05-20T14:14:51Z,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/21418,7,0.08373735988768505,False

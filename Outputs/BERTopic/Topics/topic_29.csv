@@ -1,818 +1,470 @@
-id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
-3151242547,49424,Add EnableDefaultItems=false optimization for restore operations,"Improves restore performance by disabling default item globbing during restore operations, addressing significant performance issues on projects with large numbers of files.
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,Topic,Probability,Representative_document
+3235179464,6060,Replace LINQ Any+Single patterns with Where+FirstOrDefault for better performance,"This PR addresses a performance optimization opportunity identified in PR #5717 where the pattern of using `Any()` followed by `Single()` with the same predicate can be improved.
 
 ## Problem
-
-During `dotnet restore` operations, MSBuild spends excessive time on default item globbing (Compile, EmbeddedResource, None items) which can take 45+ seconds on projects with 100k+ files. Restore operations don't actually need these items to be evaluated, making this globbing unnecessary overhead.
-
-## Solution
-
-Automatically adds `EnableDefaultItems=false` property to MSBuild arguments during restore operations while respecting user-provided values to avoid conflicts.
-
-## Changes
-
-- **`Constants.AddRestoreOptimizations()`**: New method that adds `EnableDefaultItems=false` if user hasn't already specified it
-- **`RestoreCommand.CreateForwarding()`**: Apply optimization for explicit restore commands (`dotnet restore`)
-- **`RestoringCommand.GetSeparateRestoreCommand()`**: Apply optimization for implicit restore scenarios (`dotnet build` without `--no-restore`)
-- **Comprehensive property parsing**: Handles multiple MSBuild property syntax formats (`-property:`, `-p:`, `--property:`) with case-insensitive matching
-
-## User Experience
-
-- **Transparent**: Users won't notice any behavior changes except faster restores
-- **Respects user preferences**: If user explicitly sets `EnableDefaultItems=true/false`, their value is preserved
-- **Backward compatible**: No breaking changes to existing workflows
-
-## Testing
-
-Added comprehensive unit tests covering:
-- Basic optimization behavior
-- User override scenarios with various property syntax formats
-- Case-insensitive property matching
-- Integration with both explicit and implicit restore paths
-
-## Expected Impact
-
-Based on the original performance analysis, this should reduce restore evaluation time from ~45 seconds to ~300ms on projects with large file counts.
-
-Fixes #49415.
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `josvsblobprodcus372.vsblob.vsassets.io`
->   - Triggering command: `/home/REDACTED/work/sdk/sdk/.dotnet/dotnet msbuild /m /nologo /clp:Summary /v:minimal /nr:true /warnaserror /p:TreatWarningsAsErrors=true /p:ContinuousIntegrationBuild=false /home/REDACTED/work/sdk/sdk/artifacts/toolset/restore.proj /t:__WriteToolsetLocation /clp:ErrorsOnly;NoSummary /p:__ToolsetLocationOutputFile=/home/REDACTED/work/sdk/sdk/artifacts/toolset/10.0.0-beta.25315.102.txt ` (dns block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
-
-
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-16T20:33:51Z,2025-06-25T14:43:43Z,,63984307,https://api.github.com/repos/dotnet/sdk,https://github.com/dotnet/sdk/pull/49424,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Add EnableDefaultItems=false optimization for restore operations"". Body describes performance improvement: reduce restore evaluation time. So it's performance. So output 'performance'.assistantfinalperformance",29,1.0,False
-3151370964,12025,Add fast-paths for ToolLocationHelper property functions,"This PR adds fast-path implementations for two commonly used ToolLocationHelper property functions that were identified as performance bottlenecks in template projects:
-
-- `GetPlatformSDKLocation(String, String)`
-- `GetPlatformSDKDisplayName(String, String)`
-
-## Problem
-When building template projects in .NET 10.0.100-preview.5, these property functions don't have fast paths and require expensive reflection calls during project evaluation. The tracing output showed:
-
-```
-ReceiverType=Microsoft.Build.Utilities.ToolLocationHelper; ObjectInstanceType=; MethodName=GetPlatformSDKLocation(String, String)
-ReceiverType=Microsoft.Build.Utilities.ToolLocationHelper; ObjectInstanceType=; MethodName=GetPlatformSDKDisplayName(String, String)
-```
-
-## Solution
-Added fast-path implementations in `WellKnownFunctions.cs` following the established pattern:
-
-1. **Added project reference** to `Microsoft.Build.Utilities.csproj` in the Build project to access ToolLocationHelper
-2. **Implemented fast-paths** for both methods with proper argument validation using `ParseArgs.TryGetArgs`
-3. **Added test coverage** to verify the implementation works correctly
-
-The fast-paths avoid the expensive reflection mechanism and provide direct calls to the underlying methods when the signature matches exactly (two string parameters).
-
-## Changes
-- `src/Build/Microsoft.Build.csproj`: Added project reference to Utilities
-- `src/Build/Evaluation/Expander/WellKnownFunctions.cs`: Added fast-path implementations
-- `src/Build.UnitTests/Evaluation/Expander_Tests.cs`: Added test case
-
-## Testing
-- ✅ Successfully built entire solution
-- ✅ Added and verified test case `TestToolLocationHelperFastPaths` 
-- ✅ Verified existing ToolLocationHelper tests still pass
-- ✅ Confirmed fast-paths execute without errors and return expected results
-
-Fixes #12024.
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `dnceng.pkgs.visualstudio.com`
->   - Triggering command: `dotnet build src/Build/Microsoft.Build.csproj --configuration Debug --verbosity minimal ` (dns block)
->   - Triggering command: `dotnet test src/Build.UnitTests/Microsoft.Build.Engine.UnitTests.csproj --filter TestToolLocationHelperFastPaths --configuration Debug --verbosity normal ` (dns block)
->   - Triggering command: `/home/REDACTED/work/_temp/ghcca-node/node/bin/node /home/REDACTED/work/_temp/copilot-developer-action-main/dist/index.js ` (dns block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
-
-
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,open,2025-06-16T21:24:28Z,,,32051890,https://api.github.com/repos/dotnet/msbuild,https://github.com/dotnet/msbuild/pull/12025,"analysisWe need to classify the pull request as 'performance' or 'non-performance'. The PR title: ""Add fast-paths for ToolLocationHelper property functions"". The body describes adding fast-path implementations to avoid expensive reflection calls, improving performance. Keywords: fast-paths, performance bottlenecks, expensive reflection calls, fast-paths avoid expensive reflection. So it's a performance improvement. So classification: 'performance'.assistantfinalperformance",29,1.0,False
-3153610172,12030,Add fast-path optimizations for Char.IsDigit in performance-critical paths,"This PR adds fast-path optimizations for `Char.IsDigit` calls in MSBuild's performance-critical conditional expression parsing paths, addressing performance concerns raised by the .NET SDK team.
-
-## Changes Made
-
-### Added Fast-Path Implementation
-- Added `CharacterUtilities.IsDigit(char candidate)` method with optimized ASCII range checking (`c >= '0' && c <= '9'`)
-- This avoids the overhead of Unicode categorization for common ASCII digit scenarios
-
-### Updated Performance-Critical Paths
-Replaced `char.IsDigit()` calls with the fast-path implementation in:
-- `CharacterUtilities.IsNumberStart()` - used when parsing numeric literals in conditions
-- `CharacterUtilities.IsSimpleStringChar()` - used when parsing identifiers and strings in conditions  
-- `CharacterUtilities.IsHexDigit()` - updated to leverage the new fast-path for digit detection
-- `Scanner.SkipDigits()` - critical loop that processes digit sequences in conditional expressions
-
-### Added Test Coverage
-- Added comprehensive unit test `CharacterUtilities_IsDigit_WorksCorrectly()` that validates:
-  - All ASCII digits ('0'-'9') are correctly identified
-  - Non-digit characters (letters, symbols, whitespace) are correctly rejected
-
-## Performance Impact
-These changes optimize the most frequently used code paths when MSBuild evaluates conditional expressions containing numeric values. The fast-path eliminates Unicode categorization overhead for ASCII digits, which are the vast majority of digits encountered in build scripts.
-
-## Backward Compatibility
-All changes maintain 100% backward compatibility. The behavior is identical to `char.IsDigit()` for ASCII characters, and the optimized paths only affect performance, not functionality.
-
-## Test Results
-- All existing Scanner tests continue to pass (25 tests)
-- New fast-path test passes
-- No regressions detected
-
-Fixes #12029.
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `dnceng.pkgs.visualstudio.com`
->   - Triggering command: `dotnet build src/Build.UnitTests/Microsoft.Build.Engine.UnitTests.csproj --verbosity minimal ` (dns block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
-
-
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-17T13:55:15Z,2025-06-23T08:31:36Z,2025-06-23T08:31:36Z,32051890,https://api.github.com/repos/dotnet/msbuild,https://github.com/dotnet/msbuild/pull/12030,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Add fast-path optimizations for Char.IsDigit in performance-critical paths"". The body describes fast-path optimizations, performance concerns, etc. It's clearly performance. So label 'performance'.assistantfinalperformance",29,1.0,False
-3153767187,12033,Add Microsoft.Extensions.FileSystemGlobbing support to MSBuildGlob with trait-based feature flag,"This PR implements an alternative globbing implementation using `Microsoft.Extensions.FileSystemGlobbing` as requested in the issue, allowing MSBuild to evaluate performance and maintainability benefits of using the official .NET globbing library instead of the custom implementation.
-
-## Changes Made
-
-- **Added Microsoft.Extensions.FileSystemGlobbing dependency** to the Microsoft.Build project
-- **Created FileSystemGlobbingMSBuildGlob class** that implements `IMSBuildGlob` using `Microsoft.Extensions.FileSystemGlobbing.Matcher`
-- **Added trait-based feature flag** `UseFileSystemGlobbingForMSBuildGlob` controlled by the `MSBUILD_USE_FILESYSTEMGLOBBING` environment variable
-- **Modified MSBuildGlob.IsMatch()** to conditionally delegate to the new implementation when the trait is enabled
-- **Added test infrastructure** to verify the trait system works correctly
-
-## Usage
-
-The feature can be enabled by setting the environment variable:
-```bash
-export MSBUILD_USE_FILESYSTEMGLOBBING=1
-```
-
-When enabled, all `MSBuildGlob.IsMatch()` calls will use `Microsoft.Extensions.FileSystemGlobbing` instead of the built-in regex-based implementation.
-
-## Testing
-
-- ✅ All existing MSBuildGlob tests continue to pass, ensuring backward compatibility
-- ✅ Trait system correctly switches between implementations based on environment variable
-- ✅ Basic compatibility verified between both implementations
-
-## Implementation Details
-
-The implementation maintains full API compatibility by:
-1. Adding a lazy-initialized `FileSystemGlobbingMSBuildGlob` instance to `MSBuildGlob`
-2. Checking the trait in `IsMatch()` and delegating appropriately
-3. Using compatible path handling logic for both Windows and Unix systems
-
-This provides the foundation for performance evaluation and potential migration to `Microsoft.Extensions.FileSystemGlobbing` while maintaining all existing functionality and ensuring zero impact when the feature is disabled (default state).
-
-Fixes #12032.
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `37cvsblobprodcus359.vsblob.vsassets.io`
->   - Triggering command: `dotnet restore src/Build/Microsoft.Build.csproj ` (dns block)
-> - `7tjvsblobprodcus341.vsblob.vsassets.io`
->   - Triggering command: `dotnet restore src/Build/Microsoft.Build.csproj ` (dns block)
-> - `dnceng.pkgs.visualstudio.com`
->   - Triggering command: `dotnet test src/Build.UnitTests/Microsoft.Build.Engine.UnitTests.csproj --filter MSBuildGlob_Tests --no-build ` (dns block)
->   - Triggering command: `dotnet restore src/Build/Microsoft.Build.csproj ` (dns block)
->   - Triggering command: `dotnet build src/Build/Microsoft.Build.csproj --no-restore ` (dns block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
-
-
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,open,2025-06-17T14:42:57Z,,,32051890,https://api.github.com/repos/dotnet/msbuild,https://github.com/dotnet/msbuild/pull/12033,"analysisWe need to classify whether the primary purpose is to improve performance. The PR adds Microsoft.Extensions.FileSystemGlobbing support to MSBuildGlob with trait-based feature flag. It says ""allowing MSBuild to evaluate performance and maintainability benefits of using the official.NET globbing library instead of the custom implementation."" It also mentions ""performance evaluation"" and ""potential migration to Microsoft.Extensions.FileSystemGlobbing"". But is the primary purpose to improve performance? The PR is adding an alternative implementation, but the main goal is to evaluate performance and maintainability. It might be a performance-related PR because it introduces a new implementation that could be faster. The description says ""provides the foundation for performance evaluation and potential migration"". The primary purpose is to evaluate performance, but not necessarily to improve performance directly. However, the PR is about adding a new implementation that could be faster. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The PR is about adding a new implementation to evaluate performance. The primary purpose is to evaluate performance, not necessarily to improve it. But the description says ""allowing MSBuild to evaluate performance and maintainability benefits"". The PR is not directly improving performance, but enabling evaluation. But the classification might still be 'performance' because it deals with performance evaluation. The guidelines: ""Performance-related pull requests may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs."" The title: ""Add Microsoft.Extensions.FileSystemGlobbing support to MSBuildGlob with trait-based feature flag"". The body mentions ""performance and maintainability benefits"". It doesn't explicitly mention speed or performance. But it does mention ""performance evaluation"". The guidelines say ""or any other terms referring to how faster and efficiently software runs."" The PR is about evaluating performance, but not necessarily improving it. But the classification might still be 'performance' because it's about performance evaluation. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The primary purpose is to evaluate performance, not necessarily to improve. But the PR is adding a new implementation that could be faster. The primary purpose is to evaluate performance and maintainability. That is performance-related. So classification: 'performance'.assistantfinalperformance",29,1.0,False
-3198922993,12109,Detect and log dev drive at the start of build,"Implements Dev Drive detection and logging at build start to help customers and Microsoft understand Dev Drive usage impact on build performance.
-
-## Changes
-
-This PR adds Dev Drive detection following the same pattern as the existing Long Paths feature (#10151):
-
-### Core Implementation
-- **NativeMethods.cs**: Added `DevDriveStatus` enum and `IsOnDevDrive()` method using Windows `GetVolumeInformation` API to detect ReFS file system (Dev Drive uses ReFS)
-- **XMake.cs**: Added Dev Drive status logging to build start environment information at diagnostic verbosity level
-- **Strings.resx**: Added localized resource strings for Dev Drive logging messages
-
-### Behavior
-- **Windows**: Detects if current directory is on a Dev Drive and logs ""detected"" or ""not detected""
-- **Non-Windows**: Returns ""not applicable"" and doesn't log (same pattern as Long Paths)
-- Only logs when status is applicable (Windows systems), following established logging patterns
-- Appears in diagnostic build output alongside other environment information
-
-### Testing
-- Added unit test to verify Dev Drive detection returns valid enum values
-- Successfully builds and runs on both Windows and Linux
-- Manually verified logging works with diagnostic verbosity: `dotnet MSBuild.dll project.proj -v:diagnostic`
-
-## Example Output
-
-On Windows with Dev Drive:
-```
-Environment at start of build:
-...
-Based on the current directory file system, Dev Drive is detected.
-...
-```
-
-On Windows without Dev Drive:
-```
-Environment at start of build:
-...
-Based on the current directory file system, Dev Drive is not detected.
-...
-```
-
-On non-Windows platforms, no Dev Drive message appears (not applicable).
-
-This information will be valuable for performance investigations, as Dev Drive can significantly reduce build times (the issue mentions a 10-minute copy operation reduced to ~2 minutes when moved to Dev Drive).
-
-Fixes #12108.
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `dnceng.pkgs.visualstudio.com`
->   - Triggering command: `dotnet build /tmp/TestDevDrive/TestDevDrive.csproj -v:diagnostic` (dns block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
-
-
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-07-03T10:42:16Z,,,32051890,https://api.github.com/repos/dotnet/msbuild,https://github.com/dotnet/msbuild/pull/12109,"analysisWe need to classify as performance or non-performance. The PR is about detecting Dev Drive usage and logging it to help customers and Microsoft understand Dev Drive usage impact on build performance. It mentions that Dev Drive can significantly reduce build times. The primary purpose is to detect and log dev drive at start of build. The description says ""This information will be valuable for performance investigations, as Dev Drive can significantly reduce build times"". The PR is about logging dev drive detection, not directly optimizing performance. But the purpose is to help understand performance. The classification guidelines: performance-related PRs may contain keywords like latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs. This PR includes ""performance investigations"" and ""Dev Drive can significantly reduce build times"". It mentions performance. So likely classify as performance. The primary purpose is to detect dev drive usage to help performance investigations. That is performance. So classification: performance.assistantfinalperformance",29,1.0,True
-3219696751,62661,[Blazor] Make _serializerCache static readonly to avoid creating dictionaries per instance,"This change optimizes the `PersistentStateValueProvider` class by making the `_serializerCache` field static instead of instance-level. 
-
-## Problem
-Previously, every instance of `PersistentStateValueProvider` would create its own `ConcurrentDictionary` for caching serializers, even though the serializers are typically registered as singletons in the DI container and don't vary between instances.
-
-## Solution
-Changed `_serializerCache` from `private readonly` to `private static readonly`. This allows all instances to share the same cache, reducing memory allocation and improving performance when multiple `PersistentStateValueProvider` instances are created.
-
-## Impact
-- **Performance**: Reduces memory allocation by sharing the serializer cache across all instances
-- **Compatibility**: No breaking changes - the cache behavior remains functionally identical
-- **Thread Safety**: `ConcurrentDictionary` is already thread-safe, making the static sharing safe
-
-## Testing
-- ✅ All Components tests pass (1,124 tests)
-- ✅ All PersistentStateValueProvider tests pass (35 tests)  
-- ✅ All IPersistentComponentStateSerializer tests pass (2 tests)
-- ✅ No build regressions in the core Components project
-
-Fixes #62659.
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-10T14:56:39Z,2025-07-10T16:31:44Z,2025-07-10T16:31:44Z,17620347,https://api.github.com/repos/dotnet/aspnetcore,https://github.com/dotnet/aspnetcore/pull/62661,"analysisWe need to classify as performance or non-performance. The PR title: ""[Blazor] Make _serializerCache static readonly to avoid creating dictionaries per instance"". The body says it optimizes by making static, reducing memory allocation, improving performance. So it's performance. So label 'performance'.assistantfinalperformance",29,1.0,False
-3135316626,594,Fix static member exports to not instantiate declaring type,"## Problem
-
-When accessing static member exports through MEF, the framework was unnecessarily instantiating the declaring type, even though static members don't require an instance. This caused performance overhead and potential unwanted side effects from constructor execution.
-
-Consider this example:
-```cs
-class Some
+The existing code uses this pattern in multiple places:
+```csharp
+if (collection.Any(x => x.Uid == item.Uid))
 {
-   [Export]
-   public static string Member => ""Hi"";
+    var existing = collection.Single(x => x.Uid == item.Uid);
+    // handle duplicate...
 }
 ```
 
-Before this fix, MEF would instantiate the `Some` class when obtaining the value of the static `Member` property, even though instantiation is not necessary for static members.
-
-## Root Cause
-
-The issue occurred in two places:
-
-1. **`ExportProvider.CreateExport()`** - Always called `GetValueReadyToRetrieveExportingMembers()` even for static members, causing instantiation
-2. **`RuntimeExportProvider.GetExportedValue()`** - Always created `partLifecycle` even for static members, which could trigger instantiation
+This approach has two issues:
+1. **Performance**: It enumerates the collection twice with the same predicate
+2. **Debuggability**: When `Single()` throws, it's harder to debug since you can't inspect the actual duplicate items
 
 ## Solution
+Replace the pattern with:
+```csharp
+var existing = collection.Where(x => x.Uid == item.Uid).FirstOrDefault();
+if (existing is not null)
+{
+    // handle duplicate...
+}
+```
 
-- Modified both `ExportProvider.CreateExport()` and `RuntimeExportProvider.GetExportedValue()` to check if members are static using `MemberRef.IsStatic()` before creating part lifecycle trackers
-- For static members, bypass part instantiation entirely and call `GetValueFromMember(null, ...)` directly
-- Added comprehensive unit tests covering all static member types (fields, properties, methods)
+## Benefits
+- **Performance**: Single enumeration instead of two separate LINQ operations
+- **Debuggability**: Better error context - developers can inspect the actual duplicate object when debugging
+- **Maintainability**: More explicit null checking following modern C# best practices
 
-## Tests Added
+## Changes
+Updated 14 instances across 3 files:
+- `TestHostOrchestratorManager.cs` (2 instances)
+- `TestHostControllersManager.cs` (6 instances) 
+- `TestHostManager.cs` (6 instances)
 
-- `StaticFieldExportDoesNotInstantiateClass` - Verifies static fields don't cause instantiation
-- `StaticPropertyExportDoesNotInstantiateClass` - Verifies static properties don't cause instantiation  
-- `StaticMethodExportDoesNotInstantiateClass` - Verifies static methods don't cause instantiation
-- `StaticExportInMixedClassDoesNotInstantiateClass` - Verifies static exports in mixed classes don't cause instantiation
-- `InstanceExportInMixedClassDoesInstantiateClass` - Verifies instance exports still work correctly
+All changes maintain identical functional behavior while improving performance and debugging experience.
 
-The fix ensures static member exports perform better and don't have unwanted side effects from unnecessary instantiation, while maintaining full compatibility with existing functionality.
+Fixes #5739.
 
-Fixes #593.
+<!-- START COPILOT CODING AGENT TIPS -->
+---
 
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `1elvsblobprodwus2177.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
->   - Triggering command: `dotnet build --force ` (dns block)
->   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
-> - `1mcvsblobprodwus2174.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
-> - `1n8vsblobprodwus2184.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
-> - `2wrvsblobprodwus2180.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
->   - Triggering command: `dotnet build --force ` (dns block)
-> - `5o1vsblobprodwus2115.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
->   - Triggering command: `dotnet build --force ` (dns block)
-> - `5zivsblobprodwus217.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
->   - Triggering command: `dotnet build --force ` (dns block)
->   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
-> - `78kvsblobprodwus2152.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
->   - Triggering command: `dotnet build --force ` (dns block)
-> - `7q7vsblobprodwus2144.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
->   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
-> - `7t8vsblobprodwus2168.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
-> - `84hvsblobprodwus2148.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
->   - Triggering command: `dotnet build --force ` (dns block)
-> - `8wdvsblobprodwus2137.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
->   - Triggering command: `dotnet build --force ` (dns block)
-> - `8yfvsblobprodwus2171.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
-> - `an0vsblobprodwus2146.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
->   - Triggering command: `dotnet build --force ` (dns block)
-> - `b15vsblobprodwus2164.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
->   - Triggering command: `dotnet build --force ` (dns block)
-> - `b5svsblobprodwus2116.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
->   - Triggering command: `dotnet build --force ` (dns block)
-> - `balvsblobprodwus2129.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
->   - Triggering command: `dotnet build --force ` (dns block)
-> - `cbvvsblobprodwus2131.vsblob.vsassets.io`
->   - Triggering command: `dotnet build --force ` (dns block)
-> - `etjvsblobprodwus2172.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
-> - `g3xvsblobprodwus2151.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
-> - `hd3vsblobprodwus2117.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
-> - `i01vsblobprodwus216.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
->   - Triggering command: `dotnet build --force ` (dns block)
->   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
-> - `ia4vsblobprodwus2112.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
-> - `izzvsblobprodwus2142.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
->   - Triggering command: `dotnet build --force ` (dns block)
-> - `jhgvsblobprodwus2167.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
-> - `jk4vsblobprodwus2186.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
->   - Triggering command: `dotnet build --force ` (dns block)
->   - Triggering command: `/home/REDACTED/work/_temp/ghcca-node/node/bin/node /home/REDACTED/work/_temp/copilot-developer-action-main/dist/index.js ` (dns block)
-> - `jlovsblobprodwus2163.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
->   - Triggering command: `dotnet build --force ` (dns block)
-> - `jqivsblobprodwus2187.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
->   - Triggering command: `dotnet build --force ` (dns block)
-> - `mdcvsblobprodwus2159.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
->   - Triggering command: `dotnet build --force ` (dns block)
-> - `mt2vsblobprodwus2110.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
-> - `ndavsblobprodwus219.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
-> - `nypvsblobprodwus2178.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
->   - Triggering command: `dotnet build --force ` (dns block)
-> - `p2tvsblobprodwus2189.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
->   - Triggering command: `dotnet build --force ` (dns block)
-> - `s0ivsblobprodwus2134.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
->   - Triggering command: `dotnet build --force ` (dns block)
->   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
-> - `tn2vsblobprodwus2124.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
->   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
-> - `v41vsblobprodwus2175.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
->   - Triggering command: `dotnet build --force ` (dns block)
-> - `vd2vsblobprodwus2150.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
->   - Triggering command: `dotnet build --force ` (dns block)
-> - `wlnvsblobprodwus2188.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
->   - Triggering command: `dotnet build --force ` (dns block)
-> - `wztvsblobprodwus2155.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
-> - `x1mvsblobprodwus2181.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
-> - `xktvsblobprodwus2141.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
->   - Triggering command: `dotnet build --force ` (dns block)
->   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
-> - `xofvsblobprodwus2114.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
->   - Triggering command: `dotnet build --force ` (dns block)
-> - `y1mvsblobprodwus2138.vsblob.vsassets.io`
->   - Triggering command: `dotnet build ` (dns block)
->   - Triggering command: `dotnet build --force ` (dns block)
->   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
-> - `zugvsblobprodwus2169.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/Microsoft.VisualStudio.Composition/Microsoft.VisualStudio.Composition.csproj ` (dns block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
-",Copilot,198982749,Copilot,open,2025-06-11T02:50:00Z,,,89300492,https://api.github.com/repos/microsoft/vs-mef,https://github.com/microsoft/vs-mef/pull/594,"analysisWe need to classify the pull request as 'performance' or 'non-performance'. The PR title: ""Fix static member exports to not instantiate declaring type"". The description: It addresses performance overhead due to unnecessary instantiation of static members. It modifies code to avoid instantiation, improving performance. So it's a performance improvement. So classification: 'performance'.assistantfinalperformance",29,1.0,True
-3120627194,11953,Deprecate BuildEventArgs.ThreadId and make it always return 0,"This PR deprecates the `BuildEventArgs.ThreadId` property as discussed in issue #6152 to improve performance and reduce memory usage.
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-16T09:28:27Z,2025-07-17T08:26:05Z,2025-07-17T08:26:05Z,65080725,https://api.github.com/repos/microsoft/testfx,https://github.com/microsoft/testfx/pull/6060,29,1.0,False
+3049300237,21192,perf: Optimize team bookings query by using batch version,"# Optimize Team Bookings Query by Using Batch Version
 
-## Changes Made
+## What's being changed and why
 
-1. **Added `[Obsolete]` attribute** to the `ThreadId` property with a descriptive message indicating it will be removed in a future version
-2. **Changed the constructor** to set `threadId = 0` instead of computing `System.Threading.Thread.CurrentThread.GetHashCode()`
+This PR addresses a database performance issue by updating two locations in the web app code that were still using the single-user version of `BookingRepository.getAllAcceptedTeamBookingsOfUser` instead of the batch version `BookingRepository.getAllAcceptedTeamBookingsOfUsers` that was introduced in PR #21137.
 
-## Impact
+The problematic SQL query was causing database performance issues when checking team booking limits. By using the batch version of the repository function, we can reduce the number of database queries and improve performance.
 
-- **Performance improvement**: Eliminates the thread hash computation in every `BuildEventArgs` constructor
-- **Memory neutral**: The `threadId` field still exists but stores a constant value instead of variable hash codes
-- **Backward compatibility**: All existing code continues to work with deprecation warnings
-- **Consistent behavior**: `ThreadId` now always returns 0 instead of unpredictable hash values
+## Locations updated:
+
+1. `packages/lib/intervalLimits/server/getBusyTimesFromLimits.ts` - Updated `_getBusyTimesFromTeamLimits` function to use the batch version
+2. `packages/lib/intervalLimits/server/checkBookingLimits.ts` - Updated `checkBookingLimit` function to use the batch version
 
 ## Testing
 
-- ✅ All Framework unit tests pass (75/75)
-- ✅ All serialization tests pass (48/48) 
-- ✅ Binary logger compatibility verified
-- ✅ Third-party code will receive obsolete warnings but continue to function
+- Type checking passes with `yarn type-check:ci`
+- The changes maintain the same functionality while improving database performance
 
-## Rationale
+Link to Devin run: https://app.devin.ai/sessions/55468c0da81642c6aeae9308e4e34075
+Requested by: keith@cal.com
 
-As noted in the issue comments, `ThreadId` appears to be unused and the current implementation using thread hash codes provides little value. The maintainers agreed to deprecate it for version 17.0 rather than outright removal to avoid breaking third-party code that might access this property.
-
-The thread ID was already commented out in `EventArgsFormatting.cs` (lines 224-229), confirming it's not actively used for display purposes.
-
-Fixes #6152.
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `dnceng.pkgs.visualstudio.com`
->   - Triggering command: `dotnet build src/Framework/Microsoft.Build.Framework.csproj --configuration Debug ` (dns block)
->   - Triggering command: `./.dotnet/dotnet build src/Framework/Microsoft.Build.Framework.csproj --configuration Debug ` (dns block)
->   - Triggering command: `./.dotnet/dotnet build src/Framework.UnitTests/Microsoft.Build.Framework.UnitTests.csproj --configuration Debug ` (dns block)
-> - `http://168.63.129.16:80/machine/`
->   - Triggering command: `/usr/bin/python3 -u bin/WALinuxAgent-2.13.1.1-py3.9.egg -collect-logs ` (http block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
-
-
+    
+<!-- This is an auto-generated description by mrge. -->
 ---
 
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-05T10:10:32Z,2025-06-05T16:06:06Z,,32051890,https://api.github.com/repos/dotnet/msbuild,https://github.com/dotnet/msbuild/pull/11953,"analysisWe need to classify as performance or non-performance. The PR is about deprecating ThreadId property, removing thread hash computation, to improve performance and reduce memory usage. It explicitly says ""Performance improvement: Eliminates the thread hash computation"". So it's performance. So label 'performance'.assistantfinalperformance",29,1.0,False
-3120599542,11952,Fix always-true condition in LazyItemEvaluator metadata expansion logic,"This PR fixes a logical bug in the `NeedToExpandMetadataForEachItem` method where a condition was always evaluating to true, causing unnecessary metadata expansion and breaking an optimization path.
+## Summary by mrge
+Optimized team bookings queries by switching to the batch version, reducing database load and improving performance.
+
+- **Refactors**
+  - Replaced single-user team bookings queries with batch queries in booking limits and busy times logic.
+
+<!-- End of auto-generated description by mrge. -->
+
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-08T15:06:29Z,2025-05-08T15:08:09Z,,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/21192,29,1.0,False
+2922685827,1076,fix: optimize user deletion process with queue-based system,"# User Deletion Performance Optimization
 
 ## Problem
-
-In `LazyItemEvaluator.LazyItemOperation.cs` line 293, the condition:
-
-```csharp
-if (_referencedItemLists.Count >= 0)
-```
-
-is always true because `Count` is never negative. This caused the method to always expand metadata for each item individually when any metadata was present, regardless of whether item list references (`@(...)` expressions) were actually involved.
-
-## Root Cause
-
-The always-true condition meant the else branch (lines 297-308) that checks for bare built-in metadata was never executed, breaking the intended optimization logic documented in the surrounding comments.
+Users cannot be deleted from the auth table due to incomplete implementation of the deletion process and performance issues with the Supabase Edge functions.
 
 ## Solution
+- Implemented queue-based deletion system for better reliability
+- Added timeout handling to prevent Edge function timeouts
+- Optimized SQL functions for better performance
+- Added comprehensive error handling and logging
+- Created performance metrics tracking
+- Added tests for user deletion functionality
 
-Changed the condition to properly check for non-empty collections:
+### Queue-Based Deletion System
+- Created a `deletion_queue` table to store pending user deletions
+- Implemented a new Edge function `process_deletion_queue` to handle deletions asynchronously
+- Added retry mechanism with configurable retry count
+- Implemented health check endpoint to monitor queue status
 
-```csharp
-if (_referencedItemLists.Count > 0)
+### Timeout Handling
+```typescript
+// Set a timeout for the request
+const timeoutPromise = new Promise<never>((_, reject) => {
+  setTimeout(() => reject(new Error('Operation timed out')), 25000) // 25 seconds timeout
+});
+
+// Wrap the operation in a race with the timeout
+await Promise.race([
+  processUserDeletion(c, oldRecord),
+  timeoutPromise,
+]);
 ```
 
-## Impact
+### SQL Optimizations
+- Optimized the `delete_user` SQL function with more efficient queries
+- Created a separate `get_sole_admin_orgs` function to improve query performance
+- Used Common Table Expressions (CTEs) for better query performance
+```sql
+WITH sole_admin_orgs AS (
+    SELECT org_id 
+    FROM org_users
+    WHERE user_id = v_user_id 
+    AND user_right = 'super_admin'
+    AND org_id NOT IN (
+        SELECT org_id 
+        FROM org_users
+        WHERE user_right = 'super_admin' 
+        AND user_id != v_user_id
+    )
+)
+SELECT array_agg(org_id) INTO v_user_orgs FROM sole_admin_orgs;
+```
 
-- **Performance**: Restores the optimization path for common cases without item list references
-- **Correctness**: Metadata expansion now correctly follows the intended logic:
-  - Expand per-item when item lists are referenced (`@(...)` expressions), OR  
-  - Expand per-item when bare built-in metadata is present
-  - Otherwise, use the more efficient batch expansion approach
+### Performance Metrics
+- Added a `record_performance_metric` function to track deletion performance
+- Implemented metrics for deletion duration, success rate, and queue status
+- Added structured logging with request IDs for better traceability
 
-This is a minimal, surgical fix that addresses the exact issue reported by static analysis tools.
+## Testing
+- Added automated tests for the user deletion process
+- Implemented retry logic in tests to handle asynchronous operations
+- Added helper functions for safer RPC and query operations
 
-Fixes #5586.
+Fixes #1072
+Link to Devin run: https://app.devin.ai/sessions/f0b22cb98e9047378baa11acab244b53
+Requested by: Cap-go
+",Devin,158243242,devin-ai-integration[bot],closed,2025-03-16T01:15:13Z,2025-03-16T14:42:08Z,,442321089,https://api.github.com/repos/Cap-go/capgo,https://github.com/Cap-go/capgo/pull/1076,29,1.0,False
+3049320746,21193,perf: Optimize team bookings query by using batch version,"# Optimize Team Bookings Query by Using Batch Version
 
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `dnceng.pkgs.visualstudio.com`
->   - Triggering command: `dotnet build src/Build/Microsoft.Build.csproj --configuration Debug ` (dns block)
-> - `http://168.63.129.16:80/machine/`
->   - Triggering command: `/usr/bin/python3 -u bin/WALinuxAgent-2.13.1.1-py3.9.egg -collect-logs ` (http block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
+## What's being changed and why
 
+This PR addresses a database performance issue by updating two locations in the web app code that were still using the single-user version of `BookingRepository.getAllAcceptedTeamBookingsOfUser` instead of the batch version `BookingRepository.getAllAcceptedTeamBookingsOfUsers` that was introduced in PR #21137.
 
+The problematic SQL query was causing database performance issues when checking team booking limits. By using the batch version of the repository function, we can reduce the number of database queries and improve performance.
+
+## Locations updated:
+
+1. `packages/lib/intervalLimits/server/getBusyTimesFromLimits.ts` - Updated `_getBusyTimesFromTeamLimits` function to use the batch version
+2. `packages/lib/intervalLimits/server/checkBookingLimits.ts` - Updated `checkBookingLimit` function to use the batch version
+
+## Testing
+
+- Type checking passes with `yarn type-check:ci`
+- The changes maintain the same functionality while improving database performance
+
+Link to Devin run: https://app.devin.ai/sessions/55468c0da81642c6aeae9308e4e34075
+Requested by: keith@cal.com
+
+    
+<!-- This is an auto-generated description by mrge. -->
 ---
 
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-05T10:02:08Z,2025-06-17T06:48:14Z,2025-06-17T06:48:12Z,32051890,https://api.github.com/repos/dotnet/msbuild,https://github.com/dotnet/msbuild/pull/11952,"analysisWe need to classify the PR as 'performance' or 'non-performance'. The PR fixes a logical bug that caused unnecessary metadata expansion, restoring optimization path. The impact mentions performance: ""Restores the optimization path for common cases without item list references"". So it's a performance improvement. The description includes performance-related keywords: ""performance"", ""optimization"", ""unnecessary metadata expansion"", ""optimization path"". So classification: 'performance'.assistantfinalperformance",29,1.0,False
-3081345740,49090,Prevent double-building of Microsoft.DotNet.Cli.Utils.csproj by excluding PublishDir from global properties,"This PR fixes an issue where `Microsoft.DotNet.Cli.Utils.csproj` is being built twice during the SDK build process, causing PDB mismatches on some platforms (particularly s390x in source-build).
+## Summary by mrge
+Optimized team bookings queries by switching to the batch version of the repository function, reducing database load and improving performance. Now, team booking limits for multiple users are checked in a single query instead of one per user.
 
-## Issue details
-- `Microsoft.NET.Build.Containers.csproj` references `Microsoft.DotNet.Cli.Utils.csproj`
-- In `GenerateLayout.targets`, the `PublishContainersSdk` target publishes `Microsoft.NET.Build.Containers.csproj` with specific `PublishDir` property values
-- By default, MSBuild propagates global properties like `PublishDir` to referenced projects
-- When `PublishDir` changes, MSBuild treats it as a different build configuration and rebuilds referenced projects
-- This causes `Microsoft.DotNet.Cli.Utils.csproj` to be built twice with different settings, resulting in PDB mismatches
+<!-- End of auto-generated description by mrge. -->
 
-## Solution
-Added `GlobalPropertiesToRemove=""PublishDir""` to all MSBuild calls in `GenerateLayout.targets` that either:
-1. Explicitly set the `PublishDir` property, or
-2. Could potentially propagate `PublishDir` to referenced projects
-
-This prevents the `PublishDir` property from being passed to referenced projects like `Microsoft.DotNet.Cli.Utils.csproj`, ensuring it's only built once during the entire build process.
-
-The change follows the suggested approach from @marcpopMSFT in the issue comments.
-
-Fixes #44033.
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `pkgs.dev.azure.com`
->   - Triggering command: `/home/REDACTED/work/sdk/sdk/.dotnet/dotnet msbuild /m /nologo /clp:Summary /v:minimal /nr:true /warnaserror /p:TreatWarningsAsErrors=true /p:ContinuousIntegrationBuild=false /home/REDACTED/work/sdk/sdk/artifacts/toolset/restore.proj /t:__WriteToolsetLocation /clp:ErrorsOnly;NoSummary /p:__ToolsetLocationOutputFile=/home/REDACTED/work/sdk/sdk/artifacts/toolset/10.0.0-beta.25265.101.txt ` (dns block)
->   - Triggering command: `/home/REDACTED/work/_temp/ghcca-node/node/bin/node /home/REDACTED/work/_temp/copilot-developer-action-main/dist/index.js ` (dns block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
-
-
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-05-21T20:31:51Z,2025-07-16T22:02:28Z,2025-07-16T22:02:28Z,63984307,https://api.github.com/repos/dotnet/sdk,https://github.com/dotnet/sdk/pull/49090,"analysisWe need to classify as performance or non-performance. The PR is about preventing double-building of a project to avoid PDB mismatches. It's about build process optimization, but is it performance? It's about reducing unnecessary builds, which is a performance improvement. The keywords: ""build twice"", ""rebuild"", ""build process"", ""prevent double-building"". This is about build performance, not runtime performance. But the classification is about improving performance of software. The guidelines mention performance-related PRs may contain keywords like latency, optimization, slow, memory, speed, etc. This PR is about build optimization, which is a performance improvement. So classify as 'performance'.assistantfinalperformance",29,1.0,False
-3269663648,6203,Add field support to DynamicDataAttribute,"This PR adds support for public static fields as data sources in `DynamicDataAttribute`, addressing a key performance improvement request for test data management.
-
-## Problem
-
-Previously, `DynamicDataAttribute` only supported properties and methods as data sources. This meant that even for constant test data, new objects were created on each access due to property getters or method calls, despite being static:
-
-```csharp
-// Property - creates new array on each access
-public static IEnumerable<object[]> TestData => new[]
-{
-    new object[] { 25, 250 },
-    new object[] { 42, 420 },
-    new object[] { 164, 1640 }
-};
-
-// Method - also creates new array on each call  
-public static IEnumerable<object[]> GetTestData() => new[]
-{
-    new object[] { 25, 250 },
-    new object[] { 42, 420 },
-    new object[] { 164, 1640 }
-};
-```
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-08T15:12:23Z,2025-05-08T15:15:19Z,,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/21193,29,1.0,False
+2922692804,1077,fix: optimize user deletion process with queue-based system,"## Problem
+Users cannot be deleted from the auth table due to incomplete implementation of the deletion process and performance issues.
 
 ## Solution
+- Implemented queue-based deletion system for better reliability
+- Added timeout handling to prevent Edge function timeouts
+- Optimized SQL functions for better performance
+- Added comprehensive error handling and logging
+- Created performance metrics tracking
+- Added tests for user deletion functionality
 
-Added comprehensive support for static fields as data sources, allowing truly constant test data:
+## Testing
+- Added automated tests for the user deletion process
+- Verified SQL migration with Supabase local environment
+- Tested the deletion process end-to-end
 
-```csharp
-// Field - created once, reused efficiently
-public static int[][] TestData = new[]
-{
-    new[] { 25, 250 },
-    new[] { 42, 420 },
-    new[] { 164, 1640 }
-};
+Fixes #1076
+Link to Devin run: https://app.devin.ai/sessions/a68db41c892340bba690131452892597
+Requested by: Cap-go
+",Devin,158243242,devin-ai-integration[bot],closed,2025-03-16T01:34:01Z,2025-03-16T14:42:06Z,2025-03-16T14:42:06Z,442321089,https://api.github.com/repos/Cap-go/capgo,https://github.com/Cap-go/capgo/pull/1077,29,1.0,False
+3040980236,21119,feat(prisma): add middleware to detect and report slow Prisma queries to Sentry,"# Slow Query Detection Middleware for Prisma
 
-[TestMethod]
-[DynamicData(nameof(TestData), DynamicDataSourceType.Field)]
-public void TestWithExplicitField(int input, int expected) { /* ... */ }
+This PR adds a middleware to detect and report slow Prisma queries to Sentry, including the full raw SQL query in the reports for better query optimization.
 
-[TestMethod]
-[DynamicData(nameof(TestData))] // Auto-detect also works
-public void TestWithAutoDetect(int input, int expected) { /* ... */ }
-```
+## Features
 
-## Key Features
-
-- **Explicit field specification**: `DynamicDataSourceType.Field` for direct field targeting
-- **Auto-detection support**: Fields are discovered automatically after properties and methods
-- **External class support**: Works with fields in other classes via declaring type parameter
-- **Inheritance support**: Fields from base classes are properly resolved
-- **Full integration**: Complete support in analyzer, source generation, and runtime
-- **Comprehensive validation**: Proper error messages for non-static fields and type mismatches
+- Detects queries that take longer than a configurable threshold
+- Reports slow queries to Sentry with detailed information
+- Configurable threshold via the `SLOW_QUERY_THRESHOLD_MS` environment variable
+- Rate limiting to avoid flooding Sentry with reports
+- Applied to the main Prisma client
+- Comprehensive integration tests to verify functionality
 
 ## Implementation Details
 
-- Extended `DynamicDataSourceType` enum with `Field = 3` option
-- Added field detection and data extraction methods in `DynamicDataOperations`
-- Updated auto-detect logic with priority: Property → Method → Field
-- Enhanced analyzer to validate field usage and provide appropriate diagnostics
-- Updated source generation to handle field symbols correctly
-- Added comprehensive test coverage for all field scenarios
+- Uses WeakMap for client state to avoid issues with Vercel's Fluid compute environment
+- Captures raw SQL queries using Prisma's `$on('query')` event system
+- Correlates middleware executions with raw SQL queries using timestamp matching
+- Includes automatic cleanup to prevent memory leaks
+- Handles clients without `$use` or `$on` methods gracefully
 
-## Backward Compatibility
+## Testing
 
-This change is fully backward compatible - all existing code continues to work exactly as before. The new field support is purely additive functionality.
+Added true integration tests that verify:
+- Slow queries are properly detected based on the threshold
+- The raw SQL is correctly captured and included in reports
+- Rate limiting works as expected
+- The middleware respects the configured threshold
+- Complex queries with joins are handled correctly
 
-Fixes #5321.
+I've verified that:
+- Type checks pass: `yarn type-check:ci`
+- Linting passes: `yarn lint:report`
+- Tests pass: `TZ=UTC yarn test packages/prisma/middleware/__tests__/slowQueryDetection.integration-test.ts`
 
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `37cvsblobprodcus359.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/TestFramework/TestFramework/TestFramework.csproj` (dns block)
-> - `4zjvsblobprodcus390.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/TestFramework/TestFramework/TestFramework.csproj` (dns block)
-> - `7devsblobprodcus323.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/TestFramework/TestFramework/TestFramework.csproj` (dns block)
-> - `l49vsblobprodcus358.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/TestFramework/TestFramework/TestFramework.csproj` (dns block)
-> - `ljcvsblobprodcus317.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/TestFramework/TestFramework/TestFramework.csproj` (dns block)
-> - `sqdvsblobprodcus333.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/TestFramework/TestFramework/TestFramework.csproj` (dns block)
-> - `st8vsblobprodcus339.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/TestFramework/TestFramework/TestFramework.csproj` (dns block)
-> - `ytvvsblobprodcus310.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/TestFramework/TestFramework/TestFramework.csproj` (dns block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to the custom allowlist in this repository's [Copilot coding agent settings](https://github.com/microsoft/testfx/settings/copilot/coding_agent) (admins only)
->
-> </details>
+Link to Devin run: https://app.devin.ai/sessions/5b4fdefeb6b6437a9df87e5315544650
+Requested by: zomars@cal.com
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-05T22:31:17Z,2025-05-17T15:47:12Z,,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/21119,29,1.0,False
+3042979666,21137,perf: Optimize team bookings query by fetching data for multiple users at once,"# Optimize Team Bookings Query and Busy Times Limits
 
-
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-07-28T12:16:41Z,,,65080725,https://api.github.com/repos/microsoft/testfx,https://github.com/microsoft/testfx/pull/6203,"analysisWe need to classify whether the primary purpose is to improve performance. The PR adds support for static fields as data sources, which reduces object creation overhead, improving performance. The description explicitly says ""addressing a key performance improvement request for test data management."" So it's performance. So label 'performance'.assistantfinalperformance",29,0.3174809842173936,True
-3147449966,3921,[DataGrid] Add IsFixed parameter,"This PR adds an `IsFixed` parameter to the `FluentDataGrid` component that allows developers to optimize performance when working with static datasets that are not expected to change during the grid's lifetime. Fix #3911
+This PR optimizes the team bookings query and busy times limits by fetching data for multiple users at once, rather than making separate database calls for each user.
 
 ## Changes
 
-### New Parameter
-- Added `IsFixed` boolean parameter with default value `false` to maintain backward compatibility
-- When `IsFixed=true`, the grid optimizes refresh behavior for static datasets
-- When `IsFixed=false` (default), maintains existing behavior from v4.11.9
+1. Added a new `getAllAcceptedTeamBookingsOfUsers` function in BookingRepository that accepts multiple users
+2. Created a new `getBusyTimesFromTeamLimitsForUsers` function in util.ts that processes team booking limits for multiple users
+3. Added a new `getBusyTimesFromLimitsForUsers` function in util.ts that processes booking and duration limits for multiple users
+4. Moved the condition checks from getUserAvailability.ts to util.ts
+5. Updated the GetUserAvailabilityInitialData type to include teamBookingLimits, teamForBookingLimits, busyTimesFromLimits, and eventTypeForLimits properties
+6. Modified the _getUserAvailability function to use the batch-loaded data from initialData when available
 
-### Performance Optimizations
-When `IsFixed=true`:
-- Skips hash computation for Items collection change detection
-- Reduces automatic `RefreshItems` calls to only forced or initial requests
-- Maintains full functionality for pagination, explicit refreshes, and data source changes
+## Benefits
 
-### Usage Example
-```razor
-<!-- Default behavior (existing functionality) -->
-<FluentDataGrid Items=""@dynamicData.AsQueryable()"">
-    <PropertyColumn Property=""@(x => x.Name)"" />
-</FluentDataGrid>
+- Reduces the number of database queries by fetching team bookings and busy times once for multiple users
+- Improves performance by avoiding redundant database calls
+- Maintains the same functionality while optimizing query execution
+- Particularly beneficial for team and collective scheduling types with many members
 
-<!-- Optimized for static datasets -->
-<FluentDataGrid Items=""@staticData.AsQueryable()"" IsFixed=""true"">
-    <PropertyColumn Property=""@(x => x.Name)"" />
-</FluentDataGrid>
+## Testing
+
+- Verified that all type checks pass with `yarn type-check:ci`
+
+Link to Devin run: https://app.devin.ai/sessions/5ef101ff0af14ab19d58e29583f13453
+Requested by: keith@cal.com
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-06T14:08:17Z,2025-05-06T18:47:07Z,2025-05-06T18:47:07Z,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/21137,29,1.0,False
+3147975254,21826,feat: optimize Prisma queries by replacing findFirst with findUnique where applicable,"# Optimize Prisma queries by replacing findFirst with findUnique where applicable (Non-API and Non-Test files only)
+
+## Summary
+
+This PR systematically optimizes Prisma database queries across the Cal.com codebase by replacing `findFirst` and `findFirstOrThrow` with `findUnique` and `findUniqueOrThrow` where the WHERE clause uses unique index keys. This optimization leverages database unique constraints for better performance and type safety.
+
+**Note**: Per user request, all API-related files and test files have been excluded from these optimizations to maintain API stability and test compatibility.
+
+## Changes Made
+
+### Key Optimizations
+
+- **User queries**: Replaced `findFirst` with `findUnique` for queries using `id`, `email`, and other unique fields
+- **Team queries**: Optimized queries using `id` and composite unique constraints like `slug + parentId`
+- **EventType queries**: Replaced queries using `id`, `userId + slug`, and `teamId + slug` unique constraints
+- **Booking queries**: Optimized queries using `id`, `uid`, and `idempotencyKey` unique fields
+- **Membership queries**: Replaced queries using the composite unique constraint `userId + teamId`
+- **OAuth and authentication**: Optimized client and token queries using unique identifiers
+
+### Files Modified
+
+- **93 files** across the codebase were updated (55 API files and 14 test files excluded)
+- **205 insertions, 172 deletions** - primarily method name changes and formatting improvements
+- Changes span across:
+  - tRPC handlers and routers (non-API)
+  - Repository classes (non-API)
+  - App store integrations (non-API)
+  - Feature modules
+  - Web app components and utilities
+
+### Excluded from Optimization
+
+- **API v1 endpoints** (`apps/api/v1/pages/api/`)
+- **API v2 repositories** (`apps/api/v2/src/modules/`)
+- **Web API routes** (`apps/web/app/api/`, `apps/web/pages/api/`)
+- **App store API handlers** (`packages/app-store/*/api/`)
+- **Test files** (`*.test.ts`, `*.e2e.ts`, `*.integration-test.ts`, `testUtils.ts`)
+
+### Technical Details
+
+All replacements were made only where:
+1. The WHERE clause uses fields that have unique constraints in the Prisma schema
+2. The query logic expects a single result (not multiple matches)
+3. The change maintains identical functionality and error handling
+4. The file is not in an API directory or test file (per user request)
+
+## Verification
+
+✅ **Type checking**: `yarn type-check:ci` passes
+✅ **Tests**: All 2041 tests pass with `TZ=UTC yarn test`
+✅ **Linting**: Code formatting and quality checks pass
+✅ **CI**: All 36 CI checks passing
+
+## Performance Benefits
+
+- **Database performance**: `findUnique` queries use unique indexes, providing O(1) lookup performance
+- **Type safety**: Better TypeScript inference with guaranteed single results
+- **Query optimization**: Database can optimize unique constraint queries more effectively
+
+## Link to Devin run
+https://app.devin.ai/sessions/4521f4d3b21641089560237eb9b4ad0d
+
+## Requested by
+benny@cal.com (Benny Joo)
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-15T19:01:54Z,2025-06-17T06:52:03Z,2025-06-17T06:52:03Z,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/21826,29,1.0,True
+2887787232,495,[DEVIN: Ryan] Optimize create user query to not use interactive transaction,"# Optimize create user query to not use interactive transaction
+
+This PR optimizes the create user query in `apps/backend/src/app/api/latest/users/crud.tsx` to not use an interactive transaction. The changes include:
+
+1. Refactored the `onCreate` method to use direct Prisma client operations instead of the `retryTransaction` function
+2. Updated helper functions (`checkAuthData`, `getPasswordConfig`, and `getOtpConfig`) to accept either a `PrismaClient` or a `PrismaTransaction` for better type flexibility
+3. Fixed linting issues related to trailing spaces in the file
+
+The functionality remains the same, but the implementation is now more efficient by avoiding the overhead of interactive transactions.
+
+Link to Devin run: https://app.devin.ai/sessions/899abb43e33d47a1b0ac12c6a5d5a720
+Requested by: Konsti
+",Devin,158243242,devin-ai-integration[bot],closed,2025-02-28T18:08:06Z,2025-03-13T18:51:12Z,,764642350,https://api.github.com/repos/stack-auth/stack-auth,https://github.com/stack-auth/stack-auth/pull/495,29,1.0,False
+3034903835,21067,perf: replace OR conditions with UNION in bookings query,"# Performance Improvement for Booking Queries
+
+This PR replaces the inefficient OR conditions in the booking queries with UNION queries, which are much more performant when querying large datasets. The optimized query is 212 times faster in production environments with millions of records.
+
+## Changes
+- Completely replaced Prisma ORM query with raw SQL using UNION instead of OR conditions
+- Maintained all existing filter functionality
+- Preserved the same data structure in the returned results
+- Added proper type checking for filters and parameters
+
+## Testing
+- Ran type checks and linting
+- Verified query structure matches the optimized example
+
+## Link to Devin run
+https://app.devin.ai/sessions/b183a6281d8d4c04b94d015024c38139
+
+Requested by: keith@cal.com
+
+    
+<!-- This is an auto-generated description by mrge. -->
+---
+
+## Summary by mrge
+Replaced slow OR conditions in the bookings query with UNION-based raw SQL, making large booking queries over 200x faster.
+
+- **Refactors**
+  - Switched from Prisma ORM to raw SQL with UNION for all main booking filters.
+  - Preserved all filter options and returned data structure.
+
+<!-- End of auto-generated description by mrge. -->
+
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-01T23:31:12Z,2025-05-11T15:30:44Z,,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/21067,29,1.0,False
+3070227634,21372,perf: parallelize getBusyTimes calls to improve performance,"# Parallelize getBusyTimes calls to improve performance
+
+## What does this PR do?
+
+This PR addresses a performance issue where each call to `getBusyTimes` takes progressively longer when called in a loop (as shown in the screenshot). The issue is particularly problematic for teams with 50+ members where the function may be called many times sequentially.
+
+- Fixes N/A (No specific issue number)
+
+## Visual Demo
+
+The original issue is demonstrated in the screenshot shared by the user, showing how the length of time for each `getBusyTimes` trace increases slightly with each call.
+
+## Changes
+
+- Parallelized calls to `getBusyTimesFromBookingLimits` and `getBusyTimesFromDurationLimits` in `getBusyTimesFromLimits.ts`
+- Parallelized calls to `getBusyTimesFromLimits` and `getBusyTimesFromTeamLimits` in `getUserAvailability.ts`
+- Optimized the `getBusyTimes` function to start database queries early and process results in parallel
+
+These changes focus specifically on the Prisma database calls as requested, while leaving the external calendar API calls unchanged.
+
+## Mandatory Tasks
+
+- [x] I have self-reviewed the code
+- [x] I have updated the developer docs in /docs if this PR makes changes that would require a documentation change. N/A
+- [x] I confirm automated tests are in place that prove my fix is effective or that my feature works.
+
+## How should this be tested?
+
+- Test with a team that has 50+ members to verify that the performance of `getBusyTimes` no longer degrades with each call
+- Compare the trace times before and after the changes to verify the performance improvement
+- Verify that all existing functionality continues to work as expected
+
+## Link to Devin run
+https://app.devin.ai/sessions/5edaa90977f84726a592c4e8cda677b4
+
+Requested by: keith@cal.com
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-17T02:58:48Z,2025-05-24T12:43:06Z,2025-05-24T12:43:06Z,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/21372,29,0.14989522768979757,False
+3212230718,26149,[Backport][release-474-e] Parallelize Iceberg materialized view base table freshness retrieval,"Backport of #24734 to release-474-e. This change parallelizes freshness retrieval for Iceberg materialized view base tables. See original PR for details and discussion: https://github.com/trinodb/trino/pull/24734
+
+## Summary
+
+This backport improves query planning performance for materialized views by parallelizing the retrieval of base table freshness information in the Iceberg connector. Instead of checking each base table sequentially, the freshness checks are now performed in parallel using the existing `processWithAdditionalThreads` utility.
+
+## Changes
+
+### Main Implementation (`IcebergMetadata.java`)
+- **Parallelized processing**: The `getMaterializedViewFreshness` method now processes multiple base tables concurrently using `processWithAdditionalThreads` instead of sequential iteration
+- **New error handling**: Added `CorruptedTableChange` record to properly handle corrupted tables with immediate STALE return
+- **Refactored logic**: Extracted table parsing logic into a dedicated `getTableChangeInfo(ConnectorSession, String)` method for better code organization
+
+### Test Cleanups
+Removed unused imports from test files:
+- `TestTrinoGlueCatalog.java`
+- `TestTrinoNessieCatalog.java`
+- `TestTrinoRestCatalog.java`
+
+## Performance Impact
+
+Based on benchmarks from the original PR:
+- **20 base tables with 10ms avg load time**: Reduces refresh time from 560ms to 310ms (~45% improvement)
+- **20 base tables with 100ms avg load time**: Reduces refresh time by more than 1 second
+
+## Technical Details
+
+The change maintains identical semantics while improving performance:
+
+**Before (Sequential):**
+```java
+for (String entry : tableToSnapshotIds) {
+    switch (getTableChangeInfo(session, tableHandle, snapshotAtRefresh)) {
+        // Process each table one by one
+    }
+}
 ```
 
-### Implementation Details
-- Modified `OnParametersSetAsync()` to respect the `IsFixed` parameter in change detection logic
-- Enhanced `RefreshDataCoreAsync()` to be more conservative about automatic refreshes when `IsFixed=true`
-- Added comprehensive test coverage including edge cases and explicit refresh scenarios
+**After (Parallel):**
+```java
+ImmutableList.Builder<Callable<TableChangeInfo>> tableChangeInfoTasks = ImmutableList.builder();
+for (String tableToSnapShot : Splitter.on(',').split(dependsOnTables)) {
+    tableChangeInfoTasks.add(() -> getTableChangeInfo(session, tableToSnapShot));
+}
 
-### Backward Compatibility
-- Default value of `false` ensures existing code continues to work unchanged
-- All existing functionality (pagination, sorting, explicit refreshes) remains fully functional
-- No breaking changes to existing APIs
+List<TableChangeInfo> tableChangeInfos = processWithAdditionalThreads(
+    tableChangeInfoTasks.build(), metadataFetchingExecutor);
+```
 
-This implementation replaces the automatic refresh logic that was added in v4.12.0 with more controlled behavior when developers know their dataset is static, providing significant performance benefits for such scenarios.
+## Release Notes
 
-Fixes #3920.
+```markdown
+* Improve query planning performance when reading from materialized views. ({issue}`24734`)
+```
+
+cc @chenjian2664
 
 > [!WARNING]
 >
@@ -821,76 +473,12 @@ Fixes #3920.
 >
 > #### I tried to connect to the following addresses, but was blocked by firewall rules:
 >
-> - `7tjvsblobprodcus341.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
-> - `80zvsblobprodcus35.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj -f net9.0 ` (dns block)
->   - Triggering command: `dotnet test tests/Core/Microsoft.FluentUI.AspNetCore.Components.Tests.csproj -f net9.0 --filter FluentDataGrid_IsFixed --verbosity normal ` (dns block)
-> - `8xbvsblobprodcus382.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj -f net9.0 ` (dns block)
->   - Triggering command: `dotnet test tests/Core/Microsoft.FluentUI.AspNetCore.Components.Tests.csproj -f net9.0 --filter FluentDataGrid_IsFixed --verbosity normal ` (dns block)
-> - `aka.ms`
->   - Triggering command: `curl -I -sSL --retry 5 --retry-delay 2 --connect-timeout 15 REDACTED ` (dns block)
-> - `bcnvsblobprodcus378.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj -f net9.0 ` (dns block)
->   - Triggering command: `dotnet test tests/Core/Microsoft.FluentUI.AspNetCore.Components.Tests.csproj -f net9.0 --filter FluentDataGrid_IsFixed --verbosity normal ` (dns block)
-> - `c50vsblobprodcus330.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj -f net9.0 ` (dns block)
->   - Triggering command: `dotnet test tests/Core/Microsoft.FluentUI.AspNetCore.Components.Tests.csproj -f net9.0 --filter FluentDataGrid_IsFixed --verbosity normal ` (dns block)
-> - `c78vsblobprodcus322.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
-> - `d0svsblobprodcus381.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj -f net9.0 ` (dns block)
->   - Triggering command: `dotnet test tests/Core/Microsoft.FluentUI.AspNetCore.Components.Tests.csproj -f net9.0 --filter FluentDataGrid_IsFixed --verbosity normal ` (dns block)
-> - `imzvsblobprodcus368.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj -f net9.0 ` (dns block)
->   - Triggering command: `dotnet test tests/Core/Microsoft.FluentUI.AspNetCore.Components.Tests.csproj -f net9.0 --filter FluentDataGrid_IsFixed --verbosity normal ` (dns block)
-> - `jd4vsblobprodcus366.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj -f net9.0 ` (dns block)
->   - Triggering command: `dotnet test tests/Core/Microsoft.FluentUI.AspNetCore.Components.Tests.csproj -f net9.0 --filter FluentDataGrid_IsFixed --verbosity normal ` (dns block)
-> - `jrqvsblobprodcus343.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj -f net9.0 ` (dns block)
->   - Triggering command: `dotnet test tests/Core/Microsoft.FluentUI.AspNetCore.Components.Tests.csproj -f net9.0 --filter FluentDataGrid_IsFixed --verbosity normal ` (dns block)
-> - `kh4vsblobprodcus325.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj -f net9.0 ` (dns block)
->   - Triggering command: `dotnet test tests/Core/Microsoft.FluentUI.AspNetCore.Components.Tests.csproj -f net9.0 --filter FluentDataGrid_IsFixed --verbosity normal ` (dns block)
-> - `kmuvsblobprodcus389.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj -f net9.0 ` (dns block)
->   - Triggering command: `dotnet test tests/Core/Microsoft.FluentUI.AspNetCore.Components.Tests.csproj -f net9.0 --filter FluentDataGrid_IsFixed --verbosity normal ` (dns block)
-> - `l49vsblobprodcus358.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj -f net9.0 ` (dns block)
->   - Triggering command: `dotnet test tests/Core/Microsoft.FluentUI.AspNetCore.Components.Tests.csproj -f net9.0 --filter FluentDataGrid_IsFixed --verbosity normal ` (dns block)
-> - `lylvsblobprodcus31.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj -f net9.0 ` (dns block)
->   - Triggering command: `dotnet test tests/Core/Microsoft.FluentUI.AspNetCore.Components.Tests.csproj -f net9.0 --filter FluentDataGrid_IsFixed --verbosity normal ` (dns block)
-> - `nn8vsblobprodcus340.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj -f net9.0 ` (dns block)
->   - Triggering command: `dotnet test tests/Core/Microsoft.FluentUI.AspNetCore.Components.Tests.csproj -f net9.0 --filter FluentDataGrid_IsFixed --verbosity normal ` (dns block)
-> - `o3svsblobprodcus318.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj -f net9.0 ` (dns block)
->   - Triggering command: `dotnet test tests/Core/Microsoft.FluentUI.AspNetCore.Components.Tests.csproj -f net9.0 --filter FluentDataGrid_IsFixed --verbosity normal ` (dns block)
-> - `uy6vsblobprodcus34.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
-> - `vb4vsblobprodcus33.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
-> - `x3yvsblobprodcus370.vsblob.vsassets.io`
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj ` (dns block)
->   - Triggering command: `dotnet build src/Core/Microsoft.FluentUI.AspNetCore.Components.csproj -f net9.0 ` (dns block)
->   - Triggering command: `dotnet test tests/Core/Microsoft.FluentUI.AspNetCore.Components.Tests.csproj -f net9.0 --filter FluentDataGrid_IsFixed --verbosity normal ` (dns block)
+> - `https://api.github.com/repos/trinodb/trino/branches`
+>   - Triggering command: `curl -s REDACTED` (http block)
+> - `https://api.github.com/repos/trinodb/trino/pulls/24734/commits`
+>   - Triggering command: `curl -s REDACTED` (http block)
+> - `repository.jboss.org`
+>   - Triggering command: `/usr/lib/jvm/temurin-17-jdk-amd64/bin/java --enable-native-access=ALL-UNNAMED -Xmx8192m --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED --add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED --add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED -XX:&#43;ExitOnOutOfMemoryError --enable-native-access=ALL-UNNAMED -classpath /home/REDACTED/.m2/wrapper/dists/apache-maven-3.9.10/e5402a93/boot/plexus-classworlds-2.9.0.jar -Dclassworlds.conf=/home/REDACTED/.m2/wrapper/dists/apache-maven-3.9.10/e5402a93/bin/m2.conf -Dmaven.home=/home/REDACTED/.m2/wrapper/dists/apache-maven-3.9.10/e5402a93 -Dlibrary.jansi.path=/home/REDACTED/.m2/wrapper/dists/apache-maven-3.9.10/e5402a93/lib/jansi-native -Dmaven.multiModuleProjectDirectory=/home/REDACTED/work/trino/trino org.codehaus.plexus.classworlds.launcher.Launcher compile -pl :trino-iceberg -q` (dns block)
 >
 > If you need me to access, download, or install something from one of these locations, you can either:
 >
@@ -901,46 +489,171 @@ Fixes #3920.
 
 
 
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-15T12:17:46Z,2025-06-17T07:32:33Z,,348132133,https://api.github.com/repos/microsoft/fluentui-blazor,https://github.com/microsoft/fluentui-blazor/pull/3921,"analysisWe need to classify as performance or non-performance. The PR adds IsFixed parameter to optimize performance for static datasets. It explicitly mentions performance optimizations, skipping hash computation, reducing refresh calls. So it's performance. So output 'performance'.assistantfinalperformance",29,0.23534668789032914,False
-3210885983,54325,[WIP] Antd table performance issue when pagination is disabled and data set is > 100. This issue causes huge lag in row selection and page navigation. Issue occurred since 2019,"Thanks for assigning this issue to me. I'm starting to work on it and will keep this PR's description up to date as I form a plan and make progress.
-
-Original issue description:
-
-> ### Reproduction link
-> 
-> [![Edit on CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/custom-selection-antd-5-8-2-forked-hfm79m)
-> 
-> ### Steps to reproduce
-> 
-> Display around 100rows in Antd table, clicking on selection causes a noticeable delay. Have tried other people's work around but man the delay is really obvious. Trying to migrate from ag grid to antd, but the table is almost making the component unusable... 
-> 
-> ShouldCellUpdate is not helping 
-> shouldCellUpdate: (record, prevRecord) => !_.isEqual(record, prevRecord)
-> 
-> ### What is expected?
-> 
-> Not expecting performance issue for 100+ dataset
-> 
-> ### What is actually happening?
-> 
-> delay for small size data
-> 
-> | Environment | Info |
-> | --- | --- |
-> | antd | 5.8.2 |
-> | React | 18.2 |
-> | System | web |
-> | Browser | Chrome |
-> 
-> <!-- generated by ant-design-issue-helper. DO NOT REMOVE -->
-
-
-Fixes #44039.
+*This pull request was created as a result of the following prompt from Copilot chat.*
+> Backport PR #24734 (Parallelize Iceberg materialized view base table freshness retrieval) from master to release-474-e branch.
+> - Cherry-pick all commits from https://github.com/trinodb/trino/pull/24734
+> - Resolve any merge conflicts if they arise, maintaining the original authorship and commit messages where possible.
+> - Ensure the code compiles and passes relevant CI for the release-474-e branch.
+> - Title: '[Backport][release-474-e] Parallelize Iceberg materialized view base table freshness retrieval'
+> - Description: 'Backport of #24734 to release-474-e. This change parallelizes freshness retrieval for Iceberg materialized view base tables. See original PR for details and discussion: https://github.com/trinodb/trino/pull/24734'
+> - Add a 'backport' label if available.
+> - Tag @chenjian2664 for visibility.
+> - Target branch: release-474-e
 
 <!-- START COPILOT CODING AGENT TIPS -->
 ---
 
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-08T03:27:16Z,2025-07-12T02:41:59Z,,34526884,https://api.github.com/repos/ant-design/ant-design,https://github.com/ant-design/ant-design/pull/54325,"analysisWe need to classify as performance or non-performance. The PR title: ""[WIP] Antd table performance issue when pagination is disabled and data set is > 100. This issue causes huge lag in row selection and page navigation."" Body describes performance issue, lag, delay. So it's performance. So output 'performance'.assistantfinalperformance",29,0.147815807136611,False
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-08T11:50:27Z,2025-07-08T13:02:06Z,,166515022,https://api.github.com/repos/trinodb/trino,https://github.com/trinodb/trino/pull/26149,29,0.12902439523306092,True
+3018439207,20962,fix: parallelize Google Calendar API calls,"# Description
+
+This PR fixes a performance issue where Google Calendar API calls were running sequentially instead of concurrently. This was happening in two places:
+
+1. In the `getAvailability` method of the Google Calendar service, where it was processing date ranges > 90 days sequentially
+2. In the `fetchAvailabilityAndSetCache` method, where it was processing event types sequentially
+
+The fix uses Promise.all() to run these API calls concurrently, which should significantly reduce the time to retrieve user availability.
+
+## Testing
+- Type checks pass with `yarn type-check:ci`
+- Lint passes with `yarn lint`
+- Verified that the API calls are now running concurrently
+
+Link to Devin run: https://app.devin.ai/sessions/212e073fa6ed4af98a756cb18d372b8a
+By: keith@cal.com
+
+    
+<!-- This is an auto-generated description by mrge. -->
+---
+
+## Summary by mrge
+Google Calendar API calls now run in parallel instead of one after another, making availability checks much faster.
+
+- **Performance**
+  - Used Promise.all to parallelize API requests in both getAvailability and fetchAvailabilityAndSetCache methods.
+
+<!-- End of auto-generated description by mrge. -->
+
+",Devin,158243242,devin-ai-integration[bot],closed,2025-04-24T21:00:24Z,2025-04-26T00:57:55Z,,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/20962,29,0.07018995157450784,False
+3070322024,21374,perf: add p-limit to _getUsersAvailability to limit concurrent executions to 10,"# Add p-limit to _getUsersAvailability
+
+## Description
+This PR introduces the use of `p-limit` in the `_getUsersAvailability` function to limit the number of concurrent function executions to a maximum of 10 during the Promise.all call that maps over users.
+
+This change helps prevent potential resource exhaustion when dealing with a large number of users and improves overall performance and stability.
+
+## Testing
+- Type checks pass with `yarn type-check:ci`
+- Linting passes with `yarn lint`
+
+## Link to Devin run
+https://app.devin.ai/sessions/90df3e7518ea4d5db7b7bd55bb243185
+
+Requested by: keith@cal.com
+
+    
+<!-- This is an auto-generated description by mrge. -->
+---
+
+## Summary by mrge
+Limited concurrent executions in _getUsersAvailability to 10 using p-limit to prevent resource exhaustion when processing many users.
+
+<!-- End of auto-generated description by mrge. -->
+
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-17T04:28:35Z,2025-05-17T21:05:45Z,2025-05-17T21:05:45Z,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/21374,29,0.06152019720052198,False
+3177715945,22046,feat: implement batched parallel processing for user availability calculation,"# Implement Batched Parallel Processing for User Availability Calculation
+
+## Problem
+The `calculateHostsAndAvailabilities` function had a critical performance bottleneck where `getUsersAvailability()` was processing users sequentially. For teams with 1000 users filtered down to ~40 users, this created a waterfall effect where each user's availability calculation blocked the next, severely underutilizing the 2-worker NestJS setup.
+
+## Solution
+Implemented `getUsersAvailabilityWithBatching()` function that:
+
+- **Processes users in controlled batches of 8** to balance performance vs resource usage
+- **Adds 100ms delay between batches** to prevent overwhelming external APIs (Google Calendar, Outlook, etc.)
+- **Includes comprehensive error handling** with fallback to individual processing if a batch fails
+- **Provides detailed performance logging** for monitoring and debugging
+
+## Technical Details
+
+### Key Changes
+- Added `getUsersAvailabilityWithBatching()` function in `packages/trpc/server/routers/viewer/slots/util.ts`
+- Replaced direct `getUsersAvailability()` call with batched version in `calculateHostsAndAvailabilities`
+- Maintained existing function signature and return types for backward compatibility
+
+### Batching Strategy
+- **Batch Size**: 8 users per batch (configurable via `BATCH_SIZE` constant)
+- **Inter-batch Delay**: 100ms to prevent API rate limiting
+- **Error Isolation**: Failed batches fall back to individual user processing
+- **Performance Monitoring**: Logs batch processing times and user counts
+
+### Expected Performance Impact
+- **Current**: 40 users × 2-5 seconds each = 80-200 seconds total
+- **After optimization**: 40 users processed in 3-8 seconds total
+- **Primary gains**: 80% reduction from controlled parallelization
+
+## Testing Transparency
+
+### What I Actually Checked
+✅ TypeScript compilation passes without errors  
+✅ tRPC package builds successfully  
+✅ Lint-staged checks pass during commit  
+✅ Function signature compatibility maintained  
+✅ Error handling paths implemented  
+
+### What I Did Not Check
+❌ **End-to-end availability calculation testing** - Would require setting up test users and calendar integrations  
+❌ **Performance benchmarking** - Would need production-like data with 40+ users  
+❌ **External API rate limiting behavior** - Would require testing with actual calendar providers  
+❌ **Database connection pool impact** - Would need load testing with concurrent requests  
+❌ **Memory usage under high concurrency** - Would require profiling tools  
+
+## Reviewer Checklist
+Please verify:
+- [ ] **Batch size (8 users)** is appropriate for your infrastructure
+- [ ] **100ms inter-batch delay** is sufficient for your API rate limits
+- [ ] **Error handling strategy** aligns with your monitoring/alerting setup
+- [ ] **Logging level** is appropriate for production (currently using `debug`)
+- [ ] **Performance impact** should be measured in staging environment before production deployment
+
+## Risk Assessment
+- **Low Risk**: Maintains existing function signatures and error handling
+- **Medium Risk**: Changes core availability calculation flow
+- **Mitigation**: Comprehensive fallback to individual processing on batch failures
+
+---
+
+**Link to Devin run**: https://app.devin.ai/sessions/489e5c17fc8c44d1b73b7ebe62300470  
+**Requested by**: keith@cal.com
+
+    
+<!-- This is an auto-generated description by cubic. -->
+---
+
+## Summary by cubic
+User availability calculations now run in parallel batches of 8, reducing total processing time from minutes to seconds and preventing API overload.
+
+- **Refactors**
+  - Added batched processing with a 100ms delay between batches.
+  - Improved error handling with fallback to individual user processing.
+  - Added detailed logging for monitoring and debugging.
+
+<!-- End of auto-generated description by cubic. -->
+
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-26T04:46:55Z,2025-07-04T17:03:08Z,,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/22046,29,0.05949828501562272,True
+3138324206,505,Cursor Agent: Process rules in parallel,"The `ProcessRules.tsx` file was modified to enable parallel processing of messages within the `handleRunAll` function.
+
+Key changes include:
+*   **Parallel Batch Processing**: Messages are now processed in parallel batches of 3 using `Promise.all()`. This significantly reduces the total processing time compared to sequential processing.
+*   **Configurable Batch Size**: A `BATCH_SIZE` constant (set to 3) was introduced, allowing easy adjustment of the parallel processing count to align with rate limits.
+*   **Pre-filtering**: Messages are filtered upfront into `messagesToProcess` to exclude already processed or handled thread messages, streamlining the processing loop.
+
+This approach improves performance by processing multiple messages concurrently while maintaining respect for API rate limits and preserving existing logic for stopping, deduplication, and error handling.
+
+<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
+## Summary by CodeRabbit
+
+- **Refactor**
+  - Enhanced message processing to handle multiple messages simultaneously in batches of three, improving speed and efficiency while providing clear error notifications for any processing issues.
+- **Chores**
+  - Updated application version to v1.4.15.
+<!-- end of auto-generated comment: release notes by coderabbit.ai -->",Cursor,3090527,elie222,closed,2025-06-11T23:07:48Z,2025-06-12T08:51:57Z,2025-06-12T08:51:57Z,665613753,https://api.github.com/repos/elie222/inbox-zero,https://github.com/elie222/inbox-zero/pull/505,29,0.052310425285403306,False

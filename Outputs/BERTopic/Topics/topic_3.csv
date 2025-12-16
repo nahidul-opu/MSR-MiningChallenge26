@@ -1,4 +1,4 @@
-id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,Topic,Probability,Representative_document
 3225594099,5,Fix performance and lock issues with fine-grained locking strategy,"## Problem
 
 The vocal agent had critical performance and concurrency issues due to coarse-grained locking:
@@ -75,7 +75,71 @@ The changes are minimal and focused, providing substantial performance improveme
 <!-- START COPILOT CODING AGENT TIPS -->
 ---
 
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-12T17:16:10Z,2025-07-12T17:25:07Z,,959085567,https://api.github.com/repos/tarun7r/Vocal-Agent,https://github.com/tarun7r/Vocal-Agent/pull/5,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Fix performance and lock issues with fine-grained locking strategy"". Body describes performance improvements, concurrency, throughput. So it's performance. So output 'performance'.assistantfinalperformance",3,1.0,False
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-12T17:16:10Z,2025-07-12T17:25:07Z,,959085567,https://api.github.com/repos/tarun7r/Vocal-Agent,https://github.com/tarun7r/Vocal-Agent/pull/5,3,1.0,False
+3079016065,9510,Make EnvironmentStatistics CPU usage collection interval configurable,"Currently, the CPU usage collection interval in `EnvironmentStatisticsProvider` is hardcoded to 1 second, which can impact other EventListener implementations such as Application Insights.
+
+This PR makes the CPU usage collection interval configurable by:
+
+1. Adding a new `EnvironmentStatisticsOptions` class with a `CPUUsageCollectionInterval` property
+2. Modifying `EnvironmentStatisticsProvider` to accept and use this configuration option
+3. Adding extension methods to configure the interval from client and silo builders
+
+## Example Usage
+
+```csharp
+// In silo configuration
+siloBuilder.ConfigureCPUUsageCollectionInterval(options => 
+{
+    options.CPUUsageCollectionInterval = TimeSpan.FromSeconds(5);
+});
+
+// In client configuration
+clientBuilder.ConfigureCPUUsageCollectionInterval(options => 
+{
+    options.CPUUsageCollectionInterval = TimeSpan.FromSeconds(10);
+});
+```
+
+The default value remains 1 second for backward compatibility.
+
+Fixes #9404.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `_https._tcp.esm.ubuntu.com`
+>   - Triggering command: `/usr/lib/apt/methods/https ` (dns block)
+> - `_https._tcp.motd.ubuntu.com`
+>   - Triggering command: `/usr/lib/apt/methods/https ` (dns block)
+> - `cdn.fwupd.org`
+>   - Triggering command: `/usr/bin/fwupdmgr refresh ` (dns block)
+> - `dnceng.pkgs.visualstudio.com`
+>   - Triggering command: `dotnet build src/Orleans.Core/Orleans.Core.csproj ` (dns block)
+> - `dot.net`
+>   - Triggering command: `wget REDACTED ` (dns block)
+> - `esm.ubuntu.com`
+>   - Triggering command: `/usr/lib/apt/methods/https ` (dns block)
+> - `motd.ubuntu.com`
+>   - Triggering command: `/usr/lib/apt/methods/https ` (dns block)
+> - `pkgs.dev.azure.com`
+>   - Triggering command: `dotnet build src/Orleans.Core/Orleans.Core.csproj ` (dns block)
+>   - Triggering command: `/home/REDACTED/work/_temp/ghcca-node/node/bin/node /home/REDACTED/work/_temp/copilot-developer-action-main/dist/index.js ` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-05-21T05:53:34Z,2025-07-11T18:24:29Z,,28232663,https://api.github.com/repos/dotnet/orleans,https://github.com/dotnet/orleans/pull/9510,3,1.0,False
 3170864491,2854,feat: Add timeout to sync Ids to prevent spinner hangs on slow connections & edge cases,"This PR implements automatic timeout functionality for sync IDs to prevent the syncing spinner from hanging indefinitely on slow internet connections or edge cases.
 
 ## Problem
@@ -131,44 +195,7 @@ Fixes #2853.
 <!-- START COPILOT CODING AGENT TIPS -->
 ---
 
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-24T08:05:42Z,2025-06-24T09:54:23Z,2025-06-24T09:54:23Z,456470362,https://api.github.com/repos/polkadot-cloud/polkadot-staking-dashboard,https://github.com/polkadot-cloud/polkadot-staking-dashboard/pull/2854,"analysisWe need to classify as 'performance' or 'non-performance'. The PR adds a timeout to prevent spinner hangs on slow connections. It's about preventing indefinite hanging, improving user experience. Does it improve performance? It's more about reliability and UX, not necessarily performance. The keywords: ""slow"", ""timeout"", ""hang"", ""spinner"". The classification guidelines: performance-related PRs may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs.
-
-This PR mentions ""slow connections"" and ""hang"". It adds a timeout to prevent hanging. That is about responsiveness, but is it performance? It might be considered performance improvement because it prevents indefinite waiting, but it's more about reliability. The guidelines say ""performance-related pull requests may contain keywords such as... hang"". Hang is included. So it might be considered performance. But the primary purpose is to prevent spinner hangs, not to speed up. But hang is a performance issue. The guidelines say ""or any other terms referring to how faster and efficiently software runs."" The PR addresses hanging, which is a performance issue. So likely classify as 'performance'.
-
-Thus answer: performance.assistantfinalperformance",3,1.0,False
-3190098735,13469,Core: timeoutQueue to TS,this is used by floors and currency; the set implementation may improve performance a bit,OpenAI_Codex,1683175,patmmccann,open,2025-06-30T22:54:07Z,,,39321023,https://api.github.com/repos/prebid/Prebid.js,https://github.com/prebid/Prebid.js/pull/13469,"analysisWe need to classify as performance or non-performance. The PR title: ""Core: timeoutQueue to TS"". Body: ""this is used by floors and currency; the set implementation may improve performance a bit"". It mentions performance improvement. So classify as 'performance'.assistantfinalperformance",3,1.0,False
-3078795559,72,fix tts queue final segment,"## Summary
-- queue final AI chat segment immediately instead of using setTimeout
-
-## Testing
-- `npm run lint` *(fails: Unexpected any and other errors)*",OpenAI_Codex,2830514,ryokun6,closed,2025-05-21T03:40:09Z,2025-05-21T03:40:20Z,2025-05-21T03:40:20Z,923332984,https://api.github.com/repos/ryokun6/ryos,https://github.com/ryokun6/ryos/pull/72,"analysisWe need to classify the pull request as performance or non-performance. The title: ""fix tts queue final segment"". Body: ""queue final AI chat segment immediately instead of using setTimeout"". This is about TTS queue final segment, likely to improve responsiveness or reduce latency. The change is to queue final AI chat segment immediately instead of using setTimeout. That likely improves performance by reducing delay. The keywords: ""queue final AI chat segment immediately instead of using setTimeout"". This is about reducing latency. So it's performance. The classification: 'performance'.assistantfinalperformance",3,1.0,False
-3171715437,198,Implement collection lifecycle PRD proposals,"Implements and closes #195
-
-Adds automatic lifecycle management for collections to optimize resource usage.
-
-**New Features:**
-
-- Added `startSync` option (defaults to `true`, set to `false` for lazy loading)
-- Automatic garbage collection after `gcTime` (default 5 minutes) of inactivity
-- Collection status tracking: ""idle"" | ""loading"" | ""ready"" | ""error"" | ""cleaned-up""
-- Manual `preload()` and `cleanup()` methods for lifecycle control
-
-**Usage:**
-
-```typescript
-const collection = createCollection({
-  startSync: false, // set to true to start sync on creation
-  gcTime: 300000, // Cleanup timeout (default: 5 minutes)
-})
-
-console.log(collection.status) // Current state
-await collection.preload() // Ensure ready
-await collection.cleanup() // Manual cleanup
-```",Cursor,31130,samwillis,closed,2025-06-24T11:58:43Z,2025-06-26T13:12:30Z,2025-06-26T13:12:30Z,946895816,https://api.github.com/repos/TanStack/db,https://github.com/TanStack/db/pull/198,"analysisWe need to classify whether the primary purpose is performance improvement. The PR description: ""Implement collection lifecycle PRD proposals"" adds automatic lifecycle management for collections to optimize resource usage. It includes startSync option, automatic garbage collection after gcTime, status tracking, manual preload and cleanup. This is about resource usage, memory, garbage collection, but is it performance? It says ""optimize resource usage"" and ""automatic garbage collection after inactivity"". This is about memory management, potentially performance. The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs.
-
-This PR mentions ""optimize resource usage"" and ""automatic garbage collection"". That is about memory usage, but not explicitly performance. However, memory optimization can be considered performance improvement. The guidelines say ""performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" The PR includes ""optimize resource usage"" but not the keyword ""memory"" or ""optimization"" explicitly. It does mention ""automatic garbage collection"" which is memory management. The guidelines say ""or any other terms referring to how faster and efficiently software runs."" So this could be considered performance. The primary purpose: adding lifecycle management to optimize resource usage. That is performance improvement. So classify as 'performance'.
-
-Thus answer: performance.assistantfinalperformance",3,1.0,False
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-24T08:05:42Z,2025-06-24T09:54:23Z,2025-06-24T09:54:23Z,456470362,https://api.github.com/repos/polkadot-cloud/polkadot-staking-dashboard,https://github.com/polkadot-cloud/polkadot-staking-dashboard/pull/2854,3,1.0,False
 2777349471,7619,Fix: Improve Telegram Service Connection Handling,"# Fix Telegram Service Connection Handling
 
 This PR addresses the hanging issues in the Telegram service by implementing several improvements:
@@ -193,9 +220,33 @@ This PR addresses the hanging issues in the Telegram service by implementing sev
 - Manual testing of connection scenarios was performed
 - Error handling paths have been verified
 
-Link to Devin run: https://app.devin.ai/sessions/50b5bb8187ef43949d01858bea76ce36",Devin,158243242,devin-ai-integration[bot],closed,2025-01-09T09:53:06Z,2025-01-14T06:48:54Z,2025-01-14T06:48:54Z,392073243,https://api.github.com/repos/hcengineering/platform,https://github.com/hcengineering/platform/pull/7619,"analysisWe need to classify as performance or non-performance. The PR is about improving connection handling, adding timeouts, limiting reconnection attempts, error handling, cleanup. It's about hanging issues, timeouts, reconnection attempts. Does that count as performance? The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs.
+Link to Devin run: https://app.devin.ai/sessions/50b5bb8187ef43949d01858bea76ce36",Devin,158243242,devin-ai-integration[bot],closed,2025-01-09T09:53:06Z,2025-01-14T06:48:54Z,2025-01-14T06:48:54Z,392073243,https://api.github.com/repos/hcengineering/platform,https://github.com/hcengineering/platform/pull/7619,3,1.0,False
+3171715437,198,Implement collection lifecycle PRD proposals,"Implements and closes #195
 
-This PR mentions ""hanging issues"" and ""connection timeouts"" to prevent indefinite hanging. That is about responsiveness, latency, hang. So it is performance. So classify as 'performance'.assistantfinalperformance",3,1.0,False
+Adds automatic lifecycle management for collections to optimize resource usage.
+
+**New Features:**
+
+- Added `startSync` option (defaults to `true`, set to `false` for lazy loading)
+- Automatic garbage collection after `gcTime` (default 5 minutes) of inactivity
+- Collection status tracking: ""idle"" | ""loading"" | ""ready"" | ""error"" | ""cleaned-up""
+- Manual `preload()` and `cleanup()` methods for lifecycle control
+
+**Usage:**
+
+```typescript
+const collection = createCollection({
+  startSync: false, // set to true to start sync on creation
+  gcTime: 300000, // Cleanup timeout (default: 5 minutes)
+})
+
+console.log(collection.status) // Current state
+await collection.preload() // Ensure ready
+await collection.cleanup() // Manual cleanup
+```",Cursor,31130,samwillis,closed,2025-06-24T11:58:43Z,2025-06-26T13:12:30Z,2025-06-26T13:12:30Z,946895816,https://api.github.com/repos/TanStack/db,https://github.com/TanStack/db/pull/198,3,1.0,False
+3240006620,7598,Change default hotstuff-min-timeout for collection nodes to 1s,"Collection Node timeout default value is set fairly high at 1.5s, compared to SN timeout value which is 1.045s. This results in offline nodes having a higher impact on finalization rate. See discussion here: https://flow-foundation.slack.com/archives/CUU2KQL4A/p1752765506504069?thread_ts=1752691934.415779&cid=CUU2KQL4A
+
+",Devin,158243242,devin-ai-integration[bot],closed,2025-07-17T15:28:36Z,2025-07-17T21:03:27Z,2025-07-17T21:03:27Z,297778512,https://api.github.com/repos/onflow/flow-go,https://github.com/onflow/flow-go/pull/7598,3,1.0,False
 3099825876,12057,storcon: skip offline nodes in get_top_tenant_shards,"## Summary
 
 The optimiser background loop could get delayed a lot by waiting for timeouts trying to talk to offline nodes.
@@ -208,7 +259,79 @@ Fixes: #12056
 
 Link to Devin run: https://app.devin.ai/sessions/065afd6756734d33bbd4d012428c4b6e
 Requested by: John Spray (john@neon.tech)
-",Devin,158243242,devin-ai-integration[bot],closed,2025-05-29T10:04:12Z,2025-05-29T11:17:51Z,2025-05-29T11:17:51Z,351806852,https://api.github.com/repos/neondatabase/neon,https://github.com/neondatabase/neon/pull/12057,"analysisWe need to classify as performance or non-performance. The PR title: ""storcon: skip offline nodes in get_top_tenant_shards"". Summary: ""The optimiser background loop could get delayed a lot by waiting for timeouts trying to talk to offline nodes."" So it's about skipping offline nodes to avoid delays. This is about performance improvement: reducing delays, improving speed. So classify as 'performance'.assistantfinalperformance",3,1.0,False
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-29T10:04:12Z,2025-05-29T11:17:51Z,2025-05-29T11:17:51Z,351806852,https://api.github.com/repos/neondatabase/neon,https://github.com/neondatabase/neon/pull/12057,3,1.0,False
+3220735806,226,Optimize welcome message latency by reducing sleep times and caching audio decoding,"
+# Optimize welcome message latency by reducing sleep times and caching audio decoding
+
+## Summary
+
+This PR addresses the critical 3-4 second latency issue in the welcome message when phone calls are answered, targeting a reduction to below 1000ms. The optimization focuses on three main bottlenecks in the audio processing pipeline:
+
+1. **Cached audio decoding**: Added `_cached_welcome_audio` property to avoid repeated base64 decoding of the welcome message audio on every call
+2. **Optimized stream_sid polling**: Reduced polling interval from 10ms to 1ms for faster response when stream_sid becomes available
+3. **Optimized output processing**: Reduced sleep times in the output processing loop from 100ms to 10ms across multiple locations
+4. **Added timing instrumentation**: Added performance logs to measure welcome message processing time and audio transmission latency
+
+**Expected Impact**: Welcome message latency should be reduced from 3-4 seconds to well below 1000ms.
+
+## Review & Testing Checklist for Human
+
+- [ ] **End-to-end telephony testing**: Make actual phone calls and measure welcome message latency with a stopwatch - this is the most critical test
+- [ ] **Performance monitoring**: Monitor CPU usage during calls to ensure the reduced sleep times don't cause excessive CPU consumption
+- [ ] **Audio quality verification**: Verify that welcome message audio quality hasn't been degraded by the caching or timing changes
+- [ ] **Memory usage monitoring**: Check for memory leaks from the cached audio, especially over multiple calls
+- [ ] **Multi-provider testing**: Test with both Twilio and Plivo telephony providers to ensure compatibility
+
+**Recommended Test Plan**: 
+1. Set up local telephony testing environment
+2. Make 10+ test calls measuring welcome message latency
+3. Monitor system resources during extended testing
+4. Test edge cases like rapid consecutive calls
+
+---
+
+### Diagram
+
+```mermaid
+%%{ init : { ""theme"" : ""default"" }}%%
+graph TD
+    WS[""WebSocket Connection<br/>quickstart_server.py""]:::context
+    TM[""task_manager.py<br/>TaskManager.run()""]:::major-edit
+    Cache[""_cached_welcome_audio<br/>(NEW)""]:::major-edit
+    Poll[""stream_sid polling<br/>10ms → 1ms""]:::major-edit
+    Output[""Output Processing Loop<br/>100ms → 10ms""]:::major-edit
+    Tel[""telephony.py<br/>TelephonyOutputHandler""]:::minor-edit
+    Twilio[""Twilio/Plivo<br/>Telephony Provider""]:::context
+
+    WS -->|""call answered""| TM
+    TM -->|""get stream_sid""| Poll
+    Poll -->|""faster polling""| TM
+    TM -->|""decode audio""| Cache
+    Cache -->|""cached result""| TM
+    TM -->|""audio packets""| Output
+    Output -->|""faster processing""| Tel
+    Tel -->|""timing logs""| Twilio
+
+    subgraph Legend
+        L1[""Major Edit""]:::major-edit
+        L2[""Minor Edit""]:::minor-edit
+        L3[""Context/No Edit""]:::context
+    end
+
+    classDef major-edit fill:#90EE90
+    classDef minor-edit fill:#87CEEB
+    classDef context fill:#FFFFFF
+```
+
+### Notes
+
+- **Link to Devin run**: https://app.devin.ai/sessions/5d23d64c0f6742be8fe50b511281e966
+- **Requested by**: @prateeksachan
+- **Critical path**: This affects the core user experience for all phone calls
+- **Backwards compatibility**: All existing functionality should remain intact
+- **Testing limitation**: Local telephony testing was not possible, so thorough manual testing is essential
+
+",Devin,158243242,devin-ai-integration[bot],closed,2025-07-10T21:16:21Z,2025-07-10T21:19:32Z,,846923721,https://api.github.com/repos/bolna-ai/bolna,https://github.com/bolna-ai/bolna/pull/226,3,1.0,False
 3206997775,221,Fix cartesia audio gaps and improve continuity,"
 # Fix cartesia audio gaps and improve continuity
 
@@ -284,225 +407,89 @@ graph TB
 - **Requested by**: @prateeksachan
 - **Risk Level**: 🟡 Medium - Audio processing changes are complex and require live testing to fully validate
 - **Follow-up**: Consider implementing more sophisticated audio buffering if minimal gaps still occur after this fix
-",Devin,158243242,devin-ai-integration[bot],closed,2025-07-06T20:51:24Z,2025-07-06T21:15:34Z,,846923721,https://api.github.com/repos/bolna-ai/bolna,https://github.com/bolna-ai/bolna/pull/221,"analysisWe need to classify as performance or non-performance. The PR addresses audio gaps, synchronization, reduced sleep delay, context switching optimization. The key changes: reduced sleep delay from 0.2s to 0.01s, which is a performance improvement. Also optimization of context switching. The title: ""Fix cartesia audio gaps and improve continuity"". The description mentions ""Reduced processing delays"" and ""Optimized context switching"". This is performance improvement. So classification: performance.assistantfinalperformance",3,1.0,False
-3240006620,7598,Change default hotstuff-min-timeout for collection nodes to 1s,"Collection Node timeout default value is set fairly high at 1.5s, compared to SN timeout value which is 1.045s. This results in offline nodes having a higher impact on finalization rate. See discussion here: https://flow-foundation.slack.com/archives/CUU2KQL4A/p1752765506504069?thread_ts=1752691934.415779&cid=CUU2KQL4A
-
-",Devin,158243242,devin-ai-integration[bot],closed,2025-07-17T15:28:36Z,2025-07-17T21:03:27Z,2025-07-17T21:03:27Z,297778512,https://api.github.com/repos/onflow/flow-go,https://github.com/onflow/flow-go/pull/7598,"analysisWe need to classify as performance or non-performance. The PR title: ""Change default hotstuff-min-timeout for collection nodes to 1s"". Body: explains that default timeout is high, causing offline nodes to impact finalization rate. It's about adjusting timeout to improve performance? The timeout is a parameter affecting finalization rate. It's about performance? The change is to reduce timeout to improve finalization rate. That is a performance improvement. The keywords: ""timeout"", ""impact on finalization rate"", ""offline nodes"". It's about performance. So classify as 'performance'.assistantfinalperformance",3,1.0,False
-3220735806,226,Optimize welcome message latency by reducing sleep times and caching audio decoding,"
-# Optimize welcome message latency by reducing sleep times and caching audio decoding
-
-## Summary
-
-This PR addresses the critical 3-4 second latency issue in the welcome message when phone calls are answered, targeting a reduction to below 1000ms. The optimization focuses on three main bottlenecks in the audio processing pipeline:
-
-1. **Cached audio decoding**: Added `_cached_welcome_audio` property to avoid repeated base64 decoding of the welcome message audio on every call
-2. **Optimized stream_sid polling**: Reduced polling interval from 10ms to 1ms for faster response when stream_sid becomes available
-3. **Optimized output processing**: Reduced sleep times in the output processing loop from 100ms to 10ms across multiple locations
-4. **Added timing instrumentation**: Added performance logs to measure welcome message processing time and audio transmission latency
-
-**Expected Impact**: Welcome message latency should be reduced from 3-4 seconds to well below 1000ms.
-
-## Review & Testing Checklist for Human
-
-- [ ] **End-to-end telephony testing**: Make actual phone calls and measure welcome message latency with a stopwatch - this is the most critical test
-- [ ] **Performance monitoring**: Monitor CPU usage during calls to ensure the reduced sleep times don't cause excessive CPU consumption
-- [ ] **Audio quality verification**: Verify that welcome message audio quality hasn't been degraded by the caching or timing changes
-- [ ] **Memory usage monitoring**: Check for memory leaks from the cached audio, especially over multiple calls
-- [ ] **Multi-provider testing**: Test with both Twilio and Plivo telephony providers to ensure compatibility
-
-**Recommended Test Plan**: 
-1. Set up local telephony testing environment
-2. Make 10+ test calls measuring welcome message latency
-3. Monitor system resources during extended testing
-4. Test edge cases like rapid consecutive calls
-
----
-
-### Diagram
-
-```mermaid
-%%{ init : { ""theme"" : ""default"" }}%%
-graph TD
-    WS[""WebSocket Connection<br/>quickstart_server.py""]:::context
-    TM[""task_manager.py<br/>TaskManager.run()""]:::major-edit
-    Cache[""_cached_welcome_audio<br/>(NEW)""]:::major-edit
-    Poll[""stream_sid polling<br/>10ms → 1ms""]:::major-edit
-    Output[""Output Processing Loop<br/>100ms → 10ms""]:::major-edit
-    Tel[""telephony.py<br/>TelephonyOutputHandler""]:::minor-edit
-    Twilio[""Twilio/Plivo<br/>Telephony Provider""]:::context
-
-    WS -->|""call answered""| TM
-    TM -->|""get stream_sid""| Poll
-    Poll -->|""faster polling""| TM
-    TM -->|""decode audio""| Cache
-    Cache -->|""cached result""| TM
-    TM -->|""audio packets""| Output
-    Output -->|""faster processing""| Tel
-    Tel -->|""timing logs""| Twilio
-
-    subgraph Legend
-        L1[""Major Edit""]:::major-edit
-        L2[""Minor Edit""]:::minor-edit
-        L3[""Context/No Edit""]:::context
-    end
-
-    classDef major-edit fill:#90EE90
-    classDef minor-edit fill:#87CEEB
-    classDef context fill:#FFFFFF
-```
-
-### Notes
-
-- **Link to Devin run**: https://app.devin.ai/sessions/5d23d64c0f6742be8fe50b511281e966
-- **Requested by**: @prateeksachan
-- **Critical path**: This affects the core user experience for all phone calls
-- **Backwards compatibility**: All existing functionality should remain intact
-- **Testing limitation**: Local telephony testing was not possible, so thorough manual testing is essential
-
-",Devin,158243242,devin-ai-integration[bot],closed,2025-07-10T21:16:21Z,2025-07-10T21:19:32Z,,846923721,https://api.github.com/repos/bolna-ai/bolna,https://github.com/bolna-ai/bolna/pull/226,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Optimize welcome message latency by reducing sleep times and caching audio decoding"". The body describes reducing latency, caching audio decoding, reducing sleep times, polling interval, etc. It's clearly performance improvement. So classification: performance.assistantfinalperformance",3,1.0,False
-3115567678,740,fix: Remove sleep during streaming progress,"## Summary
-- remove leftover timeout before streaming update
+",Devin,158243242,devin-ai-integration[bot],closed,2025-07-06T20:51:24Z,2025-07-06T21:15:34Z,,846923721,https://api.github.com/repos/bolna-ai/bolna,https://github.com/bolna-ai/bolna/pull/221,3,1.0,False
+3190098735,13469,Core: timeoutQueue to TS,this is used by floors and currency; the set implementation may improve performance a bit,OpenAI_Codex,1683175,patmmccann,open,2025-06-30T22:54:07Z,,,39321023,https://api.github.com/repos/prebid/Prebid.js,https://github.com/prebid/Prebid.js/pull/13469,3,1.0,False
+3078795559,72,fix tts queue final segment,"## Summary
+- queue final AI chat segment immediately instead of using setTimeout
 
 ## Testing
-- `pnpm lint:fix`
-- `pnpm --filter @gensx/core test`
-
-
-------
-https://chatgpt.com/codex/tasks/task_e_683f6f233cd4832cab400b297582ae34",OpenAI_Codex,4382100,jmoseley,closed,2025-06-03T22:08:29Z,2025-06-03T22:19:34Z,2025-06-03T22:19:34Z,899766976,https://api.github.com/repos/gensx-inc/gensx,https://github.com/gensx-inc/gensx/pull/740,"analysisWe need to classify as performance or non-performance. The PR title: ""fix: Remove sleep during streaming progress"". Summary: remove leftover timeout before streaming update. This is about removing a sleep, which likely improves performance by reducing latency. It's a performance improvement. So classify as 'performance'.assistantfinalperformance",3,0.2015131348947732,False
-3225662609,333,Improve asciicast clear offset caching,"## Summary
-- track `lastClearOffset` in `SessionInfo`
-- initialize `lastClearOffset` on session creation
-- save and reuse clear position in `StreamWatcher`
-- wire `SessionManager` into `StreamWatcher`
-- update unit tests
-
-## Testing
-- `pnpm lint`
-- `pnpm test` *(fails: vt-title-integration.test.ts and others)*
-
-------
-https://chatgpt.com/codex/tasks/task_e_68728e434ec08323a04daf5e6ab3f416",OpenAI_Codex,58493,steipete,closed,2025-07-12T18:39:20Z,2025-07-15T01:24:15Z,2025-07-15T01:24:15Z,1002552148,https://api.github.com/repos/amantus-ai/vibetunnel,https://github.com/amantus-ai/vibetunnel/pull/333,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Improve asciicast clear offset caching"". Summary: track lastClearOffset, initialize, save and reuse clear position, wire SessionManager into StreamWatcher, update unit tests. This seems to be about caching clear offset to improve performance? The description: ""Improve asciicast clear offset caching"" suggests caching to avoid recomputing? That is a performance improvement. The summary mentions track lastClearOffset, initialize, save and reuse clear position. That is caching to avoid recomputing. So likely performance. The keywords: caching, offset, clear. It's about performance. So classification: performance.assistantfinalperformance",3,0.17572306218617983,False
-2859989652,779,Update SFTP status callback to output once per second,"# Update SFTP status callback to output once per second
-
-Modified the myStatusCb function in sftpclient.c to only output status updates once per second by tracking the last output time and comparing it with the current time. This reduces the frequency of status updates while maintaining all existing functionality.
-
-## Testing
-The changes have been verified using cppcheck static analysis tool. The modifications maintain the existing functionality while adding rate limiting to the status output.
-
-## Requested by
-andrew@wolfssl.com
-
-Link to Devin run: https://app.devin.ai/sessions/23b1fd68009a48c8bb03b5309830f193
-",Devin,158243242,devin-ai-integration[bot],closed,2025-02-18T10:32:22Z,2025-02-26T23:54:21Z,2025-02-26T23:54:21Z,21134745,https://api.github.com/repos/wolfSSL/wolfssh,https://github.com/wolfSSL/wolfssh/pull/779,"analysisWe need to classify as performance or non-performance. The PR updates SFTP status callback to output once per second, reducing frequency of status updates. This is about reducing output frequency, which is a performance improvement? It's about reducing overhead, maybe improving performance by reducing I/O. The description says ""This reduces the frequency of status updates while maintaining all existing functionality."" That is a performance improvement: less output, less overhead. So classify as 'performance'.assistantfinalperformance",3,0.1623657320497261,False
-3061496148,2684,feat: implement true SSE streaming client for Hermes,"# True SSE Streaming Client for Hermes
-
-This PR implements a true Server-Sent Events (SSE) streaming client for the Hermes price service using tokio and futures streams, replacing the previous polling-based implementation.
-
-## Changes
-
-- Created a Rust client for the Hermes price service at `apps/hermes/client/rust`
-- Implemented true streaming functionality using eventsource-stream and tokio
-- Added examples for fetching latest prices and streaming price updates
-- Added GitHub Action for publishing to crates.io
-
-## Implementation Details
-
-- The streaming client uses proper tokio/futures streams instead of polling in a loop
-- SSE events are parsed and converted to strongly-typed Rust structs
-- The client handles reconnection and error scenarios gracefully
-
-## Testing
-
-The implementation has been tested with the Hermes API endpoint at https://hermes.pyth.network and successfully streams real-time price updates for BTC/USD and ETH/USD.
-
-Link to Devin run: https://app.devin.ai/sessions/68823d31375f4cb9bd88f8d362148446
-Requested by: Tejas Badadare (tejas@dourolabs.xyz)
-",Devin,158243242,devin-ai-integration[bot],closed,2025-05-14T00:26:42Z,2025-05-14T15:05:47Z,,425803244,https://api.github.com/repos/pyth-network/pyth-crosschain,https://github.com/pyth-network/pyth-crosschain/pull/2684,"analysisWe need to classify as performance or non-performance. The PR implements true SSE streaming client, replacing polling. This is about performance? It improves efficiency by using streaming instead of polling. It's about reducing latency, resource usage, maybe performance. The description: ""implement true SSE streaming client"" and ""replacing previous polling-based implementation"". This is a performance improvement: reduces overhead, latency. So classify as 'performance'.assistantfinalperformance",3,0.1576658861424252,False
-3171069351,5463,`@remotion/renderer`: Improved render time estimates,"The `renderEstimatedTime` calculation in `render-media.ts` was inaccurate because it used all frame timings to calculate the average render time, causing the first few slow frames to skew the estimation for the entire render.
+- `npm run lint` *(fails: Unexpected any and other errors)*",OpenAI_Codex,2830514,ryokun6,closed,2025-05-21T03:40:09Z,2025-05-21T03:40:20Z,2025-05-21T03:40:20Z,923332984,https://api.github.com/repos/ryokun6/ryos,https://github.com/ryokun6/ryos/pull/72,3,1.0,False
+3208009671,1717,Add configurable CPU count option for containerized environments,"This PR adds a new `--cpus` configuration option to address CPU detection issues in virtualized and containerized environments where `_SC_NPROCESSORS_CONF` and `_SC_NPROCESSORS_ONLN` return host CPU counts instead of allocated container CPUs.
 
 ## Problem
-
-The current algorithm:
-1. Accumulates time for ALL frames rendered so far in `totalTimeSpentOnFrames`
-2. Calculates average as `totalTimeSpentOnFrames / renderedFrames`
-3. Uses this average to estimate remaining time
-
-This approach is problematic because:
-- Initial frames are often slower due to cold start, initialization, etc.
-- These slow frames continue to impact the average throughout the entire render
-- Time estimates remain pessimistic even as rendering speed stabilizes
+In containerized deployments, coturn detects the host's CPU count (e.g., 128 CPUs) instead of the container's allocated CPUs (e.g., 2 CPUs). This causes the server to create excessive relay threads and database connections, leading to resource exhaustion and performance issues.
 
 ## Solution
+Added a new `cpus` configuration option that allows manual override of CPU detection:
 
-Modified the algorithm to track only the most recent 50 frame timings:
-
-```typescript
-// Track recent frame timings (at most 50)
-recentFrameTimings.push(timeToRenderInMilliseconds);
-if (recentFrameTimings.length > MAX_RECENT_FRAME_TIMINGS) {
-    recentFrameTimings.shift();
-}
-
-// Calculate average using only recent timings for better estimation
-const recentTimingsSum = recentFrameTimings.reduce((sum, time) => sum + time, 0);
-const newAverage = recentTimingsSum / recentFrameTimings.length;
+### Command Line Usage
+```bash
+turnserver --cpus 2
 ```
 
-## Benefits
+### Configuration File Usage
+```ini
+# Override system CPU count detection for containers
+cpus=2
+```
 
-- More accurate time estimates that adapt to current rendering performance
-- Eliminates bias from slow initial frames
-- Provides better user experience with realistic progress indicators
-- Maintains backward compatibility (existing `totalTimeSpentOnFrames` preserved)
+## Key Features
+- **Backward Compatible**: No changes needed for existing deployments
+- **Input Validation**: Values must be between 1 and 128 with proper error handling
+- **Comprehensive Documentation**: Updated man pages and example config files
+- **Both Interfaces**: Works via command line and configuration file
 
-## Changes
+## Testing
+The implementation has been thoroughly tested:
 
-- Added `MAX_RECENT_FRAME_TIMINGS = 50` constant
-- Added `recentFrameTimings: number[]` array to track recent frame render times
-- Updated estimation calculation to use rolling average of recent timings
-- All existing tests pass
+```bash
+# Container with 2 allocated CPUs on 128-CPU host
+$ turnserver --cpus 2
+INFO: System cpu num is 128       # Host detection
+INFO: System enable num is 128    # Host detection  
+INFO: Configured cpu num is 2     # Override applied
+INFO: Total General servers: 2    # Correct thread count
+```
 
-Fixes #5462.
+- ✅ Command line option: `--cpus 8` creates 8 relay servers
+- ✅ Config file option: `cpus=6` creates 6 relay servers  
+- ✅ Error handling: Invalid values show appropriate errors
+- ✅ Default behavior: Without option, uses system detection
+- ✅ RFC5769 tests: All protocol tests still pass
+
+## Files Modified
+- `src/apps/relay/mainrelay.c` - Core implementation
+- `src/apps/relay/mainrelay.h` - Added configuration flag
+- `examples/etc/turnserver.conf` - Added documentation and example
+- `man/man1/turnserver.1` - Updated man page
+
+This change directly addresses the resource consumption issues in containerized environments while maintaining full backward compatibility.
+
+Fixes #1628.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `esm.ubuntu.com`
+>   - Triggering command: `/usr/lib/apt/methods/https` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
 
 <!-- START COPILOT CODING AGENT TIPS -->
 ---
 
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-24T09:01:04Z,2025-06-26T10:07:38Z,2025-06-26T10:07:38Z,274495425,https://api.github.com/repos/remotion-dev/remotion,https://github.com/remotion-dev/remotion/pull/5463,"analysisWe need to classify the pull request as 'performance' or 'non-performance'. The PR title: ""`@remotion/renderer`: Improved render time estimates"". The body describes improving estimation of render time by using recent frame timings instead of all frames. This is about performance estimation, not actual performance improvement. But it's about improving the accuracy of time estimates, which is a performance-related change? The classification criteria: ""Performance-related pull requests may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs."" The PR is about improving render time estimates, which is about performance estimation. It mentions ""render time estimates"" and ""average render time"" and ""initial frames slower"" etc. It is about performance estimation, not necessarily performance improvement. But the classification is about whether the primary purpose is to improve performance. This PR is about improving the estimation of performance, not the performance itself. But the classification might still consider it performance because it's about render time estimation. The guidelines: ""Performance-related pull requests may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs."" The PR contains ""render time estimates"", ""average render time"", ""slow frames"", ""performance"". It mentions ""performance"" in the benefits. So it likely qualifies as performance. The primary purpose is to improve performance estimation, which is a performance-related change. So classification: 'performance'.assistantfinalperformance",3,0.15395960222450109,False
-2864511051,54165,"source-open-exchange-rates: Remove stream_state interpolation, update CDK","# What
-* Remove stream_state interpolation from source-open-exchange-rates connector
-* Update to latest CDK version
-* Bump patch version
-
-# Why
-Support for stream_state interpolation is being removed from the airbyte-cdk to enable streams to run concurrently. This PR updates the connector to use stream_interval instead.
-
-Fixes: https://github.com/airbytehq/airbyte-internal-issues/issues/11604
-Link to Devin run: https://app.devin.ai/sessions/3f7551af783f473abff606c7141f2eff
-
-# How
-* Replaced all instances of stream_state interpolation with stream_interval in manifest.yaml
-* Bumped patch version from 0.3.13 to 0.3.14
-",Devin,158243242,devin-ai-integration[bot],closed,2025-02-19T22:14:23Z,2025-02-25T21:59:52Z,,283046497,https://api.github.com/repos/airbytehq/airbyte,https://github.com/airbytehq/airbyte/pull/54165,"analysisWe need to classify as performance or non-performance. The PR removes stream_state interpolation to enable streams to run concurrently, updates to latest CDK, bump patch. The reason: support for stream_state interpolation removed to enable streams to run concurrently. That might improve performance? Removing interpolation to allow concurrency could improve performance. But is the primary purpose performance? The title: ""Remove stream_state interpolation, update CDK"". The body: ""Support for stream_state interpolation is being removed from the airbyte-cdk to enable streams to run concurrently. This PR updates the connector to use stream_interval instead."" That is about concurrency, which can improve performance. But is it a performance improvement? It might be a functional change to enable concurrency. The question: ""primary purpose of the pull request is to improve performance."" The PR is about removing a feature to enable concurrency. That is a performance improvement. But is it explicitly about performance? The keywords: ""concurrent"", ""streams to run concurrently"". That can improve throughput. So likely performance. But the PR also updates CDK version. But the main reason is concurrency. So classify as performance.assistantfinalperformance",3,0.1425713384406972,False
-3249668322,635,Fix preloading of next track,"## Summary
-- ensure preload audio element fetches the upcoming song
-- document fix in changelog
-
-## Testing
-- `composer validate --no-check-all`
-
-------
-https://chatgpt.com/codex/tasks/task_e_687e62bd7c108333ba8c3a0531964d18",OpenAI_Codex,13385119,Rello,closed,2025-07-21T18:44:55Z,2025-07-21T19:01:29Z,2025-07-21T19:01:29Z,62162299,https://api.github.com/repos/Rello/audioplayer,https://github.com/Rello/audioplayer/pull/635,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Fix preloading of next track"". Summary: ensure preload audio element fetches upcoming song, document fix. This is about preloading audio, likely to improve performance (faster playback). But is it performance? It's about ensuring preloading works, which is about performance (speed of playback). The keywords: ""preloading"" is about performance. The description: ""ensure preload audio element fetches the upcoming song"". That is a performance improvement. So classify as 'performance'.assistantfinalperformance",3,0.14066811253050918,False
-3154548302,951,Improve zen-consumer batch timing,"## Summary
-- add batch timeout constant
-- limit wait time for JetStream batches
-
-## Testing
-- `cargo test --quiet`
-- `cargo fmt -- --check`
-
-------
-https://chatgpt.com/codex/tasks/task_e_6851bdfcaaa08320b60344e9a94cce7d",OpenAI_Codex,1821930,mfreeman451,closed,2025-06-17T19:28:14Z,2025-06-17T19:28:35Z,2025-06-17T19:28:35Z,916252207,https://api.github.com/repos/carverauto/serviceradar,https://github.com/carverauto/serviceradar/pull/951,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve zen-consumer batch timing"". Summary: add batch timeout constant, limit wait time for JetStream batches. This is about timing, likely performance improvement. Keywords: timing, batch timeout, limit wait time. That is performance. So label 'performance'.assistantfinalperformance",3,0.10162571297921709,False
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-07T08:18:25Z,2025-07-10T13:37:02Z,2025-07-10T13:37:02Z,39242894,https://api.github.com/repos/coturn/coturn,https://github.com/coturn/coturn/pull/1717,3,0.278140481842612,False
 3226627949,94,feat(cpu-threading): integrate CLI with threading system and unify TTS API,"## Summary
 - **🔥 Major Update**: Integrates CLI modes with CPU-specific ONNX Runtime threading optimization
 - Unifies TTS API architecture by removing dual constructor patterns  
@@ -578,10 +565,7 @@ CLI processes text sequentially without chunking logic, making multiple instance
 
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
-Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,1172235,miteshashar,open,2025-07-13T16:21:50Z,,,915610024,https://api.github.com/repos/lucasjinreal/Kokoros,https://github.com/lucasjinreal/Kokoros/pull/94,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""feat(cpu-threading): integrate CLI with threading system and unify TTS API"". The body includes many performance-related terms: ""CPU threading optimizations"", ""performance warnings"", ""performance metrics"", ""benchmark data"", ""throughput"", ""speed"", ""latency"" etc. So it's definitely performance. So label 'performance'.assistantfinalperformance",3,0.10045248647232463,True
-3155059661,1286,Speed up timeline creation via batch->json,"This PR adds `batch->json` to convert batches to a compact JSON form. This avoids calling `batch->progs` during the Herbie core run and should speed up `timeline.json` generation. Now, *this* PR doesn't change `timeline.html`; it still expands out the full text form of the program. Later one I hope to change that to output a batch form too, possibly with some JS code to inline parts of it, but for now this is still an improvement.
-
-https://chatgpt.com/codex/tasks/task_e_6851153dd8188331ba77625c98584b7f",OpenAI_Codex,30707,pavpanchekha,closed,2025-06-18T00:13:34Z,2025-06-20T01:55:12Z,,13683952,https://api.github.com/repos/herbie-fp/herbie,https://github.com/herbie-fp/herbie/pull/1286,"analysisWe need to classify as performance or non-performance. The PR title: ""Speed up timeline creation via batch->json"". Body: mentions speed up timeline.json generation, avoid calling batch->progs, should speed up. So it's performance improvement. So label 'performance'.assistantfinalperformance",3,0.08660514161447182,False
+Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,1172235,miteshashar,open,2025-07-13T16:21:50Z,,,915610024,https://api.github.com/repos/lucasjinreal/Kokoros,https://github.com/lucasjinreal/Kokoros/pull/94,3,0.20483353997354428,True
 3250546916,1996,Implement `olive optimize` CLI command with comprehensive pass scheduling,"This PR implements the new `olive optimize` CLI command as requested in the feature request. The command provides a comprehensive optimization workflow with intelligent pass scheduling based on user-specified parameters.
 
 ## Key Features
@@ -670,71 +654,153 @@ Fixes #1995.
 <!-- START COPILOT CODING AGENT TIPS -->
 ---
 
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,open,2025-07-22T00:50:31Z,,,201991558,https://api.github.com/repos/microsoft/Olive,https://github.com/microsoft/Olive/pull/1996,"analysisWe need to classify whether the primary purpose of the pull request is to improve performance. The PR implements a new CLI command ""olive optimize"" with pass scheduling. It includes many passes like quantization, conversion, optimization, etc. The description mentions ""intelligent pass scheduling"" and many passes that likely improve performance. The PR is about optimization workflow, passes for quantization, conversion, etc. The question: is the primary purpose to improve performance? Yes, it's about optimization, passes for performance improvements. So classification: 'performance'.assistantfinalperformance",3,0.08393592173982628,True
-3079016065,9510,Make EnvironmentStatistics CPU usage collection interval configurable,"Currently, the CPU usage collection interval in `EnvironmentStatisticsProvider` is hardcoded to 1 second, which can impact other EventListener implementations such as Application Insights.
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,open,2025-07-22T00:50:31Z,,,201991558,https://api.github.com/repos/microsoft/Olive,https://github.com/microsoft/Olive/pull/1996,3,0.14990022129449188,True
+3115567678,740,fix: Remove sleep during streaming progress,"## Summary
+- remove leftover timeout before streaming update
 
-This PR makes the CPU usage collection interval configurable by:
+## Testing
+- `pnpm lint:fix`
+- `pnpm --filter @gensx/core test`
 
-1. Adding a new `EnvironmentStatisticsOptions` class with a `CPUUsageCollectionInterval` property
-2. Modifying `EnvironmentStatisticsProvider` to accept and use this configuration option
-3. Adding extension methods to configure the interval from client and silo builders
 
-## Example Usage
+------
+https://chatgpt.com/codex/tasks/task_e_683f6f233cd4832cab400b297582ae34",OpenAI_Codex,4382100,jmoseley,closed,2025-06-03T22:08:29Z,2025-06-03T22:19:34Z,2025-06-03T22:19:34Z,899766976,https://api.github.com/repos/gensx-inc/gensx,https://github.com/gensx-inc/gensx/pull/740,3,0.1283388764482115,False
+3225662609,333,Improve asciicast clear offset caching,"## Summary
+- track `lastClearOffset` in `SessionInfo`
+- initialize `lastClearOffset` on session creation
+- save and reuse clear position in `StreamWatcher`
+- wire `SessionManager` into `StreamWatcher`
+- update unit tests
 
-```csharp
-// In silo configuration
-siloBuilder.ConfigureCPUUsageCollectionInterval(options => 
-{
-    options.CPUUsageCollectionInterval = TimeSpan.FromSeconds(5);
-});
+## Testing
+- `pnpm lint`
+- `pnpm test` *(fails: vt-title-integration.test.ts and others)*
 
-// In client configuration
-clientBuilder.ConfigureCPUUsageCollectionInterval(options => 
-{
-    options.CPUUsageCollectionInterval = TimeSpan.FromSeconds(10);
-});
+------
+https://chatgpt.com/codex/tasks/task_e_68728e434ec08323a04daf5e6ab3f416",OpenAI_Codex,58493,steipete,closed,2025-07-12T18:39:20Z,2025-07-15T01:24:15Z,2025-07-15T01:24:15Z,1002552148,https://api.github.com/repos/amantus-ai/vibetunnel,https://github.com/amantus-ai/vibetunnel/pull/333,3,0.12201247571099505,False
+3061496148,2684,feat: implement true SSE streaming client for Hermes,"# True SSE Streaming Client for Hermes
+
+This PR implements a true Server-Sent Events (SSE) streaming client for the Hermes price service using tokio and futures streams, replacing the previous polling-based implementation.
+
+## Changes
+
+- Created a Rust client for the Hermes price service at `apps/hermes/client/rust`
+- Implemented true streaming functionality using eventsource-stream and tokio
+- Added examples for fetching latest prices and streaming price updates
+- Added GitHub Action for publishing to crates.io
+
+## Implementation Details
+
+- The streaming client uses proper tokio/futures streams instead of polling in a loop
+- SSE events are parsed and converted to strongly-typed Rust structs
+- The client handles reconnection and error scenarios gracefully
+
+## Testing
+
+The implementation has been tested with the Hermes API endpoint at https://hermes.pyth.network and successfully streams real-time price updates for BTC/USD and ETH/USD.
+
+Link to Devin run: https://app.devin.ai/sessions/68823d31375f4cb9bd88f8d362148446
+Requested by: Tejas Badadare (tejas@dourolabs.xyz)
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-14T00:26:42Z,2025-05-14T15:05:47Z,,425803244,https://api.github.com/repos/pyth-network/pyth-crosschain,https://github.com/pyth-network/pyth-crosschain/pull/2684,3,0.12150563968177037,False
+3171069351,5463,`@remotion/renderer`: Improved render time estimates,"The `renderEstimatedTime` calculation in `render-media.ts` was inaccurate because it used all frame timings to calculate the average render time, causing the first few slow frames to skew the estimation for the entire render.
+
+## Problem
+
+The current algorithm:
+1. Accumulates time for ALL frames rendered so far in `totalTimeSpentOnFrames`
+2. Calculates average as `totalTimeSpentOnFrames / renderedFrames`
+3. Uses this average to estimate remaining time
+
+This approach is problematic because:
+- Initial frames are often slower due to cold start, initialization, etc.
+- These slow frames continue to impact the average throughout the entire render
+- Time estimates remain pessimistic even as rendering speed stabilizes
+
+## Solution
+
+Modified the algorithm to track only the most recent 50 frame timings:
+
+```typescript
+// Track recent frame timings (at most 50)
+recentFrameTimings.push(timeToRenderInMilliseconds);
+if (recentFrameTimings.length > MAX_RECENT_FRAME_TIMINGS) {
+    recentFrameTimings.shift();
+}
+
+// Calculate average using only recent timings for better estimation
+const recentTimingsSum = recentFrameTimings.reduce((sum, time) => sum + time, 0);
+const newAverage = recentTimingsSum / recentFrameTimings.length;
 ```
 
-The default value remains 1 second for backward compatibility.
+## Benefits
 
-Fixes #9404.
+- More accurate time estimates that adapt to current rendering performance
+- Eliminates bias from slow initial frames
+- Provides better user experience with realistic progress indicators
+- Maintains backward compatibility (existing `totalTimeSpentOnFrames` preserved)
 
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `_https._tcp.esm.ubuntu.com`
->   - Triggering command: `/usr/lib/apt/methods/https ` (dns block)
-> - `_https._tcp.motd.ubuntu.com`
->   - Triggering command: `/usr/lib/apt/methods/https ` (dns block)
-> - `cdn.fwupd.org`
->   - Triggering command: `/usr/bin/fwupdmgr refresh ` (dns block)
-> - `dnceng.pkgs.visualstudio.com`
->   - Triggering command: `dotnet build src/Orleans.Core/Orleans.Core.csproj ` (dns block)
-> - `dot.net`
->   - Triggering command: `wget REDACTED ` (dns block)
-> - `esm.ubuntu.com`
->   - Triggering command: `/usr/lib/apt/methods/https ` (dns block)
-> - `motd.ubuntu.com`
->   - Triggering command: `/usr/lib/apt/methods/https ` (dns block)
-> - `pkgs.dev.azure.com`
->   - Triggering command: `dotnet build src/Orleans.Core/Orleans.Core.csproj ` (dns block)
->   - Triggering command: `/home/REDACTED/work/_temp/ghcca-node/node/bin/node /home/REDACTED/work/_temp/copilot-developer-action-main/dist/index.js ` (dns block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
+## Changes
 
+- Added `MAX_RECENT_FRAME_TIMINGS = 50` constant
+- Added `recentFrameTimings: number[]` array to track recent frame render times
+- Updated estimation calculation to use rolling average of recent timings
+- All existing tests pass
 
+Fixes #5462.
+
+<!-- START COPILOT CODING AGENT TIPS -->
 ---
 
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-05-21T05:53:34Z,2025-07-11T18:24:29Z,,28232663,https://api.github.com/repos/dotnet/orleans,https://github.com/dotnet/orleans/pull/9510,"analysisWe need to classify whether the primary purpose is to improve performance. The PR is about making CPU usage collection interval configurable. The default is 1 second; making it configurable may improve performance by reducing overhead. The description: ""Make EnvironmentStatistics CPU usage collection interval configurable"" and ""This PR makes the CPU usage collection interval configurable by... The default value remains 1 second for backward compatibility."" This is about performance? It's about configurability, but the reason is to reduce impact on other EventListener implementations. It's about performance optimization: reducing CPU usage collection overhead. The keywords: ""performance"" is not explicitly present, but ""impact"" and ""collection interval"" might be considered performance. The guidelines: performance-related PRs may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs. The title: ""Make EnvironmentStatistics CPU usage collection interval configurable"". The body: ""Currently, the CPU usage collection interval in EnvironmentStatisticsProvider is hardcoded to 1 second, which can impact other EventListener implementations such as Application Insights."" This is about performance. So classification: performance.assistantfinalperformance",3,0.08110376645781664,False
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-24T09:01:04Z,2025-06-26T10:07:38Z,2025-06-26T10:07:38Z,274495425,https://api.github.com/repos/remotion-dev/remotion,https://github.com/remotion-dev/remotion/pull/5463,3,0.11322801228656351,False
+2859989652,779,Update SFTP status callback to output once per second,"# Update SFTP status callback to output once per second
+
+Modified the myStatusCb function in sftpclient.c to only output status updates once per second by tracking the last output time and comparing it with the current time. This reduces the frequency of status updates while maintaining all existing functionality.
+
+## Testing
+The changes have been verified using cppcheck static analysis tool. The modifications maintain the existing functionality while adding rate limiting to the status output.
+
+## Requested by
+andrew@wolfssl.com
+
+Link to Devin run: https://app.devin.ai/sessions/23b1fd68009a48c8bb03b5309830f193
+",Devin,158243242,devin-ai-integration[bot],closed,2025-02-18T10:32:22Z,2025-02-26T23:54:21Z,2025-02-26T23:54:21Z,21134745,https://api.github.com/repos/wolfSSL/wolfssh,https://github.com/wolfSSL/wolfssh/pull/779,3,0.09984970577870528,False
+2864511051,54165,"source-open-exchange-rates: Remove stream_state interpolation, update CDK","# What
+* Remove stream_state interpolation from source-open-exchange-rates connector
+* Update to latest CDK version
+* Bump patch version
+
+# Why
+Support for stream_state interpolation is being removed from the airbyte-cdk to enable streams to run concurrently. This PR updates the connector to use stream_interval instead.
+
+Fixes: https://github.com/airbytehq/airbyte-internal-issues/issues/11604
+Link to Devin run: https://app.devin.ai/sessions/3f7551af783f473abff606c7141f2eff
+
+# How
+* Replaced all instances of stream_state interpolation with stream_interval in manifest.yaml
+* Bumped patch version from 0.3.13 to 0.3.14
+",Devin,158243242,devin-ai-integration[bot],closed,2025-02-19T22:14:23Z,2025-02-25T21:59:52Z,,283046497,https://api.github.com/repos/airbytehq/airbyte,https://github.com/airbytehq/airbyte/pull/54165,3,0.09960587171928643,False
+3249668322,635,Fix preloading of next track,"## Summary
+- ensure preload audio element fetches the upcoming song
+- document fix in changelog
+
+## Testing
+- `composer validate --no-check-all`
+
+------
+https://chatgpt.com/codex/tasks/task_e_687e62bd7c108333ba8c3a0531964d18",OpenAI_Codex,13385119,Rello,closed,2025-07-21T18:44:55Z,2025-07-21T19:01:29Z,2025-07-21T19:01:29Z,62162299,https://api.github.com/repos/Rello/audioplayer,https://github.com/Rello/audioplayer/pull/635,3,0.09343770482419099,False
+3154548302,951,Improve zen-consumer batch timing,"## Summary
+- add batch timeout constant
+- limit wait time for JetStream batches
+
+## Testing
+- `cargo test --quiet`
+- `cargo fmt -- --check`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6851bdfcaaa08320b60344e9a94cce7d",OpenAI_Codex,1821930,mfreeman451,closed,2025-06-17T19:28:14Z,2025-06-17T19:28:35Z,2025-06-17T19:28:35Z,916252207,https://api.github.com/repos/carverauto/serviceradar,https://github.com/carverauto/serviceradar/pull/951,3,0.08506423023435454,False
+3155059661,1286,Speed up timeline creation via batch->json,"This PR adds `batch->json` to convert batches to a compact JSON form. This avoids calling `batch->progs` during the Herbie core run and should speed up `timeline.json` generation. Now, *this* PR doesn't change `timeline.html`; it still expands out the full text form of the program. Later one I hope to change that to output a batch form too, possibly with some JS code to inline parts of it, but for now this is still an improvement.
+
+https://chatgpt.com/codex/tasks/task_e_6851153dd8188331ba77625c98584b7f",OpenAI_Codex,30707,pavpanchekha,closed,2025-06-18T00:13:34Z,2025-06-20T01:55:12Z,,13683952,https://api.github.com/repos/herbie-fp/herbie,https://github.com/herbie-fp/herbie/pull/1286,3,0.07143857955442753,False
 3131847694,1622,fix: #1616: batch requests to the AWS resourcegroupstaggingapi,"Batches AWS Resource Groups Tagging API requests.
 
 #1616 
@@ -760,694 +826,7 @@ After:
 <img width=""767"" height=""818"" alt=""Screenshot 2025-07-27 at 4 51 27 PM"" src=""https://github.com/user-attachments/assets/b2745859-48b3-44cd-a450-0bbdc3a771b2"" />
 
 
-",OpenAI_Codex,46503781,achantavy,closed,2025-06-10T01:01:49Z,2025-07-28T14:10:47Z,2025-07-28T14:10:47Z,172811550,https://api.github.com/repos/cartography-cncf/cartography,https://github.com/cartography-cncf/cartography/pull/1622,"analysisWe need to classify as performance or non-performance. The PR title: ""fix: #1616: batch requests to the AWS resourcegroupstaggingapi"". Body: describes batching requests to AWS Resource Groups Tagging API, updates tests, shows before and after times: 24s to 11s. So it's a performance improvement. So classification: performance.assistantfinalperformance",3,0.08044608741413128,False
-3208009671,1717,Add configurable CPU count option for containerized environments,"This PR adds a new `--cpus` configuration option to address CPU detection issues in virtualized and containerized environments where `_SC_NPROCESSORS_CONF` and `_SC_NPROCESSORS_ONLN` return host CPU counts instead of allocated container CPUs.
-
-## Problem
-In containerized deployments, coturn detects the host's CPU count (e.g., 128 CPUs) instead of the container's allocated CPUs (e.g., 2 CPUs). This causes the server to create excessive relay threads and database connections, leading to resource exhaustion and performance issues.
-
-## Solution
-Added a new `cpus` configuration option that allows manual override of CPU detection:
-
-### Command Line Usage
-```bash
-turnserver --cpus 2
-```
-
-### Configuration File Usage
-```ini
-# Override system CPU count detection for containers
-cpus=2
-```
-
-## Key Features
-- **Backward Compatible**: No changes needed for existing deployments
-- **Input Validation**: Values must be between 1 and 128 with proper error handling
-- **Comprehensive Documentation**: Updated man pages and example config files
-- **Both Interfaces**: Works via command line and configuration file
-
-## Testing
-The implementation has been thoroughly tested:
-
-```bash
-# Container with 2 allocated CPUs on 128-CPU host
-$ turnserver --cpus 2
-INFO: System cpu num is 128       # Host detection
-INFO: System enable num is 128    # Host detection  
-INFO: Configured cpu num is 2     # Override applied
-INFO: Total General servers: 2    # Correct thread count
-```
-
-- ✅ Command line option: `--cpus 8` creates 8 relay servers
-- ✅ Config file option: `cpus=6` creates 6 relay servers  
-- ✅ Error handling: Invalid values show appropriate errors
-- ✅ Default behavior: Without option, uses system detection
-- ✅ RFC5769 tests: All protocol tests still pass
-
-## Files Modified
-- `src/apps/relay/mainrelay.c` - Core implementation
-- `src/apps/relay/mainrelay.h` - Added configuration flag
-- `examples/etc/turnserver.conf` - Added documentation and example
-- `man/man1/turnserver.1` - Updated man page
-
-This change directly addresses the resource consumption issues in containerized environments while maintaining full backward compatibility.
-
-Fixes #1628.
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `esm.ubuntu.com`
->   - Triggering command: `/usr/lib/apt/methods/https` (dns block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
-
-
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-07T08:18:25Z,2025-07-10T13:37:02Z,2025-07-10T13:37:02Z,39242894,https://api.github.com/repos/coturn/coturn,https://github.com/coturn/coturn/pull/1717,analysisWe need to classify as performance or non-performance. The PR adds a CPU count option to avoid resource exhaustion. It's about performance improvement. It addresses performance issues. So classify as 'performance'.assistantfinalperformance,3,0.07795862516731382,False
-3238869981,984,"[WIP] Streaming still not working. Causing slow responses for something like 'write a report' #981
-Open
-@mzazakeith
-Description
-mzazakeith
-opened 3 hours ago
-Description
-With the latest version of PraisonAI. straming is still not real time. When in verbose mo...","Thanks for asking me to work on this. I will get started on it and keep this PR's description up to date as I form a plan and make progress.
-
-Original description:
-
-> Streaming still not working. Causing slow responses for something like 'write a report' #981
-> Open
-> @mzazakeith
-> Description
-> mzazakeith
-> opened 3 hours ago
-> Description
-> With the latest version of PraisonAI. straming is still not real time. When in verbose mode you can see the internal logs of the tool streaming the output. But as a use the final output we get is an accumulation of the internal streams.
-> 
-> Environment
-> Provider (select one):
-> 
-> Anthropic
-> 
-> OpenAI
-> 
-> Google Vertex AI
-> 
-> AWS Bedrock
-> 
-> Other:
-> PraisonAI version: latest
-> Operating System:
-> Full Code
-> from praisonaiagents import Agent
-> 
-> agent = Agent(
->     instructions=""You are a helpful assistant"",
->     llm=""gemini/gemini-2.0-flash"",
->     self_reflect=False,
->     verbose=False,
->     stream=True
-> )
-> 
-> for chunk in agent.start(""Write a report on about the history of the world""):
->     print(chunk, end="""", flush=True) 
-> or
-> 
-> from praisonaiagents import Agent
-> 
-> agent = Agent(
->     instructions=""You are a helpful assistant"",
->     llm=""gemini/gemini-2.0-flash"",
->     self_reflect=False,
->     verbose=True,
->     stream=True
-> )
-> 
-> result = agent.start(""Write a report on about the history of the world"")
-> print(result)
-> Steps to Reproduce
-> intall the lib
-> copy the code above
-> run them and observe
-> Expected Behavior
-> Instead of streaming the internal response that the user does not see we should stream realtime to the user so as to avoid unnecessary latency and improve user experience
-> 
-> Actual Behavior
-> Streaming happens internally we do not get the stream in the final response.
-> 
-> Activity
-> 
-> mzazakeith
-> added 
-> bug
-> Something isn't working
->  3 hours ago
-> MervinPraison
-> MervinPraison commented 37 minutes ago
-> MervinPraison
-> 37 minutes ago
-> Owner
-> @claude review this issue and do a detailed analysis and fix this if the existing code doesn't have the solution implemented. Making sure it has backward compatibility, no existing features removed. After making those changes, again review the applied changes. Use @web to search if you dont know any information or to find the latest documentation or to find the latest version. Run the code if you think you need to run it to test it. Minimal code change to start with if required any changes. Please create a PR using gh tool with your changes.
-> 
-> MervinPraison
-> MervinPraison commented 32 minutes ago
-> MervinPraison
-> 32 minutes ago
-> Owner
-> @claude make this to work
-> 
-> from praisonaiagents import Agent
-> 
-> agent = Agent(
->     instructions=""You are a helpful assistant"",
->     llm=""gemini/gemini-2.0-flash"",
->     self_reflect=False,
->     verbose=False,
->     stream=True
-> )
-> 
-> for chunk in agent.start(""Write a report on about the history of the world""):
->     print(chunk, end="""", flush=True)
-
-
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-17T09:37:55Z,2025-07-24T00:55:54Z,,774497032,https://api.github.com/repos/MervinPraison/PraisonAI,https://github.com/MervinPraison/PraisonAI/pull/984,"analysisWe need to classify whether the primary purpose of the PR is to improve performance. The PR title: ""[WIP] Streaming still not working. Causing slow responses for something like 'write a report' #981"". The description mentions streaming not real time, causing slow responses. The issue is about streaming and latency. The PR likely addresses performance by improving streaming to reduce latency. The keywords: slow, streaming, latency, performance. So it's performance. So label 'performance'.assistantfinalperformance",3,0.06553273224726876,False
-3220396620,388,Set default worker pollers to 1 for OrchestratorMode,"This change reduces the default number of pollers from 2 to 1 for both workflows and activities when using `WorkflowOrchestrator`, making it more resource-efficient for typical orchestrator use cases.
-
-## Changes
-
-- Modified `NewWorkflowOrchestrator` in `worker/workflow_orchestrator.go` to set default pollers to 1
-- Only applies when using default values - custom user options are still respected
-- Added comprehensive unit tests to verify the behavior
-
-## Implementation
-
-The change is minimal and surgical:
-
-```go
-// Set default pollers to 1 for orchestrator mode (unless explicitly overridden)
-if orchestratorOptions.WorkflowPollers == DefaultOptions.WorkflowPollers {
-    orchestratorOptions.WorkflowPollers = 1
-}
-if orchestratorOptions.ActivityPollers == DefaultOptions.ActivityPollers {
-    orchestratorOptions.ActivityPollers = 1
-}
-```
-
-## Behavior
-
-- **With `nil` options**: Uses 1 poller for workflows and activities (previously 2)
-- **With default options**: Reduces pollers from 2 to 1
-- **With custom options**: Respects user-specified values unchanged
-
-## Testing
-
-- Added unit tests covering all scenarios
-- Verified orchestrator sample works correctly
-- All existing tests continue to pass
-
-This makes orchestrator mode more lightweight while preserving backward compatibility for users who explicitly set custom poller counts.
-
-Fixes #385.
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-10T19:11:25Z,2025-07-10T20:46:44Z,2025-07-10T20:46:43Z,434366539,https://api.github.com/repos/cschleiden/go-workflows,https://github.com/cschleiden/go-workflows/pull/388,"analysisWe need to classify whether the primary purpose is performance improvement. The PR reduces default pollers from 2 to 1, making it more resource-efficient. It's about resource usage, performance. The description says ""makes it more lightweight"" and ""resource-efficient"". That is performance-related. So classification: 'performance'.assistantfinalperformance",3,0.05601943741536498,False
-3224833213,1549,Add paste summarization to Codex TUI,"## Summary
-- introduce `Paste` event to avoid per-character paste handling
-- collapse large pasted blocks to `[Pasted Content X lines]`
-- store the real text so submission still includes it
-- wire paste handling through `App`, `ChatWidget`, `BottomPane`, and `ChatComposer`
-
-## Testing
-- `cargo test -p codex-tui`
-
-
-------
-https://chatgpt.com/codex/tasks/task_i_6871e24abf80832184d1f3ca0c61a5ee
-
-https://github.com/user-attachments/assets/eda7412f-da30-4474-9f7c-96b49d48fbf8",OpenAI_Codex,219906144,aibrahim-oai,closed,2025-07-12T05:00:17Z,2025-07-12T22:32:01Z,2025-07-12T22:32:01Z,965415649,https://api.github.com/repos/openai/codex,https://github.com/openai/codex/pull/1549,"analysisWe need to classify whether the primary purpose is performance improvement. The PR adds paste summarization to Codex TUI. It introduces Paste event to avoid per-character paste handling, collapse large pasted blocks to [Pasted Content X lines], store real text so submission still includes it, wire paste handling through App, ChatWidget, BottomPane, ChatComposer. This is about handling paste events more efficiently, reducing per-character handling, summarizing large pasted blocks. That is a performance improvement: reducing per-character paste handling, likely improving responsiveness. The keywords: ""avoid per-character paste handling"" indicates performance. So classification: performance.assistantfinalperformance",3,0.05155222181289091,False
-3171852682,2086,Make PR to deactivate thinking field,"The browser-use agent now supports optional deactivation of the ""thinking"" field in its output.
-
-*   A `use_thinking` boolean parameter was added to `AgentSettings` in `browser_use/agent/views.py`, defaulting to `True`.
-*   A new system prompt, `system_prompt_no_thinking.md`, was created to exclude thinking-related instructions.
-*   The `SystemPrompt` class in `browser_use/agent/prompts.py` was updated to load this new prompt when `use_thinking` is `False`.
-*   The `thinking` field in `AgentBrain` and `AgentOutput` models in `browser_use/agent/views.py` was made optional.
-*   A new static method, `type_with_custom_actions_no_thinking()`, was added to `AgentOutput` to dynamically create models without the thinking field.
-*   The `Agent` service in `browser_use/agent/service.py` now uses the appropriate `AgentOutput` model based on the `use_thinking` setting, ensuring the LLM is not prompted for the thinking field when disabled.
-*   Examples in `browser_use/agent/message_manager/service.py` were updated to reflect the presence or absence of the thinking field.
-*   Logging and serialization in `browser_use/agent/service.py` were adjusted to conditionally handle the optional `thinking` field.
-
-This change reduces token usage and provides a more concise output when detailed reasoning is not required, while maintaining backward compatibility.
-    
-<!-- This is an auto-generated description by cubic. -->
----
-
-## Summary by cubic
-Added an option to disable the ""thinking"" field in the browser-use agent’s output, making responses shorter when detailed reasoning is not needed.
-
-- **New Features**
-  - Introduced a `use_thinking` setting to control inclusion of the ""thinking"" field.
-  - Updated prompts, models, and logging to support outputs with or without ""thinking"".
-  - Maintained backward compatibility; default behavior is unchanged.
-
-<!-- End of auto-generated description by cubic. -->
-
-",Cursor,22038471,mertunsall,closed,2025-06-24T12:40:19Z,2025-06-24T16:25:23Z,2025-06-24T16:25:23Z,881458615,https://api.github.com/repos/browser-use/browser-use,https://github.com/browser-use/browser-use/pull/2086,"analysisWe need to classify whether the primary purpose of the PR is to improve performance. The PR is about deactivating the ""thinking"" field to reduce token usage and provide more concise output. That is a performance improvement: reducing token usage, making responses shorter, less overhead. The description says ""This change reduces token usage and provides a more concise output when detailed reasoning is not required, while maintaining backward compatibility."" That is a performance improvement. So classification: 'performance'.assistantfinalperformance",3,0.05132897397043864,False
-3209660072,5177,feat(talis): add configurable workers flag for concurrent operations,"## Summary
-
-Adds a global `--workers` flag to all Talis commands that perform concurrent operations, allowing users with powerful machines and fast internet connections to fully utilize their processing power and bandwidth.
-
-## Changes
-
-- **Global Flag**: Added `--workers` (`-w`) flag with default value of 10 workers
-- **Updated Commands**: Modified `up`, `down`, `deploy`, `download`, and `status` commands to use configurable worker pools
-- **Backward Compatible**: Maintains existing behavior (10 workers) by default
-- **Documentation**: Updated README with usage examples and performance recommendations
-
-## Usage Examples
-
-```bash
-# Use default 10 workers
-talis up
-
-# Use 20 workers for faster instance creation
-talis up --workers 20
-
-# Use more workers for faster deployment (direct upload mode)
-talis deploy --direct-payload-upload --workers 30
-
-# Use more workers for faster downloads from many nodes
-talis download -n validator-* -t logs --workers 15
-```
-
-## Commands Affected
-
-- `talis up` - Creating DigitalOcean droplets
-- `talis down` - Destroying DigitalOcean droplets  
-- `talis deploy` - Deploying payloads (direct upload mode only)
-- `talis download` - Downloading files from nodes
-- `talis status` - Querying node status (now with worker limiting for consistency)
-
-## Technical Details
-
-- Function signatures updated to accept worker count parameter
-- Worker pools implemented using buffered channels: `make(chan struct{}, workers)`
-- Client struct extended to store and pass worker configuration
-- Global variable `globalWorkers` accessible to all commands via persistent flag
-
-## Testing
-
-- ✅ All commands build successfully
-- ✅ Help text displays workers flag correctly as global flag
-- ✅ Accepts both long (`--workers N`) and short (`-w N`) forms
-- ✅ Maintains backward compatibility with default behavior
-- ✅ Handles edge cases (0, negative, large values) gracefully
-
-Fixes #5176.
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-07T16:41:42Z,2025-07-14T09:56:10Z,2025-07-14T09:56:10Z,327696712,https://api.github.com/repos/celestiaorg/celestia-app,https://github.com/celestiaorg/celestia-app/pull/5177,"analysisWe need to classify as performance or non-performance. The PR adds a workers flag to improve concurrency, making operations faster. It's about performance. So label 'performance'.assistantfinalperformance",3,0.04926171994390911,False
-3230465602,1574,Enable streaming response deltas,"## Summary
-- forward OpenAI `response.output_text.delta` and `response.reasoning_summary_text.delta`
-- stream deltas to the TUI during a turn instead of waiting for completion
-- add incremental message handling in conversation history
-- handle deltas in exec client and MCP tool runner
-
-## Testing
-- `cargo check -p codex-tui`
-- `cargo check`
-
-------
-https://chatgpt.com/codex/tasks/task_i_6874a0bb4b6083218858bb32657453be",OpenAI_Codex,219906144,aibrahim-oai,closed,2025-07-15T01:31:38Z,2025-07-17T16:38:34Z,,965415649,https://api.github.com/repos/openai/codex,https://github.com/openai/codex/pull/1574,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Enable streaming response deltas"". Summary: forward OpenAI response.output_text.delta and response.reasoning_summary_text.delta, stream deltas to the TUI during a turn instead of waiting for completion, add incremental message handling in conversation history, handle deltas in exec client and MCP tool runner. This is about streaming incremental responses, likely improving responsiveness, reducing wait time. It's about performance? It's about user experience, streaming. The keywords: ""streaming"", ""deltas"", ""incremental"", ""response"". It might be considered performance improvement: streaming reduces latency, improves responsiveness. The guidelines: performance-related PRs may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs. This PR mentions ""stream deltas to the TUI during a turn instead of waiting for completion"". That is about reducing wait time, improving responsiveness. So it's performance. So classify as 'performance'.assistantfinalperformance",3,0.048330375595412464,False
-3230759180,2123,Optimize power meter debug logging to fix HTTP timeout issues,"This PR fixes HTTP timeout errors that started occurring after upgrading to version 2025.06.11. Users reported frequent timeouts (every 1-5 minutes, typically 4 in a row) when reading grid power via HTTP/JSON power meters with 1-second polling intervals.
-
-## Problem
-
-The screenshots show the issue clearly:
-
-![HTTP timeout errors in logs](https://github.com/user-attachments/assets/745f30bc-5c34-4d0e-8aa0-1076a4be07e8)
-
-![Comparison showing spiky regulation due to timeouts](https://github.com/user-attachments/assets/b640d5ef-bdd9-46a0-ad8b-024849659c0d)
-
-The debug logging in power meter providers was executing on every successful data read:
-
-```cpp
-DTU_LOGD(""New total: %.2f"", getPowerTotal()); // Called every 1 second for HTTP polling
-```
-
-This frequent debug logging could cause performance bottlenecks affecting HTTP operations, especially when combined with system-wide logging load.
-
-## Solution
-
-Made debug logging conditional using the established `DTU_LOG_IS_DEBUG` pattern to eliminate overhead when debug logging is disabled:
-
-```cpp
-if (DTU_LOG_IS_DEBUG) {
-    DTU_LOGD(""New total: %.2f"", getPowerTotal());
-}
-```
-
-This optimization:
-- Prevents unnecessary function calls to `getPowerTotal()` 
-- Eliminates string formatting overhead
-- Reduces overall system logging load
-- Follows established codebase patterns (used in battery and grid charger components)
-- Preserves debug information when actually needed
-
-## Changes
-
-Applied the same optimization to all three power meter providers for consistency:
-
-- **HTTP JSON Provider**: Logs every successful HTTP poll (1-second intervals)
-- **SDM Serial Provider**: Logs every successful modbus read  
-- **SML Provider**: Logs every completed SML message processing
-
-## Impact
-
-When debug logging is disabled (typical production scenario), these optimizations eliminate performance overhead that could interfere with time-sensitive HTTP operations, resolving the timeout issues.
-
-The changes are minimal (3 files, 9 insertions, 3 deletions) and maintain all existing functionality while providing significant performance benefits.
-
-Fixes #2058.
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `api.registry.nm1.platformio.org`
->   - Triggering command: `/usr/bin/python3 /home/REDACTED/.local/bin/pio run --environment generic_esp32_4mb_no_ota --target check` (dns block)
->   - Triggering command: `/usr/bin/python3 /home/REDACTED/.local/bin/pio run --environment generic_esp32_4mb_no_ota --target compiledb` (dns block)
-> - `api.registry.platformio.org`
->   - Triggering command: `/usr/bin/python3 /home/REDACTED/.local/bin/pio run --environment generic_esp32_4mb_no_ota --target check` (dns block)
->   - Triggering command: `/usr/bin/python3 /home/REDACTED/.local/bin/pio run --environment generic_esp32_4mb_no_ota --target compiledb` (dns block)
-> - `collector.platformio.org`
->   - Triggering command: `/usr/bin/python3 /home/REDACTED/.local/bin/pio run --environment generic_esp32_4mb_no_ota --target check` (dns block)
->   - Triggering command: `/usr/bin/python3 /home/REDACTED/.local/bin/pio run --environment generic_esp32_4mb_no_ota --target compiledb` (dns block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
-
-
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-15T04:52:49Z,2025-07-23T09:55:15Z,,517581241,https://api.github.com/repos/hoylabs/OpenDTU-OnBattery,https://github.com/hoylabs/OpenDTU-OnBattery/pull/2123,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize power meter debug logging to fix HTTP timeout issues"". The body describes optimization of debug logging to reduce overhead, which is performance improvement. Keywords: optimize, performance, overhead, latency, timeout. So classification: performance.assistantfinalperformance",3,0.04632401678703,False
-3163968884,2806,fix(wallet): fix wallet page jank during coin activation,"## Summary
-- avoid repeatedly fetching pubkeys while coins activate by tracking in-progress requests
-
-## Testing
-~~- `flutter pub get --offline --enforce-lockfile` *(fails: version solving failed)*~~
-~~- `flutter analyze` *(fails: version solving failed)*~~
-
-------
-https://chatgpt.com/codex/tasks/task_e_68559334727c83268a1a79bf91ce8b32",OpenAI_Codex,77973576,CharlVS,open,2025-06-20T17:25:10Z,,,225880766,https://api.github.com/repos/KomodoPlatform/komodo-wallet,https://github.com/KomodoPlatform/komodo-wallet/pull/2806,"analysisWe need to classify as performance or non-performance. The PR title: ""fix(wallet): fix wallet page jank during coin activation"". The body: ""avoid repeatedly fetching pubkeys while coins activate by tracking in-progress requests"". This is about reducing jank, which is performance. Jank refers to UI performance. So it's performance. So label 'performance'.assistantfinalperformance",3,0.04629101531925633,False
-3195078514,883,Add force_mode_constant parameter to bypass psutil overhead,"This PR adds a new `force_mode_constant` parameter to `EmissionsTracker` that allows users to bypass psutil completely and use constant CPU power estimation instead. This addresses significant performance overhead issues where `psutil.cpu_percent(interval=0.5)` calls were causing 10x+ slowdowns in ML training workflows.
-
-## Problem
-
-Users reported severe performance overhead when tracking short ML training iterations:
-- **Without CodeCarbon**: 11 seconds
-- **With CodeCarbon v3.0.2**: 1 minute 55 seconds (10x slower!)
-
-The overhead was caused by repeated `psutil.cpu_percent(interval=0.5)` calls that take 0.5 seconds each. Additionally, uninstalling psutil to force fallback mode resulted in `ModuleNotFoundError` due to unconditional imports.
-
-## Solution
-
-### 1. Graceful psutil imports
-Made psutil imports conditional in `codecarbon/core/cpu.py` and `codecarbon/core/util.py`:
-
-```python
-try:
-    import psutil
-    PSUTIL_AVAILABLE = True
-except ImportError:
-    PSUTIL_AVAILABLE = False
-    psutil = None
-```
-
-### 2. New force_mode_constant parameter
-Added `force_mode_constant` parameter to bypass psutil entirely:
-
-```python
-# Bypass psutil completely - eliminates 0.5s overhead per measurement
-tracker = EmissionsTracker(force_mode_constant=True)
-
-# Works with custom CPU power for better accuracy
-tracker = EmissionsTracker(
-    force_mode_constant=True, 
-    force_cpu_power=100  # 100W TDP
-)
-```
-
-### 3. Updated CPU tracking logic
-Modified `codecarbon/core/resource_tracker.py` to prioritize `force_mode_constant` before all other tracking methods, ensuring it completely bypasses psutil when enabled.
-
-## Features
-
-- ✅ **Zero psutil overhead**: Completely eliminates `psutil.cpu_percent()` calls
-- ✅ **Graceful fallback**: Handles missing psutil without crashing
-- ✅ **Custom power support**: Works with `force_cpu_power` parameter
-- ✅ **Precedence control**: Takes priority over `force_mode_cpu_load`
-- ✅ **Backward compatibility**: No breaking changes to existing code
-- ✅ **Comprehensive testing**: Full test suite covering all scenarios
-
-## Performance Impact
-
-Testing shows successful elimination of psutil overhead:
-- **Normal mode**: Uses CPU load tracking (slower due to psutil calls)
-- **Force constant mode**: Uses constant power estimation (eliminates overhead)
-- Both produce valid emissions measurements
-
-## Documentation
-
-Added parameter documentation to `docs/edit/parameters.rst`:
-
-```rst
-* - force_mode_constant
-  - | Force the use of constant mode for CPU power consumption measurement,
-    | defaults to ``False``. When enabled, bypasses psutil completely and
-    | uses a constant power consumption based on CPU TDP. Useful when
-    | psutil overhead is significant or psutil is unavailable.
-```
-
-Fixes #878.
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `get.geojs.io`
->   - Triggering command: `python /tmp/test_force_constant.py` (dns block)
->   - Triggering command: `python -c 
-from codecarbon import EmissionsTracker
-import tempfile
-with tempfile.TemporaryDirectory() as temp_dir:
-    tracker = EmissionsTracker(output_dir=temp_dir)
-    print(&#39;Available attributes:&#39;, [attr for attr in dir(tracker) if &#39;resource&#39; in attr.lower() or &#39;tracker&#39; in attr.lower()])` (dns block)
->   - Triggering command: `python /tmp/test_simple_constant.py` (dns block)
-> - `ip-api.com`
->   - Triggering command: `python /tmp/test_force_constant.py` (dns block)
->   - Triggering command: `python -c 
-from codecarbon import EmissionsTracker
-import tempfile
-with tempfile.TemporaryDirectory() as temp_dir:
-    tracker = EmissionsTracker(output_dir=temp_dir)
-    print(&#39;Available attributes:&#39;, [attr for attr in dir(tracker) if &#39;resource&#39; in attr.lower() or &#39;tracker&#39; in attr.lower()])` (dns block)
->   - Triggering command: `python /tmp/test_simple_constant.py` (dns block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
-
-
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-07-02T08:34:17Z,,,263364731,https://api.github.com/repos/mlco2/codecarbon,https://github.com/mlco2/codecarbon/pull/883,"analysisWe need to classify as 'performance' or 'non-performance'. The PR clearly addresses performance overhead due to psutil calls, adding a parameter to bypass psutil, conditional imports, etc. It's about performance improvement. So classification: 'performance'.assistantfinalperformance",3,0.046094242182480365,False
-3171559766,2085,Create PR to deactivate thinking field,"The browser-use agent's ""thinking"" field can now be optionally deactivated.
-
-Key changes include:
-
-*   A `disable_thinking: bool = False` parameter was added to the `Agent` class in `browser_use/agent/service.py`, defaulting to `False` for backward compatibility.
-*   The `SystemPrompt` in `browser_use/agent/prompts.py` was updated to conditionally remove the `<reasoning_rules>` section and the ""thinking"" field from the output format when `disable_thinking` is `True`.
-*   The `thinking` field in `AgentBrain` and `AgentOutput` models within `browser_use/agent/views.py` was made optional (`str | None = None`).
-*   The `MessageManager` in `browser_use/agent/message_manager/service.py` was modified to conditionally include the ""thinking"" field in example outputs.
-*   Logging in `browser_use/agent/service.py` was adjusted to only log the thinking content if it is present.
-
-This allows for reduced token usage, faster responses, and better compatibility with models that perform optimally without explicit reasoning steps.
-    
-<!-- This is an auto-generated description by cubic. -->
----
-
-## Summary by cubic
-Added an option to disable the ""thinking"" field in agent responses, allowing for shorter outputs and better compatibility with some models.
-
-- **New Features**
-  - Added a `disable_thinking` parameter to the Agent and related classes.
-  - When enabled, removes the ""thinking"" field from prompts, outputs, and logs.
-  - Keeps existing behavior by default for backward compatibility.
-
-<!-- End of auto-generated description by cubic. -->
-
-",Cursor,22038471,mertunsall,closed,2025-06-24T11:08:50Z,2025-06-24T12:02:25Z,,881458615,https://api.github.com/repos/browser-use/browser-use,https://github.com/browser-use/browser-use/pull/2085,"analysisWe need to classify whether the primary purpose is to improve performance. The PR description: ""Create PR to deactivate thinking field"" and mentions ""This allows for reduced token usage, faster responses, and better compatibility with models that perform optimally without explicit reasoning steps."" So it's about performance: reducing token usage, faster responses. So classification: 'performance'.assistantfinalperformance",3,0.043509870526155646,False
-3201567268,17613,stm32/eth: Improve Ethernet driver with link detection and static IP support.,"## Summary
-
-This PR implements comprehensive improvements to the STM32 Ethernet driver, addressing several critical usability issues and adding important features for robust network connectivity.
-
-**Key improvements:**
-- ✅ Automatic cable connect/disconnect detection with proper LWIP integration
-- ✅ Fixed `active()` method to return interface state instead of link status
-- ✅ Enable static IP configuration before interface activation
-- ✅ Eliminated blocking timeouts when activating without cable connected
-- ✅ Fixed network initialization order to allow instantiation in boot.py
-- ✅ Fixed DHCP timing issues for reliable IP acquisition
-
-## Testing
-
-Tested on NUCLEO_H563ZI board with STM32H563 MCU:
-- Cable connect/disconnect detection works reliably
-- Static IP configuration before `active(True)` works correctly
-- `active(True)` returns immediately even without cable
-- DHCP works correctly with various link timing scenarios
-- Network interfaces can be instantiated in boot.py
-- All test scripts pass successfully
-
-Test scripts included:
-- `test_eth_ipv6.py` - IPv6 support validation
-- `test_eth_link_changes.py` - Link detection functionality
-- `test_eth_active_method.py` - Interface state management
-- `test_eth_static_ip_before_active.py` - Static IP workflow
-- `test_eth_active_without_cable.py` - Non-blocking startup
-
-## Trade-offs and Alternatives
-
-**Code size increase:** ~300 lines added for improved functionality
-- This is justified by the significant usability improvements
-- Most additions are for proper state management and error handling
-
-**Alternative approaches considered:**
-- Polling link status in interrupt handler - rejected for efficiency
-- Keeping blocking PHY init - rejected for poor user experience
-- Different DHCP timing - current approach is most robust
-
-## Detailed Changes
-
-### 1. Link State Detection and Interface Management
-- Added PHY interrupt register support for future hardware interrupts
-- Implemented on-demand PHY polling for cable state changes
-- Added proper LWIP `netif_set_link_up/down()` integration
-- Fixed `active()` to return interface enabled state, not link status
-
-### 2. Static IP and Non-blocking PHY
-- Restructured LWIP initialization for early netif setup
-- Removed blocking PHY autonegotiation loops
-- Allow static IP configuration before `active(True)`
-- PHY configuration happens asynchronously when link established
-
-### 3. PHY Lifecycle Optimization
-- Moved PHY init from MAC init to interface start
-- Added proper PHY shutdown on interface stop
-- Optimized status checks to poll once then use cached state
-- Removed redundant periodic polling
-
-### 4. Network Initialization Order Fix
-- Moved `mod_network_init()` before boot.py execution
-- Allows `network.LAN()` instantiation in boot.py
-- Maintains compatibility with `network.country()` and `network.hostname()`
-
-### 5. DHCP Timing Fix
-- Poll link status before attempting DHCP start
-- Start DHCP when link comes up if no static IP
-- Handle DHCP correctly across link state changes
-
-## Performance Improvements
-
- < /dev/null |  Operation | Before | After | Improvement |
-|-----------|--------|-------|-------------|
-| `network.LAN()` | ~100ms | ~50ms | 2x faster |
-| `active(True)` with cable | ~2s | ~100ms | 20x faster |
-| `active(True)` without cable | 10s timeout | ~100ms | 100x faster |
-| Link detection | Manual only | Automatic | Real-time |
-
-## Backward Compatibility
-
-All changes maintain 100% backward compatibility:
-- Existing code continues to work unchanged
-- API signatures remain identical
-- Only behavioral improvements, no breaking changes
-
-## Example Usage
-
-```python
-# In boot.py - now works\!
-import network
-
-# Configure network settings
-network.country('US')
-network.hostname('my-device')
-
-# Create and configure interface
-eth = network.LAN()
-
-# Configure static IP before activation
-eth.ipconfig(addr='192.168.1.100', mask='255.255.255.0', gw='192.168.1.1')
-
-# Activate interface - returns immediately
-eth.active(True)
-
-# Or use DHCP
-eth.ipconfig(dhcp4=True)
-
-# Check connection status
-if eth.isconnected():
-    print('Connected with IP:', eth.ipconfig('addr4'))
-```
-
-## Documentation
-
-Comprehensive documentation included:
-- Implementation report with technical details
-- Test scripts demonstrating all features
-- Network initialization order analysis
-
-🤖 Generated with [Claude Code](https://claude.ai/code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,3318786,andrewleech,open,2025-07-04T06:53:52Z,,,15337142,https://api.github.com/repos/micropython/micropython,https://github.com/micropython/micropython/pull/17613,"analysisWe need to classify as performance or non-performance. The PR title: ""stm32/eth: Improve Ethernet driver with link detection and static IP support."" The body includes performance improvements: ""Performance Improvements"" table shows speed improvements. Also mentions ""Optimized status checks to poll once then use cached state"" and ""Removed redundant periodic polling"". So it's performance. So label 'performance'.assistantfinalperformance",3,0.03856464956505931,True
+",OpenAI_Codex,46503781,achantavy,closed,2025-06-10T01:01:49Z,2025-07-28T14:10:47Z,2025-07-28T14:10:47Z,172811550,https://api.github.com/repos/cartography-cncf/cartography,https://github.com/cartography-cncf/cartography/pull/1622,3,0.07050233563412167,False
 3237935468,22640,refactor(connector): split connector implementations into optional features,"This PR implements feature flags for major connector sinks with heavy dependencies to reduce compilation time when not needed, addressing the community request for better connector modularity.
 
 ## Background
@@ -1564,80 +943,7 @@ Fixes #16841.
 <!-- START COPILOT CODING AGENT TIPS -->
 ---
 
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-17T03:09:32Z,2025-07-23T09:03:16Z,,453068084,https://api.github.com/repos/risingwavelabs/risingwave,https://github.com/risingwavelabs/risingwave/pull/22640,"analysisWe need to classify as performance or non-performance. The PR is about refactoring connectors to make them optional to reduce compilation time. The primary purpose is to improve performance (specifically compilation performance). The description mentions ""Faster compilation"", ""Free fast compile time"". So it's performance. So label 'performance'.assistantfinalperformance",3,0.0383629317023038,False
-3149241573,251578,Fix HSL format to use whole numbers for percentages instead of decimal places,"The standalone color picker was producing HSL format with unwanted decimal places like `hsl(0, 85.70%, 43.70%)` instead of the expected whole numbers like `hsl(0, 86%, 44%)`. This behavior was inconsistent with the inline CSS color picker and unexpected for users.
-
-## Problem
-The `formatHSL` and `formatHSLA` functions in `src/vs/base/common/color.ts` were using `(value * 100).toFixed(2)` to format percentages, which always produced 2 decimal places regardless of whether they were needed.
-
-## Solution
-- Changed `(color.hsla.s * 100).toFixed(2)` to `Math.round(color.hsla.s * 100)` 
-- Changed `(color.hsla.l * 100).toFixed(2)` to `Math.round(color.hsla.l * 100)`
-- Applied fix to both `formatHSL` and `formatHSLA` functions
-- Alpha values in HSLA continue to use `.toFixed(2)` as expected for proper precision
-
-## Example
-**Before:**
-```css
-hsl(0, 85.70%, 43.70%)
-hsla(0, 85.70%, 43.70%, 0.85)
-```
-
-**After:**
-```css
-hsl(0, 86%, 44%)
-hsla(0, 86%, 44%, 0.85)
-```
-
-## Additional Benefits
-- Makes standalone color picker consistent with inline CSS color picker behavior
-- Improves performance (~7x faster with `Math.round` vs `toFixed`)
-- Cleaner, more readable color values
-- No breaking changes to existing functionality
-
-## Testing
-Added comprehensive tests covering:
-- Basic rounding behavior
-- Edge cases with different percentage values
-- Both HSL and HSLA formats
-- Verification that alpha precision is preserved
-
-In relation to #181545.
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `electronjs.org`
->   - Triggering command: `node-gyp                                                                           ` (dns block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
-
-
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-06-16T09:29:21Z,2025-06-16T11:57:59Z,2025-06-16T11:57:59Z,41881900,https://api.github.com/repos/microsoft/vscode,https://github.com/microsoft/vscode/pull/251578,"analysisWe need to classify the pull request as 'performance' or 'non-performance'. The PR description mentions performance improvement: ""Improves performance (~7x faster with Math.round vs toFixed)"". So it's a performance improvement. So classification: 'performance'.assistantfinalperformance",3,0.037920741955232956,False
-3275298847,615,Switch scrypt to wallycore,"## Summary
-- prefer `wallycore.scrypt` in `lib.pylibscrypt` when available and document fallback cost
-- keep `wallycore` only in `requirements-full.txt`
-- document the ~20% slowdown when falling back to `pylibscrypt`
-
-## Testing
-- `python run-all-tests.py`
-
-
-------
-https://chatgpt.com/codex/tasks/task_e_68893efb15c0832290ad8de32236e54c",OpenAI_Codex,2230318,3rdIteration,closed,2025-07-30T00:11:24Z,2025-07-30T01:21:57Z,,197336679,https://api.github.com/repos/3rdIteration/btcrecover,https://github.com/3rdIteration/btcrecover/pull/615,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Switch scrypt to wallycore"". Summary: prefer wallycore.scrypt in lib.pylibscrypt when available and document fallback cost. Keep wallycore only in requirements-full.txt. Document the ~20% slowdown when falling back to pylibscrypt. So it's about switching to a faster implementation? wallycore.scrypt presumably faster than pylibscrypt. They mention slowdown when falling back. So it's performance improvement. Keywords: slowdown, performance. So classify as 'performance'.assistantfinalperformance",3,0.03724597267128911,False
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-17T03:09:32Z,2025-07-23T09:03:16Z,,453068084,https://api.github.com/repos/risingwavelabs/risingwave,https://github.com/risingwavelabs/risingwave/pull/22640,3,0.06830067315693843,True
 3140239245,1731,feat: Add feature gating for halo2 imports in SDK and CLI crates,"## Feature Gating for Halo2 Imports - INT-4112
 
 This PR implements feature gating for all halo2 imports in the openvm-sdk and openvm-cli crates, making EVM proving/verification capabilities optional. This allows users who only need STARK functionality to compile without pulling in halo2 dependencies, improving compile times and reducing binary size.
@@ -1690,48 +996,7 @@ All compilation scenarios have been tested and pass successfully:
 ### Link to Devin run
 https://app.devin.ai/sessions/8bb6a0cf896e4b98972d872fffcb68bd
 
-**Requested by:** Jonathan Wang",Devin,158243242,devin-ai-integration[bot],closed,2025-06-12T13:11:51Z,2025-06-14T21:16:42Z,2025-06-14T21:16:42Z,793399480,https://api.github.com/repos/openvm-org/openvm,https://github.com/openvm-org/openvm/pull/1731,"analysisWe need to classify as performance or non-performance. The PR is about feature gating to reduce compile times and binary size. That is performance improvement. Keywords: compile times, binary size, optional dependencies. So it's performance. So output 'performance'.assistantfinalperformance",3,0.033143893639002144,False
-3218869116,755,Add .cursorignore to optimize AI editor performance and security,"  Prevents Cursor AI from accessing sensitive files (keys, credentials,
-  deployment configs) and large generated artifacts that slow down indexing.
-  Keeps source code accessible while excluding build outputs, node_modules,
-  and circuit/contract compilation artifacts across the monorepo.
-
-<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
-
-## Summary by CodeRabbit
-
-* **Chores**
-  * Added a configuration file to improve handling of sensitive and unnecessary files in the development environment. No impact on application features or user experience.
-
-<!-- end of auto-generated comment: release notes by coderabbit.ai -->",Cursor,7667514,hackertron,closed,2025-07-10T10:57:27Z,2025-07-10T12:06:05Z,,669466632,https://api.github.com/repos/selfxyz/self,https://github.com/selfxyz/self/pull/755,analysisWe need to classify as performance or non-performance. The PR adds.cursorignore to optimize AI editor performance and security. It mentions preventing Cursor AI from accessing sensitive files and large generated artifacts that slow indexing. So it's about performance optimization. So label 'performance'.assistantfinalperformance,3,0.03082950652772385,False
-3219088212,756,Cursor/cursorignore,"Prevents Cursor AI from accessing sensitive files (keys, credentials,
-deployment configs) and large generated artifacts that slow down indexing.
-Keeps source code accessible while excluding build outputs, node_modules,
-and circuit/contract compilation artifacts across the monorepo.
-
-<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
-
-## Summary by CodeRabbit
-
-* **New Features**
-  * Added multiple new zero-knowledge proof circuit configurations for identity and registration, supporting a variety of cryptographic schemes.
-  * Introduced a script to batch-compile Circom circuits into R1CS and WASM formats.
-  * Added comprehensive documentation for contract deployment and upgrade procedures.
-
-* **Improvements**
-  * Enhanced build scripts to support new circuit categories and improved concurrency handling.
-  * Refactored deployment and update scripts for better modularity, error handling, and logging.
-  * Standardized and simplified environment variable and contract address management.
-
-* **Bug Fixes**
-  * Disabled deployment of a specific verifier contract to prevent unintended deployments.
-
-* **Chores**
-  * Added configuration files to control editor and build tool behaviors, improving project maintainability.
-
-<!-- end of auto-generated comment: release notes by coderabbit.ai -->",Cursor,7667514,hackertron,closed,2025-07-10T12:06:09Z,2025-07-10T12:06:24Z,,669466632,https://api.github.com/repos/selfxyz/self,https://github.com/selfxyz/self/pull/756,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Cursor/cursorignore"". The body describes preventing Cursor AI from accessing sensitive files and large generated artifacts that slow down indexing. It keeps source code accessible while excluding build outputs, node_modules, and circuit/contract compilation artifacts across the monorepo. This is about excluding large files to improve indexing speed. That is a performance improvement: indexing speed. Keywords: ""slow"", ""slow down indexing"". So it's performance. So label 'performance'.assistantfinalperformance",3,0.028704833800945642,False
-3084098546,90,Fix duplicate compilation in explorer utility,"## Summary
-- remove redundant compilation calls in `compile_contract_from_explorer`",OpenAI_Codex,961317,TheDZhon,closed,2025-05-22T17:33:31Z,2025-05-22T17:47:45Z,2025-05-22T17:47:45Z,631200841,https://api.github.com/repos/lidofinance/diffyscan,https://github.com/lidofinance/diffyscan/pull/90,"analysisWe need to classify whether the primary purpose is to improve performance. The PR title: ""Fix duplicate compilation in explorer utility"". Body: ""remove redundant compilation calls in compile_contract_from_explorer"". This is about removing duplicate compilation calls, which likely reduces unnecessary work, improving performance. It's a performance improvement. So classify as 'performance'.assistantfinalperformance",3,0.028634433382418372,False
+**Requested by:** Jonathan Wang",Devin,158243242,devin-ai-integration[bot],closed,2025-06-12T13:11:51Z,2025-06-14T21:16:42Z,2025-06-14T21:16:42Z,793399480,https://api.github.com/repos/openvm-org/openvm,https://github.com/openvm-org/openvm/pull/1731,3,0.059844667205283746,False
 3169607617,2802,Convert WormholeContract to sol_storage! macro for TestVM compatibility,"# WormholeContract Size Optimization: Achieved 24 KiB Target ✅
 
 ## Summary
@@ -1817,311 +1082,362 @@ ayush.suresh@dourolabs.xyz
 ---
 
 **Status: ✅ Size optimization complete - 12.5 KB contract size achieved (50% reduction, well under 24 KiB target)**
-",Devin,158243242,devin-ai-integration[bot],closed,2025-06-23T22:18:13Z,2025-07-04T17:04:29Z,,425803244,https://api.github.com/repos/pyth-network/pyth-crosschain,https://github.com/pyth-network/pyth-crosschain/pull/2802,"analysisWe need to classify whether the primary purpose is to improve performance. The PR is about converting WormholeContract to sol_storage! macro for TestVM compatibility and size optimization. The title: ""Convert WormholeContract to sol_storage! macro for TestVM compatibility"". The body: mentions size optimization, reducing contract size from 25.2 KB to 12.5 KB, removing k256 dependency, disabling signature verification. This is about size optimization, not performance per se. But size optimization is a form of performance improvement? The instructions: performance-related PRs may contain keywords like memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. This PR mentions ""Size Optimization"" and ""Performance"" but not explicitly performance. It is about reducing contract size, which is a performance improvement in terms of deployment size, but the classification is ambiguous. The primary purpose is to reduce contract size, which is a performance improvement. The keywords: ""Size Optimization"" is not in the list, but ""optimization"" is. The body includes ""Size Optimization"" and ""Performance"" in the summary. The instructions say performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. The PR contains ""optimization"" and ""performance"". So it qualifies as performance. So classification: 'performance'.assistantfinalperformance",3,0.02861135151602211,False
-3246099511,634,Optimize album art lookup,"## Summary
-- remove repeated album art checks to reduce filesystem lookups
-- document performance change in CHANGELOG
-
-## Testing
-- `php -l lib/Controller/ScannerController.php`
-- `php -l CHANGELOG.md`
-
-
-------
-https://chatgpt.com/codex/tasks/task_e_687bffeca6748333b3adc08ce660fb03",OpenAI_Codex,13385119,Rello,closed,2025-07-20T07:14:31Z,2025-07-20T07:15:57Z,2025-07-20T07:15:57Z,62162299,https://api.github.com/repos/Rello/audioplayer,https://github.com/Rello/audioplayer/pull/634,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize album art lookup"". Summary: remove repeated album art checks to reduce filesystem lookups. That is a performance improvement. So label 'performance'.assistantfinalperformance",3,0.02701735845067227,False
-3195300873,1699,Fix Ollama model detection to ignore `:latest` tag when checking if model exists,"When specifying a model as `ollama:llama3.2` and having `llama3.2:latest` already present on Ollama, GenAIScript would unnecessarily pull the model because the exact string match check didn't recognize that `llama3.2` and `llama3.2:latest` refer to the same model.
-
-## Problem
-
-```javascript
-// User's script configuration
-script({
-    model: ""ollama:llama3.2"",  // No tag specified
-})
-```
-
-```bash
-# Ollama server state
-$ ollama list
-NAME                    ID              SIZE
-llama3.2:latest         abc123def456    2.0 GB
-```
-
-**Before this fix:** GenAIScript would pull `llama3.2` even though `llama3.2:latest` already exists, causing unnecessary downloads and delays.
-
-## Solution
-
-Added tag-aware model comparison specifically for the Ollama provider:
-
-1. **New utility functions** in `packages/core/src/ollama.ts`:
-   - `normalizeOllamaModelName()` - Adds `:latest` tag to models without tags
-   - `areOllamaModelsEquivalent()` - Compares models considering the implicit `:latest` tag
-
-2. **Updated model checking logic** in `packages/cli/src/nodehost.ts`:
-   - Uses tag-aware comparison for Ollama provider only
-   - Maintains exact matching for all other providers
-   - Preserves all existing functionality
-
-## Key Benefits
-
-- ✅ **Performance**: No unnecessary model pulls when `:latest` version exists
-- ✅ **Bandwidth**: Reduced network usage
-- ✅ **UX**: Faster script execution, no unexpected delays
-- ✅ **Compatibility**: Backwards compatible, only affects Ollama provider
-- ✅ **Precision**: Different model variants (e.g., `:3b` vs `:7b`) still handled correctly
-
-## Test Coverage
-
-```javascript
-// These scenarios now work correctly:
-""llama3.2"" ↔ ""llama3.2:latest""  // ✅ Equivalent
-""llama3.2"" ↔ ""llama3.2:3b""      // ❌ Different (still pulls)
-""hf.co/model"" ↔ ""hf.co/model:latest""  // ✅ Equivalent
-```
-
-Comprehensive tests added covering edge cases, integration scenarios, and regression testing for non-Ollama providers.
-
-Fixes #1698.
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `cdn.sheetjs.com`
-> - `github.com (HTTP Only)`
->   - Triggering command: `ssh -oStrictHostKeyChecking=accept-new -o SendEnv=GIT_PROTOCOL git@github.com git-upload-pack &#39;/typescript/tsc.git&#39;` (packet block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
-
-
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-02T09:50:00Z,2025-07-02T11:29:40Z,,679784368,https://api.github.com/repos/microsoft/genaiscript,https://github.com/microsoft/genaiscript/pull/1699,"analysisWe need to classify the pull request as 'performance' or 'non-performance'. The PR description: ""Fix Ollama model detection to ignore `:latest` tag when checking if model exists"". The key benefit: ""Performance: No unnecessary model pulls when `:latest` version exists"". So it's a performance improvement. So classification: 'performance'.assistantfinalperformance",3,0.025929100804992423,False
-3188046855,11994,Port Wrap with Tag endpoint to cohosting,"This PR ports the existing `WrapWithTagEndpoint` to the cohosting architecture, providing better performance and consistency with other Razor language services.
-
-## Changes Made
-
-### 1. Remote Service Infrastructure
-- **`IRemoteWrapWithTagService`** - New interface in `Microsoft.CodeAnalysis.Razor.Workspaces`
-  - `IsValidWrapWithTagLocationAsync` - Validates if position supports wrap with tag operation
-  - `FixHtmlTextEditsAsync` - Fixes text edits containing tilde characters from generated HTML
-
-- **`RemoteWrapWithTagService`** - Implementation in `Microsoft.CodeAnalysis.Remote.Razor`
-  - Copied exact validation logic from original `WrapWithTagEndpoint`
-  - Handles whitespace offset adjustments, language kind detection, and implicit expressions
-  - Implements text edit fixing using `FormattingUtilities` in the remote context
-
-### 2. Cohost Endpoint
-- **`CohostWrapWithTagEndpoint`** - New endpoint in `Microsoft.VisualStudio.LanguageServices.Razor`
-  - Validates position via remote service call
-  - Delegates to HTML server when position is valid
-  - Fixes text edits through remote service
-  - Follows established cohosting patterns with proper MEF registration
-
-### 3. Service Registration
-- Added `Microsoft.VisualStudio.Razor.WrapWithTag` entry to `Services.props`
-- Added `IRemoteWrapWithTagService` to `RazorServices.MessagePackServices`
-
-### 4. Comprehensive Tests
-- Valid HTML locations return HTML server response
-- C# locations properly return null (not supported)
-- Implicit expressions are correctly supported
-- Tilde character fixing is properly handled
-
-## Architecture Benefits
-- **Performance**: Remote service execution reduces devenv memory usage
-- **Consistency**: Follows established cohosting patterns used by other Razor services
-- **Maintainability**: Single source of validation logic shared between language server and cohost
-- **Compatibility**: Maintains exact behavior of original endpoint
-
-The implementation preserves all existing functionality while moving computation to the out-of-process service for better performance in Visual Studio.
-
-Fixes #11993.
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `80zvsblobprodcus35.vsblob.vsassets.io`
->   - Triggering command: `/home/REDACTED/work/razor/razor/.dotnet/dotnet msbuild /m /nologo /clp:Summary /v:minimal /nr:true /warnaserror /p:TreatWarningsAsErrors=true /p:ContinuousIntegrationBuild=false /home/REDACTED/work/razor/razor/artifacts/toolset/restore.proj /t:__WriteToolsetLocation /clp:ErrorsOnly;NoSummary /p:__ToolsetLocationOutputFile=/home/REDACTED/work/razor/razor/artifacts/toolset/9.0.0-beta.25255.5.txt ` (dns block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
-
-
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-30T10:57:04Z,2025-06-30T23:36:50Z,,159564733,https://api.github.com/repos/dotnet/razor,https://github.com/dotnet/razor/pull/11994,"analysisWe need to classify as performance or non-performance. The PR title: ""Port Wrap With Tag endpoint to cohosting"". Body mentions performance: ""providing better performance and consistency"", ""Performance: Remote service execution reduces devenv memory usage"". So it's performance-related. So label 'performance'.assistantfinalperformance",3,0.02493167871539145,False
-2859112713,325,fix: improve tags API error handling and model performance,"# Improve tags API error handling and model performance
-
-This PR improves error handling in the tags API and optimizes model performance to reduce CPU usage.
-
-## Changes
-1. Enhanced error handling in tags API:
-   - Added detailed error logging with stack traces
-   - Improved JSON validation with array type checking
-   - Added structured error responses with details field
-   - Added input/output logging for debugging
-
-2. Optimized model configuration:
-   - Removed unnecessary Buffer usage in favor of ArrayBuffer
-   - Fixed TypeScript errors and improved type safety
-   - Improved binary data handling in image processing
-
-## Testing Steps
-1. Test tag generation with valid input
-2. Test error handling with invalid input
-3. Verify error logs contain detailed information
-4. Check model performance improvements
-
-Link to Devin run: https://app.devin.ai/sessions/b8b3d18d2339481d827b6db2e5babd10
-Requested by: alex@fileorganizer2000.com
-",Devin,158243242,devin-ai-integration[bot],closed,2025-02-18T01:42:25Z,2025-02-18T01:51:37Z,,689765175,https://api.github.com/repos/different-ai/note-companion,https://github.com/different-ai/note-companion/pull/325,"analysisWe need to classify as performance or non-performance. The PR title: ""fix: improve tags API error handling and model performance"". Body mentions ""optimizes model performance to reduce CPU usage"". So it's performance. So label 'performance'.assistantfinalperformance",3,0.024813721083914626,False
-3236499567,5803,Improve mmaitag memory handling,"## Summary
-- fix memory management in mmaitag plugin
-- allocate provider instances per action
-- guard message duplication and JSON creation with CHKmalloc
-
-## Testing
-- `./devtools/format-code.sh`
-- `python3 devtools/rsyslog_stylecheck.py -f plugins/mmaitag/mmaitag.c`
-- `./configure --enable-imdiag --enable-testbench --enable-omstdout`
-- `make -j2`
-
-
-------
-https://chatgpt.com/codex/tasks/task_e_6877c4b01fd883328aa5d436c8985ae2",OpenAI_Codex,1482123,rgerhards,closed,2025-07-16T15:54:50Z,2025-07-17T18:31:06Z,2025-07-17T18:31:06Z,10458362,https://api.github.com/repos/rsyslog/rsyslog,https://github.com/rsyslog/rsyslog/pull/5803,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve mmaitag memory handling"". Body: fix memory management, allocate provider instances per action, guard message duplication and JSON creation with CHKmalloc. This is about memory handling, not necessarily performance. It's about memory management, not speed. The guidelines: performance-related PRs may contain keywords like memory, optimization, leak, speed, perf, etc. Wait, memory is included? The guidelines list memory as a keyword for performance. But memory handling could be about memory leaks, which is performance? The guidelines say ""Performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" So memory is included. But memory handling could be about memory leaks, which is performance. But the PR is about memory management, not necessarily performance. But the guidelines say memory is a keyword for performance. So we should classify as performance. However, the PR is about memory handling, but not necessarily performance improvement. But the guidelines say memory is a keyword for performance. So we should classify as performance. Let's check: The PR is about memory management, but not necessarily performance. But the guidelines say memory is a keyword for performance. So we should classify as performance. The title: ""Improve mmaitag memory handling"". That is memory. So classification: performance.assistantfinalperformance",3,0.02360508047367384,False
-3225788754,611,Improve image response performance,"## Summary
-- improve image response handling with stricter typing, content length and safer hashing
-- document the change in the changelog
-
-## Testing
-- `php -l lib/Http/ImageResponse.php`
-- `php -l lib/Controller/CoverController.php`
-- `git ls-files '*.php' | xargs -I{} php -l {}`
-
-------
-https://chatgpt.com/codex/tasks/task_e_6872b90b728c83338f6f3e72abffcb6c",OpenAI_Codex,13385119,Rello,closed,2025-07-12T21:21:54Z,2025-07-12T21:24:30Z,2025-07-12T21:24:30Z,62162299,https://api.github.com/repos/Rello/audioplayer,https://github.com/Rello/audioplayer/pull/611,"analysisWe need to classify as performance or non-performance. The title: ""Improve image response performance"". That clearly indicates performance improvement. So classification: performance.assistantfinalperformance",3,0.022883483139216083,False
-3164813640,2493,Improve image flipper performance,"## Summary
-- preload next few images to make flipping snappy
-- use preloaded image when available
-- add tests for preloading behaviour
-- include jest-dom types in tsconfig for tests
-- include node types so linters still pass
-- use lodash `range` helper in preloader test
-- remove lodash usage in preload test
-
-## Testing
-- `npm run linters`
-- `npm test --silent`
-- `npx jest frontend/photos/images/__tests__/image_flipper_preload_test.tsx --runInBand`
-
-
-------
-https://chatgpt.com/codex/tasks/task_e_6854f2091288832e8a5d4fcc653a5b9d",OpenAI_Codex,5524043,roryaronson,open,2025-06-21T06:22:21Z,,,17652873,https://api.github.com/repos/FarmBot/Farmbot-Web-App,https://github.com/FarmBot/Farmbot-Web-App/pull/2493,"analysisWe need to classify as performance or non-performance. The title: ""Improve image flipper performance"". The body: mentions preloading next few images to make flipping snappy, use preloaded image when available, tests for preloading behaviour. This is clearly performance improvement. So label 'performance'.assistantfinalperformance",3,0.02226525871838254,False
-3169706651,579,fix: resolve ESLint warnings by replacing img tags with Next.js Image,"# Fix Image-Related ESLint Warnings in Cook-Web
-
-## Summary
-This PR resolves all image-related ESLint warnings in the cook-web directory by replacing `<img>` tags with Next.js `<Image>` components to comply with the `@next/next/no-img-element` rule.
-
-## Changes Made
-
-### Files Modified:
-1. **`src/cook-web/src/app/main/page.tsx`**
-   - Added Next.js Image import
-   - Replaced `<img>` tag with `<Image>` component for recipe icons
-   - Added required `width={24}` and `height={24}` props
-
-2. **`src/cook-web/src/components/file-uploader/image-uploader.tsx`**
-   - Added Next.js Image import
-   - Replaced `<img>` tag with `<Image>` component for uploaded image preview
-   - Added `width={400}` and `height={400}` props
-   - Fixed import conflict by using `window.Image()` for native Image constructor
-
-3. **`src/cook-web/src/components/header/index.tsx`**
-   - Added Next.js Image import
-   - Replaced `<img>` tag with `<Image>` component for shifu avatar
-   - Added `width={40}` and `height={40}` props
-
-4. **`src/cook-web/src/components/shifu-setting/index.tsx`**
-   - Added Next.js Image import
-   - Replaced `<img>` tag with `<Image>` component for avatar upload preview
-   - Added `width={96}` and `height={96}` props
-
-## Before/After ESLint Output
-
-### Before:
-```
-./src/app/main/page.tsx
-35:42  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image`  @next/next/no-img-element
-
-./src/components/file-uploader/image-uploader.tsx
-235:11  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image`  @next/next/no-img-element
-
-./src/components/header/index.tsx
-69:33  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image`  @next/next/no-img-element
-
-./src/components/shifu-setting/index.tsx
-372:49  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image`  @next/next/no-img-element
-```
-
-### After:
-```
-No image-related warnings found
-```
-
-## Testing
-- ✅ ESLint passes with no image-related warnings
-- ✅ All existing functionality preserved
-- ✅ Image displays work correctly with Next.js Image optimization
-
-## Benefits
-- Improved performance through Next.js automatic image optimization
-- Better Core Web Vitals (LCP) scores
-- Reduced bandwidth usage
-- Compliance with Next.js best practices
-
----
-
-**Link to Devin run:** https://app.devin.ai/sessions/ca5364d8cead4f1b9fd0323efab49412  
-**Requested by:** Sunner (sunner@gmail.com)
-
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-23T22:18:13Z,2025-07-04T17:04:29Z,,425803244,https://api.github.com/repos/pyth-network/pyth-crosschain,https://github.com/pyth-network/pyth-crosschain/pull/2802,3,0.05534308411560191,False
+3219088212,756,Cursor/cursorignore,"Prevents Cursor AI from accessing sensitive files (keys, credentials,
+deployment configs) and large generated artifacts that slow down indexing.
+Keeps source code accessible while excluding build outputs, node_modules,
+and circuit/contract compilation artifacts across the monorepo.
 
 <!-- This is an auto-generated comment: release notes by coderabbit.ai -->
 
 ## Summary by CodeRabbit
 
+* **New Features**
+  * Added multiple new zero-knowledge proof circuit configurations for identity and registration, supporting a variety of cryptographic schemes.
+  * Introduced a script to batch-compile Circom circuits into R1CS and WASM formats.
+  * Added comprehensive documentation for contract deployment and upgrade procedures.
+
+* **Improvements**
+  * Enhanced build scripts to support new circuit categories and improved concurrency handling.
+  * Refactored deployment and update scripts for better modularity, error handling, and logging.
+  * Standardized and simplified environment variable and contract address management.
+
+* **Bug Fixes**
+  * Disabled deployment of a specific verifier contract to prevent unintended deployments.
+
+* **Chores**
+  * Added configuration files to control editor and build tool behaviors, improving project maintainability.
+
+<!-- end of auto-generated comment: release notes by coderabbit.ai -->",Cursor,7667514,hackertron,closed,2025-07-10T12:06:09Z,2025-07-10T12:06:24Z,,669466632,https://api.github.com/repos/selfxyz/self,https://github.com/selfxyz/self/pull/756,3,0.05182177881705812,False
+3218869116,755,Add .cursorignore to optimize AI editor performance and security,"  Prevents Cursor AI from accessing sensitive files (keys, credentials,
+  deployment configs) and large generated artifacts that slow down indexing.
+  Keeps source code accessible while excluding build outputs, node_modules,
+  and circuit/contract compilation artifacts across the monorepo.
+
+<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
+
+## Summary by CodeRabbit
+
+* **Chores**
+  * Added a configuration file to improve handling of sensitive and unnecessary files in the development environment. No impact on application features or user experience.
+
+<!-- end of auto-generated comment: release notes by coderabbit.ai -->",Cursor,7667514,hackertron,closed,2025-07-10T10:57:27Z,2025-07-10T12:06:05Z,,669466632,https://api.github.com/repos/selfxyz/self,https://github.com/selfxyz/self/pull/755,3,0.05173531258436575,False
+3084098546,90,Fix duplicate compilation in explorer utility,"## Summary
+- remove redundant compilation calls in `compile_contract_from_explorer`",OpenAI_Codex,961317,TheDZhon,closed,2025-05-22T17:33:31Z,2025-05-22T17:47:45Z,2025-05-22T17:47:45Z,631200841,https://api.github.com/repos/lidofinance/diffyscan,https://github.com/lidofinance/diffyscan/pull/90,3,0.05123115782816157,False
+3238869981,984,"[WIP] Streaming still not working. Causing slow responses for something like 'write a report' #981
+Open
+@mzazakeith
+Description
+mzazakeith
+opened 3 hours ago
+Description
+With the latest version of PraisonAI. straming is still not real time. When in verbose mo...","Thanks for asking me to work on this. I will get started on it and keep this PR's description up to date as I form a plan and make progress.
+
+Original description:
+
+> Streaming still not working. Causing slow responses for something like 'write a report' #981
+> Open
+> @mzazakeith
+> Description
+> mzazakeith
+> opened 3 hours ago
+> Description
+> With the latest version of PraisonAI. straming is still not real time. When in verbose mode you can see the internal logs of the tool streaming the output. But as a use the final output we get is an accumulation of the internal streams.
+> 
+> Environment
+> Provider (select one):
+> 
+> Anthropic
+> 
+> OpenAI
+> 
+> Google Vertex AI
+> 
+> AWS Bedrock
+> 
+> Other:
+> PraisonAI version: latest
+> Operating System:
+> Full Code
+> from praisonaiagents import Agent
+> 
+> agent = Agent(
+>     instructions=""You are a helpful assistant"",
+>     llm=""gemini/gemini-2.0-flash"",
+>     self_reflect=False,
+>     verbose=False,
+>     stream=True
+> )
+> 
+> for chunk in agent.start(""Write a report on about the history of the world""):
+>     print(chunk, end="""", flush=True) 
+> or
+> 
+> from praisonaiagents import Agent
+> 
+> agent = Agent(
+>     instructions=""You are a helpful assistant"",
+>     llm=""gemini/gemini-2.0-flash"",
+>     self_reflect=False,
+>     verbose=True,
+>     stream=True
+> )
+> 
+> result = agent.start(""Write a report on about the history of the world"")
+> print(result)
+> Steps to Reproduce
+> intall the lib
+> copy the code above
+> run them and observe
+> Expected Behavior
+> Instead of streaming the internal response that the user does not see we should stream realtime to the user so as to avoid unnecessary latency and improve user experience
+> 
+> Actual Behavior
+> Streaming happens internally we do not get the stream in the final response.
+> 
+> Activity
+> 
+> mzazakeith
+> added 
+> bug
+> Something isn't working
+>  3 hours ago
+> MervinPraison
+> MervinPraison commented 37 minutes ago
+> MervinPraison
+> 37 minutes ago
+> Owner
+> @claude review this issue and do a detailed analysis and fix this if the existing code doesn't have the solution implemented. Making sure it has backward compatibility, no existing features removed. After making those changes, again review the applied changes. Use @web to search if you dont know any information or to find the latest documentation or to find the latest version. Run the code if you think you need to run it to test it. Minimal code change to start with if required any changes. Please create a PR using gh tool with your changes.
+> 
+> MervinPraison
+> MervinPraison commented 32 minutes ago
+> MervinPraison
+> 32 minutes ago
+> Owner
+> @claude make this to work
+> 
+> from praisonaiagents import Agent
+> 
+> agent = Agent(
+>     instructions=""You are a helpful assistant"",
+>     llm=""gemini/gemini-2.0-flash"",
+>     self_reflect=False,
+>     verbose=False,
+>     stream=True
+> )
+> 
+> for chunk in agent.start(""Write a report on about the history of the world""):
+>     print(chunk, end="""", flush=True)
+
+
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-17T09:37:55Z,2025-07-24T00:55:54Z,,774497032,https://api.github.com/repos/MervinPraison/PraisonAI,https://github.com/MervinPraison/PraisonAI/pull/984,3,0.04803314062886592,False
+3230465602,1574,Enable streaming response deltas,"## Summary
+- forward OpenAI `response.output_text.delta` and `response.reasoning_summary_text.delta`
+- stream deltas to the TUI during a turn instead of waiting for completion
+- add incremental message handling in conversation history
+- handle deltas in exec client and MCP tool runner
+
+## Testing
+- `cargo check -p codex-tui`
+- `cargo check`
+
+------
+https://chatgpt.com/codex/tasks/task_i_6874a0bb4b6083218858bb32657453be",OpenAI_Codex,219906144,aibrahim-oai,closed,2025-07-15T01:31:38Z,2025-07-17T16:38:34Z,,965415649,https://api.github.com/repos/openai/codex,https://github.com/openai/codex/pull/1574,3,0.04553385279575385,False
+3224833213,1549,Add paste summarization to Codex TUI,"## Summary
+- introduce `Paste` event to avoid per-character paste handling
+- collapse large pasted blocks to `[Pasted Content X lines]`
+- store the real text so submission still includes it
+- wire paste handling through `App`, `ChatWidget`, `BottomPane`, and `ChatComposer`
+
+## Testing
+- `cargo test -p codex-tui`
+
+
+------
+https://chatgpt.com/codex/tasks/task_i_6871e24abf80832184d1f3ca0c61a5ee
+
+https://github.com/user-attachments/assets/eda7412f-da30-4474-9f7c-96b49d48fbf8",OpenAI_Codex,219906144,aibrahim-oai,closed,2025-07-12T05:00:17Z,2025-07-12T22:32:01Z,2025-07-12T22:32:01Z,965415649,https://api.github.com/repos/openai/codex,https://github.com/openai/codex/pull/1549,3,0.04219351630053029,False
+3275298847,615,Switch scrypt to wallycore,"## Summary
+- prefer `wallycore.scrypt` in `lib.pylibscrypt` when available and document fallback cost
+- keep `wallycore` only in `requirements-full.txt`
+- document the ~20% slowdown when falling back to `pylibscrypt`
+
+## Testing
+- `python run-all-tests.py`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_68893efb15c0832290ad8de32236e54c",OpenAI_Codex,2230318,3rdIteration,closed,2025-07-30T00:11:24Z,2025-07-30T01:21:57Z,,197336679,https://api.github.com/repos/3rdIteration/btcrecover,https://github.com/3rdIteration/btcrecover/pull/615,3,0.032711225157961696,False
+3163968884,2806,fix(wallet): fix wallet page jank during coin activation,"## Summary
+- avoid repeatedly fetching pubkeys while coins activate by tracking in-progress requests
+
+## Testing
+~~- `flutter pub get --offline --enforce-lockfile` *(fails: version solving failed)*~~
+~~- `flutter analyze` *(fails: version solving failed)*~~
+
+------
+https://chatgpt.com/codex/tasks/task_e_68559334727c83268a1a79bf91ce8b32",OpenAI_Codex,77973576,CharlVS,open,2025-06-20T17:25:10Z,,,225880766,https://api.github.com/repos/KomodoPlatform/komodo-wallet,https://github.com/KomodoPlatform/komodo-wallet/pull/2806,3,0.03155587464015428,False
+3220396620,388,Set default worker pollers to 1 for OrchestratorMode,"This change reduces the default number of pollers from 2 to 1 for both workflows and activities when using `WorkflowOrchestrator`, making it more resource-efficient for typical orchestrator use cases.
+
+## Changes
+
+- Modified `NewWorkflowOrchestrator` in `worker/workflow_orchestrator.go` to set default pollers to 1
+- Only applies when using default values - custom user options are still respected
+- Added comprehensive unit tests to verify the behavior
+
+## Implementation
+
+The change is minimal and surgical:
+
+```go
+// Set default pollers to 1 for orchestrator mode (unless explicitly overridden)
+if orchestratorOptions.WorkflowPollers == DefaultOptions.WorkflowPollers {
+    orchestratorOptions.WorkflowPollers = 1
+}
+if orchestratorOptions.ActivityPollers == DefaultOptions.ActivityPollers {
+    orchestratorOptions.ActivityPollers = 1
+}
+```
+
+## Behavior
+
+- **With `nil` options**: Uses 1 poller for workflows and activities (previously 2)
+- **With default options**: Reduces pollers from 2 to 1
+- **With custom options**: Respects user-specified values unchanged
+
+## Testing
+
+- Added unit tests covering all scenarios
+- Verified orchestrator sample works correctly
+- All existing tests continue to pass
+
+This makes orchestrator mode more lightweight while preserving backward compatibility for users who explicitly set custom poller counts.
+
+Fixes #385.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-10T19:11:25Z,2025-07-10T20:46:44Z,2025-07-10T20:46:43Z,434366539,https://api.github.com/repos/cschleiden/go-workflows,https://github.com/cschleiden/go-workflows/pull/388,3,0.03092547477594332,False
+3209660072,5177,feat(talis): add configurable workers flag for concurrent operations,"## Summary
+
+Adds a global `--workers` flag to all Talis commands that perform concurrent operations, allowing users with powerful machines and fast internet connections to fully utilize their processing power and bandwidth.
+
+## Changes
+
+- **Global Flag**: Added `--workers` (`-w`) flag with default value of 10 workers
+- **Updated Commands**: Modified `up`, `down`, `deploy`, `download`, and `status` commands to use configurable worker pools
+- **Backward Compatible**: Maintains existing behavior (10 workers) by default
+- **Documentation**: Updated README with usage examples and performance recommendations
+
+## Usage Examples
+
+```bash
+# Use default 10 workers
+talis up
+
+# Use 20 workers for faster instance creation
+talis up --workers 20
+
+# Use more workers for faster deployment (direct upload mode)
+talis deploy --direct-payload-upload --workers 30
+
+# Use more workers for faster downloads from many nodes
+talis download -n validator-* -t logs --workers 15
+```
+
+## Commands Affected
+
+- `talis up` - Creating DigitalOcean droplets
+- `talis down` - Destroying DigitalOcean droplets  
+- `talis deploy` - Deploying payloads (direct upload mode only)
+- `talis download` - Downloading files from nodes
+- `talis status` - Querying node status (now with worker limiting for consistency)
+
+## Technical Details
+
+- Function signatures updated to accept worker count parameter
+- Worker pools implemented using buffered channels: `make(chan struct{}, workers)`
+- Client struct extended to store and pass worker configuration
+- Global variable `globalWorkers` accessible to all commands via persistent flag
+
+## Testing
+
+- ✅ All commands build successfully
+- ✅ Help text displays workers flag correctly as global flag
+- ✅ Accepts both long (`--workers N`) and short (`-w N`) forms
+- ✅ Maintains backward compatibility with default behavior
+- ✅ Handles edge cases (0, negative, large values) gracefully
+
+Fixes #5176.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-07T16:41:42Z,2025-07-14T09:56:10Z,2025-07-14T09:56:10Z,327696712,https://api.github.com/repos/celestiaorg/celestia-app,https://github.com/celestiaorg/celestia-app/pull/5177,3,0.02624315149276104,False
+3072239786,5619,Add t.Parallel to metrics subtests,"## Summary
+- run subtests in parallel in `Test_SetConfigInfo` and `Test_SetDBConfigInfo`
+
+## Testing
+- `go test ./internal/telemetry/metrics -run Info` *(fails: no route to host)*
+
+
+[n.b. this was an experment using codex]",OpenAI_Codex,1544881,desimone,closed,2025-05-19T01:34:19Z,2025-05-19T16:20:46Z,,163722349,https://api.github.com/repos/pomerium/pomerium,https://github.com/pomerium/pomerium/pull/5619,3,0.02583732917224641,False
+3138383098,892,Add parallel test runner,"## Summary
+- add `scripts/run-tests-parallel.sh` helper to run the Catch2 suite concurrently
+- document how to use the script in README
+- use the new script in GitHub Actions to run tests in parallel on Linux builds and coverage job
+
+## Testing
+- `NUM_JOBS=2 scripts/run-tests-parallel.sh --list-tests | head -n 5` *(fails: Test executable not found)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_684a13e49de083298a30fd95bd6c063f
+
+<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
+## Summary by CodeRabbit
+
 - **New Features**
-  - Improved image rendering throughout the app by replacing standard HTML image elements with Next.js's optimized Image component, enhancing performance and image loading.
-- **Style**
-  - Updated image display for avatars and uploaded images to maintain consistent sizing and styling.
+  - Introduced scripts to run unit tests in parallel on both Linux and Windows, improving test execution speed by leveraging multiple CPU cores.
+- **Documentation**
+  - Added detailed instructions in the README for running unit tests sequentially and in parallel using the new scripts.
+- **Chores**
+  - Updated automated workflows to utilize the new parallel test execution scripts for running unit tests.
+<!-- end of auto-generated comment: release notes by coderabbit.ai -->",OpenAI_Codex,5108069,elazarg,closed,2025-06-11T23:58:56Z,2025-06-12T15:47:24Z,,137548993,https://api.github.com/repos/vbpf/prevail,https://github.com/vbpf/prevail/pull/892,3,0.02411767685005585,False
+2839448717,2359,build: add parallel and concurrency flags to test:ci and build:ci,"# PR Description
+Add --concurrency=100% flag to test:ci and build:ci scripts to improve build performance.
 
-<!-- end of auto-generated comment: release notes by coderabbit.ai -->",Devin,158243242,devin-ai-integration[bot],closed,2025-06-23T23:15:40Z,2025-06-24T03:52:48Z,2025-06-24T03:52:48Z,832552991,https://api.github.com/repos/ai-shifu/ai-shifu,https://github.com/ai-shifu/ai-shifu/pull/579,"analysisWe need to classify as performance or non-performance. The PR is about replacing <img> tags with Next.js Image component to improve performance. The description explicitly says ""Improved performance through Next.js automatic image optimization"" and ""Better Core Web Vitals"". So it's performance. So label 'performance'.assistantfinalperformance",3,0.021816691792709654,False
-2828443532,1233,fix: compress images in style panel and set default fill mode to Fill,"Fixes #1194
+Link to Devin run: https://app.devin.ai/sessions/dd4793dbc12f4887b1cf0d780499703c
+Requested by: Jayant",Devin,158243242,devin-ai-integration[bot],closed,2025-02-08T03:26:06Z,2025-02-08T13:38:51Z,,425803244,https://api.github.com/repos/pyth-network/pyth-crosschain,https://github.com/pyth-network/pyth-crosschain/pull/2359,3,0.0240654799757517,False
+3192180322,1187,Increase visual diff concurrency,"## Summary
+- add `paths` option to `sitemap-visual-diff.ts` for filtering sitemap URLs
+- update workflow to run visual diffs only on paths containing `/tests/`
+- run the workflow with concurrency set to 4
 
-Changes:
-- Add image compression before insertion in ImageManager
-- Change default fill mode from Auto to Fill
-- Reuse existing compressImage utility with standard settings
+## Testing
+- `yarn lint`
+- `yarn test`
 
-Link to Devin run: https://app.devin.ai/sessions/03773ad37bfe481b961181703dfcabb7
-Requested by: kiet@onlook.dev",Devin,158243242,devin-ai-integration[bot],closed,2025-02-03T20:19:23Z,2025-02-04T06:29:38Z,2025-02-04T06:29:38Z,820087727,https://api.github.com/repos/onlook-dev/onlook,https://github.com/onlook-dev/onlook/pull/1233,"analysisWe need to classify as performance or non-performance. The PR title: ""fix: compress images in style panel and set default fill mode to Fill"". Body: compress images before insertion, change default fill mode. This is about image compression, which is performance improvement? Image compression reduces file size, which can improve load times, memory usage. But is that considered performance? The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. The PR mentions compress images, which is optimization. It might be considered performance. But the title says ""fix: compress images in style panel and set default fill mode to Fill"". It's a fix, not necessarily performance. But compressing images is an optimization. The guidelines say performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, etc. The PR does not contain those keywords. But the content is about compressing images, which is an optimization. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The primary purpose is to compress images, which reduces file size, improving performance. So likely performance. But the guidelines: ""Performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" The PR does not contain those keywords. But the content is about compression. The guidelines say ""or any other terms referring to how faster and efficiently software runs."" So compressing images is indeed about efficiency. So classification: performance.assistantfinalperformance",3,0.02103317270049678,False
+
+------
+https://chatgpt.com/codex/tasks/task_e_6863c9430bb483238644c06104c075dc",OpenAI_Codex,9343811,sserrata,closed,2025-07-01T11:57:31Z,2025-07-01T11:58:11Z,2025-07-01T11:58:11Z,460077424,https://api.github.com/repos/PaloAltoNetworks/docusaurus-openapi-docs,https://github.com/PaloAltoNetworks/docusaurus-openapi-docs/pull/1187,3,0.023247372173961216,False
+3104440672,409,Enable parallel tests on Windows,"## Summary
+- enable parallel mode for Windows
+- update docs and CI workflow
+- add a unit test for parallel::is_enabled on Windows
+- document change in changelog
+",OpenAI_Codex,5256287,Chemaclass,closed,2025-05-30T23:08:25Z,2025-05-30T23:13:26Z,2025-05-30T23:13:25Z,686916383,https://api.github.com/repos/TypedDevs/bashunit,https://github.com/TypedDevs/bashunit/pull/409,3,0.023065044877867816,False
+3225994185,495,Enable AVX‑512 xof_many on Windows,"## Summary
+- port `blake3_xof_many_avx512` to the Windows AVX‑512 assembly sources
+- expose the function in C headers and Rust FFI for all OSes
+- allow AVX‑512 xof_many calls on Windows in dispatch and platform code
+
+## Testing
+- `cargo test`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6872fcce12e4832ebef5361018e19fac",OpenAI_Codex,860932,oconnor663,closed,2025-07-13T01:19:37Z,2025-07-13T01:23:25Z,,220778874,https://api.github.com/repos/BLAKE3-team/BLAKE3,https://github.com/BLAKE3-team/BLAKE3/pull/495,3,0.02275707646092184,False

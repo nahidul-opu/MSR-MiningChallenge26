@@ -1,336 +1,158 @@
-id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
-3168705723,1636,Implement retry-after header handling for improved throttling in fetch requests,"Currently, genaiscript handles throttling situations but does not respect the `retry-after` header returned by services. This leads to unnecessary load on throttled services and suboptimal user experience with exponential backoff delays that may be longer than needed.
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,Topic,Probability,Representative_document
+3090482540,4355,[Failed] Unable to enable browser notifications immediately after visiting the web page for the first time,"Thanks for assigning this issue to me. I'm starting to work on it and will keep this PR's description up to date as I form a plan and make progress.
 
-## Changes Made
+Original issue description:
 
-This PR implements proper `retry-after` header handling in the fetch retry logic:
-
-### 1. Added `parseRetryAfter()` function
-- Supports both integer seconds format: `retry-after: 120` 
-- Supports HTTP date format: `retry-after: Fri, 31 Dec 1999 23:59:59 GMT`
-- Handles edge cases: negative values, invalid inputs, past dates, whitespace
-- Returns `null` for invalid inputs to fallback to exponential backoff
-
-### 2. Enhanced retry logic in `createFetch()`
-- Checks for `retry-after` header in HTTP responses during retries
-- Uses server-specified delay instead of calculated exponential backoff when available
-- Falls back to existing exponential backoff when no `retry-after` header is present
-- Respects `maxDelay` configuration to prevent excessive waits
-
-### 3. Improved user transparency
-- Displays retry-after information in log messages
-- Format: `retry #1 in 120.0s (retry-after: 120s)` vs `retry #1 in 2.0s`
-- Users can now see the actual reason and duration for delays
-
-## Example Behavior
-
-**Before:**
-```
-retry #1 in 2.0s 429 Too Many Requests
-retry #2 in 3.0s 429 Too Many Requests  
-retry #3 in 4.5s 429 Too Many Requests
-```
-
-**After (with retry-after: 60):**
-```
-retry #1 in 60.0s (retry-after: 60s) 429 Too Many Requests
-```
-
-## Benefits
-
-- ✅ Reduces unnecessary load on throttled services by respecting server timing
-- ✅ Provides transparency to users about wait times and reasons
-- ✅ Maintains full backward compatibility with existing retry behavior
-- ✅ Handles common throttling scenarios (HTTP 429, 503, etc.)
-- ✅ RFC 7231 compliant retry-after header parsing
-
-## Testing
-
-Added comprehensive unit tests covering:
-- Integer seconds parsing (`""120""` → 120 seconds)
-- HTTP date parsing (future dates with proper time calculation)
-- Edge cases (negative values, invalid strings, past dates)
-- Whitespace handling and input validation
-
-Fixes #1629.
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `cdn.sheetjs.com`
->   - Triggering command: `node /usr/local/bin/yarn install ` (dns block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
+> ### Share your bug report, feature request, or comment.
+> 
+> If you try to enable browser notifications right after visiting an Owncast web page for the first time, you'll get a long loading spinner, and sometimes it'll time out.
+> 
+> I believe this is because it's waiting for the service worker to free up, but the service worker is busy in the background pre-downloading a bunch of assets.
+> 
+> I wonder if we can tell the service worker to stop anything its doing if somebody is trying to enable notifications. It's far more important than caching any of those assets. The reason I set that up to cache assets in the first place was so we wouldn't see loading spinners when you open up modals or other views that are asynchronously loaded, or wait for the emoji to load in one at a time. But if somebody had to cancel that to register for push notifications, it's really no big deal.
 
 
+Fixes #4195.
 
-<!-- START COPILOT CODING AGENT TIPS -->
 ---
 
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-23T16:02:38Z,2025-06-23T16:41:07Z,2025-06-23T16:41:07Z,679784368,https://api.github.com/repos/microsoft/genaiscript,https://github.com/microsoft/genaiscript/pull/1636,"analysisWe need to classify whether the primary purpose of the pull request is to improve performance. The PR adds retry-after header handling for throttling. Does that improve performance? It reduces unnecessary load and improves user experience. It's about throttling, not directly performance optimization. But it could be considered performance improvement: it reduces load, reduces wait times, improves throughput. The description says ""improved throttling"" and ""reduces unnecessary load"" and ""provides transparency"". It's about handling server-specified delays. It's not about optimizing code speed or memory usage. But it's about network performance. The classification guidelines: performance-related PRs may contain keywords like latency, optimization, slow, memory, speed, etc. This PR mentions ""retry-after header handling for improved throttling"" and ""reduces unnecessary load"" and ""suboptimal user experience with exponential backoff delays"". It is about improving performance by respecting server delays. It might be considered performance. The guidelines say performance-related PRs may contain keywords such as latency, optimization, slow, memory, speed, etc. This PR does not contain those keywords. But it does mention ""performance"" in the benefits: ""Maintains full backward compatibility with existing retry behavior"". It says ""Fixes #1629"". The title: ""Implement retry-after header handling for improved throttling in fetch requests"". That is about throttling, not performance. But it could be considered performance improvement. The guidelines: ""Performance-related pull requests may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs."" The PR contains ""performance"" in the benefits. But the main focus is throttling. It's not about speed or memory. But it does reduce wait times. The guidelines are ambiguous. I'd lean that it's a performance improvement because it reduces wait times and load. But the title doesn't mention performance. The body mentions ""improved throttling"" and ""suboptimal user experience with exponential backoff delays"". That is about performance. I'd classify as 'performance'.assistantfinalperformance",35,1.0,True
-3242174192,6617,feat: implement async timeout for segments with cache support,"## Overview
-
-This PR implements asynchronous segment execution with caching support to address performance issues in large repositories, specifically targeting issue #6094. The feature allows segments to execute with configurable timeouts, using cached data when operations exceed the threshold while updating the cache in the background.
-
-## Problem
-
-Users working with large monorepos experience slow prompt rendering due to expensive operations like `git status` that can take several seconds. Current workarounds involve disabling status checks, which sacrifices important information in the prompt.
-
-## Solution
-
-### Core Features
-
-1. **Async Timeout Configuration**: New `async_timeout` field for segments
-2. **Intelligent Caching**: Cached segment data with background refresh
-3. **Graceful Fallback**: Use cached data when operations exceed timeout
-4. **Background Updates**: Non-blocking cache refresh for next prompt
-
-### Implementation Details
-
-- **Configuration**: Added `async_timeout` field to segment configuration (in nanoseconds)
-- **Cache Management**: New `AsyncSegmentCache` system for persistent segment data
-- **Background Processes**: Automatic cache refresh without blocking prompt rendering
-- **CLI Support**: Cache management commands for debugging and maintenance
-
-### Usage Example
-
-```json
-{
-  ""type"": ""git"",
-  ""style"": ""plain"",
-  ""async_timeout"": 100,
-  ""properties"": {
-    ""fetch_status"": true
-  }
-}
-```
-
-## How It Works
-
-1. **First Run**: Segment executes normally, result is cached
-2. **Subsequent Runs**: 
-   - If execution completes within timeout → use fresh data, update cache
-   - If execution exceeds timeout → use cached data, start background refresh
-3. **Background Refresh**: Cache is updated asynchronously for next prompt
-
-## Benefits
-
-- **Instant Prompts**: Cached data provides immediate rendering
-- **Fresh Data**: Background updates ensure information stays current
-- **Configurable**: Per-segment timeout configuration
-- **Backward Compatible**: Existing configurations work unchanged
-
-## Testing
-
-- ✅ Unit tests for async timeout configuration
-- ✅ Cache management functionality tests
-- ✅ Integration tests with git segments
-- ✅ CLI command validation
-- ✅ Configuration loading from JSON/YAML
-
-## Files Changed
-
-- `src/config/segment.go` - Core async execution logic
-- `src/cache/async.go` - Async cache management system
-- `src/cli/cache.go` - CLI cache refresh commands
-- `src/config/async_test.go` - Comprehensive test suite
-- `src/config/async_config_test.go` - Configuration loading tests
-
-## Migration
-
-No breaking changes. The feature is opt-in via the new `async_timeout` configuration field.
-
-## Future Enhancements
-
-This implementation provides the foundation for the full async prompt system mentioned in #6094. Future work could include:
-- Shell-specific async prompt integration
-- Advanced cache invalidation strategies
-- Performance monitoring and metrics
-
-Closes #6094
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `ohmyposh.dev`
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
-
-
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-07-18T07:09:18Z,,,175405157,https://api.github.com/repos/JanDeDobbeleer/oh-my-posh,https://github.com/JanDeDobbeleer/oh-my-posh/pull/6617,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""feat: implement async timeout for segments with cache support"". The body describes async timeout, caching, to address performance issues, slow prompt rendering, etc. Keywords: performance, slow, async, caching, instant prompts, etc. So it's performance. So output 'performance'.assistantfinalperformance",35,1.0,True
-3228266614,7288,Implement exponential backoff for Copilot refresh after commenting on Padawan PRs,"When commenting on Copilot-assigned PRs, the timeline refresh now uses exponential backoff with early exit detection to show newly launched Copilot sessions more responsively.
-
-## Problem
-
-Previously, when a user commented on a Copilot-assigned PR, the extension would wait a fixed 1 second before refreshing the timeline to show the newly launched Copilot session. This caused delays since it takes time to determine and launch the session on GitHub.com.
-
-## Solution
-
-Implemented exponential backoff with retry intervals of 500ms, 1s, 2s, and 5s that:
-
-- **Captures initial timeline state** before starting retries
-- **Polls for new `CopilotStarted` events** on each retry
-- **Exits early** when a new Copilot session is detected
-- **Gracefully handles errors** during timeline fetching
-- **Falls back to single refresh** if no new events are found
-
-## Key Benefits
-
-- **Faster response** when Copilot sessions start quickly (500ms vs 1s minimum)
-- **Better user experience** by showing sessions immediately when available
-- **Server-friendly** with reasonable retry intervals that avoid excessive load
-- **Maintains reliability** with fallback behavior
-- **Backwards compatible** with existing functionality
-
-## Implementation Details
-
-The `tryScheduleCopilotRefresh` method in `src/github/issueOverview.ts` now:
-
-```typescript
-// Before: Fixed 1-second wait
-await new Promise(resolve => setTimeout(resolve, 1000));
-if (!this._isDisposed) {
-    this.refreshPanel();
-}
-
-// After: Exponential backoff with early exit
-const delays = [500, 1000, 2000, 5000];
-for (const delay of delays) {
-    await new Promise(resolve => setTimeout(resolve, delay));
-    
-    const currentTimeline = await this._getTimeline();
-    const currentCopilotStartedEvents = currentTimeline.filter(event => 
-        event.event === EventType.CopilotStarted);
-    
-    if (currentCopilotStartedEvents.length > initialCopilotStartedEvents.length) {
-        this.refreshPanel();
-        return; // Early exit when new event found
-    }
-}
-```
-
-## Testing
-
-- Added comprehensive unit tests covering edge cases
-- Verified exponential backoff timing and early exit logic
-- Confirmed backwards compatibility with existing behavior
-- All existing tests continue to pass
-
-Fixes #7231.
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-14T10:36:18Z,2025-07-14T18:47:52Z,2025-07-14T18:47:52Z,134777298,https://api.github.com/repos/microsoft/vscode-pull-request-github,https://github.com/microsoft/vscode-pull-request-github/pull/7288,"analysisWe need to classify the pull request as 'performance' or 'non-performance'. The PR implements exponential backoff for Copilot refresh after commenting on Padawan PRs. The key benefit: faster response, better user experience. It's about improving responsiveness, reducing delay. That is a performance improvement. The description mentions ""Faster response"" and ""Better user experience"" and ""Server-friendly"". It's about reducing wait times. So it's performance. So label 'performance'.assistantfinalperformance",35,1.0,True
-3088454350,694,[alpha_factory] add LRU cache size limit,"## Summary
-- implement size-capped OrderedDict cache in `llm_provider`
-- document `AF_LLM_CACHE_SIZE` in code and README
-- verify LRU eviction via new unit test
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-05-26T08:51:50Z,2025-05-26T08:52:50Z,,266445736,https://api.github.com/repos/owncast/owncast,https://github.com/owncast/owncast/pull/4355,35,1.0,True
+3111689960,1459,[alpha_factory] add i18n precache,"## Summary
+- cache locale JSON files in the Insight demo service worker
+- update build scripts and offline test
 
 ## Testing
 - `python check_env.py --auto-install`
-- `pytest -q`",OpenAI_Codex,24208299,MontrealAI,closed,2025-05-24T13:17:35Z,2025-05-24T13:17:45Z,2025-05-24T13:17:45Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/694,"analysisWe need to classify as performance or non-performance. The PR adds LRU cache size limit, which is about memory usage and eviction policy. It's about limiting cache size, which is a performance improvement? It might be about memory usage, but also about performance. The instruction says performance-related PRs may contain keywords like memory, optimization, leak, speed, perf, etc. This PR mentions LRU cache size limit, which is about memory usage. That is a performance improvement. So classify as 'performance'.assistantfinalperformance",35,1.0,False
-3104683212,1245,[alpha_factory] optimize rate limiter,"## Summary
-- use TTLCache+deque for SimpleRateLimiter
-- adjust demos and tests
-- add regression test for throttling
+- `pytest -q` *(fails: ValueError: Duplicated timeseries in CollectorRegistry)*
+- `pre-commit run --files alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/sw.js alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/build.js alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/manual_build.py alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/tests/test_pwa_offline.py` *(fails: could not fetch hooks)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_683e14e79714833394fa05218bb4a081",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-02T21:28:36Z,2025-06-02T21:29:58Z,2025-06-02T21:29:58Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1459,35,1.0,False
+3188284723,2798,[alpha_factory] Update service worker caching,"## Summary
+- cache pyodide assets during service worker install
+- handle external asset failures with local cache fallback
+- bump cache version
+
+## Testing
+- `python scripts/check_python_deps.py`
+- `python check_env.py --auto-install`
+- `pytest -q` *(fails: ImportError for research_agent and others)*
+- `pre-commit run --files docs/assets/service-worker.js` *(fails: proto-verify, verify-requirements-lock)*
+- `scripts/build_gallery_site.sh` *(fails: Preflight checks failed)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_68620c464f6483339524573c94b43ccd",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-30T12:21:20Z,2025-06-30T12:25:12Z,2025-06-30T12:25:12Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/2798,35,1.0,False
+3187037212,2796,feat: cache pyodide assets in service worker,"## Summary
+- precache Pyodide runtime files
+- handle external requests with cached fallback
+- bump offline cache version
+
+## Testing
+- `mkdocs build`
+- `./scripts/build_insight_docs.sh` *(fails: Unable to retrieve wasm_llm/wasm-gpt2.tar)*
+- `pre-commit run --files docs/assets/service-worker.js` *(failed to finish due to missing environments)*
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_686207f0d0e48333bdd56cd69274b995",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-30T03:52:13Z,2025-06-30T03:53:13Z,2025-06-30T03:53:13Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/2796,35,1.0,False
+3239561220,2920,perf: Add config option `enableResourceCache` to cache dashboard resources locally for faster loading in additional browser tabs,"## Summary
+- add a service worker to cache dashboard bundles
+- register the service worker in login and dashboard entry points
+
+## Testing
+- `npm test`
+- `npm run lint`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6878f529c7f0832db6628e25b01b9e02
+
+<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
+## Summary by CodeRabbit
+
+* **New Features**
+  * Introduced an optional browser service worker to cache dashboard assets, improving load performance and enabling offline support for previously visited resources.
+  * Added a configuration option to enable or disable the service worker via the dashboard settings.
+  * Service worker automatically unregisters and clears cache when all dashboard tabs are closed to ensure updates are received.
+
+* **Documentation**
+  * Updated documentation to describe the new browser service worker feature and its configuration.
+<!-- end of auto-generated comment: release notes by coderabbit.ai -->",OpenAI_Codex,5673677,mtrezza,closed,2025-07-17T13:15:15Z,2025-07-18T14:58:56Z,2025-07-18T14:58:56Z,50623416,https://api.github.com/repos/parse-community/parse-dashboard,https://github.com/parse-community/parse-dashboard/pull/2920,35,1.0,True
+3112264968,1484,[alpha_factory] cache runtime assets,"## Summary
+- cache fonts and IPFS JSON using Workbox runtime caching
+- keep runtime caching when building service workers
+- verify cached fonts and IPFS JSON load when offline
 
 ## Testing
 - `python check_env.py --auto-install`
-- `pre-commit run --files src/interface/api_server.py alpha_factory_v1/demos/alpha_agi_insight_v1/src/interface/api_server.py tests/test_rate_limiter_eviction.py tests/test_api_server_static.py` *(fails: could not fetch black)*
-- `mypy --config-file mypy.ini src/interface/api_server.py alpha_factory_v1/demos/alpha_agi_insight_v1/src/interface/api_server.py tests/test_rate_limiter_eviction.py tests/test_api_server_static.py` *(fails: many errors)*
-- `pytest -q tests/test_rate_limiter_eviction.py tests/test_api_server_static.py`
+- `pytest -q` *(fails: ValueError: Duplicated timeseries in CollectorRegistry)*
 
 ------
-https://chatgpt.com/codex/tasks/task_e_683a659fc3748333bf8a6dbe3a466de4",OpenAI_Codex,24208299,MontrealAI,closed,2025-05-31T02:23:30Z,2025-05-31T02:23:59Z,2025-05-31T02:23:59Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1245,"analysisWe need to classify as performance or non-performance. The PR title: ""[alpha_factory] optimize rate limiter"". Summary: use TTLCache+deque for SimpleRateLimiter, adjust demos and tests, add regression test for throttling. This is about optimizing rate limiter, likely performance improvement. Keywords: optimize, rate limiter, TTLCache, deque. It's about performance. So classification: performance.assistantfinalperformance",35,1.0,False
-3253128073,95,Modify exit to throttle on bandwidth exhaustion,"## Summary
-- add fallback mode without exposing governor types
-- create fallback limiter via `with_fallback`
-- throttle using fallback rate when paid bandwidth is exhausted
+https://chatgpt.com/codex/tasks/task_e_683e6b96d6b08333bbf63ad0cd9435d1",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-03T03:36:55Z,2025-06-03T03:37:09Z,2025-06-03T03:37:09Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1484,35,1.0,False
+3206662836,360,Analyze factors causing iOS to kill PWA,"<!-- One very short sentence on the WHAT and WHY of the PR. E.g. ""Remove pathHash attribute because it is confirmed unused."" or ""Add DNS round robin to improve load distribution."" -->
+Implement PWA background optimization for iOS to reduce resource consumption and prevent app termination.
+
+<!-- OPTIONAL: If the WHY of the PR is not obvious, perhaps because it fixed a gnarly bug, explain it in a short paragraph here. E.g. ""Commit a73bb98 introduced a bug where the class list was filtered to only work for MDC files, hence we partially revert it here."" -->
+The application was frequently terminated by iOS when in the background due to continuous resource consumption from active Server-Sent Events (SSE) connections and various timers. This PR introduces a centralized `BackgroundManager` and `SSEManager` to automatically pause/stop these activities when the app transitions to the background, significantly improving its survival rate, reducing battery drain, and enhancing overall system stability. This also includes a version bump to `2.6.3` and cleanup of temporary documentation.",Cursor,51039935,jxxghp,closed,2025-07-06T15:14:31Z,2025-07-06T22:40:43Z,2025-07-06T22:40:43Z,657824656,https://api.github.com/repos/jxxghp/MoviePilot-Frontend,https://github.com/jxxghp/MoviePilot-Frontend/pull/360,35,1.0,True
+3209183782,364,Evaluate app shell model compliance,"<!-- Implement comprehensive PWA optimizations to enhance performance, offline experience, and user installability. -->
+This PR includes critical CSS inlining, refined caching strategies (CacheFirst for App Shell, versioning, cleanup), background sync for offline API requests, and an improved PWA installation prompt with a dedicated offline page.",Cursor,51039935,jxxghp,closed,2025-07-07T14:06:33Z,2025-07-07T14:09:11Z,2025-07-07T14:09:11Z,657824656,https://api.github.com/repos/jxxghp/MoviePilot-Frontend,https://github.com/jxxghp/MoviePilot-Frontend/pull/364,35,1.0,False
+3190642541,2834,Update service worker asset list,"## Summary
+- cache docs HTML pages in the generated service worker
+- bump cache version to v4 and regenerate `service-worker.js`
 
 ## Testing
-- `cargo check -p geph5-exit`
-- `cargo test -p geph5-exit -- --help`
-
+- `python scripts/build_service_worker.py`
+- `pytest -k 'service_worker' -q` *(fails: ImportError: cannot import name 'research_agent')*
 
 ------
-https://chatgpt.com/codex/tasks/task_b_687fa69770b8833381b6d4afa2c42b46",OpenAI_Codex,20490891,nullchinchilla,closed,2025-07-22T15:22:31Z,2025-07-22T15:23:40Z,2025-07-22T15:23:40Z,758681331,https://api.github.com/repos/geph-official/geph5,https://github.com/geph-official/geph5/pull/95,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Modify exit to throttle on bandwidth exhaustion"". Summary: add fallback mode, create fallback limiter via with_fallback, throttle using fallback rate when paid bandwidth is exhausted. This is about throttling bandwidth, controlling rate, fallback limiter. It's about performance? It's about controlling bandwidth usage, maybe to avoid overuse. It's about throttling, which is a performance-related change? It might be about resource usage, but it's not necessarily performance improvement. It's more about bandwidth management, maybe to avoid hitting limits. The keywords: throttle, bandwidth, fallback, limiter. The classification: performance or non-performance. The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. This PR is about throttling on bandwidth exhaustion. It's about limiting bandwidth usage, not necessarily improving performance. It's more about resource management. It might be considered performance? The guidelines say performance-related PRs may contain keywords such as throughput. Throughput is a keyword. The PR mentions ""throttle using fallback rate when paid bandwidth is exhausted"". That is about throughput. So it might be considered performance. But is it about improving performance? It's about controlling bandwidth usage to avoid hitting limits. It's more about resource usage, not necessarily performance improvement. But the guidelines say performance-related PRs may contain keywords such as throughput. So we should classify as performance. The primary purpose: throttle on bandwidth exhaustion. That is about controlling throughput. So likely performance. I'll classify as 'performance'.assistantfinalperformance",35,1.0,False
-3243098553,300,Add cache size limit support,"## Summary
-- implement `cache_size_limit` and `replacement_policy` parameters
-- default to LRU policy and enforce limit in memory core
-- document cache size limiting in README
-- test LRU eviction behaviour
-- update default params test
+https://chatgpt.com/codex/tasks/task_e_68635c885a948333985cd0dfed6e89d4",OpenAI_Codex,24208299,MontrealAI,closed,2025-07-01T04:29:08Z,2025-07-01T04:29:20Z,2025-07-01T04:29:20Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/2834,35,1.0,False
+3206379276,359,分析PWA状态切换体验问题,"Optimize PWA state restoration for a seamless, imperceptible background-to-foreground transition, eliminating loading screens and flickering.
+
+The original implementation showed a loading screen and flickering when the PWA returned from the background, due to state restoration timing and UI handling. This PR refactors the PWA state management to initialize and restore state *before* the Vue app mounts, uses a new loading state manager to coordinate resource loading, and enhances Service Worker caching and navigation preloading. All visual indicators and console logs related to this process have been removed to ensure a truly native-like, ""no-sense"" user experience.",Cursor,51039935,jxxghp,closed,2025-07-06T10:31:58Z,2025-07-06T10:35:53Z,2025-07-06T10:35:53Z,657824656,https://api.github.com/repos/jxxghp/MoviePilot-Frontend,https://github.com/jxxghp/MoviePilot-Frontend/pull/359,35,1.0,False
+3071302729,566,fix(website): Remove Google Fonts caching and add JS files caching in VitePWA,"# fix(website): Remove Google Fonts caching and add JS files caching in VitePWA
+
+- Removed Google Fonts caching configuration as it's not being used in the project
+- Added NetworkFirst caching strategy for JS files to ensure they update properly when changed
+
+Fixes the issue where JS files were not being updated properly.
+
+Link to Devin run: https://app.devin.ai/sessions/8528638d44f9419b859c1b3582fe63cb
+Requested by: Kazuki Yamada
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-18T02:29:47Z,2025-05-18T02:51:18Z,2025-05-18T02:51:18Z,828119367,https://api.github.com/repos/yamadashy/repomix,https://github.com/yamadashy/repomix/pull/566,35,1.0,False
+3111826436,1464,[alpha_factory] inline WASM assets,"## Summary
+- inline pyodide asm and wasm-gpt2 placeholders in the Insight build
+- expose helper to load Pyodide from a base64 blob
+- allow the LLM loader to read a base64 model
+- verify Simulator initializes quickly
 
 ## Testing
-- `ruff check .`
-- `mypy src/cachier`
-- `pytest -m ""memory or pickle"" --cov=cachier --cov-report=term`
-- `./scripts/test-local.sh all` *(fails: Docker is not installed)*
+- `python check_env.py --auto-install`
+- `pre-commit run --files alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/build.js alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/lib/pyodide.js alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/src/utils/llm.js alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/tests/simulator_perf.test.js tests/test_simulator_init.py`
+- `pytest -q` *(fails: ValueError: Duplicated timeseries in Collector)*
 
 ------
-https://chatgpt.com/codex/tasks/task_e_687a30b9d6dc8323931ef5c545e0c3bb",OpenAI_Codex,917954,shaypal5,open,2025-07-18T12:37:46Z,,,66466789,https://api.github.com/repos/python-cachier/cachier,https://github.com/python-cachier/cachier/pull/300,"analysisWe need to classify whether the primary purpose of the pull request is to improve performance. The PR adds cache size limit support, LRU policy, eviction behavior, etc. This is about memory usage and eviction policy. It might be considered performance improvement? The description: ""implement cache_size_limit and replacement_policy parameters, default to LRU policy and enforce limit in memory core, document cache size limiting, test LRU eviction behaviour, update default params test."" This is about memory usage and eviction, which is performance-related. The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. The PR mentions memory, cache size limit, LRU eviction. That is about memory usage and performance. So classify as 'performance'.
-
-Thus output: performance.assistantfinalperformance",35,1.0,False
-3274990408,410,Add runtime rate target config,"## Summary
-- add `RuntimeConfig` with `rate_target_hz`
-- propagate runtime config in `CuConfig`
-- store runtime config in `CuRuntime`
-- enforce rate target in generated `run` loop
-- showcase rate target in new `cu_rate_target` example
+https://chatgpt.com/codex/tasks/task_e_683e2480c83c8333a86bdeb7f1e6bc17",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-02T22:32:54Z,2025-06-02T22:33:01Z,2025-06-02T22:33:01Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1464,35,0.27906052939681897,False
+3122714770,1637,[alpha_factory] Skip wasm preload when inlined,"## Summary
+- avoid adding preload tag when wasm is embedded
+- refresh generated dist/index.html
+- check CSP tests for embedded wasm
+- ensure the browser test checks for any wasm requests
 
 ## Testing
-- `cargo check -p cu-rate-target`
-- `cargo test -p cu29-runtime --no-run`
-
+- `python check_env.py --auto-install`
+- `pytest -q` *(fails: 135 failed, 512 passed, 43 skipped)*
 
 ------
-https://chatgpt.com/codex/tasks/task_e_688933dc67cc8330b6bb6971073465c6",OpenAI_Codex,975564,gbin,closed,2025-07-29T21:06:22Z,2025-07-30T02:12:42Z,2025-07-30T02:12:42Z,290790298,https://api.github.com/repos/copper-project/copper-rs,https://github.com/copper-project/copper-rs/pull/410,"analysisWe need to classify whether the primary purpose is performance. The PR adds runtime rate target config, enforce rate target in run loop. This is about controlling rate, likely performance tuning. It mentions rate target, enforce rate target, showcase example. This is about performance? It's about controlling runtime rate, maybe to improve performance or to enforce a target. The keywords: ""rate target"", ""enforce"", ""runtime config"". The classification: performance. The PR is about adding a config to enforce a rate target, which is a performance-related change. So label 'performance'.assistantfinalperformance",35,1.0,False
-3089612967,892,Use LRU cache for preprocess,"## Summary
-- speed up token preprocessing with `functools.lru_cache`
-- add `PREPROCESS_CACHE_SIZE` setting
+https://chatgpt.com/codex/tasks/task_e_6842078e39e48333aceccca0ecfe0599",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-05T21:23:05Z,2025-06-05T21:23:26Z,2025-06-05T21:23:26Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1637,35,0.2634868166151052,False
+3114659416,1500,[alpha_factory] inline wasm assets,"## Summary
+- inline `pyodide.asm.wasm` and `wasm-gpt2.tar` during manual build
+- decode embedded WASM in runtime loader
+- test that `window.PYODIDE_WASM_BASE64` exists in the built UI
 
 ## Testing
-- `pytest -q`",OpenAI_Codex,1231232,jdesboeufs,closed,2025-05-25T22:20:49Z,2025-06-01T21:24:58Z,,28606501,https://api.github.com/repos/addok/addok,https://github.com/addok/addok/pull/892,"analysisWe need to classify as performance or non-performance. The PR title: ""Use LRU cache for preprocess"". Summary: ""speed up token preprocessing with functools.lru_cache"". That is clearly performance improvement. So label 'performance'.assistantfinalperformance",35,1.0,False
-3228424652,2437,Limit wait action to 10 seconds,"Cap the wait action at a maximum of 10 seconds to prevent excessively long waits.
+- `python check_env.py --auto-install`
+- `pytest -q` *(fails: ValueError: Duplicated timeseries in CollectorRegistry)*
+- `pytest tests/test_wasm_base64.py -q`
 
----
-
-[Slack Thread](https://browser-use.slack.com/archives/D092QUQDC56/p1752492155090079?thread_ts=1752492155.090079&cid=D092QUQDC56)
-    
-<!-- This is an auto-generated description by cubic. -->
----
-
-## Summary by cubic
-Limited the wait action to a maximum of 10 seconds to prevent long delays and updated the action description to show this cap.
-
-- **Bug Fixes**
-  - Capped wait time at 10 seconds, with clear logging when the limit is applied.
-
-<!-- End of auto-generated description by cubic. -->
-
-",Cursor,22038471,mertunsall,closed,2025-07-14T11:27:13Z,2025-07-14T11:40:38Z,2025-07-14T11:40:37Z,881458615,https://api.github.com/repos/browser-use/browser-use,https://github.com/browser-use/browser-use/pull/2437,"analysisWe need to classify as performance or non-performance. The PR is about limiting wait action to 10 seconds to prevent excessively long waits. This is about performance? It's about preventing long delays, but it's more about limiting wait time, which is a bug fix to avoid long waits. It could be considered performance improvement? The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs.
-
-The PR includes ""wait"" and ""long delays"" and ""prevent excessively long waits"". That is about performance. So classify as 'performance'.assistantfinalperformance",35,1.0,False
+------
+https://chatgpt.com/codex/tasks/task_e_683f210c617c8333933deaf6d9902bf9",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-03T16:27:50Z,2025-06-03T16:27:57Z,2025-06-03T16:27:57Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1500,35,0.2602794208551326,False

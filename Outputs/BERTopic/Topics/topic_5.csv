@@ -1,2672 +1,363 @@
-id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
-3199812992,62558,[Blazor] Remove sourcemap link comments from production bundles for blazor.web.js and blazor.webassembly.js,"This change modifies the Rollup configuration to generate sourcemap files without including sourcemap link comments in production bundles for `blazor.web.js` and `blazor.webassembly.js`.
-
-## Changes Made
-
-- Modified `src/Components/Web.JS/rollup.config.mjs` to use `sourcemap: 'hidden'` for production builds of blazor.web.js and blazor.webassembly.js
-- This generates `.map` files but omits the `//# sourceMappingURL=` comments from the bundle
-- Preserves existing behavior for other bundles:
-  - `blazor.server.js` still gets sourcemap link comments (`sourcemap: true`)
-  - `blazor.webview.js` still gets inline sourcemaps (`sourcemap: 'inline'`)
-  - All development builds continue to include sourcemap link comments
-
-## Behavior
-
-**Before:**
-```javascript
-// Production blazor.web.js would end with:
-console.log('Blazor initialized');
-//# sourceMappingURL=blazor.web.js.map
-```
-
-**After:**
-```javascript
-// Production blazor.web.js now ends with:
-console.log('Blazor initialized');
-// No sourcemap link comment
-```
-
-The sourcemap files (`blazor.web.js.map`, `blazor.webassembly.js.map`) are still generated and contain full debugging information. Developers can manually load these sourcemaps in browser dev tools when needed.
-
-## Benefits
-
-- Reduces production bundle size by eliminating sourcemap URL comments
-- Maintains debugging capability through manually loadable sourcemap files
-- Aligns with security best practices by not exposing sourcemap URLs in production
-- Consistent with the related .NET runtime issue approach
-
-Fixes #62295.
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `googlechromelabs.github.io`
->   - Triggering command: `node install.mjs` (dns block)
-> - `https://storage.googleapis.com/chrome-for-testing-public/134.0.6998.35/linux64/chrome-headless-shell-linux64.zip`
->   - Triggering command: `node install.mjs` (http block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
-
-
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-03T15:33:45Z,2025-07-09T16:05:38Z,2025-07-09T16:05:38Z,17620347,https://api.github.com/repos/dotnet/aspnetcore,https://github.com/dotnet/aspnetcore/pull/62558,"analysisWe need to classify whether the primary purpose is performance. The PR removes sourcemap link comments from production bundles. This reduces bundle size by eliminating comments. It's about reducing size, not necessarily performance? It's about reducing bundle size, which can improve load time, but the primary purpose is to reduce bundle size and security. The description says ""Reduces production bundle size by eliminating sourcemap URL comments"". That is a performance improvement? It's a small optimization. The guidelines: performance-related PRs may contain keywords like latency, optimization, slow, memory, speed, etc. This PR does not mention those. It mentions reducing bundle size. That is a performance improvement. But is it considered performance? The guidelines say performance-related PRs may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs. This PR does not contain those keywords. But the content is about reducing bundle size, which is a performance improvement. But the guidelines rely on keywords. The PR title: ""[Blazor] Remove sourcemap link comments from production bundles for blazor.web.js and blazor.webassembly.js"". No performance keyword. The body: ""Reduces production bundle size by eliminating sourcemap URL comments"". That is a performance improvement. But the guidelines: ""Performance-related pull requests may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs."" The PR does not contain those. But the content is about performance. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The primary purpose is to reduce bundle size, which is a performance improvement. So we should classify as 'performance'. Even though no keyword, the content indicates performance. The guidelines mention keywords but not exclusive. So classification: performance.assistantfinalperformance",5,1.0,False
-3147503921,5375,docs: Upgrade Docusaurus from 3.7.0 to 3.8.1,"This PR upgrades Docusaurus dependencies from version 3.7.0 to 3.8.1 (latest stable) to improve performance, security, and provide access to the latest features and bug fixes.
-
-## Changes Made
-
-### 📦 Dependencies Updated
-- `@docusaurus/core`: 3.7.0 → 3.8.1
-- `@docusaurus/plugin-content-blog`: 3.7.0 → 3.8.1  
-- `@docusaurus/plugin-google-gtag`: 3.7.0 → 3.8.1
-- `@docusaurus/preset-classic`: 3.7.0 → 3.8.1
-- `@docusaurus/theme-common`: 3.7.0 → 3.8.1
-- `@docusaurus/faster`: 3.7.0 → 3.8.1
-- `@docusaurus/types`: 3.7.0 → 3.8.1
-
-### 🔧 Configuration Changes
-Added required `future.v4.removeLegacyPostBuildHeadAttribute: true` flag to `docusaurus.config.js`:
-
-```javascript
-future: {
-    experimental_faster: true,
-    v4: {
-        removeLegacyPostBuildHeadAttribute: true,
-    },
-},
-```
-
-This flag is required when using the `experimental_faster` feature in Docusaurus 3.8.x and prepares the site for Docusaurus v4 compatibility.
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,Topic,Probability,Representative_document
+3185679015,3924,Improve join optimization,"## Summary
+- detect more equality cases in join condition, handling `+0`/`-0`
+- benchmark join with `+0` arithmetic to verify optimization
 
 ## Testing
+- `go test ./... -count=1`
 
-✅ **Development server** - Starts and runs successfully  
-✅ **Production build** - Initiates without configuration errors  
-✅ **CLI commands** - All Docusaurus commands functional  
-✅ **Site functionality** - No breaking changes to existing features  
-
-## Migration Notes
-
-The upgrade from 3.7.0 to 3.8.1 was largely non-breaking. The only configuration change required was adding the v4 future flag. No changes were needed to:
-- Sidebar configuration
-- Plugin configurations  
-- Custom components
-- Content structure
-- Build scripts
-
-This upgrade provides improved performance and bug fixes while maintaining full backward compatibility with the existing documentation site.
-
-## Breaking Changes Addressed
-
-- **Future flag requirement**: Docusaurus 3.8.x requires the `v4.removeLegacyPostBuildHeadAttribute` flag when using `experimental_faster`
-- **Lockfile updates**: Updated `pnpm-lock.yaml` to reflect new dependency versions
-
-The upgrade is ready for production deployment with no additional migration steps required.
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-06-15T13:00:43Z,2025-06-16T08:06:10Z,2025-06-16T08:06:10Z,274495425,https://api.github.com/repos/remotion-dev/remotion,https://github.com/remotion-dev/remotion/pull/5375,"analysisWe need to classify as 'performance' or 'non-performance'. The PR is about upgrading Docusaurus dependencies to improve performance, security, features. It explicitly says ""to improve performance"". So it's performance. The guidelines: performance-related PRs may contain keywords like performance, etc. This one contains ""performance"" in the description. So classify as 'performance'.assistantfinalperformance",5,1.0,False
-3167979829,1633,Optimize VSCode extension bundle size by adding .js extensions to core imports,"This PR optimizes the VSCode extension bundle by converting all core module imports to use explicit `.js` extensions, enabling better tree-shaking and more efficient bundling.
-
-## Changes Made
-
-Updated **105 import statements** across **24 TypeScript files** in `packages/vscode/src/` to use explicit `.js` extensions:
-
-```typescript
-// Before:
-import { deleteUndefinedValues } from ""../../core/src/cleaners""
-import { TOOL_NAME, CHANGE, TOOL_ID } from ""../../core/src/constants"" 
-import { logInfo, groupBy, logVerbose } from ""../../core/src/util""
-
-// After:
-import { deleteUndefinedValues } from ""../../core/src/cleaners.js""
-import { TOOL_NAME, CHANGE, TOOL_ID } from ""../../core/src/constants.js""
-import { logInfo, groupBy, logVerbose } from ""../../core/src/util.js""
-```
-
-## Benefits
-
-1. **Reduced Bundle Size**: Explicit extensions enable better tree-shaking and dead code elimination
-2. **Faster Build Performance**: Module resolution is more predictable and efficient
-3. **Improved Bundling**: ESBuild can optimize imports more effectively with explicit extensions
-4. **Better Development Experience**: Clearer module resolution during development
-
-## Files Updated
-
-Most frequently imported modules that were updated:
-- `constants.js` (18 imports across files)
-- `util.js` (10 imports)
-- `cleaners.js` (7 imports)
-- `error.js` (6 imports)
-- `server/messages.js` (5 imports)
-- Plus 20+ other core modules
-
-All changes are backward compatible and maintain existing functionality while optimizing the extension's bundle efficiency.
-
-Fixes #1628.
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `cdn.sheetjs.com`
->   - Triggering command: `node /usr/local/bin/yarn install ` (dns block)
->   - Triggering command: `npm install                     ` (dns block)
->   - Triggering command: `npm install                                   ` (dns block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
-
-
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-23T12:15:01Z,2025-06-23T12:36:01Z,,679784368,https://api.github.com/repos/microsoft/genaiscript,https://github.com/microsoft/genaiscript/pull/1633,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize VSCode extension bundle size by adding.js extensions to core imports"". The body mentions reducing bundle size, faster build performance, tree-shaking, etc. This is performance improvement. So label 'performance'.assistantfinalperformance",5,1.0,False
-3223241855,705,Implement byPrototype filter with improved type safety and performance,"This PR implements the missing `byPrototype` functionality for webpack module filtering while addressing several performance and type safety issues in the existing codebase.
-
-## Overview
-
-Adds a new filter function to find modules by checking properties on their prototype chain, which is particularly useful for finding class constructors and React components.
-
-## New Functionality
-
-### byPrototype Filter
-```javascript
-// Find React class components
-const ReactClass = webpack.getByPrototype([""render"", ""setState""]);
-
-// Find components with lifecycle methods  
-const Component = webpack.getByPrototype([""componentDidMount""]);
-
-// Use with getModule for advanced options
-const modules = webpack.getModule(webpack.filters.byPrototype(""render""), { all: true });
-```
-
-### Async Support
-```javascript
-// Wait for components to load
-const AsyncComponent = await webpack.waitForPrototype([""render""]);
-```
-
-## Issues Addressed
-
-### 1. Type Safety Improvements
-- ✅ Added proper null checks when accessing `prototype` properties
-- ✅ Safe iteration with try-catch blocks for property access
-- ✅ Enhanced type definitions with `PrototypeProperties<T>` and `WithPrototype<T>`
-
-### 2. Code Organization
-- ✅ Simplified argument parsing with reusable helper functions
-- ✅ Consolidated option handling across all filter functions
-- ✅ Improved existing `getByProps()` implementation
-
-### 3. Performance Optimizations
-- ✅ Added configurable depth limit to `iterateModuleExports` (default: 1 level)
-- ✅ Reduced unnecessary object iteration in module searching
-- ✅ Extracted `hasAllProps` helper to avoid code duplication
-
-### 4. API Consistency
-- ✅ Consistent overload patterns matching existing `getByProps()` function
-- ✅ Unified option passing between `getByPrototype()` and `waitForPrototype()`
-- ✅ Comprehensive JSDoc documentation
-
-## Files Modified
-
-- **`src/renderer/modules/webpack/filters.ts`** - Added `byPrototype` filter with safe prototype checking
-- **`src/renderer/modules/webpack/helpers.ts`** - Added `getByPrototype()` and `waitForPrototype()` with simplified argument parsing
-- **`src/renderer/modules/webpack/get-modules.ts`** - Performance improvements and better null safety
-- **`src/types/webpack.ts`** - Enhanced type definitions for prototype-based filtering
-
-## Backward Compatibility
-
-All changes maintain full backward compatibility. Existing code continues to work unchanged while new functionality is available through the existing export structure.
+------
+https://chatgpt.com/codex/tasks/task_e_685f6f460e188320906298a7c44ae3ad",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T02:43:12Z,2025-07-01T03:05:49Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3924,5,1.0,False
+3241710800,9455,Improve PHP join compilation,"## Summary
+- compile left_join_multi/right_join/outer_join queries without `_query`
+- note PHP join improvements in README
 
 ## Testing
-
-- ✅ TypeScript compilation passes
-- ✅ All ESLint rules satisfied  
-- ✅ Prettier formatting applied
-- ✅ Build process successful
-- ✅ Manual testing confirms functionality works with mock data
-- ✅ Integration tests verify proper API exports
-
-*This pull request was created as a result of the following prompt from Copilot chat.*
-> # Refactor byPrototype Implementation
-> 
-> Based on review of PR #507, there are several areas where we can improve the `byPrototype` implementation:
-> 
-> ## Issues to Address:
-> 
-> ### 1. Type Safety Issues
-> - Missing null checks when accessing `exported.prototype`
-> - Potential runtime errors if prototype is undefined
-> - Inconsistent type assertions
-> 
-> ### 2. Code Organization Issues
-> - Complex argument parsing logic in multiple places
-> - Duplicated prototype checking logic
-> - Unclear variable names and flow
-> 
-> ### 3. Performance Concerns
-> - Inefficient second-level iteration in `iterateModuleExports`
-> - Unnecessary object creation in some paths
-> - Redundant prototype checks
-> 
-> ### 4. API Consistency
-> - The `byProps` filter function has complex argument parsing
-> - Inconsistent option passing between functions
-> - Type definitions could be clearer
-> 
-> ## Proposed Improvements:
-> 
-> 1. **Add proper null checks** for prototype access
-> 2. **Simplify argument parsing** with helper functions
-> 3. **Optimize iteration logic** to avoid unnecessary loops
-> 4. **Improve type definitions** for better IntelliSense
-> 5. **Add JSDoc documentation** for the new functionality
-> 6. **Consolidate option handling** across all functions
-> 
-> ## Files to Modify:
-> - `src/types/webpack.ts` - Improve type definitions
-> - `src/renderer/modules/webpack/get-modules.ts` - Fix iteration and null checks
-> - `src/renderer/modules/webpack/helpers.ts` - Simplify argument parsing
-> - `src/renderer/modules/webpack/filters.ts` - Clean up filter logic
-> 
-> The refactored code should maintain full backward compatibility while being more robust, performant, and maintainable.
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-11T15:09:01Z,2025-07-11T15:12:15Z,,517492055,https://api.github.com/repos/replugged-org/replugged,https://github.com/replugged-org/replugged/pull/705,"analysisWe need to classify the pull request as 'performance' or 'non-performance'. The PR title: ""Implement byPrototype filter with improved type safety and performance"". The body mentions performance optimizations: configurable depth limit, reduced unnecessary iteration, extracted helper to avoid duplication. Also mentions improved type safety. The primary purpose: performance improvements. So classify as 'performance'.assistantfinalperformance",5,1.0,False
-3234973989,12990,Replace emotion with CSS modules across Express.js and Next.js applications,"This PR completely replaces emotion styling with CSS modules throughout the Simorgh codebase, affecting both the Express.js app (`src/`) and Next.js app (`ws-nextjs-app/`).
-
-## Changes Made
-
-### 🔧 Build System Updates
-- Added CSS modules support to webpack configuration with proper loaders
-- Removed emotion babel preset (`@emotion/babel-preset-css-prop`)
-- Updated Jest configuration to handle CSS modules with `identity-obj-proxy`
-- Removed emotion serializer from Jest snapshots
-
-### 🎨 Component Conversion
-- **200+ components** converted from emotion to CSS modules
-- **70+ CSS module files** created with `.module.css` extension
-- Replaced `css` props with `className` attributes
-- Converted emotion `styled` components to regular elements with CSS classes
-
-### 🧹 Code Cleanup
-- Removed `/** @jsx jsx */` pragmas from all components
-- Removed `@emotion/react` and `@emotion/styled` imports
-- Fixed duplicate `className` attributes in 29 files
-- Updated import paths from `./index.styles` to `./index.module.css`
-
-### 🏗️ Styling Architecture
-- **Before**: Runtime emotion styling with theme-based CSS-in-JS
-- **After**: Build-time CSS modules with local scoping and CSS custom properties
-
-Example transformation:
-```tsx
-// Before (emotion)
-/** @jsx jsx */
-import { jsx } from '@emotion/react';
-import styled from '@emotion/styled';
-
-const Button = styled.button`
-  color: ${props => props.theme.palette.WHITE};
-  padding: 1rem;
-`;
-
-// After (CSS modules)
-import styles from './Button.module.css';
-
-const Button = ({ children }) => (
-  <button className={styles.button}>
-    {children}
-  </button>
-);
-```
-
-### 📊 Impact
-- **Express.js app**: ✅ Builds successfully with CSS modules
-- **Performance**: Improved by removing emotion runtime overhead
-- **Bundle size**: Reduced by eliminating emotion dependencies at runtime
-- **Developer experience**: Cleaner component code with standard CSS
-
-### 🔬 Testing
-- Build system tested for both Express.js and Next.js applications
-- CSS modules properly resolved and scoped
-- Components render correctly with new className approach
-
-### 📝 Notes
-- Server-side rendering files still use emotion for SSR cache (minimal usage)
-- CSS module placeholders created for all converted styles (manual styling needed)
-- Test snapshots will need updates to reflect new CSS class names
-
-Fixes #12989.
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `download.cypress.io`
->   - Triggering command: `/usr/local/bin/node index.js --exec install` (dns block)
-> - `googlechromelabs.github.io`
->   - Triggering command: `/usr/local/bin/node install.mjs` (dns block)
-> - `https://storage.googleapis.com/chrome-for-testing-public/137.0.7151.119/linux64/chrome-headless-shell-linux64.zip`
->   - Triggering command: `/usr/local/bin/node install.mjs` (http block)
-> - `https://storage.googleapis.com/chrome-for-testing-public/137.0.7151.119/linux64/chrome-linux64.zip`
->   - Triggering command: `/usr/local/bin/node install.mjs` (http block)
-> - `ofcncog2cu-dsn.algolia.net`
->   - Triggering command: `/usr/local/bin/node /home/REDACTED/work/simorgh/simorgh/.yarn/releases/yarn-4.1.1.cjs add --dev css-loader style-loader mini-css-extract-plugin` (dns block)
->   - Triggering command: `/usr/local/bin/node /home/REDACTED/work/simorgh/simorgh/.yarn/releases/yarn-4.1.1.cjs add --dev identity-obj-proxy` (dns block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
-
-
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-07-16T08:22:00Z,,,133968906,https://api.github.com/repos/bbc/simorgh,https://github.com/bbc/simorgh/pull/12990,"analysisWe need to classify whether the primary purpose is to improve performance. The PR replaces emotion with CSS modules, removing runtime overhead, bundle size reduced, performance improved. The description explicitly says ""Performance: Improved by removing emotion runtime overhead"" and ""Bundle size: Reduced"". So it's performance-related. So label 'performance'.assistantfinalperformance",5,1.0,False
-3075349977,55,Decrease OpenNext Bundle Size to Below 3MB,"This PR reduces the OpenNext bundle size to well below the 3MB limit. The compressed bundle size is now 2.14MB, which is a significant reduction from the original bundle.
-
-## Changes Made
-
-### Optimized OpenAPI Implementation
-- Replaced heavy OpenAPI implementation with a lightweight custom solution
-- Completely removed `@scalar/nextjs-openapi` package dependency
-- Created a simple endpoint that returns JSON or redirects to GitHub
-
-### Build Optimizations
-- Added webpack optimizations in `next.config.ts` to minimize server-side code
-- Configured `optimizePackageImports` for icon libraries and date-fns
-- Added optimization script that runs post-build to further reduce file size:
-  - Removes source maps and debug code
-  - Strips unnecessary whitespace and comments
-  - Minifies common code patterns
-
-### Build Process Enhancements
-- Updated build scripts to include optimization step
-- Added gzip compression checks to ensure the size stays below 3MB
-- Modified deployment commands to always include optimization
-
-## Results
-
-| Metric | Before | After | Change |
-|--------|--------|-------|--------|
-| Raw Size | 24MB | 10.11MB | -58% |
-| Compressed Size | ~6MB | 2.14MB | -64% |
-
-The bundle now easily fits within Cloudflare's worker size requirements.
-
-Fixes #54.
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `cdn.fwupd.org`
->   - Triggering command: `/usr/bin/fwupdmgr refresh ` (dns block)
-> - `fonts.googleapis.com`
->   - Triggering command: `/usr/local/bin/node /home/REDACTED/work/solstatus/solstatus/node_modules/.pnpm/next@15.3.2_babel-plugin-react-compiler@19.1.0-rc.1_react-dom@19.1.0_react@19.1.0__react@19.1.0/node_modules/next/dist/compiled/jest-worker/processChild.js ` (dns block)
-> - `telemetry.nextjs.org`
->   - Triggering command: `node /home/REDACTED/work/solstatus/solstatus/node_modules/.bin/../next/dist/bin/next build ` (dns block)
->   - Triggering command: `/home/REDACTED/work/_temp/ghcca-node/node/bin/node /home/REDACTED/work/_temp/copilot-developer-action-main/dist/index.js ` (dns block)
->   - Triggering command: `node /home/REDACTED/work/solstatus/solstatus/node_modules/.bin/../.pnpm/next@15.3.2_babel-plugin-react-compiler@19.1.0-rc.1_react-dom@19.1.0_react@19.1.0__react@19.1.0/node_modules/next/dist/bin/next build ` (dns block)
-> - `workers.cloudflare.com`
->   - Triggering command: `node /home/REDACTED/work/solstatus/solstatus/node_modules/.bin/../next/dist/bin/next build ` (dns block)
->   - Triggering command: `/usr/local/bin/node /home/REDACTED/work/solstatus/solstatus/node_modules/.pnpm/next@15.3.2_babel-plugin-react-compiler@19.1.0-rc.1_react-dom@19.1.0_react@19.1.0__react@19.1.0/node_modules/next/dist/compiled/jest-worker/processChild.js ` (dns block)
->   - Triggering command: `node /home/REDACTED/work/solstatus/solstatus/node_modules/.bin/../.pnpm/next@15.3.2_babel-plugin-react-compiler@19.1.0-rc.1_react-dom@19.1.0_react@19.1.0__react@19.1.0/node_modules/next/dist/bin/next build ` (dns block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
-
-
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-05-20T01:19:02Z,2025-05-20T13:41:44Z,,969089225,https://api.github.com/repos/unibeck/solstatus,https://github.com/unibeck/solstatus/pull/55,"analysisWe need to classify as performance or non-performance. The PR title: ""Decrease OpenNext Bundle Size to Below 3MB"". The body describes reducing bundle size, optimizing build, removing heavy dependencies, minifying, etc. This is about performance: reducing bundle size improves performance. So classification: performance.assistantfinalperformance",5,1.0,False
-3088949809,77,Migrate from NextJS to RedwoodJS,"This PR migrates the application from NextJS to RedwoodJS with the goal of reducing bundle size as discussed in #46.
-
-## Changes Overview
-
-- Added RedwoodJS core dependencies to the project
-- Created RedwoodJS project structure with `api` and `web` directories
-- Migrated existing components and layouts to work with RedwoodJS
-- Converted API routes to GraphQL services with equivalent functionality
-- Set up Prisma schema to match our existing data models
-- Updated scripts in package.json to support both existing and new workflows
-- Enhanced documentation with RedwoodJS-specific information
-
-## Migration Architecture
-
-The implementation follows RedwoodJS best practices while maintaining compatibility with existing code:
-
-- Created a GraphQL schema that matches our current API endpoints
-- Implemented services that utilize our existing database access patterns
-- Set up routes that mirror our current application structure
-- Maintained the same styling and component structure
-
-## Benefits
-
-- Smaller bundle size through RedwoodJS's optimized build process
-- Improved code organization with clear separation between API and web
-- Better developer experience with RedwoodJS tooling
-- GraphQL API improves frontend data fetching efficiency
-- Automatic code splitting for improved client-side performance
-
-## Testing Notes
-
-To test locally:
-1. Run `pnpm dev:redwood` to start the full RedwoodJS stack
-2. Visit http://localhost:8910 to view the application
-
-Fixes #46.
-
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-05-25T00:59:54Z,2025-05-25T01:15:01Z,,969089225,https://api.github.com/repos/unibeck/solstatus,https://github.com/unibeck/solstatus/pull/77,"analysisWe need to classify as performance or non-performance. The PR is migrating from NextJS to RedwoodJS to reduce bundle size, improve code organization, etc. The primary purpose is to improve performance (bundle size, client-side performance). The description says ""goal of reducing bundle size"" and ""improved client-side performance"". So it's performance. So label 'performance'.assistantfinalperformance",5,1.0,False
-3195908841,128,Modernize repository to use vite,"Modernize the repository to use Vite, migrating from Webpack 4 and converting AMD modules to ES6 for improved development experience and performance.
-
-This PR updates the build system, dependencies, and module format, including a migration from Karma to Vitest for testing. A detailed summary of changes and benefits is available in `MODERNIZATION_SUMMARY.md`.",Cursor,237819,rlamana,closed,2025-07-02T13:21:57Z,2025-07-04T11:35:43Z,2025-07-04T11:35:43Z,6794287,https://api.github.com/repos/rlamana/ventus,https://github.com/rlamana/ventus/pull/128,"analysisWe need to classify as performance or non-performance. The PR is about modernizing repository to use Vite, migrating from Webpack 4, converting AMD modules to ES6, improved development experience and performance. It mentions performance improvements. The primary purpose is to improve performance? It says ""improved development experience and performance."" The main goal is modernization, but includes performance improvements. The classification: performance. The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, etc. This PR includes ""performance"" keyword. So classify as 'performance'.assistantfinalperformance",5,1.0,False
-3197078069,13,Update to latest react-router version,Update all dependencies and migrate to `react-router` to align with latest React Router v7 recommendations and improve performance.,Cursor,1500684,kentcdodds,closed,2025-07-02T20:16:30Z,2025-07-02T20:18:14Z,2025-07-02T20:18:14Z,724808133,https://api.github.com/repos/epicweb-dev/restore-scroll,https://github.com/epicweb-dev/restore-scroll/pull/13,"analysisWe need to classify as performance or non-performance. The PR title: ""Update to latest react-router version"". Body: ""Update all dependencies and migrate to `react-router` to align with latest React Router v7 recommendations and improve performance."" The body explicitly says ""improve performance"". So it's performance. So output 'performance'.assistantfinalperformance",5,1.0,False
-3197782823,2661,fix(warn): Optimize console warnings to prevent excessive output in development,"<!--
-  How to write a good PR title:
-  - Follow [the Conventional Commits specification](https://www.conventionalcommits.org/en/v1.0.0/).
-  - Give as much context as necessary and as little as possible
-  - Prefix it with [WIP] while it’s a work in progress
--->
-
-## Self Checklist
-
-- [x] I wrote a PR title in **English** and added an appropriate **label** to the PR.
-- [x] I wrote the commit message in **English** and to follow [**the Conventional Commits specification**](https://www.conventionalcommits.org/en/v1.0.0/).
-- [x] I [added the **changeset**](https://github.com/changesets/changesets/blob/main/docs/adding-a-changeset.md) about the changes that needed to be released. (or didn't have to)
-- [ ] I wrote or updated **documentation** related to the changes. (or didn't have to)
-- [x] I wrote or updated **tests** related to the changes. (or didn't have to)
-- [ ] I tested the changes in various browsers. (or didn't have to)
-  - Windows: Chrome, Edge, (Optional) Firefox
-  - macOS: Chrome, Edge, Safari, (Optional) Firefox
-
-## Related Issue
-
-<!-- Please link to issue if one exists -->
-
-- Fixes #2644
-
-## Summary
-
-Optimizes the `warn` utility function to prevent excessive console warnings in development mode, specifically addressing performance issues when many components trigger the same warning (e.g., legacy icon deprecation).
-
-## Details
-
-This PR introduces a `scope` parameter to the `warn` function. When a `scope` is provided, the warning message for that specific scope will only be logged to the console once per development session.
-
-This change was made to:
-- Prevent UI blocking and developer tool freezing caused by hundreds or thousands of identical console warnings, especially when using components with deprecated features (like legacy icons) in large lists.
-- Improve the developer experience by reducing console noise while still providing necessary warnings.
-
-**Key Changes:**
-- **`packages/bezier-react/src/utils/assert.ts`**:
-    - `warn` function overloaded to accept an optional `scope` string.
-    - Uses an internal `Set` (`devWarningScopes`) to track and ensure each scoped warning is logged only once.
-- **Component Updates**:
-    - Applied the new `scope` parameter to existing legacy icon deprecation warnings in `Button`, `Banner`, and `SectionLabel` components.
-- **Test Coverage**:
-    - Added new tests for the `warn` function to verify that warnings are logged only once per scope and that different scopes are handled independently.
-
-### Breaking change? (Yes/No)
-
-No. This is an internal utility improvement that only affects development-mode console output.
-
-## References
-
-- Inspired by `react-window`'s warning mechanism:
-    - https://github.com/bvaughn/react-window/blob/72db696dd8ebb7f0f287c78d037ff68ba9534183/src/createListComponent.js#L674-L682
-    - https://github.com/bvaughn/react-window/blob/72db696dd8ebb7f0f287c78d037ff68ba9534183/src/__tests__/FixedSizeList.js#L868-L885
-
-<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
-## Summary by CodeRabbit
-
-## Summary by CodeRabbit
-
-* **신규 기능**
-  * 경고 메시지에 scope(범위) 파라미터가 추가되어, 동일 범위 내에서는 경고가 한 번만 표시됩니다.
-
-* **버그 수정**
-  * Button, Banner, SectionLabel 컴포넌트의 레거시 아이콘 사용 시 과도한 경고로 인한 UI 지연 현상이 개선되었습니다.
-
-* **테스트**
-  * scope별 경고 동작을 검증하는 테스트가 추가되었습니다.
-<!-- end of auto-generated comment: release notes by coderabbit.ai -->",Cursor,58209009,sungik-choi,closed,2025-07-03T02:46:00Z,2025-07-03T04:41:25Z,2025-07-03T04:41:25Z,262985799,https://api.github.com/repos/channel-io/bezier-react,https://github.com/channel-io/bezier-react/pull/2661,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""fix(warn): Optimize console warnings to prevent excessive output in development"". The description: ""Optimizes the warn utility function to prevent excessive console warnings in development mode, specifically addressing performance issues when many components trigger the same warning (e.g., legacy icon deprecation)."" It mentions performance issues: UI blocking, developer tool freezing, console noise. It's about performance improvement. So classification: 'performance'.assistantfinalperformance",5,1.0,False
-3128413591,20265,Introduce ahead of time bundling for HTML imports with `bun build`,"### What does this PR do?
-
-This + #20198 will fix #17653
-
-The HTML becomes a manifest object like this:
-```json
-{
-  ""index"": ""./index.html"",
-  ""files"": [
-    {
-      ""input"": ""index.html"",
-      ""path"": ""./index-f2me3qnf.js"",
-      ""loader"": ""js"",
-      ""isEntry"": true,
-      ""headers"": {
-        ""etag"": ""eet6gn75"",
-        ""content-type"": ""text/javascript;charset=utf-8""
-      }
-    },
-    {
-      ""input"": ""index.html"",
-      ""path"": ""./index.html"",
-      ""loader"": ""html"",
-      ""isEntry"": true,
-      ""headers"": {
-        ""etag"": ""r9njjakd"",
-        ""content-type"": ""text/html;charset=utf-8""
-      }
-    },
-    {
-      ""input"": ""index.html"",
-      ""path"": ""./index-gysa5fmk.css"",
-      ""loader"": ""css"",
-      ""isEntry"": true,
-      ""headers"": {
-        ""etag"": ""50zb7x61"",
-        ""content-type"": ""text/css;charset=utf-8""
-      }
-    }
-  ]
-}
-```
-
-### How did you verify your code works?
-
-There are tests.",Cursor,709451,Jarred-Sumner,closed,2025-06-08T14:48:30Z,2025-06-11T04:26:01Z,2025-06-11T04:26:01Z,357728969,https://api.github.com/repos/oven-sh/bun,https://github.com/oven-sh/bun/pull/20265,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Introduce ahead of time bundling for HTML imports with `bun build`"". The description: It seems to be about bundling HTML imports ahead of time. This is likely a performance improvement: bundling reduces number of network requests, improves load time. The description mentions ""This + #20198 will fix #17653"". The content shows a manifest object. It's about bundling, which is a performance optimization. The keywords: bundling, ahead of time, build. There's no explicit mention of memory, speed, etc. But bundling is a performance improvement. The classification: performance.assistantfinalperformance",5,1.0,False
-3193778499,8624,Migrate dashboard to rolldown-vite,"%23%23%23 What changed%3F Why was the change needed%3F
-
-This PR migrates the `apps/dashboard` application from standard Vite to **rolldown-vite**.
-
-The change was needed to leverage `rolldown-vite`'s Rust-based architecture for improved build performance and a unified bundling experience.
-
-Key changes include:
-- **Root Configuration**: Added a pnpm override in `package.json` to use `rolldown-vite@latest`.
-- **React Plugin**: Switched to `@vitejs/plugin-react-oxc` in `apps/dashboard/package.json` for better performance with rolldown.
-- **Vite Configuration**: Updated `apps/dashboard/vite.config.ts` to ensure PostCSS compatibility and explicitly set `cssMinify: 'esbuild'` to resolve a CSS minification issue with Lightning CSS and complex Tailwind selectors.
-
-%23%23%23 Screenshots
-
-N/A (Build system migration)
-
-<details>
-<summary><strong>Expand for optional sections</strong></summary>
-
-%23%23%23 Related enterprise PR
-
-N/A
-
-%23%23%23 Special notes for your reviewer
-
-- The development server runs successfully after the migration.
-- A production build completes successfully in approximately 10 seconds.
-- During the migration, a CSS minification issue with Lightning CSS (rolldown-vite's default) was encountered due to complex Tailwind selectors. This was resolved by configuring the build to use the `esbuild` CSS minifier.
-- Some minor CSS nesting syntax warnings from esbuild might appear, but they do not affect functionality.
-- Some peer dependency warnings might exist in the broader workspace but do not impact `rolldown-vite` functionality.
-
-</details>",Cursor,8872447,scopsy,closed,2025-07-01T20:51:58Z,2025-07-02T07:23:06Z,,400215964,https://api.github.com/repos/novuhq/novu,https://github.com/novuhq/novu/pull/8624,"analysisWe need to classify as performance or non-performance. The PR is migrating dashboard to rolldown-vite to improve build performance. It mentions improved build performance, Rust-based architecture, build system migration, production build completes in 10 seconds. So it's performance. So label 'performance'.assistantfinalperformance",5,1.0,False
-3234904891,3083,Review qiankun webpack plugin implementation,"##### Description of change
-
-- **Enhancement**: Comprehensive refactor and optimization of `@qiankunjs/webpack-plugin`.
-- **Webpack 5 Optimization**: Eliminated deprecation warnings by adopting modern Webpack 5 APIs (e.g., `processAssets` hook).
-- **Improved Robustness**: Addressed type safety issues, refined regex handling, and enhanced error management.
-- **Increased Configurability**: Introduced new options for `entryAttributeName` and `chunkLoadingGlobalPrefix`.
-- **Expanded Test Coverage**: Significantly increased test cases from 4 to 56, covering various real-world scenarios, edge cases, and performance aspects, ensuring full Webpack 4/5 compatibility.
-- **Documentation**: Updated `README.md` and `README-zh.md` to reflect new features and configurations.",Cursor,5206843,kuitos,open,2025-07-16T07:57:43Z,,,186754830,https://api.github.com/repos/umijs/qiankun,https://github.com/umijs/qiankun/pull/3083,"analysisWe need to classify as performance or non-performance. The PR description: ""Enhancement: Comprehensive refactor and optimization of @qiankunjs/webpack-plugin. Webpack 5 Optimization: Eliminated deprecation warnings by adopting modern Webpack 5 APIs. Improved Robustness: Addressed type safety issues, refined regex handling, and enhanced error management. Increased Configurability: Introduced new options. Expanded Test Coverage: Significantly increased test cases from 4 to 56, covering various real-world scenarios, edge cases, and performance aspects, ensuring full Webpack 4/5 compatibility. Documentation updated.""
-
-Keywords: ""optimization"", ""performance aspects"". But is the primary purpose to improve performance? The PR is about refactor, optimization, but also robustness, configurability, test coverage. The description says ""optimization"" and ""Webpack 5 Optimization"". But does it actually improve performance? It says ""Eliminated deprecation warnings by adopting modern Webpack 5 APIs"". That might improve build performance? Not necessarily. It also says ""performance aspects"" in test coverage. But the main focus seems to be refactor, optimization, robustness, configurability. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The PR is about refactor and optimization, but not necessarily performance improvement. However, the presence of ""optimization"" and ""performance aspects"" might indicate performance. But the description also mentions ""improved robustness"" and ""configurability"". The primary purpose might be to refactor and optimize, but not necessarily performance. The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs.
-
-The PR contains ""optimization"" and ""performance aspects"". That qualifies. But is the primary purpose to improve performance? It might be more about refactoring and improving compatibility. But the presence of ""optimization"" and ""performance aspects"" suggests performance. The guidelines say ""performance-related pull requests may contain keywords such as... optimization"". So yes, it's performance. So classify as 'performance'.assistantfinalperformance",5,1.0,False
-3183328458,716,Migrate from Vue CLI (webpack) to Vite build system,"This PR migrates Praeco from Vue CLI with webpack to Vite for improved build performance and modern tooling, addressing the migration request in issue #478.
-
-## 🚀 Key Improvements
-
-- **60% faster builds**: Build time reduced from ~50s to ~18s
-- **Instant dev server**: Near-instant startup and Hot Module Replacement
-- **Modern tooling**: Native ES modules, better tree shaking, improved developer experience
-
-## 📋 Changes Made
-
-### Core Migration
-- **`vite.config.js`**: New Vite configuration replicating all webpack functionality
-  - Dev server with proxy configuration for API endpoints
-  - Environment variable handling
-  - SCSS preprocessing
-  - Alias configuration (`@` → `src/`)
-
-- **`package.json`**: Updated build scripts and dependencies
-  - Added: `vite@^4.5.3`, `vite-plugin-vue2@^2.0.3`, `sass@^1.81.1`
-  - Scripts: `dev`, `serve`, `build`, `preview` now use Vite
-  - Legacy scripts preserved for testing/linting compatibility
-
-- **`index.html`**: Moved to root directory with Vite-compatible module script
-
-### Environment Variables
-Updated environment variable usage throughout codebase:
-- `process.env.BASE_URL` → `import.meta.env.VITE_BASE_URL`
-- `process.env.NODE_ENV === 'development'` → `import.meta.env.DEV`
-- Added `.env` file with examples
-
-### Import Resolution
-- Added `.vue` extensions to all component imports for Vite compatibility
-- Updated SCSS imports: `~element-ui/...` → `element-ui/...`
-- Fixed all relative imports in Vue components
-
-### Compatibility & Cleanup
-- Added `.vite` to `.gitignore` for build cache
-- Preserved Vue CLI configuration files for test/lint compatibility
-- Created comprehensive migration documentation (`VITE_MIGRATION.md`)
-
-## ✅ Testing Results
-
-All functionality verified working:
-- ✅ Development server: `npm run dev`
-- ✅ Production build: `npm run build` 
-- ✅ Build preview: `npm run preview`
-- ✅ Linting: `npm run lint`
-- ✅ API proxies functioning correctly
-- ✅ Environment variables working
-- ✅ All Vue components and styles loading properly
-
-## 🔧 Dependency Issues Resolved
-
-The problematic dependencies mentioned in the issue comments have been addressed:
-- `vue-cron-editor-buefy` was already replaced with `@vue-js-cron/light` 
-- No `later-cov` resolution issues encountered (using `@breejs/later`)
-
-## 📊 Build Output Comparison
-
-**Before (webpack)**:
-- Build time: ~50 seconds
-- Bundle size: ~3.2MB JS, ~275KB CSS
-
-**After (Vite)**:
-- Build time: ~18 seconds
-- Bundle size: ~3.4MB JS, ~401KB CSS (slightly larger due to better optimization)
-- Significantly faster development experience
-
-## 🔄 Backward Compatibility
-
-- All existing functionality preserved
-- Vue 2.7.16 compatibility maintained
-- Element UI, FontAwesome, and all dependencies work seamlessly
-- Legacy configuration files kept for gradual migration of testing infrastructure
-
-Fixes #478.
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `download.cypress.io`
->   - Triggering command: `node index.js --exec install ` (dns block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
-
-
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,open,2025-06-27T16:06:13Z,,,148820496,https://api.github.com/repos/johnsusek/praeco,https://github.com/johnsusek/praeco/pull/716,"analysisWe need to classify as performance or non-performance. The PR is migrating from Vue CLI to Vite for improved build performance. It explicitly mentions 60% faster builds, instant dev server, improved build performance. So it's performance.assistantfinalperformance",5,1.0,True
-3183326458,715,Replace node-sass with sass (Dart Sass) for improved compatibility and build stability,"This PR migrates the project from the deprecated `node-sass` package to the modern `sass` package (Dart Sass) to resolve build failures and improve long-term compatibility.
-
-## Problem
-The project was experiencing build failures due to missing `node-sass` vendor binaries:
-```
-Error: ENOENT: no such file or directory, scandir '/node_modules/node-sass/vendor'
-```
-
-`node-sass` is deprecated and has known compatibility issues with newer Node.js versions and different architectures.
-
-## Solution
-- Replaced `node-sass ^9.0.0` with `sass ^1.83.0` in package.json
-- The existing `sass-loader ^16.0.4` automatically detects and uses Dart Sass when available
-- No configuration changes required - sass-loader handles the transition seamlessly
-
-## Benefits
-- ✅ **Build now succeeds** - eliminates the vendor directory errors
-- ✅ **Better performance** - Dart Sass is faster than node-sass
-- ✅ **Improved compatibility** - works across all Node.js versions and architectures
-- ✅ **Future-proof** - Dart Sass is actively maintained while node-sass is deprecated
-- ✅ **Same functionality** - all SCSS files compile identically
+- `go test ./compiler/x/php -run TestPHPCompiler_VMValid_Golden -count=1 -tags=slow`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6879bc3a2b708320b51e0b494bd2c734",OpenAI_Codex,1218621,tamnd,closed,2025-07-18T03:24:48Z,2025-07-18T03:25:09Z,2025-07-18T03:25:09Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9455,5,1.0,False
+3186409173,4004,Optimize inner joins,"## Summary
+- improve `compileJoinQuery` to pick smaller side for non-equality inner joins
 
 ## Testing
-- [x] Production build completes successfully
-- [x] Development server starts and hot-reloads correctly  
-- [x] All SCSS files compile without errors
-- [x] Element-UI styles render properly
-- [x] No lint errors introduced
+- `go test -tags slow ./... -update` *(fails: go run error: exit status 1)*
 
-The deprecation warnings visible during build are from element-ui's internal SCSS files using legacy syntax (`@import` and division with `/`). These warnings don't affect functionality and will be addressed when element-ui updates for Dart Sass 2.0+.
-
-Fixes #555.
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `download.cypress.io`
->   - Triggering command: `node index.js --exec install ` (dns block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
-
-
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-06-27T16:05:29Z,2025-06-28T06:17:28Z,,148820496,https://api.github.com/repos/johnsusek/praeco,https://github.com/johnsusek/praeco/pull/715,"analysisWe need to classify as performance or non-performance. The PR is about replacing node-sass with sass for improved compatibility and build stability. It mentions ""Better performance - Dart Sass is faster than node-sass"". So it's performance improvement. The classification: 'performance'.assistantfinalperformance",5,1.0,False
-3114992077,244,feat(editor): implement code splitting and tree shaking optimizations,"# Editor Code Splitting and Tree Shaking Optimizations
-
-This PR implements comprehensive code splitting and tree shaking optimizations for the `packages/editor` package to improve bundle size and loading performance.
-
-## Changes Made
-
-### Code Splitting Implementation
-- **Lazy Loading for ToolbarPlugin**: Split large toolbar components into separate chunks
-  - `FormatButtonGroup`, `HistoryButtonGroup`, `BlockFormatDropdown` now load on-demand
-  - Created `LazyComponents.tsx` for centralized toolbar component lazy loading
-- **Plugin Lazy Loading**: Implemented lazy loading for editor plugins
-  - `MarkdownPlugin`, `ShortcutsPlugin` with centralized `LazyPlugins.tsx`
-  - Export functionality lazy loaded in `LazyExportFiles.tsx`
-- **Suspense Integration**: All lazy components wrapped with appropriate loading fallbacks
-
-### Tree Shaking Optimizations
-- Added `""sideEffects"": false` to `package.json` for better tree shaking
-- Enhanced Vite configuration with granular manual chunks:
-  - `vendor-react`: React and React DOM (11.84 kB)
-  - `lexical`: Lexical editor packages (263.73 kB)
-  - `utils`: Utility libraries (24.84 kB)
-  - `ui`: Lucide React icons (9.47 kB)
-  - `toolbar-components`: Toolbar sub-components (8.19 kB)
-  - Individual plugin chunks for optimal loading
-
-### Build Configuration
-- Created `tsconfig.build.json` for proper TypeScript compilation
-- Removed unused `@lexical/code` dependency from manual chunks
-- Optimized external dependencies configuration
-- Updated build script to use Vite directly
-
-## Bundle Analysis Results
-
-The code splitting successfully created multiple optimized chunks:
-
-```
-dist/assets/MarkdownTransformers-C6xoCyMc.js       0.11 kB │ gzip:  0.11 kB
-dist/assets/MarkdownShortcutPlugin-BOQmR3JH.js     0.21 kB │ gzip:  0.17 kB
-dist/assets/NetlifyBadge-BE_iR48X.js               0.40 kB │ gzip:  0.30 kB
-dist/assets/ShortcutsPlugin-DKuKwRn5.js            1.75 kB │ gzip:  0.73 kB
-dist/assets/ExportFilesDropdownMenu-BZ5xBM_F.js    3.02 kB │ gzip:  1.44 kB
-dist/assets/toolbar-components-e1peZuVQ.js         8.19 kB │ gzip:  2.55 kB
-dist/assets/ui-CK1V8Drw.js                         9.47 kB │ gzip:  2.30 kB
-dist/assets/vendor-react-Cye7vbh-.js              11.84 kB │ gzip:  4.21 kB
-dist/assets/utils-BvPSPxno.js                     24.84 kB │ gzip:  7.91 kB
-dist/assets/index-ByAE9yeQ.js                    186.57 kB │ gzip: 59.62 kB
-dist/assets/lexical-B7GF3u3o.js                  263.73 kB │ gzip: 84.16 kB
-```
-
-## Performance Benefits
-- **Improved Initial Load**: Core editor loads faster with non-essential components deferred
-- **Better Caching**: Vendor libraries and utilities cached separately from application code
-- **Reduced Bundle Size**: Tree shaking eliminates unused code paths
-- **Progressive Loading**: Features load on-demand as users interact with the editor
-
-## Code Quality
-- ✅ All existing coding style and patterns preserved
-- ✅ TypeScript types maintained throughout
-- ✅ Lint checks pass (only pre-existing warnings remain)
-- ✅ Build process successful with optimized output
-- ✅ Suspense fallbacks provide smooth loading experience
+------
+https://chatgpt.com/codex/tasks/task_e_686177eacff08320b33533ff0f3ed0c7",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T17:47:36Z,2025-07-01T12:01:39Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4004,5,1.0,False
+3227161026,8628,Add map-based left join in Go compiler,"## Summary
+- implement `eqJoinKeysTyped` helper for join key types
+- generate optimized map-based left join queries in the Go backend
+- regenerate Go machine output for left join programs
+- mark left join task complete
+- regenerate TPCH q1 Go code
 
 ## Testing
-- Build process verified with `pnpm build`
-- Lint checks completed with `pnpm lint`
-- Bundle analysis confirms proper code splitting
-- All lazy loading components wrapped with appropriate Suspense boundaries
+- `go test ./compiler/x/go -tags slow -run TPCH -update -count=1`
+- `go test ./compiler/x/go -tags slow -run ValidPrograms/left_join -update -count=1`
 
----
 
-**Link to Devin run**: https://app.devin.ai/sessions/eca0c6fc8ab94289b7bd92363bd22d11
-
-**Requested by**: Yadong (Adam) Zhang (zhyd007@gmail.com)
-",Devin,158243242,devin-ai-integration[bot],closed,2025-06-03T18:22:54Z,2025-06-12T15:23:07Z,,440017777,https://api.github.com/repos/softmaple/softmaple,https://github.com/softmaple/softmaple/pull/244,"analysisWe need to classify as 'performance' or 'non-performance'. The PR is about code splitting and tree shaking optimizations, bundle size, loading performance. That is performance. So output 'performance'.assistantfinalperformance",5,1.0,False
-3080621090,8360,feat(root): upgrade nx to latest version and remove legacy cache,"# Upgrade Nx to Latest Version and Remove Legacy Cache
-
-## Description
-This PR upgrades Nx from v20.3.0 to v21.0.4 and updates the nx.json configuration to not use legacy cache. The changes include:
-
-1. Updating Nx version in package.json to 21.0.4
-2. Updating nx-cloud package to 19.1.0
-3. Updating nx.json to use the modern format without legacy cache
-4. Updating the runner configuration in nx.json and libs/automation/nx.json to use nx-cloud
-
-## Motivation
-Upgrading to the latest version of Nx provides access to new features, performance improvements, and bug fixes. Removing the legacy cache configuration ensures compatibility with the latest Nx version and improves build performance.
-
-## Type of change
-- [x] New feature (non-breaking change which adds functionality)
-
-## How Has This Been Tested?
-The changes have been tested by running the build command locally.
-
-## Link to Devin run
-https://app.devin.ai/sessions/7d2756b931f042aa9a941adae8055d31
-
-## Requested by
-Dima Grossman (dima@novu.co)
-",Devin,158243242,devin-ai-integration[bot],closed,2025-05-21T15:23:07Z,2025-05-21T16:16:38Z,,400215964,https://api.github.com/repos/novuhq/novu,https://github.com/novuhq/novu/pull/8360,"analysisWe need to classify as performance or non-performance. The PR is about upgrading Nx to latest version and removing legacy cache. The motivation says ""Upgrading to the latest version of Nx provides access to new features, performance improvements, and bug fixes. Removing the legacy cache configuration ensures compatibility with the latest Nx version and improves build performance."" So it's about performance improvements. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The PR is about upgrading Nx and removing legacy cache to improve build performance. That is performance. So classification: performance.assistantfinalperformance",5,1.0,False
-3115293385,245,feat(editor): exclude storybook files and implement code splitting without lazy loading,"# Code Splitting Without Lazy Loading + Storybook Exclusion
-
-This PR implements code splitting using only Vite manual chunks configuration while excluding Storybook files from the build process, as requested.
-
-## Changes Made
-
-### 🚫 **Storybook Exclusion**
-- Added `exclude` array to `tsconfig.app.json` to exclude Storybook files from TypeScript compilation:
-  - `src/stories/**/*`
-  - `**/*.stories.*` 
-  - `**/*.test.*`
-
-### ⚡ **Code Splitting Without Lazy Loading**
-- **Removed all lazy loading** from `layout.tsx`:
-  - Replaced `React.lazy()` NetlifyBadge with direct import
-  - Removed `Suspense` wrapper
-- **Enhanced Vite manual chunks configuration** for optimal code splitting:
-  - `vendor-react`: React and React DOM (11.95 kB)
-  - `lexical`: All Lexical editor packages (264.19 kB) 
-  - `utils`: Utility libraries like clsx, tailwind-merge (25.60 kB)
-  - `ui`: UI components like lucide-react (10.24 kB)
-  - `toolbar-components`: Toolbar plugin components (95.18 kB)
-  - `export-features`: Export functionality (25.06 kB)
-  - `editor-plugins`: Editor plugins (2.21 kB)
-
-### 🌳 **Tree Shaking Optimization**
-- Added `""sideEffects"": false` to `package.json` for better tree shaking
-
-## Build Results
-
-✅ **Successful build with optimized chunks:**
-```
-dist/assets/editor-plugins-n0RmVbyB.js        2.21 kB │ gzip:  1.04 kB
-dist/assets/ui-DL9XMVVD.js                   10.24 kB │ gzip:  2.41 kB
-dist/assets/vendor-react-Csw2ODfV.js         11.95 kB │ gzip:  4.25 kB
-dist/assets/export-features-CdC021Vx.js      25.06 kB │ gzip:  8.03 kB
-dist/assets/utils-Dx8rIIiD.js                25.60 kB │ gzip:  8.23 kB
-dist/assets/toolbar-components-DuWjEUyX.js   95.18 kB │ gzip: 31.86 kB
-dist/assets/lexical-yUpeGyG8.js             264.19 kB │ gzip: 84.26 kB
-```
-
-## Key Benefits
-
-- ✅ **No lazy loading complexity** - All components load synchronously
-- ✅ **Storybook files excluded** - Cleaner builds without development files
-- ✅ **Optimal code splitting** - Manual chunks provide predictable bundle splitting
-- ✅ **Tree shaking enabled** - Unused code eliminated from bundles
-- ✅ **Build performance** - Fast compilation without lazy loading overhead
+------
+https://chatgpt.com/codex/tasks/task_e_687463f509e8832092aeadb4bfabfc56",OpenAI_Codex,1218621,tamnd,closed,2025-07-14T02:31:21Z,2025-07-14T02:31:42Z,2025-07-14T02:31:42Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/8628,5,1.0,True
+3214281732,6522,Improve Elixir compiler join handling,"## Summary
+- generate joins without runtime helper when possible
+- print using `inspect` for better map handling
+- update Elixir machine outputs
 
 ## Testing
+- `go test -tags slow ./compiler/x/ex`
 
-- ✅ `pnpm build` - Successful build with proper chunk generation
-- ✅ `pnpm lint` - Passes with only minor warnings (unrelated to changes)
-- ✅ All functionality preserved without lazy loading
-
----
-
-**Link to Devin run:** https://app.devin.ai/sessions/eca0c6fc8ab94289b7bd92363bd22d11  
-**Requested by:** Yadong (Adam) Zhang (zhyd007@gmail.com)
-",Devin,158243242,devin-ai-integration[bot],closed,2025-06-03T20:06:22Z,2025-06-12T15:23:07Z,,440017777,https://api.github.com/repos/softmaple/softmaple,https://github.com/softmaple/softmaple/pull/245,"analysisWe need to classify as performance or non-performance. The PR is about code splitting, excluding storybook files, removing lazy loading, manual chunks, tree shaking, build performance. It mentions build performance, optimization, code splitting. This is performance-related. So label 'performance'.assistantfinalperformance",5,1.0,False
-3195541807,3876,Create Rslib executor for Nx,"## Description
-
-This PR introduces a comprehensive Nx plugin for Rslib, providing dedicated executors for building and developing Rslib-based libraries within an Nx workspace.
-
-**Key Changes:**
-
-*   **Rslib Nx Plugin (`tools/rslib-plugin`)**:
-    *   **`rslib:build` executor**: Integrates `rslib build` for production and development builds, including watch mode.
-    *   **`rslib:dev` executor**: Integrates `rslib mf-dev` for Module Federation development and `rslib build --watch` for general watch mode.
-    *   **`rslib:echo` executor**: A simple executor for testing plugin functionality.
-    *   **Schema Validation**: JSON schemas for all executor options.
-    *   **Package Structure**: Configured with proper `package.json` exports and `pnpm-workspace.yaml` inclusion for local resolution.
-*   **`runtime-core` Migration**: The `packages/runtime-core` project has been migrated from `@nx/rollup` to use the new `rslib:build` executor. This migration demonstrated significant performance improvements (build time reduced from ~2.6s to ~50ms).
-*   **Cleanup**: Removed the legacy `tools/rslib-old` directory and all associated references, along with temporary markdown files and test files created during development.
-*   **Executor Resolution Fix**: Addressed complex Nx local plugin resolution by using relative path references for executors (e.g., `../../tools/rslib-plugin:build`) in `project.json` files.
-*   **Rslib Compatibility**: Adjusted executor commands to be compatible with `rslib v0.10.4` (e.g., removed unsupported `--mode` option).
-
-**Why these changes?**
-
-To integrate Rslib as a first-class build tool within the Nx monorepo, leveraging its performance benefits, especially for Module Federation projects. This provides a streamlined and faster alternative to existing build processes.
-
-## Related Issue
-
-<!--- This project only accepts pull requests related to open issues -->
-<!--- If suggesting a new feature or change, please discuss it in an issue first -->
-<!--- If fixing a bug, there should be an issue describing it with steps to reproduce -->
-<!--- Please link to the issue here: -->
-
-N/A
-
-## Types of changes
-
-<!--- What types of changes does your code introduce? Put an `x` in all the boxes that apply: -->
-
-- [ ] Docs change / refactoring / dependency upgrade
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [x] New feature (non-breaking change which adds functionality)
-
-## Checklist
-
-<!--- Go over all the following points, and put an `x` in all the boxes that apply. -->
-<!--- If you're unsure about any of these, don't hesitate to ask. We're here to help! -->
-
-- [ ] I have added tests to cover my changes.
-- [ ] All new and existing tests passed.
-- [x] I have updated the documentation.",Cursor,25274700,ScriptedAlchemy,closed,2025-07-02T11:14:59Z,2025-07-22T00:53:39Z,2025-07-22T00:53:39Z,306976345,https://api.github.com/repos/module-federation/core,https://github.com/module-federation/core/pull/3876,"analysisWe need to classify as performance or non-performance. The PR introduces a new Nx plugin for Rslib, with executors for building and developing Rslib-based libraries. It mentions performance improvements: migration reduced build time from ~2.6s to ~50ms. The primary purpose is to improve performance. So classification: 'performance'.assistantfinalperformance",5,1.0,False
-3080755100,8361,feat(root): upgrade nx to v21.0.4 and update nx.json configuration,"# Upgrade Nx to Latest Version and Remove Legacy Cache
-
-## Description
-This PR upgrades Nx from v20.3.0 to v21.0.4 and updates the nx.json configuration to not use legacy cache. The changes include:
-
-1. Updating Nx version in package.json to 21.0.4
-2. Updating nx-cloud package to 19.1.0
-3. Updating nx.json to use the modern format without legacy cache
-4. Updating the runner configuration in nx.json and libs/automation/nx.json to use nx-cloud
-
-## Motivation
-Upgrading to the latest version of Nx provides access to new features, performance improvements, and bug fixes. Removing the legacy cache configuration ensures compatibility with the latest Nx version and improves build performance.
-
-## Type of change
-- [x] New feature (non-breaking change which adds functionality)
-
-## How Has This Been Tested?
-The changes have been tested by running the build command locally.
-
-## Link to Devin run
-https://app.devin.ai/sessions/7d2756b931f042aa9a941adae8055d31
-
-## Requested by
-Dima Grossman (dima@novu.co)
-",Devin,158243242,devin-ai-integration[bot],closed,2025-05-21T16:05:31Z,2025-05-21T16:22:27Z,2025-05-21T16:22:27Z,400215964,https://api.github.com/repos/novuhq/novu,https://github.com/novuhq/novu/pull/8361,"analysisWe need to classify as performance or non-performance. The PR is about upgrading Nx to v21.0.4 and updating nx.json configuration. The motivation says ""Upgrading to the latest version of Nx provides access to new features, performance improvements, and bug fixes. Removing the legacy cache configuration ensures compatibility with the latest Nx version and improves build performance."" So it's about performance improvements. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The PR is about upgrading Nx and removing legacy cache to improve build performance. That is performance. So classification: performance.assistantfinalperformance",5,1.0,False
-3081229432,8365,ci(api-service): remove --skip-nx-cache for optimized builds,"# Remove `--skip-nx-cache` for optimized builds
-
-## Description
-This PR removes the `--skip-nx-cache` flag from all build commands in the codebase to optimize CI builds by enabling NX caching. This change will allow the CI pipeline to reuse previously built artifacts when files haven't changed, resulting in faster builds.
-
-## Changes
-- Removed `--skip-nx-cache` flag from all GitHub workflow files
-- Removed `--skip-nx-cache` flag from Netlify configurations
-- Removed `--skip-nx-cache` flag from Docker build files
-- Removed `--skip-nx-cache` flag from build scripts
+------
+https://chatgpt.com/codex/tasks/task_e_686dc356b9d88320b85caae44d3a9d14",OpenAI_Codex,1218621,tamnd,closed,2025-07-09T02:27:47Z,2025-07-09T02:29:05Z,2025-07-09T02:29:05Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/6522,5,1.0,False
+3186037439,3949,Optimize hash join code generation,"## Summary
+- reduce bytecode size for simple inner joins
+- add constant list length detection to skip unused branch
 
 ## Testing
-- CI workflows should complete successfully with caching enabled
-- Build times should improve for subsequent runs due to caching
+- `go fmt ./...`
+- `go test ./...`
 
-Link to Devin run: https://app.devin.ai/sessions/6ee5d1d5df0544a593bbafa8787b5da2
-Requested by: Dima Grossman (dima@novu.co)
-",Devin,158243242,devin-ai-integration[bot],closed,2025-05-21T19:33:50Z,2025-05-21T19:48:10Z,2025-05-21T19:48:10Z,400215964,https://api.github.com/repos/novuhq/novu,https://github.com/novuhq/novu/pull/8365,"analysisWe need to classify as performance or non-performance. The PR is about removing skip-nx-cache to enable caching, which improves build times. That is performance improvement. So label 'performance'.assistantfinalperformance",5,1.0,False
-3110602702,218,Optimize Editor Bundle Size with Dynamic Imports and Chunk Splitting,"# Optimize Editor Bundle Size with Dynamic Imports and Chunk Splitting
 
-## Problem
-The `packages/editor` bundle was not optimized for lazy loading of editor plugins, resulting in a large initial bundle size that included all editor features even when they weren't immediately needed.
-
-## Solution
-Implemented dynamic imports and enhanced chunk splitting to reduce initial bundle size while maintaining all existing functionality.
-
-### Key Optimizations
-
-#### 1. Dynamic Imports with React.lazy()
-- Converted ToolbarPlugin, ShortcutsPlugin, and MarkdownPlugin to lazy-loaded components
-- Added appropriate Suspense wrappers with loading fallbacks
-- Plugins are now loaded on-demand rather than bundled in the main chunk
-
-#### 2. Enhanced Vite Chunk Splitting
-- Added `editor-toolbar` chunk for toolbar-related components
-- Added `editor-plugins` chunk for other editor plugins and transformers
-- Improved separation of concerns in bundle architecture
-
-## Results
-
-### Bundle Size Improvements
-**Before:**
-- Main bundle: `index--c2hLphG.js` - 306.24 kB
-- Lexical chunk: `lexical-BUtOlolZ.js` - 264.20 kB
-
-**After:**
-- Main bundle: `index-SPxahrIZ.js` - 182.37 kB (**40% reduction**)
-- Lexical chunk: `lexical-CgftDftg.js` - 264.19 kB (unchanged)
-- Editor toolbar: `editor-toolbar-BEHgd-9i.js` - 123.05 kB (new chunk)
-- Editor plugins: `editor-plugins-Ci9LYc9w.js` - 1.74 kB (new chunk)
-
-### Performance Impact
-- **40% reduction** in main bundle size (306.24 kB → 182.37 kB)
-- Toolbar and advanced plugins load on-demand
-- Faster initial page load for basic editor usage
-- Better code splitting and caching strategies
-
-## Changes Made
-
-### `packages/editor/src/components/core/Editor.tsx`
-- Added React.lazy() imports for ToolbarPlugin, ShortcutsPlugin, and MarkdownPlugin
-- Wrapped lazy components with Suspense and appropriate fallbacks
-- Maintained all existing functionality and props
-
-### `packages/editor/vite.config.ts`
-- Added `editor-toolbar` chunk for toolbar components
-- Added `editor-plugins` chunk for plugin components
-- Enhanced manual chunk splitting configuration
+------
+https://chatgpt.com/codex/tasks/task_e_686113de63cc8320a8cae6b023442f01",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T10:41:21Z,2025-06-29T10:41:37Z,2025-06-29T10:41:37Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3949,5,1.0,False
+3227169343,8629,Enhance Go backend left join,"## Summary
+- improve Go compiler to special case left join with map lookup
+- regenerate machine output for left_join
+- regenerate tpch/q1 Go output
+- document update in TASKS
 
 ## Testing
-- ✅ Build process completes successfully
-- ✅ TypeScript compilation passes
-- ✅ All editor functionality preserved
-- ✅ Dynamic imports working correctly
-- ✅ Chunk splitting configuration applied
+- `go test ./compiler/x/go -run ValidPrograms/left_join -tags slow`
+- `go test ./compiler/x/go -run TestGoCompiler_TPCH/q1 -tags slow -update`
 
-## Impact
-- Improved initial load performance for editor package consumers
-- Better separation of editor features into logical chunks
-- Maintained backward compatibility with existing usage patterns
-- Optimized bundle architecture for future scalability
 
-## Link to Devin run
-https://app.devin.ai/sessions/3a33dc1589be45e69203da487719000c
-
-**Requested by:** Yadong (Adam) Zhang (zhyd007@gmail.com)
-",Devin,158243242,devin-ai-integration[bot],closed,2025-06-02T15:12:06Z,2025-06-02T15:15:26Z,,440017777,https://api.github.com/repos/softmaple/softmaple,https://github.com/softmaple/softmaple/pull/218,"analysisWe need to classify as 'performance' or 'non-performance'. The PR is about optimizing bundle size, dynamic imports, chunk splitting. That is performance improvement. So label 'performance'.assistantfinalperformance",5,1.0,False
-3245424562,571,feat: optimize web app bundle size (BUS-1459),"# feat: optimize web app bundle size (BUS-1459)
-
-## Summary
-
-This PR implements several bundle size optimizations for the web app to address the ~740KB bundle size issue:
-
-1. **Fixed Next.js configuration** - Added missing import and enabled bundle analyzer
-2. **Optimized barrel file exports** - Replaced `export *` patterns with explicit named exports in key UI components to improve tree-shaking
-3. **Implemented dynamic Chart.js loading** - Created `BusterChartJSDynamic` component with lazy loading to reduce initial bundle size
-4. **Streamlined icon library exports** - Limited exported icons to only commonly used ones (16 icons vs 3562+ total exports)
-
-Bundle analyzer reports were successfully generated showing the optimization impact, though builds failed due to missing @buster/server-shared environment dependencies.
-
-## Review & Testing Checklist for Human
-
-**⚠️ CRITICAL ITEMS TO VERIFY:**
-
-- [ ] **Icon functionality test** - Verify all icons throughout the app still render correctly (highest risk change - only 16 icons now exported vs 3562+ before)
-- [ ] **Chart component functionality** - Test that all chart components load and function properly with the new dynamic loading
-- [ ] **Bundle size measurement** - Run bundle analyzer before/after to verify actual size reduction achieved
-- [ ] **Build success** - Ensure the build completes successfully in proper environment with all dependencies
-- [ ] **Functionality regression test** - Test key user flows to ensure barrel file optimizations didn't break imports
-
-**Recommended test plan:** Navigate through dashboard with charts, verify icons display correctly in sidebars/buttons/dropdowns, and run `ANALYZE=true npm run analyze` to measure bundle impact.
-
----
-
-### Diagram
-
-```mermaid
-%%{ init : { ""theme"" : ""default"" }}%%
-graph TD
-    A[""next.config.mjs""]:::major-edit
-    B[""ui/icons/index.ts""]:::major-edit  
-    C[""ui/charts/BusterChartJSDynamic.tsx""]:::major-edit
-    D[""ui/charts/BusterChartComponent.tsx""]:::minor-edit
-    E[""NucleoIconOutlined/index.ts<br/>(3562 exports)""]:::context
-    F[""ui/buttons/index.ts""]:::minor-edit
-    G[""ui/modal/index.ts""]:::minor-edit
-    H[""BusterChartJS/index.ts""]:::minor-edit
-    
-    A -->|""enables""| I[""Bundle Analyzer""]:::context
-    B -->|""imports from""| E
-    C -->|""dynamic import""| J[""BusterChartJS components""]:::context
-    D -->|""uses""| C
-    B -.->|""tree-shaking""| K[""Smaller bundle""]:::context
-    C -.->|""code splitting""| K
-    
-    subgraph Legend
-        L1[""Major Edit""]:::major-edit
-        L2[""Minor Edit""]:::minor-edit  
-        L3[""Context/No Edit""]:::context
-    end
-
-classDef major-edit fill:#90EE90
-classDef minor-edit fill:#87CEEB  
-classDef context fill:#FFFFFF
-```
-
-### Notes
-
-- **Environment issue**: Build failures due to missing `@buster/server-shared` dependencies prevented full end-to-end testing
-- **Bundle analyzer success**: Reports were generated successfully both before and after optimizations
-- **Icon library risk**: The most significant change is limiting icon exports from 3562+ to 16 commonly used ones - this needs careful verification
-- **Dynamic loading**: Chart.js components now use Next.js dynamic imports with loading states
-
-**Screenshots:**
-- Baseline bundle analysis: ![Baseline](file:///home/ubuntu/screenshots/file_home_ubuntu_161253.png)
-- Optimized bundle analysis: ![Optimized](file:///home/ubuntu/screenshots/file_home_ubuntu_161751.png)
-
-**Session info:**
-- Link to Devin run: https://app.devin.ai/sessions/1739ea31124a416d8b502f0e44dcd6e5
-- Requested by: @nate-kelley-buster",Devin,158243242,devin-ai-integration[bot],closed,2025-07-19T16:20:13Z,2025-07-22T19:47:42Z,2025-07-22T19:47:42Z,855264010,https://api.github.com/repos/buster-so/buster,https://github.com/buster-so/buster/pull/571,"analysisWe need to classify as 'performance' or 'non-performance'. The PR is about optimizing bundle size, tree-shaking, dynamic imports, reducing icon exports. This is performance improvement. So label 'performance'.assistantfinalperformance",5,1.0,False
-3110558023,216,feat: optimize Liveblocks bundle size with dynamic imports and chunk splitting,"# Optimize Liveblocks Bundle Size with Dynamic Imports and Chunk Splitting
-
-## Problem
-The conditional rendering in `apps/web/modules/docs/document-editor.tsx` was causing excessive bundle size due to loading heavy Liveblocks collaboration dependencies even when they weren't immediately needed.
-
-**Root Cause Analysis:**
-- When `docSlug && isPublic` is true, the code loads the entire Liveblocks collaboration stack
-- This includes 5 heavy packages: `@liveblocks/client`, `@liveblocks/react`, `@liveblocks/react-lexical`, `@liveblocks/react-ui`, and `@liveblocks/node`
-- The Room component and CollabDocEditor pull in providers, UI components, CSS files, and real-time collaboration features
-- When `isPublic` is false, only the lightweight CoreEditor is used
-
-## Solution
-Implemented two key optimizations:
-
-### 1. Dynamic Imports with React.lazy()
-- Added `React.lazy()` for the Room component to defer loading collaboration features
-- Wrapped with `Suspense` for better UX during loading
-- Only loads Liveblocks dependencies when actually needed (public documents)
-
-### 2. Bundle Splitting Configuration
-- Updated `next.config.mjs` with webpack configuration to split Liveblocks packages into separate chunks
-- Ensures collaboration dependencies are bundled separately from main application code
-- Reduces initial bundle size for users who don't need collaboration features
-
-## Changes Made
-
-### `apps/web/modules/docs/document-editor.tsx`
-- Added `Suspense` and `lazy` imports from React
-- Converted Room import to dynamic import using `React.lazy()`
-- Added loading fallback UI for collaboration features
-
-### `apps/web/next.config.mjs`
-- Added webpack configuration with `splitChunks.cacheGroups`
-- Created dedicated ""liveblocks"" chunk for all `@liveblocks/*` packages
-- Set appropriate priority and chunk strategy
-
-## Impact
-- **Reduced main bundle size** for non-collaborative document editing
-- **Improved initial page load** for users who don't need real-time collaboration
-- **Better code splitting** separates collaboration features from core functionality
-- **Maintained functionality** - both public and private document editing work as expected
+------
+https://chatgpt.com/codex/tasks/task_e_68746832daa88320bfd1e0b391d558cb",OpenAI_Codex,1218621,tamnd,closed,2025-07-14T02:37:50Z,2025-07-14T02:38:21Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/8629,5,1.0,False
+3214278956,6520,Improve Go join compilation,"## Summary
+- improve go query compiler: detect simple left joins so helper is skipped
+- regenerate `left_join.go`
+- note new join behaviour in Go machine README
 
 ## Testing
-- ✅ Build process completes successfully with optimizations
-- ✅ Dynamic imports compile correctly
-- ✅ Bundle splitting configuration applied without errors
-- ✅ Lint-staged hooks passed with code formatting
+- `go test ./compiler/x/go -tags slow`
+- `go test ./compiler/x/go -tags slow -run TestGoCompiler_ValidPrograms/left_join`
 
-## Link to Devin run
-https://app.devin.ai/sessions/3a33dc1589be45e69203da487719000c
 
-**Requested by:** Yadong (Adam) Zhang (zhyd007@gmail.com)
-",Devin,158243242,devin-ai-integration[bot],closed,2025-06-02T15:00:11Z,2025-06-02T15:15:24Z,,440017777,https://api.github.com/repos/softmaple/softmaple,https://github.com/softmaple/softmaple/pull/216,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""feat: optimize Liveblocks bundle size with dynamic imports and chunk splitting"". The body describes dynamic imports, bundle splitting, reducing bundle size, improving initial page load. This is performance optimization. So label 'performance'.assistantfinalperformance",5,1.0,False
-2973653748,874,Update esbuild to 0.25.2 and optimize SDK size,"- Updated esbuild from 0.14.13 to 0.25.2
-- Added size optimization options (treeShaking, drop, mangleProps, metafile)
-- Updated esbuild API implementation to work with version 0.25.2
-- Verified build works without issues
-
-Link to Devin run: https://app.devin.ai/sessions/11285192f45f4b66b3d0326ecef40f92
-Requested by: jerry@magic.link
-<!-- GITHUB_RELEASE PR BODY: canary-version -->
-<details>
-  <summary>📦 Published PR as canary version: <code>Canary Versions</code></summary>
-  <br />
-
-  :sparkles: Test out this PR locally via:
-  
-  ```bash
-  npm install @magic-ext/algorand@24.0.6-canary.874.14364251287.0
-  npm install @magic-ext/aptos@12.0.6-canary.874.14364251287.0
-  npm install @magic-ext/avalanche@24.0.6-canary.874.14364251287.0
-  npm install @magic-ext/bitcoin@24.0.6-canary.874.14364251287.0
-  npm install @magic-ext/conflux@22.0.6-canary.874.14364251287.0
-  npm install @magic-ext/cosmos@24.0.6-canary.874.14364251287.0
-  npm install @magic-ext/ed25519@20.0.6-canary.874.14364251287.0
-  npm install @magic-ext/farcaster@1.0.6-canary.874.14364251287.0
-  npm install @magic-ext/flow@24.0.6-canary.874.14364251287.0
-  npm install @magic-ext/gdkms@12.0.6-canary.874.14364251287.0
-  npm install @magic-ext/harmony@24.0.6-canary.874.14364251287.0
-  npm install @magic-ext/icon@24.0.6-canary.874.14364251287.0
-  npm install @magic-ext/kadena@1.0.6-canary.874.14364251287.0
-  npm install @magic-ext/near@24.0.6-canary.874.14364251287.0
-  npm install @magic-ext/oauth@23.0.7-canary.874.14364251287.0
-  npm install @magic-ext/oauth2@11.0.6-canary.874.14364251287.0
-  npm install @magic-ext/oidc@12.0.6-canary.874.14364251287.0
-  npm install @magic-ext/polkadot@24.0.6-canary.874.14364251287.0
-  npm install @magic-ext/react-native-bare-oauth@26.0.8-canary.874.14364251287.0
-  npm install @magic-ext/react-native-expo-oauth@26.0.7-canary.874.14364251287.0
-  npm install @magic-ext/solana@26.0.6-canary.874.14364251287.0
-  npm install @magic-ext/sui@1.0.6-canary.874.14364251287.0
-  npm install @magic-ext/taquito@21.0.6-canary.874.14364251287.0
-  npm install @magic-ext/terra@21.0.6-canary.874.14364251287.0
-  npm install @magic-ext/tezos@24.0.6-canary.874.14364251287.0
-  npm install @magic-ext/web3modal-ethers5@1.0.6-canary.874.14364251287.0
-  npm install @magic-ext/webauthn@23.0.6-canary.874.14364251287.0
-  npm install @magic-ext/zilliqa@24.0.6-canary.874.14364251287.0
-  npm install @magic-sdk/commons@25.0.6-canary.874.14364251287.0
-  npm install @magic-sdk/pnp@23.0.7-canary.874.14364251287.0
-  npm install @magic-sdk/provider@29.0.6-canary.874.14364251287.0
-  npm install @magic-sdk/react-native-bare@30.0.7-canary.874.14364251287.0
-  npm install @magic-sdk/react-native-expo@30.0.6-canary.874.14364251287.0
-  npm install magic-sdk@29.0.6-canary.874.14364251287.0
-  # or 
-  yarn add @magic-ext/algorand@24.0.6-canary.874.14364251287.0
-  yarn add @magic-ext/aptos@12.0.6-canary.874.14364251287.0
-  yarn add @magic-ext/avalanche@24.0.6-canary.874.14364251287.0
-  yarn add @magic-ext/bitcoin@24.0.6-canary.874.14364251287.0
-  yarn add @magic-ext/conflux@22.0.6-canary.874.14364251287.0
-  yarn add @magic-ext/cosmos@24.0.6-canary.874.14364251287.0
-  yarn add @magic-ext/ed25519@20.0.6-canary.874.14364251287.0
-  yarn add @magic-ext/farcaster@1.0.6-canary.874.14364251287.0
-  yarn add @magic-ext/flow@24.0.6-canary.874.14364251287.0
-  yarn add @magic-ext/gdkms@12.0.6-canary.874.14364251287.0
-  yarn add @magic-ext/harmony@24.0.6-canary.874.14364251287.0
-  yarn add @magic-ext/icon@24.0.6-canary.874.14364251287.0
-  yarn add @magic-ext/kadena@1.0.6-canary.874.14364251287.0
-  yarn add @magic-ext/near@24.0.6-canary.874.14364251287.0
-  yarn add @magic-ext/oauth@23.0.7-canary.874.14364251287.0
-  yarn add @magic-ext/oauth2@11.0.6-canary.874.14364251287.0
-  yarn add @magic-ext/oidc@12.0.6-canary.874.14364251287.0
-  yarn add @magic-ext/polkadot@24.0.6-canary.874.14364251287.0
-  yarn add @magic-ext/react-native-bare-oauth@26.0.8-canary.874.14364251287.0
-  yarn add @magic-ext/react-native-expo-oauth@26.0.7-canary.874.14364251287.0
-  yarn add @magic-ext/solana@26.0.6-canary.874.14364251287.0
-  yarn add @magic-ext/sui@1.0.6-canary.874.14364251287.0
-  yarn add @magic-ext/taquito@21.0.6-canary.874.14364251287.0
-  yarn add @magic-ext/terra@21.0.6-canary.874.14364251287.0
-  yarn add @magic-ext/tezos@24.0.6-canary.874.14364251287.0
-  yarn add @magic-ext/web3modal-ethers5@1.0.6-canary.874.14364251287.0
-  yarn add @magic-ext/webauthn@23.0.6-canary.874.14364251287.0
-  yarn add @magic-ext/zilliqa@24.0.6-canary.874.14364251287.0
-  yarn add @magic-sdk/commons@25.0.6-canary.874.14364251287.0
-  yarn add @magic-sdk/pnp@23.0.7-canary.874.14364251287.0
-  yarn add @magic-sdk/provider@29.0.6-canary.874.14364251287.0
-  yarn add @magic-sdk/react-native-bare@30.0.7-canary.874.14364251287.0
-  yarn add @magic-sdk/react-native-expo@30.0.6-canary.874.14364251287.0
-  yarn add magic-sdk@29.0.6-canary.874.14364251287.0
-  ```
-</details>
-<!-- GITHUB_RELEASE PR BODY: canary-version -->
-",Devin,158243242,devin-ai-integration[bot],closed,2025-04-05T00:52:56Z,2025-04-09T20:52:26Z,2025-04-09T20:52:26Z,239957242,https://api.github.com/repos/magiclabs/magic-js,https://github.com/magiclabs/magic-js/pull/874,"analysisWe need to classify whether the primary purpose is to improve performance. The PR updates esbuild to 0.25.2 and adds size optimization options (treeShaking, drop, mangleProps, metafile). It also updates API implementation. The title: ""Update esbuild to 0.25.2 and optimize SDK size"". The body mentions size optimization options. This is performance improvement: reducing SDK size, tree shaking, etc. So classification: performance.assistantfinalperformance",5,1.0,False
-3201181526,6,Introduce the project,"Modernize the frontend project to enhance development experience, performance, and maintainability.
-
-This PR comprehensively upgrades the frontend stack to Vue 3.4.21, TypeScript 5.4.3, and Vite 5.2.6, replacing Vuex with Pinia and introducing Element Plus for UI. It also refactors the architecture with clear service and store layers, implements a robust CSS variable-based styling system with multi-theme support, and includes various performance optimizations like code splitting and lazy loading.",Cursor,26037703,liyupi,open,2025-07-04T03:27:32Z,,,970578570,https://api.github.com/repos/liyupi/yu-ai-agent,https://github.com/liyupi/yu-ai-agent/pull/6,"analysisWe need to classify as performance or non-performance. The PR title: ""Introduce the project"" and body: ""Modernize the frontend project to enhance development experience, performance, and maintainability."" It mentions performance optimizations like code splitting and lazy loading. So it's performance-related. So label 'performance'.assistantfinalperformance",5,1.0,False
-3108415971,257,feat: migrate tests from Bun to Vitest with parallel execution,"# Migrate Tests from Bun to Vitest with Parallel Execution
-
-This PR migrates all tests in the Alchemy repository from Bun's test framework to Vitest, enabling parallel test execution for improved performance.
-
-## Changes Made
-
-### Core Migration
-- **Created Vitest test helper** (`alchemy/src/test/vitest.ts`) that replicates the functionality of the existing Bun test helper without modifying the original
-- **Updated 50+ test files** to import from `vitest` instead of `bun:test`
-- **Added Vitest configuration** (`vitest.config.ts`) with parallel execution settings using thread pool
-
-### Test Infrastructure Updates
-- **Enhanced test runner** (`alchemy/src/test/prune.ts`) to support both Bun and Vitest modes
-- **Updated package.json scripts** to include both `test` (Bun) and `test:vitest` (Vitest) options
-- **Modified CI workflow** to use Vitest for test execution with `--vitest` flag
-
-### Compatibility Fixes
-- Fixed Vitest-specific matcher compatibility:
-  - `.toBeNumber()` → `.toBeTypeOf('number')`
-  - `.toBeEmpty()` → `.toHaveLength(0)`
-  - `.toBeArray()` → `.toBeInstanceOf(Array)`
-
-## Key Features
-
-### Parallel Execution
-- Configured Vitest with thread pool for concurrent test execution
-- Tests can now run in parallel across multiple threads
-- Maintains proper scope isolation and resource cleanup
-
-### Backward Compatibility
-- Original Bun test helper remains unchanged
-- Test runner supports both frameworks via command-line flag
-- Existing test patterns and scope management preserved
-
-### Performance Benefits
-- Parallel execution should significantly reduce test suite runtime
-- Thread-based concurrency for CPU-intensive test operations
-- Configurable timeout (120s) for infrastructure tests
+------
+https://chatgpt.com/codex/tasks/task_e_686dc2fa08ac8320bece11662d1b2a58",OpenAI_Codex,1218621,tamnd,closed,2025-07-09T02:26:08Z,2025-07-09T02:26:26Z,2025-07-09T02:26:26Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/6520,5,1.0,False
+3216964251,7004,Optimize joins in Go backend,"## Summary
+- improve join logic in `compiler/x/go` runtime
 
 ## Testing
+- `go test ./compiler/x/go -tags slow` *(fails: cannot use _ as value or type)*
 
-✅ **Verified test execution**: Successfully ran individual test files with Vitest
-✅ **Confirmed scope management**: Resource creation/cleanup working correctly  
-✅ **Lint checks passed**: All formatting and type issues resolved
-✅ **Parallel execution**: Tests running concurrently as expected
-
-## Usage
-
-```bash
-# Run tests with Vitest (new default)
-bun run test:vitest
-
-# Run tests with Bun (legacy)
-bun run test
-
-# Run specific tests with Vitest
-bun vitest run alchemy/test/specific-test.test.ts
-
-# Run tests since specific commit (CI usage)
-bun run test --since HEAD~1 --vitest
-```
-
-## Migration Notes
-
-- All existing test functionality preserved
-- Scope management and resource cleanup working identically
-- Test helper API remains the same for seamless migration
-- CI configured to use Vitest by default
-
----
-
-**Link to Devin run**: https://app.devin.ai/sessions/5725bfed1a764ad5a5b16856689c52b6
-
-**Requested by**: sam (sam@alchemy.run)
-",Devin,158243242,devin-ai-integration[bot],closed,2025-06-02T03:38:52Z,2025-06-02T09:11:49Z,,917974798,https://api.github.com/repos/sam-goodwin/alchemy,https://github.com/sam-goodwin/alchemy/pull/257,"analysisWe need to classify as performance or non-performance. The PR is migrating tests to Vitest with parallel execution, improving performance. Keywords: parallel execution, performance benefits, speed, etc. So it's performance.assistantfinalperformance",5,0.37616884497385644,False
-2790868866,3850,feat(content-sidebar): remove react-router-dom in favor of custom router,"## Description
-Remove react-router-dom dependency and replace with custom NavRouter implementation to reduce bundle size and improve routing control.
-
-## Changes
-- Removed react-router-dom dependency
-- Added custom NavRouter implementation with history package
-- Converted relevant components to TypeScript
-- Updated tests to use react-testing-library
-- Added data-testid attributes for better test coverage
+------
+https://chatgpt.com/codex/tasks/task_e_686ec3cf542483208262312e9f190dbb",OpenAI_Codex,1218621,tamnd,closed,2025-07-09T19:48:47Z,2025-07-09T19:48:58Z,2025-07-09T19:48:58Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7004,5,1.0,False
+3216916039,6987,Optimize Clojure query helpers,"## Summary
+- add helpers for extracting join key expressions
+- emit join key functions in Clojure query compiler
+- speed up `_group_by` using transients
+- use hash join when key functions are provided in `_query`
 
 ## Testing
-- Ran unit tests: ✅ All tests passing
-- Verified navigation in Storybook: ✅ Components render correctly
-- Checked bundle size: ✅ Reduced by removing react-router-dom
-- Verified no unintended i18n changes
+- `go test ./...`
 
-## Link to Devin run
-https://app.devin.ai/sessions/eb002c1fb7e54520bb03d088d3d612aa
-",Devin,158243242,devin-ai-integration[bot],closed,2025-01-15T20:54:58Z,2025-01-23T20:09:25Z,,95743138,https://api.github.com/repos/box/box-ui-elements,https://github.com/box/box-ui-elements/pull/3850,"analysisWe need to classify as performance or non-performance. The PR removes react-router-dom to reduce bundle size and improve routing control. The description says ""reduce bundle size"" and ""improve routing control"". The focus is on bundle size, which is a performance improvement. The keywords: ""reduce bundle size"" is a performance improvement. The instruction says performance-related PR may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. ""bundle size"" is a performance metric. So classify as performance.assistantfinalperformance",5,0.37348023995402424,False
-3275415903,12599,linter: implement pattern-based Jest validation following Vitest approach for binary size optimization,"## Summary
-
-This PR implements pattern-based Jest validation using the same algorithmic approach as Vitest (PR #11384) to achieve binary size reduction while maintaining proper validation of Jest function call chains.
-
-## Problem
-
-The binary size investigation in #9998 identified that `VALID_JEST_FN_CALL_CHAINS` was storing Jest function call patterns inefficiently. The initial approach of completely removing validation was too permissive and could allow invalid Jest chaining patterns.
-
-## Solution
-
-**Pattern-based Jest validation** (following PR #11384 approach):
-```rust
-// Before: static array with 52 entries and binary search lookup
-const VALID_JEST_FN_CALL_CHAINS: [&str; 52] = [
-    ""describe.each"", ""it.concurrent.only.each"", ""test"", // ... 49 more
-];
-
-// After: algorithmic pattern validation
-fn is_valid_jest_call(members: &[Cow<str>]) -> bool {
-    match first {
-        ""describe"" | ""fdescribe"" | ""xdescribe"" => {
-            // Validate modifiers: only, skip, each
-        }
-        ""it"" | ""test"" | ""fit"" | ""xit"" | ""xtest"" => {
-            // Validate modifiers: only, skip, each, concurrent, failing, todo
-        }
-        ""beforeAll"" | ""afterAll"" | ""beforeEach"" | ""afterEach"" | ""bench"" => {
-            // No modifiers allowed
-        }
-        _ => false,
-    }
-}
-```
-
-**Static array optimization**:
-```rust
-// Before
-const JEST_METHOD_NAMES: [&str; 18] = [...];
-
-// After  
-static JEST_METHOD_NAMES: [&str; 18] = [...];
-```
-
-## Benefits
-
-1. **Binary size reduction**: Eliminates 52 validation strings while maintaining validation logic
-2. **Proper validation**: Prevents invalid Jest chaining patterns like `describe.invalidMethod()`
-3. **Better memory efficiency**: Static arrays have better memory layout than const arrays
-4. **Maintainable**: Algorithmic validation is easier to extend than maintaining large static lists
-5. **Consistent approach**: Uses same pattern as Vitest validation (PR #11384)
-
-## Validation Coverage
-
-- ✅ Root functions: `describe`, `it`, `test`, `beforeAll`, `afterAll`, `beforeEach`, `afterEach`, `bench`
-- ✅ Prefixed variants: `fdescribe`, `xdescribe`, `fit`, `xit`, `xtest`
-- ✅ Valid modifiers: `only`, `skip`, `each`, `concurrent`, `failing`, `todo`
-- ✅ Proper chaining rules for each function type
-- ✅ Rejects invalid patterns while accepting all valid Jest calls
+------
+https://chatgpt.com/codex/tasks/task_e_686ebd073530832087825b793466ef82",OpenAI_Codex,1218621,tamnd,closed,2025-07-09T19:25:09Z,2025-07-09T19:25:21Z,2025-07-09T19:25:21Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/6987,5,1.0,False
+3241758610,9484,Improve Clojure join compilation,"## Summary
+- optimize Clojure compiler by translating simple left/right/outer joins to direct comprehensions
+- regenerate outer_join machine translation without `_query` helper
+- update machine README checklist
+- note progress in Clojure TASKS
 
 ## Testing
+- `go test -tags slow ./compiler/x/clj -run TestClojureCompiler_VMValid_Golden/outer_join -count=1`
 
-- ✅ `cargo check -p oxc_linter` passes without warnings
-- ✅ Comprehensive test suite validates all supported Jest patterns
-- ✅ Invalid chaining patterns correctly rejected
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,open,2025-07-30T01:38:39Z,,,599431918,https://api.github.com/repos/oxc-project/oxc,https://github.com/oxc-project/oxc/pull/12599,"analysisWe need to classify whether the primary purpose is performance. The PR is about binary size optimization, reducing binary size by removing static array of 52 entries, algorithmic validation. This is a performance improvement: binary size reduction, memory efficiency. The description says ""binary size reduction"" and ""better memory efficiency"". So it's performance. So label 'performance'.assistantfinalperformance",5,0.3658260118907485,False
-3129029549,2799,Draw down `Wrapper` components and migrate from `styled-components` to SCSS modules,"Successfully migrated 19 components from styled-components to SCSS modules in `packages/app/src/library`, establishing clear patterns for the remaining migration work.
-
-## Changes Made
-
-### Components Migrated (19 total)
-- **StyledSlider** - Simple wrapper conversion
-- **SideMenu/Heading** - Transient props (`$minimised`) → CSS classes
-- **SetupSteps/Header** - Complex wrapper with nested sections
-- **EstimatedTxFee** - Simple wrapper conversion
-- **MainFooter** - Complex component with CSS variables
-- **Stat** - Transient props (`$isAddress`) → CSS classes
-- **NotificationPrompts** - Simple wrapper conversion
-- **SelectItems** - Complex responsive layout with breakpoints
-- **Tooltip** - Simple wrapper conversion
-- **ErrorBoundary** - Multiple conditional classes
-- **Form/Warning** - Simple wrapper conversion
-- **AccountInput** - Complex conditional classes and state
-- **Nominations** - Simple wrapper conversion
-- **Account** - Conditional classes
-- **StatusLabel** - CSS variables as inline styles
-- **ActionItem** - Semantic HTML tags (h3)
-- **QrReader** - Animations and keyframes
-- **PayeeInput** - Complex transient props and state
-
-### Key Infrastructure Added
-- **`_variables.scss`** - Shared SCSS variables for breakpoints, colors, and common values
-- **Consistent patterns** - Established migration patterns for future work
-
-## Migration Patterns Established
-
-### 1. Transient Props → CSS Classes
-```tsx
-// Before (styled-components)
-<Wrapper $isAddress={type === 'address'} />
-
-// After (CSS modules)
-const allClasses = classNames(classes.wrapper, {
-  [classes.isAddress]: type === 'address',
-})
-<div className={allClasses} />
-```
-
-### 2. CSS Variables in SCSS
-```scss
-// _variables.scss
-$network-bar-font-size: 0.9rem;
-$two-threshold: 800px;
-$positive-color: #3eb955;
-
-// Component SCSS
-.wrapper {
-  font-size: $network-bar-font-size;
-  
-  @media (min-width: $two-threshold) {
-    // responsive styles
-  }
-}
-```
-
-### 3. Complex Responsive Layouts
-```scss
-.selectItemsWrapper {
-  &.twoCol {
-    @media (min-width: $two-threshold-min) {
-      > div:nth-child(2n) {
-        padding-right: 0;
-      }
-    }
-  }
-}
-```
-
-### 4. Animations and Keyframes
-```scss
-@keyframes fadeInScale {
-  from {
-    opacity: 0.75;
-    transform: scale(0.75);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.wrapper {
-  animation: fadeInScale 0.2s cubic-bezier(0, 1, 0, 1) forwards;
-}
-```
-
-## Benefits Achieved
-
-1. **Reduced Bundle Size** - Eliminated styled-components overhead for 19 components
-2. **Better Performance** - CSS modules provide better tree-shaking and optimization  
-3. **Improved Maintainability** - Clearer separation between styles and logic
-4. **Better Developer Experience** - CSS autocomplete, better debugging tools
-5. **Standards Compliance** - Moving towards standard CSS approaches
-6. **Type Safety** - CSS modules provide better type safety for class names
-
-## Remaining Work
-
-26 wrapper files remain to be migrated using the established patterns:
-- `Tx/Wrapper.ts`
-- `Card/Wrappers.ts` 
-- `Modal/Wrappers.ts`
-- `Form/Wrappers.ts`
-- And 22 others...
-
-The patterns established in this PR provide a clear roadmap for completing the migration.
-
-Fixes #2798.
-
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-09T03:32:28Z,2025-06-14T07:41:26Z,,456470362,https://api.github.com/repos/polkadot-cloud/polkadot-staking-dashboard,https://github.com/polkadot-cloud/polkadot-staking-dashboard/pull/2799,"analysisWe need to classify as performance or non-performance. The PR is about migrating styled-components to SCSS modules, reducing bundle size, better performance. The primary purpose is to improve performance. So label 'performance'.assistantfinalperformance",5,0.35021056522325644,False
-2777919004,38561,feat: Used ShadowDOM in CustomWidget,"# Replace iFrame with ShadowDOM in CustomWidget
-
-This PR replaces the iFrame-based rendering with ShadowDOM for better isolation in the CustomWidget component.
-
-## Changes
-- Replaced iFrame-based rendering with ShadowDOM for better isolation
-- Updated event handling to use CustomEvents instead of postMessage
-- Added type safety with explicit interfaces
-- Improved performance by removing iFrame overhead
-
-## ⚠️ Important Note
-This is an experimental feature without backward compatibility guarantees. The ShadowDOM implementation may need further refinement based on review feedback.
+------
+https://chatgpt.com/codex/tasks/task_e_6879c147cdfc832088f453a112e75963",OpenAI_Codex,1218621,tamnd,closed,2025-07-18T03:54:44Z,2025-07-18T03:55:13Z,2025-07-18T03:55:13Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9484,5,0.46768839190340017,True
+3216930805,6993,Add hash join optimization for Go backend,"## Summary
+- extend Go runtime `_query` helper with optional hash join support
+- detect simple equality joins and emit `leftKey`/`rightKey` functions
+- new `eqJoinKeys` helper to recognise equality join predicates
 
 ## Testing
-- [ ] Manual testing of widget rendering
-- [ ] Event handling verification needed
-- [ ] Cross-browser compatibility check required
+- `go test ./compiler/x/go -tags slow -run TestGoCompiler_ValidPrograms -count=1`
 
-Link to Devin run: https://app.devin.ai/sessions/685f677d159545038d2d5428db0909e0
-
-## Automation
-
-/ok-to-test tags=""@tag.Widget""
-
-### :mag: Cypress test results
-<!-- This is an auto-generated comment: Cypress test results  -->
-> [!WARNING]
-> Tests have not run on the HEAD d609fd0bcaab3e4f35d671e8020225e5c874fa85 yet
-> <hr>Thu, 09 Jan 2025 18:16:22 UTC
-<!-- end of auto-generated comment: Cypress test results  -->
-",Devin,158243242,devin-ai-integration[bot],closed,2025-01-09T13:58:33Z,2025-01-17T04:56:06Z,,275993885,https://api.github.com/repos/appsmithorg/appsmith,https://github.com/appsmithorg/appsmith/pull/38561,"analysisWe need to classify as performance or non-performance. The PR title: ""feat: Used ShadowDOM in CustomWidget"". Body: mentions replacing iFrame with ShadowDOM for better isolation, improved performance by removing iFrame overhead. That is a performance improvement. So classification: performance.assistantfinalperformance",5,0.3454005430512636,False
-3214086292,2609,Update Async Tests Under Dependencies Extension to Use the Modern AsyncQueue Pattern,"This PR modernizes all async unit tests in the `extensions/applicationinsights-dependencies-js` directory by migrating from the deprecated `testCaseAsync` pattern to the modern `asyncQueue` pattern.
-
-## Changes Made
-
-- **Converted 28 testCaseAsync instances** to use `testCase` with `this._asyncQueue()`
-- **Updated all polling asserts** from `PollingAssert.createPollingAssert` to `PollingAssert.asyncTaskPollingAssert`
-- **Removed deprecated properties**: `stepDelay`, `autoComplete`, and `testContext.testDone()` calls
-- **Implemented Promise-based flow** with `.waitComplete()` for proper async handling
-- **Maintained test functionality** while improving performance and error handling
-
-## Migration Pattern
-
-**Before:**
-```typescript
-this.testCaseAsync({
-    name: ""Test name"",
-    stepDelay: 10,
-    autoComplete: false,
-    steps: [(testContext) => {
-        // test logic
-        testContext.testDone();
-    }]
-});
-```
-
-**After:**
-```typescript
-this.testCase({
-    name: ""Test name"",
-    test: () => {
-        return this._asyncQueue()
-            .add(() => {
-                // test logic
-            })
-            .waitComplete();
-    }
-});
-```
-
-## Benefits
-
-- **Better performance** through improved async task scheduling
-- **Enhanced error handling** and reporting capabilities  
-- **Future-proof** test infrastructure aligned with framework best practices
-- **Automatic detection** by test framework for async test cases
-
-All tests maintain their original functionality while benefiting from the modern async infrastructure.
-
-Fixes #2608.
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,open,2025-07-09T00:27:50Z,,,33373292,https://api.github.com/repos/microsoft/ApplicationInsights-JS,https://github.com/microsoft/ApplicationInsights-JS/pull/2609,"analysisWe need to classify as performance or non-performance. The PR title: ""Update Async Tests Under Dependencies Extension to Use the Modern AsyncQueue Pattern"". The body describes migrating async unit tests to modern asyncQueue pattern, improving async task scheduling, better performance, error handling. The keywords: performance, improved async task scheduling, better performance. The classification: performance. The PR is about improving performance of tests. So label 'performance'.assistantfinalperformance",5,0.31994975255296826,False
-3128226642,8473,feat(root): migrate from ESLint and Prettier to Biome,"# Migrate from ESLint and Prettier to Biome
-
-## Summary
-This PR migrates the entire Novu monorepo from ESLint and Prettier to Biome, providing faster linting and formatting with a unified toolchain.
-
-## Changes Made
-
-### Core Migration
-- ✅ Installed `@biomejs/biome` v1.9.4 as development dependency
-- ✅ Created comprehensive `biome.json` configuration using `biome migrate eslint --write` and `biome migrate prettier --write`
-- ✅ Removed all ESLint dependencies (40+ packages including eslint, typescript-eslint, and all eslint-plugin-* packages)
-- ✅ Removed Prettier dependencies (`prettier`, `prettier-plugin-tailwindcss`)
-
-### Configuration Cleanup
-- ✅ Deleted `eslint.config.mjs` (root ESLint flat config)
-- ✅ Deleted `apps/dashboard/eslint.config.js`
-- ✅ Deleted `libs/internal-sdk/eslint.config.mjs`
-- ✅ Deleted `eslint-local-rules.js` (custom JSX class validation rule)
-- ✅ Deleted `.prettierrc` and `.prettierignore`
-- ✅ Deleted `packages/framework/.prettierrc`
-
-### Package Scripts Update
-- ✅ Updated root `lint` script to use `biome check --write`
-- ✅ Updated lint scripts across 29+ packages to use `biome check` instead of `eslint`
-- ✅ Updated lint:fix scripts to use `biome check --write` instead of `eslint --fix`
-
-### CI/CD Integration
-- ✅ Updated `nx.json` to replace `@nx/eslint:lint` target with `biome:check`
-- ✅ Updated GitHub Actions workflow (`.github/workflows/on-pr.yml`) to use `biome:check` target
-- ✅ Updated OpenAPI validation action to use Biome
-- ✅ Updated lint-staged configuration to use `biome format --write` instead of Prettier
-- ✅ Updated Docker files to copy `biome.json` instead of Prettier configs
-
-## Breaking Changes
-
-### Custom ESLint Rules
-- **Removed**: Custom JSX class validation rule from `eslint-local-rules.js` that enforced `style()` function usage in JSX class attributes
-- **Impact**: This rule is not directly available in Biome and would need alternative implementation if still required
-- **Recommendation**: Consider TypeScript types or build-time checks for similar validation
-
-### Developer Commands
-- **Before**: `pnpm lint` (used ESLint via Nx)
-- **After**: `pnpm lint` (now uses `biome check --write`)
-- **Before**: Individual package lint scripts used `eslint`
-- **After**: Individual package lint scripts use `biome check`
-
-## Benefits
-- 🚀 **Performance**: Biome is significantly faster than ESLint + Prettier (written in Rust)
-- 🔧 **Simplified toolchain**: One tool instead of ESLint + Prettier + multiple plugins
-- 📦 **Reduced dependencies**: Removed 40+ ESLint-related packages
-- ⚡ **Faster CI**: Improved performance in GitHub Actions workflows
-- 🛠️ **Better DX**: Unified configuration and consistent behavior
+------
+https://chatgpt.com/codex/tasks/task_e_686ebcd8ecfc8320a0253441d3a464f9",OpenAI_Codex,1218621,tamnd,closed,2025-07-09T19:32:09Z,2025-07-09T19:32:24Z,2025-07-09T19:32:23Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/6993,5,0.41198515120054113,False
+3183195813,3870,Improve TPCH query compilation,"## Summary
+- add `_hash_combine` runtime helper for hashing struct keys
+- track element types for query variables when compiling
+- generate struct keys for grouped queries when the key is a map literal
 
 ## Testing
-- ✅ All package.json lint scripts updated and verified
-- ✅ Dependencies successfully removed from lockfile
-- ✅ GitHub Actions workflow targets updated
-- ⏳ CI validation pending
+- `go test ./... -tags=slow` *(fails: signal interrupt)*
 
-## Migration Notes
-The migration used Biome's official migration commands which automatically mapped ESLint rules to their Biome equivalents. The generated `biome.json` includes:
-- Comprehensive linting rules covering complexity, style, and suspicious patterns
-- Package-specific overrides for different project types (apps, libs, packages)
-- Proper ignore patterns and file type handling
-- Formatter configuration matching previous Prettier settings
-
-## Link to Devin run
-https://app.devin.ai/sessions/74c779f7bc00435eb947a3af95343628
-
-## Requested by
-Dima Grossman (dima@novu.co)
-",Devin,158243242,devin-ai-integration[bot],closed,2025-06-08T11:00:45Z,2025-06-08T13:00:23Z,,400215964,https://api.github.com/repos/novuhq/novu,https://github.com/novuhq/novu/pull/8473,"analysisWe need to classify as 'performance' or 'non-performance'. The PR is migrating from ESLint and Prettier to Biome, claiming faster linting and formatting, improved performance. The description explicitly says ""Performance: Biome is significantly faster than ESLint + Prettier"". So it's a performance improvement. So label 'performance'.assistantfinalperformance",5,0.3089227943426813,False
-3145702280,2826,Move BarChart to ui-graphs package with SCSS modules and bigint support,"This PR migrates the `BarChart` components from `packages/app/src/library/BarChart` to the `ui-graphs` package, following the established patterns and conventions of the ui-graphs package.
-
-## Key Changes
-
-### 🏗️ Component Migration
-- **Moved** all BarChart components from `app/library` to `ui-graphs/src/BarChart/`
-- **Converted** styled-components in `Wrappers.ts` to native SCSS modules (`index.module.scss`)
-- **Updated** component structure to follow ui-graphs conventions
-
-### 🔧 Type System Improvements
-- **Replaced** `BigNumber` with `bigint` for better performance and type safety
-- **Updated** `BondedChart` to accept `bigint` values directly instead of converting from `BigNumber`
-- **Enhanced** prop interfaces to support both individual components and composite usage
-
-### 🎯 Dependency Management
-- **Removed** dependencies on app-specific hooks (`useTranslation`, `useHelp`)
-- **Refactored** components to accept labels and help callbacks as props
-- **Maintained** backward compatibility for existing usage patterns
-
-### 📦 Package Structure
-- **Added** proper exports in `ui-graphs/src/index.tsx`
-- **Updated** all imports across the app to use `ui-graphs` exports
-- **Removed** legacy `BarChart` directory from app package
-
-## Files Updated
-
-### New Components in `ui-graphs`
-- `BarChart/index.module.scss` - SCSS module replacing styled-components
-- `BarChart/BarSegment.tsx` - Individual bar segment component
-- `BarChart/LegendItem.tsx` - Legend item with optional help support
-- `BarChart/BondedChart.tsx` - Main chart component with bigint support
-- `BarChart/Wrappers.tsx` - Container components using SCSS classes
-- `BarChart/types.ts` - Updated type definitions
-- `BarChart/defaults.ts` - Configuration constants
-
-### Updated App Components
-- `pages/Pools/ManageBond.tsx` - Updated to use new BarChart API
-- `pages/Nominate/Active/ManageBond.tsx` - Updated to use new BarChart API  
-- `pages/Overview/AccountBalance/BalanceChart.tsx` - Updated imports for individual components
-
-## Before/After Usage
-
-### Before (BigNumber + styled-components)
-```tsx
-import { BondedChart } from 'library/BarChart/BondedChart'
-
-<BondedChart
-  active={new BigNumber(planckToUnit(active, units))}
-  free={new BigNumber(planckToUnit(free, units))}
-  // ... other BigNumber conversions
-/>
-```
-
-### After (bigint + SCSS modules)
-```tsx
-import { BondedChart } from 'ui-graphs'
-
-<BondedChart
-  active={active}          // Direct bigint usage
-  free={free}             // No conversion needed
-  labels={{
-    bonded: t('bonded'),
-    free: t('free'),
-    // ... localized labels
-  }}
-  unit={unit}
-  units={units}
-  onHelpClick={openHelp}
-/>
-```
-
-## Benefits
-- ✅ **Better separation of concerns** - UI components now in dedicated ui-graphs package
-- ✅ **Improved performance** - Direct bigint usage eliminates BigNumber conversions
-- ✅ **Consistent styling** - SCSS modules align with other ui-graphs components
-- ✅ **Type safety** - Enhanced TypeScript support with proper bigint types
-- ✅ **Maintainability** - Centralized graph components reduce duplication
+------
+https://chatgpt.com/codex/tasks/task_e_685eaef2a7948320bb16d7ecb29e4d9a",OpenAI_Codex,1218621,tamnd,closed,2025-06-27T15:20:18Z,2025-06-27T15:24:55Z,2025-06-27T15:24:55Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3870,5,0.3950254819943527,False
+3216962602,7003,Improve TS query compile,"## Summary
+- add hash-based join helper in TS runtime
+- detect simple equality joins to use hashed join
+- expose joinEqFields helper
 
 ## Testing
-- ✅ TypeScript compilation passes for both packages
-- ✅ ESLint and Prettier formatting passes
-- ✅ All existing functionality preserved
-- ✅ Components render correctly with new bigint API
+- `go test ./...`
 
-Fixes #2825.
+------
+https://chatgpt.com/codex/tasks/task_e_686ebcf0eeb88320848cda5d4534bc8c",OpenAI_Codex,1218621,tamnd,closed,2025-07-09T19:48:00Z,2025-07-09T19:48:11Z,2025-07-09T19:48:11Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7003,5,0.38088484478876283,False
+3240935078,280,Resolve db self-join memory bug,"Add comprehensive self-join tests to verify correct behavior and investigate a reported cartesian product bug.
 
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-06-14T07:45:53Z,2025-06-14T11:32:29Z,,456470362,https://api.github.com/repos/polkadot-cloud/polkadot-staking-dashboard,https://github.com/polkadot-cloud/polkadot-staking-dashboard/pull/2826,"analysisWe need to classify as performance or non-performance. The PR mentions ""Improved performance - Direct bigint usage eliminates BigNumber conversions"". That is a performance improvement. Also mentions ""Better separation of concerns"" but performance is explicitly mentioned. So classification: performance.assistantfinalperformance",5,0.29002491969897637,False
-3084907353,2209,[SymbolReader] Make symbol server timeout configurable and remove dead server mechanism,"## Changes Made
-
-This PR addresses two issues with symbol server resolution in PerfView:
-
-1. Makes the symbol server timeout configurable by adding a new `ServerTimeout` property to the `SymbolReader` class with a default value of 60 seconds (matching the previous hard-coded behavior).
-
-2. Removes the ""mark as dead"" functionality for servers, which means that subsequent requests will still go through after a timeout, rather than blocking a server for 5 minutes after a failure.
-
-These changes will significantly improve PerfView's behavior in slower network environments by:
-- Allowing users to increase the timeout duration for symbol resolution
-- Preventing symbol servers from being blocked after a timeout, which improves the chance of resolving symbols on subsequent attempts
-
-### Implementation Details
-
-- Added a new `ServerTimeout` property to control the timeout behavior
-- Removed code that maintained a list of ""dead servers"" along with their tracking timestamps
-- Updated log messages to reflect the new behavior
-- Made minimal changes to maintain compatibility with existing code
-
-Fixes #1895.
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `crl3.digicert.com`
->   - Triggering command: `dotnet build /p:Configuration=Release ` (dns block)
->   - Triggering command: `dotnet build src/TraceEvent/TraceEvent.csproj /p:Configuration=Release ` (dns block)
-> - `crl4.digicert.com`
->   - Triggering command: `dotnet build /p:Configuration=Release ` (dns block)
->   - Triggering command: `dotnet build src/TraceEvent/TraceEvent.csproj /p:Configuration=Release ` (dns block)
-> - `ocsp.digicert.com`
->   - Triggering command: `dotnet build /p:Configuration=Release ` (dns block)
->   - Triggering command: `dotnet build src/TraceEvent/TraceEvent.csproj /p:Configuration=Release ` (dns block)
-> - `s.symcb.com`
->   - Triggering command: `dotnet build /p:Configuration=Release ` (dns block)
->   - Triggering command: `dotnet build src/TraceEvent/TraceEvent.csproj /p:Configuration=Release ` (dns block)
-> - `s.symcd.com`
->   - Triggering command: `dotnet build /p:Configuration=Release ` (dns block)
->   - Triggering command: `dotnet build src/TraceEvent/TraceEvent.csproj /p:Configuration=Release ` (dns block)
-> - `ts-crl.ws.symantec.com`
->   - Triggering command: `dotnet build /p:Configuration=Release ` (dns block)
->   - Triggering command: `dotnet build src/TraceEvent/TraceEvent.csproj /p:Configuration=Release ` (dns block)
-> - `ts-ocsp.ws.symantec.com`
->   - Triggering command: `dotnet build /p:Configuration=Release ` (dns block)
->   - Triggering command: `dotnet build src/TraceEvent/TraceEvent.csproj /p:Configuration=Release ` (dns block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
-
-
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-05-23T01:35:35Z,2025-05-27T15:36:02Z,2025-05-27T15:36:01Z,33010673,https://api.github.com/repos/microsoft/perfview,https://github.com/microsoft/perfview/pull/2209,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""[SymbolReader] Make symbol server timeout configurable and remove dead server mechanism"". The body: It addresses symbol server timeout, making it configurable, removing dead server mechanism. It says ""These changes will significantly improve PerfView's behavior in slower network environments by: Allowing users to increase the timeout duration for symbol resolution; Preventing symbol servers from being blocked after a timeout, which improves the chance of resolving symbols on subsequent attempts"". This is about performance? It's about improving behavior in slower network environments, but is it performance? The keywords: ""timeout"", ""slower network environments"", ""improve the chance of resolving symbols"". It's about reliability and maybe performance. The instruction says performance-related PRs may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs. The body contains ""slower network environments"" and ""improve the chance of resolving symbols"". It doesn't explicitly mention performance, but it does mention ""timeout"" and ""slower network environments"". The instruction says ""or any other terms referring to how faster and efficiently software runs."" This is about improving performance? It might be considered performance improvement. The PR is about making timeout configurable and removing dead server mechanism to improve symbol resolution. That is a performance improvement. So classify as 'performance'.
-
-Thus answer: performance.assistantfinalperformance",5,0.2611606304860789,False
-3137902575,5212,Build: Use --follow-symlinks in VSCE,"This PR implements support for the new `--follow-symlinks` flag in VSCE to eliminate the unnecessary copying of PowerShell Editor Services (PSES) modules during builds, as requested in #5169.
-
-## What Changed
-
-**Package.json Scripts:**
-- Added `--follow-symlinks` flag to both `vsce package` and `vsce publish` commands
-- This allows VSCE to handle symbolic links natively instead of requiring file copies
-
-**Build Script Simplification:**
-- Removed complex symlink-to-copy conversion logic from the Package task (eliminated 8 lines)
-- Modified Release configuration to use symlinks consistently with Debug mode
-- Removed the ""dumb task of copying PSES to vscode for a build"" as mentioned in the issue
-- Added explanatory comments about the new VSCE symlink support
-
-## Benefits
-
-- ✅ **Faster builds** - No more file copying during packaging
-- ✅ **Simplified logic** - Consistent symlink handling between Debug and Release modes  
-- ✅ **Reduced complexity** - Net reduction of 10+ lines of build script code
-- ✅ **Better maintainability** - VSCE now handles symlinks natively
-
-## Before/After Comparison
-
-**Before:** Build script would detect symlinks and convert them to copies before packaging:
-```powershell
-if ((Get-Item ./modules -ErrorAction SilentlyContinue).LinkType -eq ""SymbolicLink"") {
-    Write-Build DarkRed ""PSES is a symbolic link, replacing with copy!""
-    Remove-BuildItem ./modules
-    Copy-Item -Recurse -Force ""$(Split-Path (Get-EditorServicesPath))/module"" ./modules
-}
-```
-
-**After:** VSCE handles symlinks directly with `--follow-symlinks` flag:
-```json
-""package"": ""vsce package --out out/ --no-gitHubIssueLinking --follow-symlinks""
-```
-
-This change leverages the symlink following support added to VSCE in October 2024 ([microsoft/vscode-vsce@51e122a](https://github.com/microsoft/vscode-vsce/commit/51e122af452144b12c5231a2615a81404fda32a1)).
-
-Fixes #5169.
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `0t3vsblobprodcus362.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `11vvsblobprodcus336.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `1javsblobprodcus364.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `1k9vsblobprodcus379.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `1oavsblobprodcus350.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `1p7vsblobprodcus324.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `1s1vsblobprodcus386.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `2kmvsblobprodcus39.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `2zrvsblobprodcus388.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `37bvsblobprodcus311.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `37cvsblobprodcus359.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `4m6vsblobprodcus384.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
-> - `4myvsblobprodcus32.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `4vyvsblobprodcus361.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `4zjvsblobprodcus390.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
-> - `51yvsblobprodcus36.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `5dkvsblobprodcus355.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
-> - `5rqvsblobprodcus385.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `6s7vsblobprodcus313.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
-> - `7devsblobprodcus323.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `7k6vsblobprodcus337.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `7tjvsblobprodcus341.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
-> - `80zvsblobprodcus35.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `8xbvsblobprodcus382.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `96bvsblobprodcus338.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `ajhvsblobprodcus363.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `bcnvsblobprodcus378.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `c50vsblobprodcus330.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `c78vsblobprodcus322.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
-> - `cflvsblobprodcus383.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `/home/REDACTED/work/_temp/ghcca-node/node/bin/node /home/REDACTED/work/_temp/copilot-developer-action-main/dist/index.js ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `ckzvsblobprodcus347.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
-> - `d0svsblobprodcus381.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `dlbvsblobprodcus316.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
-> - `e7bvsblobprodcus348.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `fdpvsblobprodcus345.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
-> - `frdvsblobprodcus327.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `gbsvsblobprodcus365.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `gervsblobprodcus329.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `h6tvsblobprodcus346.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `i1qvsblobprodcus353.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `ibzvsblobprodcus369.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
-> - `imzvsblobprodcus368.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `jd4vsblobprodcus366.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `josvsblobprodcus372.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `jrqvsblobprodcus343.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `k0ivsblobprodcus356.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `k4kvsblobprodcus344.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `kgfvsblobprodcus314.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `kh4vsblobprodcus325.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `kijvsblobprodcus387.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `kmuvsblobprodcus389.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `kxqvsblobprodcus376.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `l49vsblobprodcus358.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `l7avsblobprodcus319.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `ljcvsblobprodcus317.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `lylvsblobprodcus31.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `m16vsblobprodcus374.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
-> - `m6xvsblobprodcus342.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `m8dvsblobprodcus37.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `mfjvsblobprodcus373.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `n3kvsblobprodcus335.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
-> - `nn8vsblobprodcus340.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `o3svsblobprodcus318.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `ofvvsblobprodcus315.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `p2ovsblobprodcus312.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
-> - `pc2vsblobprodcus360.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `pdfvsblobprodcus380.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `pe3vsblobprodcus354.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
-> - `pe4vsblobprodcus351.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `pkvvsblobprodcus321.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `rcxvsblobprodcus328.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `s4uvsblobprodcus326.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `s8mvsblobprodcus38.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `/home/REDACTED/work/_temp/ghcca-node/node/bin/node /home/REDACTED/work/_temp/copilot-developer-action-main/dist/index.js ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `sc4vsblobprodcus331.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `se1vsblobprodcus349.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `sqdvsblobprodcus333.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `st8vsblobprodcus339.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `tphvsblobprodcus375.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `u3hvsblobprodcus371.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `u6ovsblobprodcus377.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `ukkvsblobprodcus352.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `uy6vsblobprodcus34.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `v53vsblobprodcus320.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `vb4vsblobprodcus33.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `vwvvsblobprodcus334.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `x3yvsblobprodcus370.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `xupvsblobprodcus332.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
-> - `yluvsblobprodcus367.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `yttvsblobprodcus357.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
-> - `ytvvsblobprodcus310.vsblob.vsassets.io`
->   - Triggering command: `npm ci                                        ` (dns block)
->   - Triggering command: `npm ci                                     ` (dns block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
-
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-06-11T19:33:46Z,,,42131201,https://api.github.com/repos/PowerShell/vscode-powershell,https://github.com/PowerShell/vscode-powershell/pull/5212,"analysisWe need to classify as performance or non-performance. The PR is about adding --follow-symlinks to VSCE to eliminate unnecessary copying of modules during builds, resulting in faster builds. It explicitly mentions ""Faster builds"" and ""No more file copying during packaging"". This is a performance improvement. So classification: performance.assistantfinalperformance",5,0.2551274730410403,False
-3200433499,4495,Migrate eBPF for Windows from packages.config to PackageReference NuGet style,"This PR migrates eBPF for Windows from the legacy `packages.config` NuGet format to the modern `PackageReference` format, improving dependency management and build performance.
-
-## Changes Made
-
-### 🔄 Package Reference Migrations
-- **libs/elf_spec/elf_spec.vcxproj**: Converted EverParse package to PackageReference and updated tool path to use `$(PkgEverParse)` variable
-- **installer/ebpf-for-windows.wixproj**: Converted WiX toolset package to PackageReference and updated import paths to use `$(PkgWiX)` variable
-- **Directory.Build.props**: Added centralized PackageReference declarations for all Windows SDK and WDK packages
-
-### 🛠️ Build System Updates
-- **wdk.props**: Updated to use PackageReference variables (`$(PkgMicrosoft_Windows_*)`) instead of hardcoded packages directory paths
-- **tests/sample/sample.vcxproj**: Updated PowerShell script parameters to use project-relative paths instead of solution-level packages directory
-
-### 🗑️ Cleanup
-Removed all `packages.config` files:
-- `libs/elf_spec/packages.config`
-- `installer/packages.config`
-- `scripts/setup_build/packages.config`
-- `scripts/setup_build/packages.config.template`
-
-### 📚 Documentation
-- Updated `docs/GettingStarted.md` to reflect new package cache directory structure
-
-## Package References Added
-
-All packages now use version `10.0.26100.3323`:
-- `Microsoft.Windows.SDK.CPP`
-- `Microsoft.Windows.SDK.CPP.arm64`
-- `Microsoft.Windows.SDK.CPP.x64`
-- `Microsoft.Windows.SDK.CPP.x86`
-- `Microsoft.Windows.WDK.ARM64`
-- `Microsoft.Windows.WDK.x64`
-- `Microsoft.Windows.WDK.x86`
-
-Plus individual packages:
-- `EverParse` (2022.6.13)
-- `WiX` (3.14.1)
-
-## Benefits
-
-✅ **Simplified dependency management** - Packages automatically restored and cached globally  
-✅ **Better build performance** - Eliminates solution-level packages directory  
-✅ **Improved CI/CD** - More reliable package restore in build pipelines  
-✅ **Modern tooling alignment** - Follows current .NET ecosystem best practices  
-✅ **Reduced repository size** - No more committed packages directory
+The bug report described self-joins causing memory exhaustion and cartesian products. These new tests, including scenarios with larger datasets and `limit`, demonstrate that the core `db` join logic correctly handles self-joins without producing cartesian products. This suggests the reported issue might stem from the `useLiveQuery` integration or an environment-specific factor, as the underlying join mechanism appears to be working as expected.",Cursor,31130,samwillis,closed,2025-07-17T21:15:07Z,2025-07-18T10:18:19Z,,946895816,https://api.github.com/repos/TanStack/db,https://github.com/TanStack/db/pull/280,5,0.3588424537779724,False
+3186037018,3948,Optimize inner join in VM,"## Summary
+- tune inner join code generation
+- regenerate benchmark results
+- update join benchmark documentation
 
 ## Testing
+- `go test ./...`
+- `go run cmd/mochi-bench/main.go`
 
-The migration maintains backward compatibility where possible. Key areas to verify:
-- Package restore works correctly on clean builds
-- WDK/SDK tools are accessible via new paths
-- PowerShell build scripts function with updated parameters
-- All project configurations build successfully
 
-Fixes #4494.
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-03T19:28:42Z,2025-07-03T20:34:15Z,,355718757,https://api.github.com/repos/microsoft/ebpf-for-windows,https://github.com/microsoft/ebpf-for-windows/pull/4495,"analysisWe need to classify as performance or non-performance. The PR is about migrating NuGet package format to improve dependency management and build performance. The description says ""improving dependency management and build performance."" But is the primary purpose to improve performance? The keywords: ""build performance"" is mentioned. But the main goal is migrating to PackageReference. That is more about build system improvement, not necessarily performance. However, the description explicitly says ""improving dependency management and build performance."" The classification rule: performance-related PRs may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs.
-
-The PR contains ""build performance"" and ""performance"" keyword. So it qualifies as performance. The primary purpose is to improve build performance. So classify as 'performance'.assistantfinalperformance",5,0.2534855095815222,False
-3080933474,8363,fix(api): Update mocha configuration to use SWC instead of ts-node,"# feat(api): Update API tests to use SWC instead of ts-node
-
-## Description
-This PR updates the mocha configuration in the API tests to use SWC instead of ts-node for compilation. This aligns the test environment with the existing NestJS runtime that already uses SWC, which should improve test execution speed.
-
-## Changes
-- Updated `.mocharc.json` to use a custom SWC register script instead of ts-node/register
-- Updated `.vscode/settings.json` to use the custom SWC register script for the VS Code Mocha explorer
-- Updated test scripts in `package.json` to use the custom SWC register script instead of ts-node/register
-- Added @swc/register and @swc/core as dev dependencies in the API service
-- Created a custom SWC register script (swc-register.js) that uses:
-  - ts-node for .source directory files (which contain ES modules)
-  - SWC for all other TypeScript files
-- Refactored the code to break circular dependencies between PromoteNotificationTemplateChange, ApplyChange, and PromoteChangeToEnvironment classes:
-  - Created an interface (INotificationTemplateChangeService) to decouple the classes
-  - Updated the PromoteNotificationTemplateChange class to implement this interface
-  - Updated the PromoteChangeToEnvironment class to use the interface instead of direct imports
-  - Updated the change.module.ts file to provide the interface implementation
-- Fixed enterprise package imports in billing e2e tests to use require() instead of import for better SWC compatibility
-- Added S3 mocking in setup.ts to handle LocalStack connection issues during tests
-- Created a MockStorageService to use during tests instead of the real S3 service
-- Updated shared.module.ts to use the MockStorageService during tests
-
-## Technical Details
-
-### Circular Dependencies
-SWC's handling of circular dependencies is different from ts-node. We resolved this by:
-- Creating an interface (`INotificationTemplateChangeService`)
-- Implementing the interface in `PromoteNotificationTemplateChange`
-- Using dependency injection with a provider token in `change.module.ts`
-- Updating `PromoteChangeToEnvironment` to inject the interface instead of the class
-
-### ES Module Compatibility
-SWC had issues with ES module syntax in the `.source` directory. We solved this with a hybrid approach:
-- Created a custom register script (`swc-register.js`) that uses ts-node for `.source` directory files
-- Used SWC for all other TypeScript files
-- Configured the SWC settings to optimize for circular dependencies and NestJS compatibility
-
-### S3 Storage Mocking
-Tests were failing with ""connect ECONNREFUSED 127.0.0.1:4566"" errors when trying to connect to LocalStack S3. We addressed this by:
-- Mocking the S3Client in setup.ts to handle all S3 operations without requiring a real S3 service
-- Creating a MockStorageService that implements the StorageService interface for use during tests
-- Updating shared.module.ts to use the MockStorageService during tests
-
-This approach maintains compatibility with existing code while giving us the performance benefits of SWC for most of the codebase.
-
-## Known Issues
-- Some tests in trigger-event-topic.e2e.ts are still failing with ""expected +0 to equal 1"" errors. These tests expect messages and notifications to be created, but none are being created. This is likely due to issues with the worker service or the S3 mocking.
+------
+https://chatgpt.com/codex/tasks/task_e_68611419206083209e3be1b1abf8c6b2",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T10:40:41Z,2025-07-01T03:06:08Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3948,5,0.29616818219474805,False
+3184544966,3893,Improve VM join performance,"## Summary
+- optimize OpAppend to mutate lists in place when safe
+- update query compilation to use in-place append for joins
 
 ## Testing
-The changes have been tested locally with the API e2e tests using the following command:
-```
-npm run test:e2e:novu-v2
-```
+- `go test ./...`
 
-## Link to Devin run
-https://app.devin.ai/sessions/b4082ec73d3a45bc9ce9cc7df897fe28
-
-## Requested by
-Dima Grossman (dima@novu.co)
-
-
-<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
-
-## Summary by CodeRabbit
-
-- **Breaking Changes**
-  - Removed several notification statistics, subscriber, and integration-related API functions and React Query hooks, including those for activity stats, chat OAuth, and paginated subscriber lists.
-  - The `feedId` field in notification feed items is now optional and can be null.
-  - The `dataSchema` and `variables` properties in some API responses are now generic objects, no longer strictly typed.
-- **Improvements**
-  - Expanded and clarified documentation across many SDK and React Query functions for better understanding of API usage and requirements.
-- **Bug Fixes**
-  - Increased test timeouts and improved test environment setup for more reliable automated testing.
-- **Chores**
-  - Updated SDK metadata and dependency versions. Added new spell-check dictionary entries.
-
-<!-- end of auto-generated comment: release notes by coderabbit.ai -->",Devin,158243242,devin-ai-integration[bot],closed,2025-05-21T17:17:57Z,2025-05-23T11:06:52Z,2025-05-23T11:06:52Z,400215964,https://api.github.com/repos/novuhq/novu,https://github.com/novuhq/novu/pull/8363,"analysisWe need to classify as performance or non-performance. The PR updates mocha config to use SWC instead of ts-node, which should improve test execution speed. Also mentions performance benefits. So it's performance. The classification: 'performance'.assistantfinalperformance",5,0.24711444100015864,True
-3132024225,1623,"fix: refactor EBS snapshots module (issue #665, #1414)","## Summary
-- migrate snapshots intel module to datamodel, fixing perf and stability issues in #665 and #1414
-- add datamodel for EBSSnapshot
-- update integration tests
-- update AGENTS.md guidance
-
-Testing and proof this works:
-<img width=""547"" height=""788"" alt=""Screenshot 2025-07-17 at 9 25 34 PM"" src=""https://github.com/user-attachments/assets/5e799fc1-37df-458c-96ea-0a13261f0832"" />
-
-<img width=""1060"" height=""562"" alt=""image"" src=""https://github.com/user-attachments/assets/a23e4506-fec6-440a-a075-e7de47f816e9"" />
-",OpenAI_Codex,46503781,achantavy,closed,2025-06-10T03:26:37Z,2025-07-18T17:26:45Z,2025-07-18T17:26:45Z,172811550,https://api.github.com/repos/cartography-cncf/cartography,https://github.com/cartography-cncf/cartography/pull/1623,"analysisWe need to classify as performance or non-performance. The PR title: ""fix: refactor EBS snapshots module (issue #665, #1414)"". Summary: ""migrate snapshots intel module to datamodel, fixing perf and stability issues in #665 and #1414"". It mentions ""perf"" and ""stability issues"". So it's performance-related. Also includes ""fixing perf"". So classification: performance.assistantfinalperformance",5,0.24639839404156721,False
-2766896431,982,Replace motion library with Tailwind transitions in EditPanel,"Replaces motion library implementation with Tailwind transitions for elements in the EditPanel to improve performance.
-
-## Changes
-- Removed motion library dependency from EditPanel components
-- Replaced motion.div elements with regular div elements
-- Added Tailwind transition classes for animations
-- Improved performance by removing runtime animation library dependency
-
-## Components Updated
-- NestedInputs.tsx
-- TagDetails.tsx
-- DisplayInput.tsx
-- BorderInput.tsx
+------
+https://chatgpt.com/codex/tasks/task_e_685f6a8120fc83208b4b3d7a0559b324",OpenAI_Codex,1218621,tamnd,closed,2025-06-28T04:16:33Z,2025-06-30T15:09:50Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3893,5,0.20738286693858624,False
+3186007005,3945,Improve join performance with hashed left join,"## Summary
+- add hash-based optimization for left joins
+- regenerate left join IR after optimization
+- update join benchmarks to reflect faster joins
 
 ## Testing
-- Verified all components compile without errors
-- Ran lint and build checks successfully
-- Confirmed transitions work correctly with Tailwind classes
+- `go run ./cmd/mochi run tests/vm/valid/inner_join.mochi --ir` *(fails: unknown flag)*
 
-Link to Devin run: https://app.devin.ai/sessions/e2fe8d543a2441e39a1e82af89642bc7",Devin,158243242,devin-ai-integration[bot],closed,2025-01-03T02:44:37Z,2025-01-06T22:07:34Z,,820087727,https://api.github.com/repos/onlook-dev/onlook,https://github.com/onlook-dev/onlook/pull/982,"analysisWe need to classify as performance or non-performance. The PR title: ""Replace motion library with Tailwind transitions in EditPanel"". Body says ""improve performance"" by removing runtime animation library dependency. So it's performance. So output 'performance'.assistantfinalperformance",5,0.20066824568428682,False
-2782133644,1016,refactor: remove framer-motion animations from ShareProject and ChatInput components,"# Remove Framer Motion animations from ShareProject and ChatInput components
 
-## Changes
-- Removed AnimatePresence and motion components from ShareProject/index.tsx
-- Removed AnimatePresence and motion components from ChatInput.tsx
-- Replaced animated components with static div elements
-- Preserved core functionality without animations
-
-## Impact
-- Improved performance by removing MobX-triggered animations
-- Reduced unnecessary re-renders from observable state changes
-- Simplified component structure and reduced bundle size
-- Maintained core functionality while removing animation overhead
+------
+https://chatgpt.com/codex/tasks/task_e_68610e47c0148320adf72b2fe8c94159",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T10:11:15Z,2025-06-29T10:23:01Z,2025-06-29T10:23:01Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3945,5,0.08470540906389264,False
+3186315425,3985,Add hashed outer join optimization,"## Summary
+- optimize join handling by adding `compileHashOuterJoin`
+- regenerate IR outputs for dataset JOB and VM tests
 
 ## Testing
-- Build succeeds without errors
-- Core functionality remains intact
-- UI transitions now happen instantly instead of animated
+- `go test -tags slow ./tests/vm -run TestVM_IR -update`
+- `go run ./tools/update_job/main.go`
+- `go run ./tools/update_tpch/main.go` *(fails: index out of range)*
 
-Link to Devin run: https://app.devin.ai/sessions/a8b3d35e051246a3a80a097ddc020f10
-",Devin,158243242,devin-ai-integration[bot],closed,2025-01-11T20:26:17Z,2025-01-11T20:46:23Z,,820087727,https://api.github.com/repos/onlook-dev/onlook,https://github.com/onlook-dev/onlook/pull/1016,"analysisWe need to classify as performance or non-performance. The PR removes framer-motion animations, claims improved performance by removing MobX-triggered animations, reduced re-renders, simplified component structure, reduced bundle size. That is performance improvement. So label 'performance'.assistantfinalperformance",5,0.17782978875159025,False
-3100224074,431,chore: simplify project selector,"## Summary
-- remove intermediate ProjectSelectOption state
-- use projects directly to populate list
-
-<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
-
-## Summary by CodeRabbit
-
-- **Refactor**
-  - Streamlined the project selector for improved performance and responsiveness by simplifying how projects are displayed and selected. No visible changes to the user interface.
-
-<!-- end of auto-generated comment: release notes by coderabbit.ai -->",OpenAI_Codex,199983080,aipolabs-credentials,closed,2025-05-29T12:40:47Z,2025-05-29T17:45:23Z,2025-05-29T17:45:22Z,859956307,https://api.github.com/repos/aipotheosis-labs/aci,https://github.com/aipotheosis-labs/aci/pull/431,"analysisWe need to classify as performance or non-performance. The PR title: ""chore: simplify project selector"". Body: mentions removing intermediate state, using projects directly to populate list. Also says ""Streamlined the project selector for improved performance and responsiveness by simplifying how projects are displayed and selected."" That indicates performance improvement. So classify as 'performance'.assistantfinalperformance",5,0.17598160067567983,False
-3219932316,2108,Add Get-SqlDscServerProtocol public command with CIM support,"## Summary
-
-Implements the enhancement requested in issue #2104 by creating a new public command `Get-SqlDscServerProtocol` that provides access to SQL Server protocol information using CIM instances with SMO fallback support.
-
-## Changes Made
-
-### New Public Command
-- **`Get-SqlDscServerProtocol`**: New public command that replaces the need to use the private `Get-ServerProtocolObject` function directly
-- Supports all three SQL Server network protocols: `TcpIp`, `NamedPipes`, and `SharedMemory`
-- Includes comprehensive comment-based help with examples
-
-### CIM Instance Implementation
-- **`Get-ServerProtocolObjectByCim`**: New private function implementing CIM-based approach as suggested in the issue
-- Automatically detects SQL Server version and uses appropriate namespace (supports SQL Server 2008-2022)
-- Uses `Get-CimInstance -ClassName 'ServerNetworkProtocol'` for better performance
-
-### SMO Fallback Support
-- **`Get-ServerProtocolObjectBySmo`**: Extracted existing SMO logic into separate private function
-- Provides automatic fallback when CIM instances are unavailable
-- Maintains full backward compatibility
-
-### Enhanced Features
-- **Intelligent Fallback**: Automatically tries CIM first, falls back to SMO if needed
-- **`-UseCim` Parameter**: Allows forcing CIM usage when desired
-- **Multiple Namespace Support**: Tries multiple SQL Server CIM namespaces for version compatibility
-- **Comprehensive Error Handling**: Proper error messages with localization support
-
-## Usage Examples
-
-```powershell
-# Basic usage - get TCP/IP protocol for default instance
-Get-SqlDscServerProtocol -InstanceName 'MSSQLSERVER' -ProtocolName 'TcpIp'
-
-# Get Named Pipes protocol for named instance on remote server
-Get-SqlDscServerProtocol -ServerName 'RemoteServer' -InstanceName 'SQL2019' -ProtocolName 'NamedPipes'
-
-# Force CIM usage
-Get-SqlDscServerProtocol -InstanceName 'MSSQLSERVER' -ProtocolName 'SharedMemory' -UseCim
-```
-
-## Backward Compatibility
-
-✅ **No breaking changes** - All existing DSC resources continue to work unchanged as the original private `Get-ServerProtocolObject` function remains available and unmodified.
+------
+https://chatgpt.com/codex/tasks/task_e_686163e02c688320885f98c03e2e9e81",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T16:14:00Z,2025-07-01T12:01:57Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3985,5,0.07882003887288107,False
+3186381329,4002,Optimize outer join in VM,"## Summary
+- implement compileHashOuterJoin for hashed full outer join
+- wire outer join optimization into compileJoinQuery
+- document benchmark update for outer joins
+- regenerate `outer_join.ir.out`
 
 ## Testing
+- `go build ./...`
 
-- Added comprehensive unit tests following Pester v5 syntax and SqlServerDsc conventions
-- Tests cover CIM approach, SMO fallback, error handling, and parameter validation
-- All tests pass and follow existing module patterns
-
-## Documentation
-
-- Added 10 new localized strings for all function messages
-- Complete comment-based help with synopsis, description, parameters, examples, and notes
-- Following all SqlServerDsc documentation standards
-
-## Files Added/Modified
-
-### Added Files
-- `source/Public/Get-SqlDscServerProtocol.ps1`
-- `source/Private/Get-ServerProtocolObjectByCim.ps1`
-- `source/Private/Get-ServerProtocolObjectBySmo.ps1`
-- `tests/Unit/Public/Get-SqlDscServerProtocol.Tests.ps1`
-
-### Modified Files
-- `source/en-US/SqlServerDsc.strings.psd1` (added localized strings)
-- `source/prefix.ps1` (added CIM preference variable)
-
-## Benefits
-
-1. **Better Performance**: CIM instances provide better performance than SMO objects
-2. **Modern Approach**: Uses current PowerShell and CIM standards
-3. **Public API**: Now available for broader community use beyond DSC resources
-4. **Future-Proof**: Automatic detection of SQL Server versions
-5. **Reliable Fallback**: Works in environments where CIM may not be available
-
-Resolves #2104
-
-## Type of Change
-- [x] New feature (non-breaking change which adds functionality)
-- [x] Enhancement (improvement to existing functionality)
-
-## Checklist
-- [x] Code follows the project's coding standards
-- [x] Self-review of code completed
-- [x] Code has been commented, particularly in hard-to-understand areas
-- [x] Corresponding changes to documentation have been made
-- [x] Unit tests added that prove the fix is effective or that the feature works
-- [x] New and existing unit tests pass locally
-- [x] No breaking changes introduced
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `www.powershellgallery.com`
->   - Triggering command: `pwsh -c ./build.ps1 -Tasks &#39;build&#39;` (dns block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
-
-
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.
-
-<!-- Reviewable:start -->
-- - -
-This change is [<img src=""https://reviewable.io/review_button.svg"" height=""34"" align=""absmiddle"" alt=""Reviewable""/>](https://reviewable.io/reviews/dsccommunity/SqlServerDsc/2108)
-<!-- Reviewable:end -->
-",Copilot,198982749,Copilot,open,2025-07-10T16:11:24Z,,,34022262,https://api.github.com/repos/dsccommunity/SqlServerDsc,https://github.com/dsccommunity/SqlServerDsc/pull/2108,"analysisWe need to classify as performance or non-performance. The PR adds a new command that uses CIM instances for better performance than SMO. It explicitly states ""Better Performance: CIM instances provide better performance than SMO objects"". So it's a performance improvement. The classification: 'performance'.assistantfinalperformance",5,0.16676452888530344,True
-3215328044,7994,Remove junderw-crc32c dependency and create PR,Remove unused `junderw-crc32c` dependency to reduce bundle size and clean up the dependency tree.,Cursor,1913337,Overtorment,closed,2025-07-09T10:03:37Z,2025-07-10T18:58:14Z,,117463191,https://api.github.com/repos/BlueWallet/BlueWallet,https://github.com/BlueWallet/BlueWallet/pull/7994,"analysisWe need to classify whether the primary purpose is performance. The PR removes an unused dependency to reduce bundle size. That is about bundle size, not necessarily performance. But reducing bundle size can improve performance (load time). However the description says ""remove unused dependency to reduce bundle size and clean up the dependency tree."" That is more about bundle size, which is a performance improvement. But the classification guidelines: performance-related PRs may contain keywords like memory, optimization, leak, speed, perf, etc. This PR does not contain those keywords. But the purpose is to reduce bundle size, which is a performance improvement. The guidelines say ""Performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" The description does not contain those keywords. But the primary purpose is to reduce bundle size, which is a performance improvement. The guidelines say ""Given a text combining the title and body of a pull request, determine whether the primary purpose of the pull request is to improve performance."" So we need to decide if the primary purpose is performance. Removing an unused dependency to reduce bundle size is indeed a performance improvement. So classification: performance.assistantfinalperformance",5,0.11367610943473412,False
-2892884286,6775,chore: remove unused imports,"Removed approximately 20 lines of unused imports from the codebase to improve code quality and reduce bundle size. This PR does not modify any functionality, only removes unused code.
-
-Changes made:
-- Removed LoadURLOptions import in DesktopWebView.tsx
-- Removed useDialogInstance import in RenameDialog/index.tsx
-- Removed unused variable _ in NetworkSelectorTriggerDApp.tsx
-- Removed commented-out imports and unused displayName parameter in createLazyKitProvider.tsx
-- Removed commented-out code in useCreateQrWallet.tsx
-
-Link to Devin run: https://app.devin.ai/sessions/f80fc305ae8447269a994fe397ca198d
-User: 候耀
-",Devin,158243242,devin-ai-integration[bot],closed,2025-03-04T04:21:17Z,2025-03-04T05:32:06Z,,430749584,https://api.github.com/repos/OneKeyHQ/app-monorepo,https://github.com/OneKeyHQ/app-monorepo/pull/6775,"analysisWe need to classify as performance or non-performance. The PR removes unused imports, reduces bundle size. That is performance improvement? The description says ""to improve code quality and reduce bundle size."" Removing unused imports reduces bundle size, which is a performance improvement. But the classification guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. This PR does not contain those keywords. But the action is to reduce bundle size, which is a performance improvement. The guidelines say ""Performance-related pull requests may contain keywords such as... or any other terms referring to how faster and efficiently software runs."" It doesn't say that if it doesn't contain those keywords it's automatically non-performance. But the primary purpose is to improve performance. The guidelines: ""Given a text combining the title and body of a pull request, determine whether the primary purpose of the pull request is to improve performance."" So we need to decide if the primary purpose is to improve performance. Removing unused imports reduces bundle size, which is a performance improvement. So classification: performance.assistantfinalperformance",5,0.11078616346272367,False
-3165098830,536,Remove unused code across Helper monorepo,"# Remove unused code across Helper monorepo
-
-This PR removes unused code identified by knip analysis across the Helper monorepo, significantly reducing bundle size and maintenance overhead while maintaining all core functionality.
-
-## What was removed
-
-### 🗂️ Unused Files (24 deleted)
-- **Database setup scripts**: `db/drizzle.config.ts`, `db/lib/cronUtils.ts`, `db/lib/debug.ts`, `db/seeds/index.ts`, `db/seeds/seedDatabase.ts`, `db/setupCron.ts`
-- **Test files**: `tests/evals/chat/*`, `tests/evals/support/*`, `tests/support/factories/messageNotifications.ts`
-- **Unused UI components**: `components/sortableList.tsx`, `components/ui/hover-card.tsx`, `components/ui/pagination.tsx`, `components/ui/panel.tsx`, `components/ui/slider.tsx`
-- **Dashboard components**: Status filter, trend indicator, view switcher, navigation buttons
-- **Scripts and utilities**: `scripts/deploy-helper-projects.ts`, `scripts/replGlobals.mts`, `lib/github/constants.ts`, `trpc/serverActions.ts`
-- **Type definitions**: `types/clerkMetadata.ts`, `packages/react/global.d.ts`
-
-### 📦 Unused Dependencies (37 removed)
-
-**Main package dependencies (15):**
-- `@openrouter/ai-sdk-provider`, `@radix-ui/react-hover-card`, `@slack/oauth`
-- `@tailwindcss/forms`, `@tailwindcss/typography`
-- `@tiptap/extension-bold`, `@tiptap/extension-bubble-menu`, `@tiptap/extension-italic`
-- `js-tiktoken`, `p-limit`, `react-hot-toast`, `react-sortablejs`
-- `tailwindcss-animate`, `tw-animate-css`, `ws`
-
-**Main package devDependencies (12):**
-- `@babel/core`, `@svgr/webpack`, `@testcontainers/postgresql`
-- `@types/dom-speech-recognition`, `@types/ws`, `@vercel/sdk`
-- `autoevals`, `dayjs`, `dotenv`, `eslint-config-next`, `evalite`, `heroku`, `react-email`, `vercel`
-
-**Workspace packages (10):**
-- `next-themes`, `@svgr/webpack`, `eslint-config-next`, `tailwindcss-animate` from marketing package
-- `crypto-js`, `@testing-library/user-event`, `@vitejs/plugin-react` from react package
-
-## Impact
-
-- **Reduced bundle size**: Removed 37 unused dependencies
-- **Cleaner codebase**: Deleted 24 unused files (1,809 lines removed)
-- **Lower maintenance overhead**: Fewer dependencies to manage and update
-- **Improved build performance**: Less code to process during builds
-
-## Verification
-
-This cleanup was identified using `npx knip` analysis across the entire monorepo. All removed code was confirmed to be unused through static analysis of:
-- Import/export relationships
-- Dependency usage patterns
-- File references across the codebase
-
-The application functionality remains intact - only truly unused code was removed.
-
-Link to Devin run: https://app.devin.ai/sessions/35f23c2680624c168406058263e1103b
-",Devin,158243242,devin-ai-integration[bot],closed,2025-06-21T13:39:27Z,2025-06-21T13:41:38Z,,941289933,https://api.github.com/repos/antiwork/helper,https://github.com/antiwork/helper/pull/536,"analysisWe need to classify as performance or non-performance. The PR removes unused code and dependencies, reducing bundle size, build performance. The primary purpose is to improve performance? It reduces bundle size, build performance, maintenance overhead. The description says ""significantly reducing bundle size and maintenance overhead while maintaining all core functionality."" The keywords: ""performance"" is mentioned. The removal of unused code is a performance improvement. The classification: performance.assistantfinalperformance",5,0.10966945917152339,False
-3077061912,21418,perf: remove unused tRPC routes to reduce type generation load,"# Remove unused tRPC routes to reduce type generation load
-
-This PR removes unused tRPC routes to help reduce the TypeScript type generation load. Specifically, it removes the following routes which are not being used in the codebase:
-
-- `loggedInViewerRouter.submitFeedback` (explicitly marked as unused in a comment)
-
-This should help reduce the number of types that TypeScript has to generate, addressing the issue where we're exceeding the maximum amount of types that TypeScript can generate on the pregenerated tRPC types.
+------
+https://chatgpt.com/codex/tasks/task_e_6861722f141883208bff79fcb7c95f04",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T17:25:32Z,2025-06-29T17:26:25Z,2025-06-29T17:26:25Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4002,5,0.07751050642159571,False
+3186305026,3979,Improve VM join optimizer,"## Summary
+- add hashed right join implementation
+- regenerate IR golden for right join query
 
 ## Testing
-- Verified that the route is not used anywhere in the codebase
-- Ran type checking to ensure no regressions
+- `go test ./tests/vm -tags slow -run '^TestVM_IR/right_join$' -update`
+- `go test ./...`
 
-Link to Devin run: https://app.devin.ai/sessions/85c98fb2939d41b5aca8988f9802fc97
-Requested by: alex@cal.com
+------
+https://chatgpt.com/codex/tasks/task_e_6861603fabc083208abf08472e70a251",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T16:01:05Z,2025-06-29T16:01:18Z,2025-06-29T16:01:18Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3979,5,0.07685635831367424,False
+3186433660,4011,Improve VM join compilation,"## Summary
+- add constant-empty checks before join compilation
+- generate simple nil-right loops for constant empty right side in left join
+- update golden IR outputs
 
-    
-<!-- This is an auto-generated description by cubic. -->
----
+## Testing
+- `go test ./tests/vm -tags slow -run TestVM_IR -update`
 
-## Summary by cubic
-Removed the unused submitFeedback tRPC route to lower TypeScript type generation load and improve build performance.
+------
+https://chatgpt.com/codex/tasks/task_e_6861820b3bfc8320989233ffc16bf14b",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T18:19:28Z,2025-07-01T12:01:37Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4011,5,0.07172403314878277,False
+3185988908,3943,Optimize VM join loops,"## Summary
+- optimize join loops in `runtime/vm` with `OpLessInt` and cached null constants
+- update join benchmarks
+- regenerate IR golden files for VM tests
+- fold VM constant expressions without importing the interpreter
 
-<!-- End of auto-generated description by cubic. -->
+## Testing
+- `go test ./tests/vm -tags slow -run TestVM_IR -update`
 
-",Devin,158243242,devin-ai-integration[bot],closed,2025-05-20T13:36:19Z,2025-05-20T14:14:51Z,2025-05-20T14:14:51Z,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/21418,"analysisWe need to classify as performance or non-performance. The PR title: ""perf: remove unused tRPC routes to reduce type generation load"". The body: removing unused routes to reduce TypeScript type generation load, addressing issue exceeding maximum types. This is about performance: reducing type generation load, improving build performance. So classification: performance.assistantfinalperformance",5,0.08445665572854054,False
+
+------
+https://chatgpt.com/codex/tasks/task_e_6860fd4253048320b7a9b041def55989",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T09:57:37Z,2025-06-29T09:58:13Z,2025-06-29T09:58:13Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3943,5,0.06474380471525755,False
+3142771614,2267,Improve SortedSet union,"## Summary
+- optimize `union` in SortedSet
+- avoid re-counting elements by tracking size during tree copy/merge
+
+## Testing
+- `moon fmt`
+- `moon info`
+- `moon test`
+
+------
+https://chatgpt.com/codex/tasks/task_e_684bd59b9ccc8320b5e9a44429fe1b2b",OpenAI_Codex,747051,bobzhang,open,2025-06-13T08:46:02Z,,,749681472,https://api.github.com/repos/moonbitlang/core,https://github.com/moonbitlang/core/pull/2267,5,0.05854169773519469,False
+3186235764,3969,Optimize set operations in VM,"## Summary
+- improve runtime performance of `Union`, `Except`, and `Intersect` opcodes by using map-based lookups
+- regenerate VM IR golden files
+
+## Testing
+- `go test ./...`
+- `go test -tags slow ./tests/vm -run TestVM_IR -update --vet=off`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_686141e352588320961acbdd4321c4fa",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T14:41:31Z,2025-06-29T14:41:46Z,2025-06-29T14:41:46Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3969,5,0.054802987974423345,False
+3186289712,3974,Implement jump threading optimization,"## Summary
+- add `foldJumpChains` to collapse chains of jumps in the VM optimizer
+- update a few IR goldens affected by the new optimization
+
+## Testing
+- `go test ./...`
+- `go test ./tests/vm -tags slow -run TestVM_IR -update`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_68615b6441988320883c603ef962eaa3",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T15:42:14Z,2025-06-29T15:42:30Z,2025-06-29T15:42:30Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3974,5,0.05410631862169956,False
+3214280822,6521,Improve Python join code generation,"## Summary
+- improve the Python backend to emit list comprehensions for inner joins
+- regenerate golden machine outputs for inner join programs
+- document new join handling in the Python machine README
+
+## Testing
+- `go test -tags slow ./compiler/x/python -run TestCompilePrograms -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686dc30703a883208c194f20cb79ae02",OpenAI_Codex,1218621,tamnd,closed,2025-07-09T02:27:09Z,2025-07-09T02:28:52Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/6521,5,0.040954636156292856,True
+3166655793,2686,Add simple interpreter inlining,"## Summary
+- add `inlineCandidates` and `callCounts` maps to Interpreter
+- record small functions as inline candidates
+- count calls and inline hot, pure single-expression functions
+- initialize helper Interpreters with these maps
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6858cbbc7a3483209f88c35706070449",OpenAI_Codex,1218621,tamnd,closed,2025-06-23T03:44:29Z,2025-06-23T05:35:20Z,2025-06-23T05:35:19Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2686,5,0.03967996943222354,False
+3168509434,2721,Optimize interpreter performance,"## Summary
+- cache builtin function table to avoid map allocations
+- add environment pooling helpers for reusing Env objects
+- use AcquireEnv/ReleaseEnv in interpreter for loops, if-statements and function calls
+- lower inline call threshold
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68596837f34c83208cb32ac21acf786b",OpenAI_Codex,1218621,tamnd,closed,2025-06-23T14:56:56Z,2025-06-23T15:13:30Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2721,5,0.03887945512174705,False
+3152227912,1268,Optimize interpreter ops,"## Summary
+- centralize built-in operator implementations in a shared table
+- route applyBinaryValue and applyUnaryValue through this table
+
+## Testing
+- `go fmt ./...`
+- `go test ./...` *(fails: golden mismatch)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_685108101fdc8320a06210f0d1abe097",OpenAI_Codex,1218621,tamnd,closed,2025-06-17T06:29:21Z,2025-06-17T06:35:29Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/1268,5,0.038389887576561775,False
+3242128024,9492,Improve Python compiler list set ops,"## Summary
+- optimize list set operations by unwrapping optional types before deciding whether helpers are needed
+- update compiler test helper indentation
+- regenerate Python machine outputs
+- document recent compiler changes
+
+## Testing
+- `go test -tags slow ./compiler/x/python -run TestPythonCompiler_VMValid_Golden -count=1` *(fails: golden mismatch for several programs)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_6879c6469d8c83208026d01713bd6f9b",OpenAI_Codex,1218621,tamnd,closed,2025-07-18T06:49:11Z,2025-07-18T06:49:28Z,2025-07-18T06:49:28Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9492,5,0.03659620424981458,False
+3226302090,8385,Improve Go compiler struct reuse,"## Summary
+- enhance Go compiler struct inference so existing structs are reused
+- add `structMatches` helper
+- update checklists for TPCH progress
+- regenerate machine output for `cast_struct` example
+
+## Testing
+- `go test ./compiler/x/go -tags slow -run TestGoCompiler_ValidPrograms`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6873777e9cd48320aa36c8b4718e36ee",OpenAI_Codex,1218621,tamnd,closed,2025-07-13T09:25:31Z,2025-07-13T09:25:49Z,2025-07-13T09:25:49Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/8385,5,0.03423511776624581,False
+3202763859,5067,Improve Python compiler list operations,"## Summary
+- reduce use of runtime helpers for `union`, `union_all`, `except` and `intersect`
+- infer resulting list element type when possible
+
+## Testing
+- `go test ./... --vet=off -run TestPyCompiler_SubsetPrograms -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6867d5cdcb3c8320b49589ac64cc4233",OpenAI_Codex,1218621,tamnd,closed,2025-07-04T13:31:50Z,2025-07-04T13:32:03Z,2025-07-04T13:32:03Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/5067,5,0.033210860505493295,False
+3241690700,9435,Update Clojure compiler,"## Summary
+- avoid emitting `_cast_struct` and `_cast_struct_list` when the value already matches the target type
+- document the optimization in TASKS
+
+## Testing
+- `go vet ./...`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6879b65a24cc832090f470206870dc82",OpenAI_Codex,1218621,tamnd,closed,2025-07-18T03:11:18Z,2025-07-18T03:11:29Z,2025-07-18T03:11:29Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9435,5,0.033084435737244205,False
+3227405736,8664,Improve Python compiler struct reuse,"## Summary
+- dedupe struct names across query compilation
+- document progress in Python backend tasks and README
+- regenerate Python machine outputs including TPCH q1
+
+## Testing
+- `go test ./compiler/x/python -tags slow -run TestCompilePrograms -count=1`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_68748c5135bc83208038140e4c99bc05",OpenAI_Codex,1218621,tamnd,closed,2025-07-14T05:25:50Z,2025-07-14T05:26:12Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/8664,5,0.032986435240349894,False

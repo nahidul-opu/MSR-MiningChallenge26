@@ -1,0 +1,307 @@
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,Topic,Probability,Representative_document
+3076401687,583,Cache CloudInfo / CloudSettings by authority,"This PR modifies `CloudSettings` to cache cloud information by authority (schema, host, and port) rather than by the full URL. This ensures that multiple URLs pointing to the same cluster with different paths will share the same cached `CloudInfo` object.
+
+## Changes Made
+
+1. Modified `_normalize_uri` method in `CloudSettings` class:
+   - Now extracts and returns only the authority part (scheme + netloc) from URLs
+   - The netloc component includes both host and port when present
+
+2. Updated `get_cloud_info_for_cluster` method:
+   - Changed all references to use the normalized authority as the cache key
+
+3. Created comprehensive tests:
+   - Tests that `_normalize_uri` correctly extracts just the authority part
+   - Tests that URLs with the same authority (but different paths) share the same `CloudInfo` cache entry
+   - Tests that URLs with different ports are cached separately
+
+## Example
+
+Before this change:
+- `https://cluster.kusto.windows.net/`
+- `https://cluster.kusto.windows.net/database1`
+- `https://cluster.kusto.windows.net/v1/rest`
+
+Would all be cached separately, requiring multiple network requests for the same cluster.
+
+After this change:
+All these URLs will use the same cached `CloudInfo` object for `https://cluster.kusto.windows.net`, improving efficiency and consistency.
+
+Fixes #582.
+
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-05-20T09:49:33Z,2025-05-21T08:20:12Z,2025-05-21T08:20:12Z,108257720,https://api.github.com/repos/Azure/azure-kusto-python,https://github.com/Azure/azure-kusto-python/pull/583,45,1.0,False
+3078518733,9,Add FastMCP server,"## Summary
+- add `run_fastmcp.py` for running DeepSearchAgents via FastMCP
+- document running the new MCP server in README
+
+## Testing
+- `make test` *(fails: No route to host)*",OpenAI_Codex,11715013,lwyBZss8924d,open,2025-05-21T00:28:08Z,,,966679215,https://api.github.com/repos/lwyBZss8924d/DeepSearchAgents,https://github.com/lwyBZss8924d/DeepSearchAgents/pull/9,45,1.0,False
+3210496890,545,Increase TTL for older posts,"## Summary
+- set 24 hour Cache-Control header for posts older than six months
+- test TTL behavior for old and new items
+
+## Testing
+- `DATABASE_URL=postgres://testuser:testpass@localhost/simonwillisonblog python manage.py test -v2 | tail -n 20`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_686c5320b124832690bd7094dd8218d5
+
+Transcript: https://chatgpt.com/s/cd_686c56123ff48191b7bea5c066cd8474",OpenAI_Codex,9599,simonw,closed,2025-07-07T23:19:15Z,2025-07-07T23:20:09Z,2025-07-07T23:20:09Z,104670293,https://api.github.com/repos/simonw/simonwillisonblog,https://github.com/simonw/simonwillisonblog/pull/545,45,1.0,False
+3135095932,1787,Cache request settings for Client,"## Summary
+- compute `_headers` and `_timeout` during client initialization
+- update request logic to reuse cached values
+- refresh `_headers` when the API key changes
+- update unit tests for header caching
+
+## Testing
+- `make format`
+- `make lint`
+- `make tests`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6848a9ac7f0c832d9f48d9faac108d32",OpenAI_Codex,56902,nfcampos,closed,2025-06-11T00:02:14Z,2025-06-11T03:23:30Z,2025-06-11T03:23:30Z,647427819,https://api.github.com/repos/langchain-ai/langsmith-sdk,https://github.com/langchain-ai/langsmith-sdk/pull/1787,45,1.0,False
+3089770645,403,Fix cache headers on range requests,"## Summary
+- set caching headers before handling byte ranges
+- document X-Cache and related headers for 206 responses
+- test that range responses include cache header
+
+## Testing
+- `npx eslint src test`
+- `npm test` *(fails: fetch failed)*",OpenAI_Codex,1110,djwhitt,closed,2025-05-26T01:46:50Z,2025-05-27T17:26:37Z,2025-05-27T17:26:37Z,480614136,https://api.github.com/repos/ar-io/ar-io-node,https://github.com/ar-io/ar-io-node/pull/403,45,1.0,False
+2784488870,13245,fix: optimize explore caching in ValidationService,"This PR optimizes the explore caching logic in ValidationService by moving the findExploresFromCache call inside the condition where compiledExplores is undefined. This prevents unnecessary database requests when we already have the explores in memory.
+
+Changes:
+- Moved findExploresFromCache call inside the condition in ValidationService.ts
+- Updated to use Object.values on the returned cache object
+
+Link to Devin run: https://app.devin.ai/sessions/4a389b656d1e4c93b43c19e390960259
+",Devin,158243242,devin-ai-integration[bot],closed,2025-01-13T16:13:35Z,2025-01-13T16:15:10Z,,349372179,https://api.github.com/repos/lightdash/lightdash,https://github.com/lightdash/lightdash/pull/13245,45,1.0,False
+2784500442,13246,fix: optimize explore caching in ValidationService,"This PR optimizes the explore caching logic in ValidationService by moving the findExploresFromCache call inside the condition where compiledExplores is undefined. This prevents unnecessary database requests when we already have the explores in memory.
+
+Changes:
+- Moved findExploresFromCache call inside the condition in ValidationService.ts
+- Updated to use Object.values on the returned cache object
+
+Link to Devin run: https://app.devin.ai/sessions/4a389b656d1e4c93b43c19e390960259
+",Devin,158243242,devin-ai-integration[bot],closed,2025-01-13T16:17:08Z,2025-01-13T16:19:28Z,,349372179,https://api.github.com/repos/lightdash/lightdash,https://github.com/lightdash/lightdash/pull/13246,45,1.0,False
+3189863486,72,Implement maxAge fast scraping parameter,"
+# Implement maxAge fast scraping parameter
+
+## Summary
+
+This PR implements the `maxAge` fast scraping parameter across all scraping-related tools in the Firecrawl MCP Server, enabling 500% faster scraping through intelligent caching as documented in PR #34 of firecrawl-docs.
+
+**Key Changes:**
+- Added `maxAge` parameter (number, defaults to 0) to SCRAPE_TOOL, CRAWL_TOOL, and SEARCH_TOOL schemas
+- **Created missing BATCH_SCRAPE_TOOL** that was referenced in tests but absent from main code
+- Added proper type guard and request handler for batch scraping functionality  
+- Updated all tool schemas to include maxAge with proper descriptions and defaults
+
+The maxAge parameter accepts milliseconds and uses cached content if younger than the specified age, otherwise scrapes fresh content. A value of 0 (default) means always scrape fresh.
+
+## Review & Testing Checklist for Human
+
+- [ ] **Test actual caching behavior**: Verify maxAge parameter works with real Firecrawl API calls (make same request twice with maxAge > 0, confirm second request uses cache)
+- [ ] **Test new BATCH_SCRAPE_TOOL**: Verify the previously missing batch scrape functionality now works end-to-end  
+- [ ] **Verify backward compatibility**: Test all existing tools still work without maxAge specified
+- [ ] **Test parameter passing**: Confirm maxAge gets properly passed to underlying Firecrawl client methods
+- [ ] **Integration testing**: Run the MCP server with a real MCP client and test all modified tools
+
+**Recommended test plan:**
+1. Start MCP server locally  
+2. Test each tool (scrape, crawl, batch_scrape, search) with and without maxAge
+3. For caching verification: scrape same URL twice with maxAge=300000 (5min), verify second call is faster
+4. Verify error handling when maxAge is invalid (negative, non-number)
+
+---
+
+### Diagram
+
+```mermaid
+%%{ init : { ""theme"" : ""default"" }}%%
+graph TD
+    subgraph ""MCP Server Structure""
+        Index[""src/index.ts""]:::major-edit
+        Tests[""src/index.test.ts""]:::context
+    end
+    
+    subgraph ""Tool Definitions (Updated)""
+        SCRAPE[""SCRAPE_TOOL<br/>+maxAge param""]:::major-edit
+        CRAWL[""CRAWL_TOOL<br/>+maxAge in scrapeOptions""]:::major-edit  
+        SEARCH[""SEARCH_TOOL<br/>+maxAge in scrapeOptions""]:::minor-edit
+        BATCH[""BATCH_SCRAPE_TOOL<br/>**NEW TOOL**""]:::major-edit
+    end
+    
+    subgraph ""API Handlers (Updated)""  
+        Handler[""CallToolRequestSchema<br/>+batch_scrape case""]:::major-edit
+        TypeGuards[""Type Guards<br/>+isBatchScrapeOptions""]:::minor-edit
+    end
+    
+    subgraph ""Firecrawl Client Calls""
+        ScrapeCall[""client.scrapeUrl()""]:::context
+        CrawlCall[""client.asyncCrawlUrl()""]:::context  
+        BatchCall[""client.asyncBatchScrapeUrls()""]:::context
+        SearchCall[""client.search()""]:::context
+    end
+    
+    Index --> SCRAPE
+    Index --> CRAWL  
+    Index --> SEARCH
+    Index --> BATCH
+    Index --> Handler
+    Index --> TypeGuards
+    
+    
+    Handler --> ScrapeCall
+    Handler --> CrawlCall
+    Handler --> BatchCall  
+    Handler --> SearchCall
+    
+    Tests -.-> BATCH
+    
+    subgraph Legend
+        L1[""Major Edit""]:::major-edit
+        L2[""Minor Edit""]:::minor-edit  
+        L3[""Context/No Edit""]:::context
+    end
+    
+    classDef major-edit fill:#90EE90
+    classDef minor-edit fill:#87CEEB  
+    classDef context fill:#FFFFFF
+```
+
+### Notes
+
+- **Critical Discovery**: The BATCH_SCRAPE_TOOL was completely missing from the main code despite being referenced in tests - this was a significant gap that needed to be filled
+- **TypeScript Issue**: Had to remove `origin: 'mcp-server'` parameter from batch scrape call due to type compatibility issues
+- **Testing Limitation**: While all lint/test/build checks pass, the actual caching behavior with real Firecrawl API calls couldn't be verified in the development environment
+- **Documentation Alignment**: Implementation follows the fast-scraping documentation from firecrawl-docs PR #34
+
+**Session Info**: 
+- Requested by: @nickscamara
+- Devin session: https://app.devin.ai/sessions/bdb0c3cd0d424fc390d6fdb8be775d11
+- Fixes: mendableai/firecrawl-mcp-server#69
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-30T21:08:17Z,2025-06-30T21:14:25Z,,899407931,https://api.github.com/repos/mendableai/firecrawl-mcp-server,https://github.com/mendableai/firecrawl-mcp-server/pull/72,45,1.0,True
+3189869767,73,Implement maxAge fast scraping parameter,"
+# Implement maxAge fast scraping parameter
+
+## Summary
+
+This PR implements the `maxAge` parameter for the firecrawl-mcp-server to enable faster scraping through caching, addressing GitHub issue #69. The implementation exposes the existing Firecrawl API `maxAge` parameter through the MCP server's tool schema.
+
+**Key changes:**
+- Added `maxAge` parameter to SCRAPE_TOOL inputSchema as optional number field
+- Updated tool description and usage examples to highlight caching benefits  
+- Added test coverage to verify parameter is passed through to Firecrawl API
+- Merged latest main branch changes (version bump to 1.11.0)
+
+The `maxAge` parameter allows users to specify a cache duration in milliseconds. When set, the system will use cached content if available and younger than the specified age, otherwise scrape fresh content.
+
+## Review & Testing Checklist for Human
+
+- [ ] **Test maxAge with real Firecrawl API calls** - Verify that setting maxAge actually enables caching behavior (most critical)
+- [ ] **Validate performance claims** - Test whether maxAge actually provides significant speed improvements as claimed
+- [ ] **Test edge cases** - Try invalid maxAge values (negative, non-numeric) to ensure proper error handling
+- [ ] **Verify backwards compatibility** - Ensure existing scrape calls without maxAge parameter continue working
+
+**Recommended test plan:** Create a test script that scrapes the same URL twice with maxAge set, verify the second call is faster and returns cached content.
+
+---
+
+### Diagram
+
+```mermaid
+%%{ init : { ""theme"" : ""default"" }}%%
+graph TD
+    subgraph ""MCP Server Implementation""
+        IndexTS[""src/index.ts""]:::major-edit
+        IndexTestTS[""src/index.test.ts""]:::major-edit
+    end
+    
+    subgraph ""Tool Schema""
+        SCRAPE_TOOL[""SCRAPE_TOOL definition""]:::major-edit
+        InputSchema[""inputSchema.properties""]:::major-edit
+    end
+    
+    subgraph ""External Dependencies""
+        FirecrawlSDK[""@mendable/firecrawl-js""]:::context
+        ScrapeParams[""ScrapeParams type""]:::context
+    end
+    
+    IndexTS --> SCRAPE_TOOL
+    SCRAPE_TOOL --> InputSchema
+    InputSchema --> |""maxAge: number""| FirecrawlSDK
+    IndexTestTS --> |""tests maxAge passing""| FirecrawlSDK
+    FirecrawlSDK --> ScrapeParams
+    
+    subgraph Legend
+        L1[""Major Edit""]:::major-edit
+        L2[""Minor Edit""]:::minor-edit  
+        L3[""Context/No Edit""]:::context
+    end
+
+    classDef major-edit fill:#90EE90
+    classDef minor-edit fill:#87CEEB
+    classDef context fill:#FFFFFF
+```
+
+### Notes
+
+- Implementation relies on existing Firecrawl SDK `ScrapeParams` type to handle maxAge validation
+- The parameter is optional and should default to 0 (always scrape fresh) per Firecrawl API behavior
+- Performance improvement claims (500% faster) are based on issue description but not independently verified
+- Session URL: https://app.devin.ai/sessions/49a52e8dbd37423ca390018a20461749
+- Requested by: @nickscamara
+
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-30T21:11:11Z,2025-06-30T21:14:56Z,2025-06-30T21:14:56Z,899407931,https://api.github.com/repos/mendableai/firecrawl-mcp-server,https://github.com/mendableai/firecrawl-mcp-server/pull/73,45,1.0,True
+3067476387,98,feat: add caching layer for frequent identical requests,"# Project-level Caching Layer for Identical Requests
+
+This PR adds a caching layer for frequent identical requests on a per-project basis, with configurable cache duration and API-based toggleability.
+
+## Features
+
+- Added `cacheEnabled` and `cacheDuration` columns to the project table
+- Created API endpoints to toggle and configure caching settings
+- Implemented caching logic in request handling for non-streaming requests
+- Cache duration configurable between 10 seconds and 1 year (31536000 seconds)
+- Cache is disabled by default and must be explicitly enabled per project
+
+## Implementation Details
+
+- Cache keys are generated based on all parameters that affect the response
+- Only non-streaming requests are cached (streaming responses not suitable for caching)
+- Cache integrates with the existing logging system to track both cache hits and misses
+- Default cache duration is 1 hour (3600 seconds)
+
+## Notes
+
+There are test failures related to the database schema changes. The schema changes have been applied to the development database using `pnpm push`, but the test database appears to be using a different configuration.
+
+## Link to Devin run
+https://app.devin.ai/sessions/725b346a9bd34bde9c44274075b94806
+
+Requested by: Luca Steeb
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-15T22:08:58Z,2025-05-17T09:43:46Z,,965250949,https://api.github.com/repos/theopenco/llmgateway,https://github.com/theopenco/llmgateway/pull/98,45,1.0,True
+3074351366,1569,FIR-2006: Fix maxUrls and timeLimit parameters in Deep Research API,"# FIR-2006: Fix maxUrls and timeLimit parameters in Deep Research API
+
+## Problem
+The Deep Research API wasn't properly enforcing two key parameters:
+1. When users set `maxUrls=5`, the API processed many more URLs (88 in the reported case)
+2. When users set `timeLimit=180`, the API ran much longer (400s in the reported case)
+
+## Solution
+1. Fixed URL counting logic by replacing the async filter function with a for loop implementation that properly counts URLs and enforces the maxUrls limit immediately
+2. Added a time limit helper function and more frequent time limit checks throughout the code
+3. Added better logging for debugging URL counts and time limits
+
+## Testing
+- Added unit tests to verify maxUrls and timeLimit enforcement
+- Tested locally to ensure parameters are properly respected
+
+Link to Devin run: https://app.devin.ai/sessions/f04a46755b0a46438087d9dea98cf5b8
+Requested by: Nicolas Camara
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-19T16:04:38Z,2025-05-20T21:39:56Z,2025-05-20T21:39:56Z,787076358,https://api.github.com/repos/mendableai/firecrawl,https://github.com/mendableai/firecrawl/pull/1569,45,1.0,False

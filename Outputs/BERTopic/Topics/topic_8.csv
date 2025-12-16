@@ -1,4 +1,4 @@
-id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,Topic,Probability,Representative_document
 3166199077,60,feat: Phase 7.1 - Basket Asset Performance Tracking,"## Summary
 
 This PR implements Phase 7.1 of the roadmap - Basket Asset Performance Tracking. This adds comprehensive performance analytics for basket assets including returns, volatility, Sharpe ratio, and maximum drawdown calculations.
@@ -58,7 +58,7 @@ This PR implements Phase 7.1 of the roadmap - Basket Asset Performance Tracking.
 
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
-Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,5859318,YOzaz,closed,2025-06-22T19:18:39Z,2025-06-23T07:06:14Z,2025-06-23T07:06:14Z,842589907,https://api.github.com/repos/FinAegis/core-banking-prototype-laravel,https://github.com/FinAegis/core-banking-prototype-laravel/pull/60,"analysisWe need to classify as 'performance' or 'non-performance'. The PR is about adding performance analytics for basket assets. It includes performance metrics, calculations, etc. The primary purpose is to add performance tracking. The classification: 'performance'.assistantfinalperformance",8,1.0,False
+Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,5859318,YOzaz,closed,2025-06-22T19:18:39Z,2025-06-23T07:06:14Z,2025-06-23T07:06:14Z,842589907,https://api.github.com/repos/FinAegis/core-banking-prototype-laravel,https://github.com/FinAegis/core-banking-prototype-laravel/pull/60,8,1.0,False
 3259689574,584,Implement ForestRun performance benchmark system with GitHub Actions,"Implements a comprehensive performance benchmark system for the ForestRun cache to measure and compare cache operation performance against Apollo's InMemoryCache.
 
 ## Features
@@ -130,7 +130,7 @@ Fixes #583.
 <!-- START COPILOT CODING AGENT TIPS -->
 ---
 
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-07-24T12:15:27Z,,,349554698,https://api.github.com/repos/microsoft/graphitation,https://github.com/microsoft/graphitation/pull/584,"analysisWe need to classify the pull request as 'performance' or 'non-performance'. The PR title: ""Implement ForestRun performance benchmark system with GitHub Actions"". Body describes performance benchmarks, measuring cache performance, etc. It's clearly performance-related. So classification: performance.assistantfinalperformance",8,1.0,False
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-07-24T12:15:27Z,,,349554698,https://api.github.com/repos/microsoft/graphitation,https://github.com/microsoft/graphitation/pull/584,8,1.0,False
 3100789352,414,Add performance benchmarking and AOT file size tracking with Azure storage,"Implements a comprehensive performance tracking system that monitors benchmark execution times and AOT native file sizes, storing historical data in Azure Table Storage and detecting performance regressions in pull requests.
 
 ## Features
@@ -242,225 +242,7 @@ Fixes #413.
 
 ---
 
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-05-29T16:02:40Z,,,879168187,https://api.github.com/repos/AArnott/Nerdbank.MessagePack,https://github.com/AArnott/Nerdbank.MessagePack/pull/414,"analysisWe need to classify as 'performance' or 'non-performance'. The PR adds performance benchmarking and AOT file size tracking, with regression detection, etc. It's clearly performance-related. So label 'performance'.assistantfinalperformance",8,1.0,True
-3088691462,1751,Add Performance Testing Infrastructure,"This PR adds a comprehensive performance testing infrastructure to the project using the `benny` benchmarking library. The implementation enables automated detection of performance regressions between PRs and the main branch.
-
-## Features Added
-
-- Added performance testing framework with `benny` library
-- Created TypeScript configuration for performance tests
-- Implemented a sample model creation performance test
-- Added npm scripts for running performance tests locally:
-  - `npm run performance` - Builds and runs all performance tests
-  - `npm run performance:build` - Just builds the performance tests
-  - `npm run performance:run` - Runs pre-built performance tests
-  - `npm run performance:compare` - Compares results between two test runs
-
-- Added GitHub Actions workflow that:
-  - Runs performance tests on each PR
-  - Stores results as artifacts
-  - Downloads previous results from the main branch
-  - Compares current performance with baseline
-  - Fails the check if performance decreases beyond a threshold (default 20%)
-
-## Usage
-
-To run performance tests locally:
-
-```bash
-npm run performance
-```
-
-To compare two result files:
-
-```bash
-npm run performance:compare -- path/to/baseline.json path/to/current.json [threshold]
-```
-
-The performance tests save results in JSON, CSV, and HTML chart formats for easy analysis.
-
-## Documentation
-
-Added documentation in `packages/dynamoose/performance/README.md` that explains:
-- How to run performance tests
-- How to add new performance tests
-- How performance regression detection works
-- How to interpret the results
-
-Fixes #1681.
-
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-05-24T19:48:28Z,,,16962535,https://api.github.com/repos/dynamoose/dynamoose,https://github.com/dynamoose/dynamoose/pull/1751,analysisWe need to classify as 'performance' or 'non-performance'. The PR is about adding performance testing infrastructure. That is performance-related. So label 'performance'.assistantfinalperformance,8,1.0,False
-3132905408,107,[gh-flow] Add minimal Azure provisioning for local development,"This PR implements a split provisioning solution for the gh-flow sample, allowing developers to provision only essential Azure resources when developing locally instead of the full production infrastructure.
-
-## Problem
-
-Previously, developers working locally on gh-flow had to run `azd provision` which creates the complete Azure infrastructure including:
-- Container Apps Environment & Registry
-- Azure-hosted Qdrant on Container Apps  
-- Cosmos DB
-- Application Insights & Log Analytics
-- Monitoring dashboards
-- The gh-flow Container App service
-
-This resulted in:
-- Slow provisioning (20+ minutes)
-- High Azure costs during development ($50+/month)
-- Unnecessary complexity for local development
-
-## Solution
-
-Added a minimal provisioning option that only creates essential Azure resources while leveraging the existing containerized services in the devcontainer:
-
-### New Files
-- **`infra/main.local.bicep`** - Minimal bicep template (49 lines vs 160 lines in full template)
-- **`infra/main.local.parameters.json`** - Parameters for local development
-- **`provision-local.sh`** - Helper script for easy provisioning
-- **`LOCAL-DEVELOPMENT.md`** - Detailed documentation
-- **`.gitignore`** - Ignore generated bicep artifacts
-
-### Updated Files
-- **`docs/github-flow-getting-started.md`** - Added Option 2 for minimal provisioning
-
-## What Gets Provisioned
-
-| Deployment Type | Resources | Estimated Cost |
-|---|---|---|
-| **Full** (`azd provision`) | Storage + Container Apps + Qdrant + Cosmos + Monitoring + App Service | $50+/month |
-| **Local** (`./provision-local.sh`) | Storage account only | ~$1/month |
-
-## Usage
-
-```bash
-# Full deployment (unchanged)
-azd provision
-
-# Local development (new)
-./provision-local.sh my-local-env
-```
-
-## Benefits
-
-- **90%+ resource reduction**: 1 storage account vs 10+ resources
-- **Faster provisioning**: Minutes instead of 20+ minutes  
-- **Lower cost**: ~$1/month vs $50+/month
-- **Better developer experience**: Local debugging, containerized Qdrant, faster iteration
-- **Easy cleanup**: Minimal resources to delete when done
-
-## Technical Details
-
-The local template reuses existing core bicep modules but only provisions:
-- Resource group
-- Storage account with file shares (needed for Azure Container Instances)
-
-Local development uses:
-- Containerized Qdrant (`http://qdrant:6333`) from devcontainer
-- Local application debugging via VS Code
-- User-configured OpenAI and GitHub App settings
-
-Both templates are validated and compile successfully. The solution maintains full backward compatibility with existing workflows.
-
-Fixes #72.
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `aka.ms`
->   - Triggering command: `curl -fsSL REDACTED ` (dns block)
->   - Triggering command: `/usr/bin/../../opt/az/bin/python3 -Im azure.cli bicep validate --file main.local.bicep ` (dns block)
->   - Triggering command: `bicep lint main.local.bicep ` (dns block)
-> - `app.aladdin.microsoft.com`
->   - Triggering command: `/usr/bin/../../opt/az/bin/python3 -Im azure.cli bicep validate --file main.local.bicep ` (dns block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
-",Copilot,198982749,Copilot,open,2025-06-10T09:52:32Z,,,676195998,https://api.github.com/repos/microsoft/project-oagents,https://github.com/microsoft/project-oagents/pull/107,"analysisWe need to classify as performance or non-performance. The PR is about minimal Azure provisioning for local dev, reducing resources, faster provisioning, lower cost. The primary purpose is to improve performance? It says ""Faster provisioning: Minutes instead of 20+ minutes"". That is performance improvement. The keywords: ""slow provisioning"", ""faster iteration"", ""90%+ resource reduction"", ""Faster provisioning"". So it's performance. So label 'performance'.assistantfinalperformance",8,1.0,False
-3075815710,443,Enhance devcontainer.json for prebuilds and Azure CLI installation,"This PR addresses two important enhancements for the development environment:
-
-## Changes
-
-1. **Added prebuild support**
-   - Added `updateContentCommand` to devcontainer.json to enable GitHub Codespaces prebuilds
-   - This will significantly speed up container startup times when using GitHub Codespaces
-
-2. **Automated Azure CLI updates**
-   - Added automatic Azure CLI installation/update to the post-create script
-   - Added `curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash` to setup_env.sh
-   - This resolves the documented issue where users sometimes need to manually update the Azure CLI
-
-## Benefits
-
-- **Faster development environment setup**: Prebuilds will make GitHub Codespaces launch faster
-- **More reliable Azure CLI experience**: The CLI will always be updated when the container starts
-- **Better experience for time-constrained environments**: Reduces manual steps needed to get started with the sample
-
-These changes make the development experience more seamless, especially in time-constrained lab environments.
-
-Fixes #319.
-
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-05-20T06:27:24Z,2025-05-26T04:56:41Z,,819995419,https://api.github.com/repos/microsoft/document-generation-solution-accelerator,https://github.com/microsoft/document-generation-solution-accelerator/pull/443,"analysisWe need to classify as performance or non-performance. The PR is about enhancing devcontainer.json for prebuilds and Azure CLI installation. It mentions ""significantly speed up container startup times"" and ""faster development environment setup"". That is performance improvement. So classify as 'performance'.assistantfinalperformance",8,1.0,False
-3240241128,582,Add performance benchmarks requirement to contributing guidelines,"# Add performance benchmarks requirement to contributing guidelines
-
-## Summary
-
-Added a new requirement to the Testing Guidelines section of CONTRIBUTING.md mandating that contributors include specific performance benchmarks when submitting optimization-related changes. This ensures that performance improvements are backed by measurable data.
-
-**Change**: Added single bullet point ""Please include specific performance benchmarks for any optimizations"" to the Testing Guidelines section.
-
-## Review & Testing Checklist for Human
-
-- [ ] Verify the wording ""Please include specific performance benchmarks for any optimizations"" matches the intended requirement
-- [ ] Confirm placement in Testing Guidelines section is appropriate (vs other sections like Pull Request or Style Guide)
-- [ ] Check that the new guideline flows well with existing bullet points and maintains consistent tone
-
-**Recommended test plan**: Review the updated CONTRIBUTING.md file to ensure the new requirement is clear and appropriately positioned within the existing guidelines structure.
-
----
-
-### Diagram
-
-```mermaid
-%%{ init : { ""theme"" : ""default"" }}%%
-graph TD
-    CONTRIB[""CONTRIBUTING.md<br/>Contributing Guidelines""]:::major-edit
-    TEST_SECTION[""Testing Guidelines<br/>Section (lines 41-48)""]:::major-edit
-    EXISTING[""Existing Guidelines<br/>- Descriptive test names<br/>- Independent tests<br/>- API testing<br/>- Use factories<br/>- Test edge cases""]:::context
-    NEW[""NEW: Performance<br/>benchmarks requirement""]:::major-edit
-    
-    CONTRIB --> TEST_SECTION
-    TEST_SECTION --> EXISTING
-    TEST_SECTION --> NEW
-    
-    subgraph Legend
-        L1[Major Edit]:::major-edit
-        L2[Minor Edit]:::minor-edit  
-        L3[Context/No Edit]:::context
-    end
-
-classDef major-edit fill:#90EE90
-classDef minor-edit fill:#87CEEB
-classDef context fill:#FFFFFF
-```
-
-### Notes
-
-- This change directly addresses the Slack request from sahil.lavingia@gmail.com to add performance benchmarks requirement to contributing guidelines
-- Very low-risk documentation change with no code impact
-- Maintains consistency with existing bullet point format in Testing Guidelines section
-
-**Link to Devin run**: https://app.devin.ai/sessions/2cd07d8067c94caba39633c67d5a12cb  
-**Requested by**: sahil.lavingia@gmail.com",Devin,158243242,devin-ai-integration[bot],closed,2025-07-17T16:47:16Z,2025-07-17T16:50:12Z,2025-07-17T16:50:12Z,955904085,https://api.github.com/repos/antiwork/flexile,https://github.com/antiwork/flexile/pull/582,analysisWe need to classify as performance or non-performance. The PR is adding a requirement to include performance benchmarks for optimizations. The primary purpose is to improve performance? It's a documentation change requiring benchmarks for optimization changes. The primary purpose is to enforce performance measurement. The classification: performance. Because it is about performance benchmarks. So output 'performance'.assistantfinalperformance,8,1.0,False
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-05-29T16:02:40Z,,,879168187,https://api.github.com/repos/AArnott/Nerdbank.MessagePack,https://github.com/AArnott/Nerdbank.MessagePack/pull/414,8,1.0,True
 3210760092,3298,Cursor/prepare performance benchmarking publishing system 349b,"# 🚀 Automated Benchmarking System with GitHub Pages Publishing
 
 TODO: comment creation (403 error fix)
@@ -643,72 +425,237 @@ This PR is ready for review. The system is:
 - **Extensible**: Easy to add new benchmarks and metrics
 - **Production-Ready**: Handles errors gracefully
 
-The placeholder `run.sh` script can be replaced with actual benchmark implementation when ready, without changing the rest of the system.",Cursor,1109011,myungjoo,open,2025-07-08T02:08:57Z,,,249615315,https://api.github.com/repos/nnstreamer/nntrainer,https://github.com/nnstreamer/nntrainer/pull/3298,"analysisWe need to classify as 'performance' or 'non-performance'. The PR is about adding automated benchmarking system, publishing results, etc. It's clearly performance-related. So label 'performance'.assistantfinalperformance",8,1.0,True
-3226670834,202,Create speed benchmark for execute_sequence,"## Pull Request Template
+The placeholder `run.sh` script can be replaced with actual benchmark implementation when ready, without changing the rest of the system.",Cursor,1109011,myungjoo,open,2025-07-08T02:08:57Z,,,249615315,https://api.github.com/repos/nnstreamer/nntrainer,https://github.com/nnstreamer/nntrainer/pull/3298,8,1.0,True
+3258420806,10177,feat(agent): support multiple flow log senders,"### This PR is for:
 
-### Description
-Adds an ignored integration test to benchmark the `execute_sequence` function's wall-clock performance against a real website. The test launches the MCP agent, executes a simple navigation and wait workflow, and compares client-side elapsed time with the agent's reported duration.
+- [x] Agent  
 
-### Type of Change
-- [ ] Bug fix
-- [x] New feature  
-- [ ] Breaking change
-- [ ] Documentation update
-- [ ] Other:
+---
 
-### Video Demo (Recommended)
-🎥 **Please include a video demo** showing your changes in action! We might use it to post on social media and grow the community.
+### Feature: 
 
-**Suggested editing tools:**
-- [Cap.so](https://cap.so/)
-- [Screen.studio](https://screen.studio/)
-- [CapCut](https://www.capcut.com/)
-- [Kapwing](https://www.kapwing.com/)
-- [Descript](https://www.descript.com/)
+- 支持多线程并发发送日志，提升高吞吐量场景稳定性
+- 引入了基于 crossbeam-channel 的 全新 MPMC（多生产者多消费者）队列实现，用于替代或补充现有的 ring-buffer 实现。
+
+#### 背景问题
+
+在专属采集器或高速数据面（如 2 Mpps、L4 Flow 限速 4 万条/s）下，现有链路中仅包含单个发送队列和单个 `UniformSenderThread`，很容易出现写入过快、队列被写满、日志覆盖丢弃的问题，最终影响日志完整性与可观测性。
+
+---
+
+#### 本次改动实现
+
+##### ✅ 主要改动
+在 agent/crates/public/src/queue/ 下新增：mpmc_queue.rs：实现基于 crossbeam_channel 的 Sender、Receiver 和 StatsHandle，支持 MPMC 模型；
+
+修改 queue/mod.rs： 引入并导出 mpmc_queue，增加 bounded_mpmc() 构造函数
+
+##### ✅ 新增功能：
+
+- 引入可配置的 **日志发送并发度参数**，包括：
+  - `l4_flow_senders`
+  - `l7_flow_senders`
+  - `metric_senders`
+  - `pcap_senders` 等
+
+- 每类日志类型按配置值创建多个：
+  - 有界 `DebugSender` 队列（`queue::bounded_with_debug`）
+  - 对应的 `UniformSenderThread` 实例
+
+- 所有 sender 命名后缀追加编号（如 `3-flowlog-to-collector-sender-0` ~ `-3`）
+
+##### ✅ 日志发送改为并发分发：
+
+- **负载均衡策略**：目前支持：
+  - Round-Robin（默认）
+  - 哈希分发（基于五元组）可扩展支持
+
+- 发送线程存入 `Vec<UniformSenderThread<_>>`，在 `Trident::start()` 中统一启动，优雅退出时统一停止
+
+##### ✅ 配置示例（YAML）：
+
+```yaml
+log:
+  l4_flow_senders: 4
+  l7_flow_senders: 2
+  metric_senders: 2
+
+## ChatGPT/CodeX 设计思路
+
+1. 配置并发度
+为每种日志类型新增一个配置项，如 l4_flow_senders、metrics_senders 等，用于指定要创建的 sender 数量。
+
+2. 创建多组队列及线程
+根据上述配置，循环调用 queue::bounded_with_debug 和 UniformSenderThread::new 创建若干队列及对应的 UniformSenderThread。可以在队列名称后追加索引区分，例如 ""3-flowlog-to-collector-sender-1""、""3-flowlog-to-collector-sender-2"" 等。所有生成的线程存入 Vec<UniformSenderThread<_>> 统一管理。
+
+3. 在聚合／生成阶段分发数据
+原先的发送链路（如 FlowAggrThread）只向一个 DebugSender 写数据。扩展后，可在 CollectorThread 或 FlowAggrThread 中实现简单的负载均衡策略：
+
+- 轮询：对每个输出条目按顺序选择不同的 DebugSender。
+- 哈希：根据流的五元组或其他关键字段计算哈希，选择固定的 sender，从而保持同一流的数据顺序。
+分发后即可并行写入多个发送队列。
+
+4. 启动与管理多个线程
+
+在 Trident::start() 中遍历 Vec<UniformSenderThread<_>>，逐一调用 start() 启动。停止时同样遍历 notify_stop 或 stop()。
+统计信息和异常处理可沿用现有逻辑，只需将每个线程的计数器注册到 stats_collector。
+
+5. 多消费者/MPMC支持
+
+多消费者（MPMC, Multi-Producer Multi-Consumer）支持是对当前队列模型（MPSC: 多生产者单消费者）的架构级增强，其核心目标是提升消费者处理吞吐能力，降低单消费者瓶颈对系统稳定性的影响
+",OpenAI_Codex,4133689,svc-design,open,2025-07-24T04:11:19Z,,,448599559,https://api.github.com/repos/deepflowio/deepflow,https://github.com/deepflowio/deepflow/pull/10177,8,1.0,False
+3088691462,1751,Add Performance Testing Infrastructure,"This PR adds a comprehensive performance testing infrastructure to the project using the `benny` benchmarking library. The implementation enables automated detection of performance regressions between PRs and the main branch.
+
+## Features Added
+
+- Added performance testing framework with `benny` library
+- Created TypeScript configuration for performance tests
+- Implemented a sample model creation performance test
+- Added npm scripts for running performance tests locally:
+  - `npm run performance` - Builds and runs all performance tests
+  - `npm run performance:build` - Just builds the performance tests
+  - `npm run performance:run` - Runs pre-built performance tests
+  - `npm run performance:compare` - Compares results between two test runs
+
+- Added GitHub Actions workflow that:
+  - Runs performance tests on each PR
+  - Stores results as artifacts
+  - Downloads previous results from the main branch
+  - Compares current performance with baseline
+  - Fails the check if performance decreases beyond a threshold (default 20%)
+
+## Usage
+
+To run performance tests locally:
+
+```bash
+npm run performance
+```
+
+To compare two result files:
+
+```bash
+npm run performance:compare -- path/to/baseline.json path/to/current.json [threshold]
+```
+
+The performance tests save results in JSON, CSV, and HTML chart formats for easy analysis.
+
+## Documentation
+
+Added documentation in `packages/dynamoose/performance/README.md` that explains:
+- How to run performance tests
+- How to add new performance tests
+- How performance regression detection works
+- How to interpret the results
+
+Fixes #1681.
+
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-05-24T19:48:28Z,,,16962535,https://api.github.com/repos/dynamoose/dynamoose,https://github.com/dynamoose/dynamoose/pull/1751,8,1.0,False
+3224713270,31987,Cursor/optimize ticket buying decisions for profit 3347,"Thank you for contributing to LangChain!
+
+- [ ] **PR title**: ""package: description""
+  - Where ""package"" is whichever of langchain, core, etc. is being modified. Use ""docs: ..."" for purely docs changes, ""infra: ..."" for CI changes.
+  - Example: ""core: add foobar LLM""
 
 
-### AI Review & Code Quality
-- [ ] I asked AI to critique my PR and incorporated feedback
-- [ ] I formatted my code properly
-- [ ] I tested my changes locally
+- [ ] **PR message**: ***Delete this entire checklist*** and replace with
+    - **Description:** a description of the change
+    - **Issue:** the issue # it fixes, if applicable
+    - **Dependencies:** any dependencies required for this change
+    - **Twitter handle:** if your PR gets announced, and you'd like a mention, we'll gladly shout you out!
 
-### Checklist
-- [x] Code follows project style guidelines
-- [ ] Added video demo (recommended)
-- [ ] Updated documentation if needed
 
-### Additional Notes
-This benchmark provides a reproducible performance snapshot of `execute_sequence` in a real-world browsing scenario.
+- [ ] **Add tests and docs**: If you're adding a new integration, please include
+  1. a test for the integration, preferably unit tests that do not rely on network access,
+  2. an example notebook showing its use. It lives in `docs/docs/integrations` directory.
 
-To run: `cargo test -- --ignored` (requires a graphical environment and browser).
-The target URL can be customized via the `MCP_BENCH_TARGET_URL` environment variable.",Cursor,25003283,louis030195,closed,2025-07-13T17:18:47Z,2025-07-13T17:32:26Z,2025-07-13T17:32:26Z,964314175,https://api.github.com/repos/mediar-ai/terminator,https://github.com/mediar-ai/terminator/pull/202,analysisWe need to classify as performance or non-performance. The PR adds a speed benchmark for execute_sequence. It's about measuring wall-clock performance. That is performance. So label 'performance'.assistantfinalperformance,8,1.0,False
-3233772745,208,Add format function instruction for clippy compliance,"## Pull Request Template
 
-### Description
-Adds a new section to the `terminator-development-guide.mdc` outlining best practices for using the `format!` macro, focusing on efficiency, readability, and adherence to `cargo clippy` guidelines.
+- [ ] **Lint and test**: Run `make format`, `make lint` and `make test` from the root of the package(s) you've modified. See contribution guidelines for more: https://python.langchain.com/docs/contributing/
 
-### Type of Change
-- [ ] Bug fix
-- [ ] New feature  
-- [ ] Breaking change
-- [x] Documentation update
-- [ ] Other:
+Additional guidelines:
+- Make sure optional dependencies are imported within a function.
+- Please do not add dependencies to pyproject.toml files (even optional ones) unless they are required for unit tests.
+- Most PRs should not touch more than one package.
+- Changes should be backwards compatible.
 
-### Video Demo (Recommended)
-N/A
+If no one reviews your PR within a few days, please @-mention one of baskaryan, eyurtsev, ccurme, vbarda, hwchase17.
+",Cursor,116213574,emaceira,closed,2025-07-12T02:39:02Z,2025-07-13T03:22:55Z,,552661142,https://api.github.com/repos/langchain-ai/langchain,https://github.com/langchain-ai/langchain/pull/31987,8,1.0,False
+3097403205,21,Optimize bandwidth aggregation with out-of-order processing and dynamic allocation,"# Bandwidth Aggregation Optimization
 
-### AI Review & Code Quality
-- [x] I asked AI to critique my PR and incorporated feedback
-- [x] I formatted my code properly
-- [x] I tested my changes locally
+This PR implements two key optimizations to improve bandwidth aggregation efficiency when using workers with unbalanced bandwidth configurations:
 
-### Checklist
-- [x] Code follows project style guidelines
-- [ ] Added video demo (recommended)
-- [x] Updated documentation if needed
+## Changes Made
 
-### Additional Notes
-This update aims to ensure our codebase consistently meets `cargo clippy -- -D warnings` standards and minimizes unnecessary string allocations.",Cursor,25003283,louis030195,closed,2025-07-15T21:38:05Z,2025-07-15T21:38:25Z,2025-07-15T21:38:25Z,964314175,https://api.github.com/repos/mediar-ai/terminator,https://github.com/mediar-ai/terminator/pull/208,"analysisWe need to classify as performance or non-performance. The PR is about adding format function instruction for clippy compliance, focusing on efficiency, readability, and adherence to clippy guidelines. It mentions minimizing unnecessary string allocations. That is performance improvement? It's documentation update, but mentions efficiency. The primary purpose is to improve performance? It's documentation, but the content is about efficiency. The classification: performance or non-performance. The guidelines: performance-related PRs may contain keywords like memory, optimization, speed, etc. This PR mentions ""efficiency"" and ""minimizes unnecessary string allocations"". That is performance. But it's documentation. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The PR is documentation update to ensure code meets clippy standards and minimize string allocations. That is performance improvement. So classify as 'performance'.assistantfinalperformance",8,1.0,False
+1. **Out-of-order Frame Processing**: Modified the receiver to buffer frames that arrive out of order, preventing slower workers from blocking faster ones
+2. **Dynamic Frame Allocation**: Implemented performance tracking and dynamic frame distribution based on actual worker throughput
+
+## Performance Results
+
+- **Before**: 100KB/s + 500KB/s workers achieved only 34.72% efficiency (208.31KB/s actual vs 600KB/s expected)
+- **After**: 100KB/s + 500KB/s workers achieved 69.44% efficiency (416.64KB/s actual vs 600KB/s expected)
+- **Balanced Workers**: 300KB/s + 300KB/s workers achieved 100.59% efficiency (603.53KB/s actual vs 600KB/s expected)
+
+## Testing
+
+Tested with bandwidth-test tool using various worker configurations to verify improvements:
+- Unbalanced workers (100KB/s + 500KB/s): Efficiency improved from 34.72% to 69.44%
+- Balanced workers (300KB/s + 300KB/s): Achieved 100.59% efficiency
+
+Link to Devin run: https://app.devin.ai/sessions/3571e39c6d55434a84d80937d3437d5b
+Requested by: fatedier
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-28T13:27:57Z,2025-05-28T13:36:35Z,2025-05-28T13:36:35Z,119536149,https://api.github.com/repos/fatedier/fft,https://github.com/fatedier/fft/pull/21,8,1.0,False
+3097456896,22,Advanced Bandwidth Aggregation Optimization,"# Advanced Bandwidth Aggregation Optimization
+
+This PR implements several advanced optimizations to further improve the bandwidth aggregation efficiency, building on the previous optimizations (out-of-order frame processing and dynamic allocation).
+
+## New Optimizations
+
+### 1. RTT-Based Congestion Control
+- Added RTT statistics tracking with smoothed RTT and RTT variation measurements
+- Enhanced congestion window adjustment based on network conditions
+- Early congestion detection using RTT increases
+- Improved slow start exit conditions based on RTT measurements
+
+### 2. Adaptive Frame Sizing
+- Dynamically adjusts frame size based on network conditions
+- Increases frame size when network is stable (low RTT variation)
+- Decreases frame size during congestion or unstable network conditions
+- Configurable minimum and maximum frame size bounds
+
+### 3. Predictive Retransmission
+- Proactively retransmits frames that might be lost based on RTT timeout
+- Reduces head-of-line blocking by not waiting for explicit timeouts
+- Improves performance on networks with packet loss
+
+## Expected Benefits
+
+These optimizations should further improve bandwidth aggregation efficiency, especially in the following scenarios:
+- Networks with variable latency
+- Connections with occasional packet loss
+- Highly asymmetric worker configurations
+- Long-distance transfers with higher RTT
+
+The adaptive frame sizing will help optimize memory usage and throughput based on actual network conditions, while the enhanced congestion control will better utilize available bandwidth while avoiding congestion collapse.
+
+Link to Devin run: https://app.devin.ai/sessions/58cab6f5ac1f41a295ed3edc4e6f7eb5
+Requested by: fatedier
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-28T13:44:50Z,2025-05-30T08:52:49Z,,119536149,https://api.github.com/repos/fatedier/fft,https://github.com/fatedier/fft/pull/22,8,1.0,False
+3067474905,97,feat(cache): async log processing with queue,"# Use Valkey for async log processing with queue
+
+Added Redis (Valkey) for async log processing using a message queue. Modified the insertLog function to send items to a queue, and created a worker that listens to the queue and handles the actual database insertions.
+
+## Changes
+- Added Valkey service to docker-compose.yml
+- Created Redis client utility in redis.ts
+- Modified insertLog to publish to queue instead of direct DB insert
+- Created worker to consume from queue and handle DB insertions
+- Updated serve.ts to start the worker
+
+Link to Devin run: https://app.devin.ai/sessions/ab026fb2d0e3474ea172fa879b93df26
+Requested by: Luca Steeb
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-15T22:07:53Z,2025-05-16T13:03:44Z,2025-05-16T13:03:44Z,965250949,https://api.github.com/repos/theopenco/llmgateway,https://github.com/theopenco/llmgateway/pull/97,8,1.0,False
 3097996516,67,Add HTTP benchmark implementation,"# HTTP Benchmark Implementation
 
 This PR adds benchmarking tools to compare the performance of the Python (FastAPI) and Rust implementations of the RequestRepo backend.
@@ -745,33 +692,7 @@ https://app.devin.ai/sessions/053551a2f773437a96e8b3dc0f59f99a
 
 ## Requested by
 Dragos Albastroiu (albastroiudragos@gmail.com)
-",Devin,158243242,devin-ai-integration[bot],closed,2025-05-28T16:59:11Z,2025-05-29T16:50:57Z,2025-05-29T16:50:57Z,583054436,https://api.github.com/repos/adrgs/requestrepo,https://github.com/adrgs/requestrepo/pull/67,analysisWe need to classify as performance or non-performance. The PR adds HTTP benchmark implementation. It's about benchmarking performance. So it's performance.assistantfinalperformance,8,0.34894580669367165,False
-3249191998,46,Refactor OSM cache benchmarking helpers,"## Summary
-- break out provider loading and engine benchmarking into helpers
-- compute performance metrics with a dedicated helper
-- update `benchmark_routing_performance` to use new helpers
-
-## Testing
-- `pytest -q` *(fails: cannot import graphserver)*
-
-------
-https://chatgpt.com/codex/tasks/task_e_687dd791801883329f83ad97921b37be",OpenAI_Codex,51985,bmander,closed,2025-07-21T15:55:57Z,2025-07-25T06:16:59Z,2025-07-25T06:16:59Z,122162,https://api.github.com/repos/bmander/graphserver,https://github.com/bmander/graphserver/pull/46,"analysisWe need to classify the pull request as performance or non-performance. The title: ""Refactor OSM cache benchmarking helpers"". Summary: break out provider loading and engine benchmarking into helpers, compute performance metrics with a dedicated helper, update benchmark_routing_performance to use new helpers. The description mentions benchmarking, compute performance metrics. That is performance-related. The keywords: ""benchmark"", ""performance metrics"". So it's performance. So classification: performance.assistantfinalperformance",8,0.2282445798448968,False
-3089613637,893,Optimize token relation computation,"## Summary
-- memoize relation lookup in `_compute_onetomany_relations`
-- add benchmark script for the relation computation
-- test the new behaviour explicitly
-
-## Testing
-- `pytest -q`
-- `python benchmarks/benchmark_onetomany.py`
-",OpenAI_Codex,1231232,jdesboeufs,closed,2025-05-25T22:22:09Z,2025-06-01T21:24:58Z,,28606501,https://api.github.com/repos/addok/addok,https://github.com/addok/addok/pull/893,"analysisWe need to classify the pull request as 'performance' or 'non-performance'. The title: ""Optimize token relation computation"". The body: mentions memoize relation lookup, add benchmark script, test new behaviour. This is about improving performance of token relation computation. Keywords: optimize, memoize, benchmark. So it's performance. So output 'performance'.assistantfinalperformance",8,0.2114299656715644,False
-3081150843,35,Optimize koota benchmarks,"## Summary
-- update `benchmarks/koota.js` to use direct store access via `useStores`
-- cache queries for faster loops
-
-## Testing
-- `npm run format`
-- `npm run bench`",OpenAI_Codex,11973041,felixtrz,closed,2025-05-21T18:58:06Z,2025-05-22T21:38:03Z,,720999772,https://api.github.com/repos/elixr-games/elics,https://github.com/elixr-games/elics/pull/35,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize koota benchmarks"". Body: update benchmarks to use direct store access via useStores, cache queries for faster loops. This is about improving performance of benchmarks. So it's performance.assistantfinalperformance",8,0.1747133462712777,False
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-28T16:59:11Z,2025-05-29T16:50:57Z,2025-05-29T16:50:57Z,583054436,https://api.github.com/repos/adrgs/requestrepo,https://github.com/adrgs/requestrepo/pull/67,8,1.0,False
 3049349544,21194,feat: add testing suite,"# Add k6 Performance Testing Suite
 
 This PR adds a comprehensive k6 performance testing suite to Cal.com with integration into the CI/CD pipeline. The implementation includes:
@@ -815,365 +736,316 @@ Added a k6 performance testing suite with load, stress, and spike tests for key 
 
 <!-- End of auto-generated description by mrge. -->
 
-",Devin,158243242,devin-ai-integration[bot],closed,2025-05-08T15:22:11Z,2025-05-08T15:22:32Z,,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/21194,analysisWe need to classify as performance or non-performance. The PR adds a k6 performance testing suite. That is performance-related. So label 'performance'.assistantfinalperformance,8,0.174271950491237,False
-3077584749,10,Add benchmark script for EliCS vs ecsy,"## Summary
-- add `ecsy` as a dev dependency
-- implement a detailed benchmark runner with packed, simple, fragmented, entity cycle, and add/remove tests
-- document benchmark scenarios in README
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-08T15:22:11Z,2025-05-08T15:22:32Z,,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/21194,8,1.0,False
+3226670834,202,Create speed benchmark for execute_sequence,"## Pull Request Template
 
-## Testing
-- `npm test` *(fails: jest not found)*",OpenAI_Codex,11973041,felixtrz,closed,2025-05-20T16:21:10Z,2025-05-20T22:16:19Z,,720999772,https://api.github.com/repos/elixr-games/elics,https://github.com/elixr-games/elics/pull/10,"analysisWe need to classify whether the primary purpose is performance. The PR adds benchmark script for EliCS vs ecsy, includes dev dependency, implements benchmark runner, documents scenarios. This is about performance measurement, benchmarking. So it's performance. The classification: 'performance'.assistantfinalperformance",8,0.17409845226568443,False
-3074924091,57,Optimize iPod component Zustand selectors,"## Summary
-- reduce Zustand subscriptions in `IpodAppComponent` by batching selectors
+### Description
+Adds an ignored integration test to benchmark the `execute_sequence` function's wall-clock performance against a real website. The test launches the MCP agent, executes a simple navigation and wait workflow, and compares client-side elapsed time with the agent's reported duration.
 
-## Testing
-- `npm run lint` *(fails: numerous pre-existing lint errors)*",OpenAI_Codex,2830514,ryokun6,closed,2025-05-19T20:20:34Z,2025-05-21T21:28:27Z,,923332984,https://api.github.com/repos/ryokun6/ryos,https://github.com/ryokun6/ryos/pull/57,"analysisWe need to classify whether the primary purpose is performance. The title: ""Optimize iPod component Zustand selectors"". Summary: ""reduce Zustand subscriptions in IpodAppComponent by batching selectors"". This is about reducing subscriptions, likely performance improvement. So classification: performance.assistantfinalperformance",8,0.15330480231048443,False
-3071083444,82,Improve behavior library performance,"## Summary
-- add a HashSet to BehaviorCollection for quicker duplicate checks
-- clear the set during detach/reset
-- reuse behavior collection in Interaction event handlers
-- preallocate results list in Interaction.ExecuteActions
+### Type of Change
+- [ ] Bug fix
+- [x] New feature  
+- [ ] Breaking change
+- [ ] Documentation update
+- [ ] Other:
 
-## Testing
-- `dotnet test --no-build` *(fails: `dotnet` not found)*",OpenAI_Codex,2297442,wieslawsoltes,closed,2025-05-17T21:41:04Z,2025-05-18T19:36:42Z,,792160692,https://api.github.com/repos/wieslawsoltes/Xaml.Behaviors,https://github.com/wieslawsoltes/Xaml.Behaviors/pull/82,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve behavior library performance"". Body mentions adding HashSet for quicker duplicate checks, clear set during detach/reset, reuse behavior collection, preallocate results list. These are performance improvements. So classification: performance.assistantfinalperformance",8,0.14566656341363368,False
-3078172167,17,Improve ECS performance benchmarks,"## Summary
-- implement a fast numeric `BitSet`
-- update `Entity` and `QueryManager` to reduce query updates
-- optimize query checks
-- refresh benchmark results in the README
+### Video Demo (Recommended)
+🎥 **Please include a video demo** showing your changes in action! We might use it to post on social media and grow the community.
 
-## Testing
-- `npm run build`
-- `npm test`
-- `npm run bench`",OpenAI_Codex,11973041,felixtrz,closed,2025-05-20T20:33:59Z,2025-05-20T22:15:57Z,,720999772,https://api.github.com/repos/elixr-games/elics,https://github.com/elixr-games/elics/pull/17,"analysisWe need to classify as performance or non-performance. The title: ""Improve ECS performance benchmarks"". Body: mentions implementing fast numeric BitSet, update Entity and QueryManager to reduce query updates, optimize query checks, refresh benchmark results. This is clearly performance improvement. So label 'performance'.assistantfinalperformance",8,0.14366170857518756,False
-3084684604,39,Improve entity destroy performance,"## Summary
-- optimize Entity.destroy to avoid creating new BitSet and iterating using an array
-- simplify entityCycle benchmark to iterate query set directly
+**Suggested editing tools:**
+- [Cap.so](https://cap.so/)
+- [Screen.studio](https://screen.studio/)
+- [CapCut](https://www.capcut.com/)
+- [Kapwing](https://www.kapwing.com/)
+- [Descript](https://www.descript.com/)
 
-## Testing
-- `npm run build`
-- `npm run test`
-- `npm run format`
-",OpenAI_Codex,11973041,felixtrz,closed,2025-05-22T22:27:44Z,2025-05-22T22:30:08Z,2025-05-22T22:30:08Z,720999772,https://api.github.com/repos/elixr-games/elics,https://github.com/elixr-games/elics/pull/39,"analysisWe need to classify as performance or non-performance. The title: ""Improve entity destroy performance"". The body: mentions optimizing Entity.destroy to avoid creating new BitSet and iterating using an array, simplify benchmark. This is clearly performance improvement. So label 'performance'.assistantfinalperformance",8,0.14356062215303272,False
-3084770989,42,Improve query update performance,"## Summary
-- optimize `Entity.destroy` to loop only through active components
-- map queries by component for targeted updates
-- update world to supply component manager to query manager
-- enhance `QueryManager.resetEntity` efficiency
-- add integration tests for new query manager behavior
 
-## Testing
-- `npm run format`
-- `npm run build`
-- `npm run test`
-",OpenAI_Codex,11973041,felixtrz,closed,2025-05-22T23:27:38Z,2025-05-22T23:59:39Z,2025-05-22T23:59:39Z,720999772,https://api.github.com/repos/elixr-games/elics,https://github.com/elixr-games/elics/pull/42,"analysisWe need to classify as performance or non-performance. The title: ""Improve query update performance"". The body mentions optimizing Entity.destroy, mapping queries by component, etc. It's clearly performance improvement. So label 'performance'.assistantfinalperformance",8,0.13438978125118548,False
-3193198936,841,feat(telemetry): implement performance testing framework (Phase 8),"## Summary
+### AI Review & Code Quality
+- [ ] I asked AI to critique my PR and incorporated feedback
+- [ ] I formatted my code properly
+- [ ] I tested my changes locally
 
-This PR implements Phase 8 of the telemetry system migration (#833), focusing on comprehensive performance testing and validation. The primary goal was to ensure the telemetry system has minimal performance impact when disabled (<100ns) while providing robust testing capabilities.
+### Checklist
+- [x] Code follows project style guidelines
+- [ ] Added video demo (recommended)
+- [ ] Updated documentation if needed
 
-## Key Achievements
+### Additional Notes
+This benchmark provides a reproducible performance snapshot of `execute_sequence` in a real-world browsing scenario.
 
-### 🎯 Performance Goals Met
-- **2.4 nanoseconds** per operation when telemetry is disabled (target: <100ns)
-- **Zero memory allocations** on the disabled path
-- Atomic flag checking optimized to 1.3ns
+To run: `cargo test -- --ignored` (requires a graphical environment and browser).
+The target URL can be customized via the `MCP_BENCH_TARGET_URL` environment variable.",Cursor,25003283,louis030195,closed,2025-07-13T17:18:47Z,2025-07-13T17:32:26Z,2025-07-13T17:32:26Z,964314175,https://api.github.com/repos/mediar-ai/terminator,https://github.com/mediar-ai/terminator/pull/202,8,1.0,False
+3216324404,950,Enhance multi-agent swarm structures,"Thank you for contributing to Swarms!
 
-### 🧪 Testing Infrastructure
-- **MockTransport**: Thread-safe Sentry transport implementation for testing
-- **Test Helpers**: Unified testing interface for both `testing.T` and `testing.B`
-- **Integration Tests**: Complete end-to-end telemetry flow validation
-- **Performance Benchmarks**: Comprehensive benchmark suite
+- Description: This PR significantly enhances the `HierarchicalSwarm` structure to improve its reliability, performance, and manageability. The core changes focus on making multi-agent task execution more robust and efficient for production environments.
 
-## What's Changed
+  Key improvements include:
+  - **Enhanced Reliability:** Implemented agent health monitoring, automatic failure detection, configurable retry mechanisms with exponential backoff, and graceful degradation.
+  - **Improved Performance:** Enabled concurrent task execution using `ThreadPoolExecutor`, intelligent load balancing, and priority-based scheduling.
+  - **Robust Task Management:** Added per-task timeouts, retry counts, and dependency management for complex workflows.
+  - **Better Observability:** Introduced real-time performance metrics and comprehensive logging for easier monitoring and troubleshooting.
+  - **Graceful Shutdown:** Added context manager support for proper resource cleanup.
+- Issue: None
+- Dependencies: None
+- Tag maintainer: kye@apac.ai
+- Twitter handle:
 
-### MockTransport Implementation
-- Implements full `sentry.Transport` interface
-- Thread-safe event capture and retrieval
-- Helper methods for test assertions
-- Support for async event verification
+Please make sure your PR is passing linting and testing before submitting. Run `make format`, `make lint` and `make test` to check this locally.
 
-### Test Coverage
-- ✅ Telemetry system unit tests
-- ✅ Integration tests with error package
-- ✅ End-to-end flow tests
-- ✅ Privacy compliance verification
-- ✅ Concurrent operation tests
-- ✅ Performance benchmarks
+See contribution guidelines for more information on how to write/run tests, lint, etc: 
+https://github.com/kyegomez/swarms/blob/master/CONTRIBUTING.md
 
-### Performance Optimizations
-- Atomic flag for fast telemetry state checking
-- Optimized capture functions with early returns
-- Zero-allocation path when disabled
+If you're adding a new integration, please include:
+  1. a test for the integration, preferably unit tests that do not rely on network access,
+  2. an example notebook showing its use.
 
-## Performance Results
 
-```
-BenchmarkOptimizedTelemetryDisabled/FastCaptureError-4     496724498    2.423 ns/op    0 B/op    0 allocs/op
-BenchmarkOptimizedTelemetryDisabled/FastCaptureMessage-4   491951907    2.448 ns/op    0 B/op    0 allocs/op
-BenchmarkOptimizedTelemetryDisabled/AtomicCheck-4          897079670    1.346 ns/op    0 B/op    0 allocs/op
-```
+Maintainer responsibilities:
+  - General / Misc / if you don't know who to tag: kye@apac.ai
+  - DataLoaders / VectorStores / Retrievers: kye@apac.ai
+  - swarms.models: kye@apac.ai
+  - swarms.memory: kye@apac.ai
+  - swarms.structures: kye@apac.ai
 
-## Testing Guidelines
+If no one reviews your PR within a few days, feel free to email Kye at kye@apac.ai
 
-### Using MockTransport
-```go
-config, cleanup := telemetry.InitForTesting(t)
-defer cleanup()
+See contribution guidelines for more information on how to write/run tests, lint, etc: https://github.com/kyegomez/swarms
 
-// Your test code here
-telemetry.CaptureError(err, ""component"")
+<!-- readthedocs-preview swarms start -->
+----
+📚 Documentation preview 📚: https://swarms--950.org.readthedocs.build/en/950/
 
-// Verify
-telemetry.AssertEventCount(t, config.MockTransport, 1, 100*time.Millisecond)
-```
+<!-- readthedocs-preview swarms end -->",Cursor,98760976,kyegomez,open,2025-07-09T15:25:27Z,,,639195966,https://api.github.com/repos/kyegomez/swarms,https://github.com/kyegomez/swarms/pull/950,8,1.0,False
+3240241128,582,Add performance benchmarks requirement to contributing guidelines,"# Add performance benchmarks requirement to contributing guidelines
 
-### Performance Testing
-```go
-// Use optimized functions in production code
-if telemetry.IsTelemetryEnabled() {
-    telemetry.CaptureError(err, component)
-}
-```
+## Summary
 
-## Files Changed
-- `internal/telemetry/mock_transport.go` - MockTransport implementation
-- `internal/telemetry/test_helpers.go` - Testing utilities
-- `internal/telemetry/integration_test.go` - Integration tests
-- `internal/telemetry/e2e_test.go` - End-to-end tests
-- `internal/telemetry/benchmark_test.go` - Performance benchmarks
-- `internal/telemetry/optimized_capture.go` - Performance optimizations
-- `internal/telemetry/optimized_benchmark_test.go` - Optimized benchmarks
+Added a new requirement to the Testing Guidelines section of CONTRIBUTING.md mandating that contributors include specific performance benchmarks when submitting optimization-related changes. This ensures that performance improvements are backed by measurable data.
 
-## Related Issues
-- Implements Phase 8 of #833
-- Continues work from PR #839 (Phase 7)
+**Change**: Added single bullet point ""Please include specific performance benchmarks for any optimizations"" to the Testing Guidelines section.
 
-## Checklist
-- [x] Tests pass
-- [x] Linter passes
-- [x] Performance targets met
-- [x] Documentation updated
-- [x] No breaking changes
+## Review & Testing Checklist for Human
 
-## Next Steps
-Phase 9 will focus on documentation and examples to help developers integrate with the new telemetry system.
+- [ ] Verify the wording ""Please include specific performance benchmarks for any optimizations"" matches the intended requirement
+- [ ] Confirm placement in Testing Guidelines section is appropriate (vs other sections like Pull Request or Style Guide)
+- [ ] Check that the new guideline flows well with existing bullet points and maintains consistent tone
 
-🤖 Generated with [Claude Code](https://claude.ai/code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>
-
-<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
-## Summary by CodeRabbit
-
-* **New Features**
-  * Introduced a mock transport for capturing and inspecting telemetry events in tests.
-  * Added optimized functions for fast telemetry state checks and event capturing.
-  * Provided utilities for initializing and asserting telemetry events in test environments.
-  * Added a recommended asynchronous telemetry worker with rate limiting and circuit breaker for reliable error reporting.
-  * Integrated telemetry state cache updates on settings changes to ensure accurate telemetry enablement status.
-
-* **Tests**
-  * Added comprehensive unit, integration, end-to-end, and benchmark tests for telemetry, including privacy scrubbing, concurrency, and performance scenarios.
-  * Included helpers for verifying event content, count, levels, and tags during testing.
-  * Validated asynchronous and synchronous telemetry error reporting behaviors and non-blocking guarantees.
-<!-- end of auto-generated comment: release notes by coderabbit.ai -->",Claude_Code,7030001,tphakala,closed,2025-07-01T17:00:54Z,2025-07-01T18:11:08Z,2025-07-01T18:11:08Z,707764474,https://api.github.com/repos/tphakala/birdnet-go,https://github.com/tphakala/birdnet-go/pull/841,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""feat(telemetry): implement performance testing framework (Phase 8)"". Body includes performance goals, benchmarks, optimization. So it's performance. So label 'performance'.assistantfinalperformance",8,0.1106500073145271,False
-3113190475,2073,docs: update trusted hash guide,"- [x] Analyzed repository structure and understood the issue
-- [x] Confirmed build system works correctly
-- [x] Identified that quick-start.md already uses the new command format
-- [x] Update celestia-node-trusted-hash.md to use the new single-call command instead of two separate curl calls
-- [x] Test that the markdown lints correctly after changes
-- [x] Verify build still works after changes
-
-The issue requests updating the trusted hash guide to use a more efficient single API call command instead of making two separate curl requests. This reduces network calls and improves user experience.
-
-Current state: The file `/how-to-guides/celestia-node-trusted-hash.md` still uses the old two-call approach on lines 50-51, while `/how-to-guides/quick-start.md` already uses the new efficient single-call format.
-
-Fixes #2033.
+**Recommended test plan**: Review the updated CONTRIBUTING.md file to ensure the new requirement is clear and appropriately positioned within the existing guidelines structure.
 
 ---
 
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-03T09:30:34Z,2025-06-04T01:15:59Z,2025-06-04T01:15:59Z,470727349,https://api.github.com/repos/celestiaorg/docs,https://github.com/celestiaorg/docs/pull/2073,analysisWe need to classify as performance or non-performance. The PR updates docs to use a more efficient single API call command instead of two separate curl requests. The issue requests updating the trusted hash guide to use a more efficient single API call command instead of making two separate curl requests. This reduces network calls and improves user experience. The primary purpose is to improve performance (network calls). So classification: performance.assistantfinalperformance,8,0.09781977172968227,False
-3110867755,4915,docs: Add IAVL v1 migration guide for consensus node operators,"This PR adds comprehensive documentation for consensus node operators on how to migrate from IAVL v0 to IAVL v1 to achieve optimal performance benefits with celestia-app v4.
+### Diagram
 
-## Background
+```mermaid
+%%{ init : { ""theme"" : ""default"" }}%%
+graph TD
+    CONTRIB[""CONTRIBUTING.md<br/>Contributing Guidelines""]:::major-edit
+    TEST_SECTION[""Testing Guidelines<br/>Section (lines 41-48)""]:::major-edit
+    EXISTING[""Existing Guidelines<br/>- Descriptive test names<br/>- Independent tests<br/>- API testing<br/>- Use factories<br/>- Test edge cases""]:::context
+    NEW[""NEW: Performance<br/>benchmarks requirement""]:::major-edit
+    
+    CONTRIB --> TEST_SECTION
+    TEST_SECTION --> EXISTING
+    TEST_SECTION --> NEW
+    
+    subgraph Legend
+        L1[Major Edit]:::major-edit
+        L2[Minor Edit]:::minor-edit  
+        L3[Context/No Edit]:::context
+    end
 
-With celestia-app v4, the state machine uses IAVL v1.x which provides roughly 10x performance improvement over v0.x through data locality optimizations. However, the entire database needs to be migrated to the v1 key layout. While this happens lazily by default, it can cause increased I/O load and make state access a performance bottleneck during the migration period.
-
-## What's Added
-
-The new migration guide (`docs/maintainers/iavl-v1-migration.md`) provides:
-
-### Migration Options
-- **Lazy Migration** (default): Automatic migration during normal operation
-- **State Sync Migration** (recommended): Full migration via state sync for immediate optimal performance
-
-### Comprehensive Instructions
-- Step-by-step procedures for both migration approaches
-- Specific commands and configuration examples
-- Prerequisites and preparation steps
-- Backup and recovery procedures
-
-### Performance Optimization
-- IAVL configuration options in `app.toml` with tuning recommendations
-- Performance monitoring guidance to measure improvements
-- Key performance indicators to track
-
-### Operational Support
-- Troubleshooting common migration issues
-- Best practices for safe migration
-- Recovery procedures if rollback is needed
-- Links to additional resources and support channels
-
-## Key Benefits
-
-This documentation addresses the concern that lazy migration might cause increased I/O load and prevent maximizing throughput. By providing clear guidance on the state sync migration approach, consensus node operators can immediately access the full IAVL v1 performance benefits without experiencing a degradation period.
-
-The guide is specifically written for consensus node operators and includes validator-specific considerations like proper backup procedures, downtime planning, and configuration optimization.
-
-Fixes #4839.
-
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-02T16:34:00Z,2025-06-06T15:26:26Z,2025-06-06T15:26:25Z,327696712,https://api.github.com/repos/celestiaorg/celestia-app,https://github.com/celestiaorg/celestia-app/pull/4915,"analysisWe need to classify as performance or non-performance. The PR is docs: Add IAVL v1 migration guide for consensus node operators. It includes performance optimization, but it's documentation. The primary purpose is to provide documentation for migration to achieve performance benefits. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The PR is about documentation, but it includes performance optimization guidance. The primary purpose is to add documentation, not code changes. But the content is about performance. The classification: performance or non-performance. The guidelines: performance-related PRs may contain keywords such as latency, optimization, slow, etc. This PR contains ""performance optimization"" and ""performance benefits"". But is the primary purpose to improve performance? It's documentation to help operators achieve performance. The primary purpose is documentation. But the content is about performance. The classification likely ""performance"" because it addresses performance improvements. However, the guidelines: ""Performance-related pull requests may contain keywords such as... or any other terms referring to how faster and efficiently software runs."" This PR contains those terms. So likely ""performance"". But we need to decide. The PR is docs, but the content is about performance. The classification is about the primary purpose. The primary purpose is to provide documentation for migration to achieve performance benefits. That is performance. So classify as 'performance'.assistantfinalperformance",8,0.0976033163536117,False
-3188858394,834,feat: implement async notification and telemetry system (Phase 1-3),"## Summary
-
-This PR implements the first three phases of the async notification and telemetry system as outlined in #833. It introduces a non-blocking event bus architecture that decouples error reporting from notification/telemetry processing, preventing any blocking operations during error handling.
-
-## Related Issues
-
-- Implements phases 1-3 of #833 (Async notification/telemetry system)
-- Addresses performance concerns from #825 (Error handling optimization)
-- Includes error deduplication from #827 (Reduce telemetry noise)
-
-## Changes
-
-### Phase 1: Core Event Bus Infrastructure ✅
-- Created `internal/events` package with non-blocking event bus
-- Implemented worker pool pattern with configurable workers (default: 4)
-- Added `TryPublish()` method that never blocks (drops events if buffer full)
-- Comprehensive unit tests with 100% coverage
-- Structured logging with `internal/logging` package
-- Atomic operations for thread-safe metrics
-
-### Phase 2: Error Deduplication System ✅
-- Hash-based deduplication with configurable TTL (default: 5 minutes)
-- LRU eviction for memory-bounded cache (max 10,000 entries)
-- Periodic cleanup goroutine for expired entries
-- Comprehensive deduplication metrics (hit rate, suppression count)
-- Reduces telemetry volume by suppressing duplicate errors
-
-### Phase 3: Error Package Integration ✅
-- Enhanced `EnhancedError` to implement `ErrorEvent` interface
-- Created `EventPublisher` interface to avoid circular dependencies
-- Adapter pattern connects errors and events packages
-- Maintains backward compatibility - falls back to sync processing if event bus not initialized
-- Verified no circular dependencies through compilation tests
-
-## Architecture
-
-```
-errors package → EventBus → Deduplication → notification workers (future)
-                                         ↘ → telemetry workers (future)
+classDef major-edit fill:#90EE90
+classDef minor-edit fill:#87CEEB
+classDef context fill:#FFFFFF
 ```
 
-### Key Design Principles
+### Notes
 
-1. **Zero-cost when disabled**: No overhead when telemetry/notifications are off
-2. **Non-blocking guarantees**: `TryPublish()` never blocks, uses select with default
-3. **No circular dependencies**: Uses interfaces to decouple packages
-4. **Backward compatible**: Falls back to legacy sync processing
-5. **Production ready**: Proper error handling, metrics, and tests
+- This change directly addresses the Slack request from sahil.lavingia@gmail.com to add performance benchmarks requirement to contributing guidelines
+- Very low-risk documentation change with no code impact
+- Maintains consistency with existing bullet point format in Testing Guidelines section
 
-## Performance Characteristics
+**Link to Devin run**: https://app.devin.ai/sessions/2cd07d8067c94caba39633c67d5a12cb  
+**Requested by**: sahil.lavingia@gmail.com",Devin,158243242,devin-ai-integration[bot],closed,2025-07-17T16:47:16Z,2025-07-17T16:50:12Z,2025-07-17T16:50:12Z,955904085,https://api.github.com/repos/antiwork/flexile,https://github.com/antiwork/flexile/pull/582,8,1.0,False
+3162346531,609,Replace random sampling with Farthest Point Sampling for better spatial coverage,"# Replace Random Sampling with Farthest Point Sampling for Better Spatial Coverage
 
-- Error creation overhead: < 100ns when telemetry disabled (maintains #825 optimizations)
-- Event publishing: Non-blocking with overflow protection
-- Deduplication: O(1) hash lookup with < 100ns overhead
-- Memory usage: Bounded by configuration (10k events max)
-- Zero goroutine leaks verified
+## Overview
+This PR replaces the current random sampling implementation in the hierarchical merge labelling step with Farthest Point Sampling (FPS) to achieve better spatial coverage of opinions across the entire opinion space.
+
+## Changes Made
+- **Added fpsample library import** to `hierarchical_merge_labelling.py`
+- **Replaced random sampling logic** in `process_merge_labelling` function with FPS using x,y coordinates
+- **Added robust error handling** to fallback to random sampling if x,y coordinates are unavailable or FPS fails
+- **Maintained existing interface** - no changes to function signatures or sampling_num parameter behavior
+
+## Benefits
+- **Better spatial coverage**: FPS selects points that are maximally distant from each other in the x,y coordinate space
+- **More representative sampling**: Ensures comprehensive coverage of the opinion space rather than potentially clustering around similar spatial regions
+- **Robust fallback**: Gracefully handles edge cases by falling back to original random sampling when needed
+
+## Technical Details
+- Uses `fpsample.fps_sampling()` - a high-performance Rust-based FPS implementation (100x faster than numpy)
+- Checks for presence of x,y coordinates before applying FPS
+- Handles cases where sampling_num >= available data points
+- Maintains backward compatibility with existing pipeline configuration
 
 ## Testing
+- ✅ Lint checks pass (`python -m ruff check .`)
+- ✅ Import verification successful
+- ✅ Error handling tested for missing coordinates scenario
 
-- Comprehensive unit tests for all components
-- Integration tests verify no circular dependencies
-- Fixed deadlock issues in error hooks
-- Proper test isolation and cleanup
-- All tests pass without timeouts or race conditions
+## Link to Devin run
+https://app.devin.ai/sessions/ad4f0bb2409a43c798480409db4c336d
 
-## Configuration
+## Requested by
+shinta.nakayama@gmail.com
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-20T08:19:46Z,2025-06-28T14:56:24Z,,934897158,https://api.github.com/repos/digitaldemocracy2030/kouchou-ai,https://github.com/digitaldemocracy2030/kouchou-ai/pull/609,8,1.0,False
+2932553016,2407,Add kickoff_for_each_parallel method using ThreadPoolExecutor,"Fixes #2406 - Adds a new method to run a crew multiple times in parallel on different inputs using ThreadPoolExecutor. This allows for better performance when running the same crew on many inputs.
 
-The system supports configuration through the new event bus config:
+Link to Devin run: https://app.devin.ai/sessions/3184eb8f13bf4af58cd59a2dc3133f63
+Requested by: Joe Moura (joao@crewai.com)",Devin,158243242,devin-ai-integration[bot],closed,2025-03-19T17:05:51Z,2025-03-28T14:55:15Z,,710601088,https://api.github.com/repos/crewAIInc/crewAI,https://github.com/crewAIInc/crewAI/pull/2407,8,0.18250342302473477,False
+2976324699,246,[FEATURE] 1回のextractionで複数のcommentを処理する,"# 複数コメントを1回のextraction処理で処理する
 
-```go
-type Config struct {
-    BufferSize    int                    // Event buffer size (default: 10,000)
-    Workers       int                    // Worker goroutines (default: 4)
-    Enabled       bool                   // Enable event bus (default: true)
-    Deduplication *DeduplicationConfig   // Deduplication settings
-}
+## 概要
+Issue #190 の実装です。1回のLLMリクエストで複数のコメントを同時に処理できるようにしました。これにより、処理速度の向上とOpenAI APIのレート制限の問題の緩和が期待できます。
 
-type DeduplicationConfig struct {
-    Enabled         bool          // Enable deduplication (default: true)
-    TTL             time.Duration // Duplicate window (default: 5m)
-    MaxEntries      int          // Max cache size (default: 10,000)
-    CleanupInterval time.Duration // Cleanup frequency (default: 1m)
-}
+## 変更内容
+- extractionPromptを更新し、複数コメントを一度に処理できるフォーマットに変更
+- extraction.pyにバッチ処理のロジックを実装
+- parse_json_list.pyを拡張し、新しいJSONレスポンス形式に対応
+
+## テスト
+- 短いコメント（ツイートレベル）と長いコメント（公開コメントレベル）の両方でテスト
+- 従来の方法と比較して処理速度の向上を確認
+
+Link to Devin run: https://app.devin.ai/sessions/c9d31459eaed4fe9bc2274aaf699d893
+Requested by: annyotaka@gmail.com
+",Devin,158243242,devin-ai-integration[bot],closed,2025-04-07T10:02:28Z,2025-04-09T04:36:03Z,,934897158,https://api.github.com/repos/digitaldemocracy2030/kouchou-ai,https://github.com/digitaldemocracy2030/kouchou-ai/pull/246,8,0.17881983595672835,False
+2957569040,643,feat(cache): Implement threaded stream finalization,"This PR implements threaded stream finalization to improve performance for sources with many streams and provide better resilience against process interruptions.
+
+Changes:
+- Add ThreadPoolExecutor for concurrent stream finalization
+- Finalize each stream in a separate thread as it completes
+- Add configurable maximum thread count setting
+- Make relevant components thread-safe
+- Add locks to prevent concurrent state message commits
+- Implement proper thread cleanup
+
+Requested by: Aaron (AJ) Steers (@aaronsteers)
+Link to Devin run: https://app.devin.ai/sessions/9aebdd8a2c98418aaa4f1ec281c89574",Devin,158243242,devin-ai-integration[bot],closed,2025-03-29T00:30:02Z,2025-04-06T14:44:21Z,,752526884,https://api.github.com/repos/airbytehq/PyAirbyte,https://github.com/airbytehq/PyAirbyte/pull/643,8,0.17703320581712614,False
+3098597632,529,Make Serial asynchronous,"## Summary
+- make `Serial` methods async using a `ThreadPoolExecutor`
+- revert lazy FTDI initialization to avoid altering behavior
+
+## Testing
+- `make test` *(fails: biotek tests)*",OpenAI_Codex,36956818,rickwierenga,closed,2025-05-28T21:25:47Z,2025-05-28T22:11:11Z,2025-05-28T22:11:11Z,524145041,https://api.github.com/repos/PyLabRobot/pylabrobot,https://github.com/PyLabRobot/pylabrobot/pull/529,8,0.17367394690094295,False
+3225248831,5591,fix: mise up parallel execution,Enable parallel installation for `mise upgrade` to improve performance.,Cursor,216188,jdx,closed,2025-07-12T11:45:09Z,2025-07-20T17:30:06Z,2025-07-20T17:30:06Z,586920414,https://api.github.com/repos/jdx/mise,https://github.com/jdx/mise/pull/5591,8,0.1612366746622466,False
+3070955999,28,Add translate-crowdin-parallel command,"## Summary
+- allow Crowdin translations to run in parallel
+- register new command in the service provider
+- mention new command in README
+
+## Testing
+- `git status --short`",OpenAI_Codex,1438533,kargnas,closed,2025-05-17T17:36:09Z,2025-05-17T17:54:29Z,,822046563,https://api.github.com/repos/kargnas/laravel-ai-translator,https://github.com/kargnas/laravel-ai-translator/pull/28,8,0.16052995659209027,False
+3075009767,1561,Enable parallel simulation for AgentPopulation,"## Summary
+- allow parallel execution in `AgentPopulation.simulate`
+- set a flag to warn only once if parallel execution fails
+- replace variable docstring with a comment
+
+## Testing
+- `python -m pytest -n auto`",OpenAI_Codex,5382704,alanlujan91,closed,2025-05-19T21:00:37Z,2025-05-20T01:03:16Z,2025-05-20T01:03:16Z,50448254,https://api.github.com/repos/econ-ark/HARK,https://github.com/econ-ark/HARK/pull/1561,8,0.13694544909760062,False
+3132905408,107,[gh-flow] Add minimal Azure provisioning for local development,"This PR implements a split provisioning solution for the gh-flow sample, allowing developers to provision only essential Azure resources when developing locally instead of the full production infrastructure.
+
+## Problem
+
+Previously, developers working locally on gh-flow had to run `azd provision` which creates the complete Azure infrastructure including:
+- Container Apps Environment & Registry
+- Azure-hosted Qdrant on Container Apps  
+- Cosmos DB
+- Application Insights & Log Analytics
+- Monitoring dashboards
+- The gh-flow Container App service
+
+This resulted in:
+- Slow provisioning (20+ minutes)
+- High Azure costs during development ($50+/month)
+- Unnecessary complexity for local development
+
+## Solution
+
+Added a minimal provisioning option that only creates essential Azure resources while leveraging the existing containerized services in the devcontainer:
+
+### New Files
+- **`infra/main.local.bicep`** - Minimal bicep template (49 lines vs 160 lines in full template)
+- **`infra/main.local.parameters.json`** - Parameters for local development
+- **`provision-local.sh`** - Helper script for easy provisioning
+- **`LOCAL-DEVELOPMENT.md`** - Detailed documentation
+- **`.gitignore`** - Ignore generated bicep artifacts
+
+### Updated Files
+- **`docs/github-flow-getting-started.md`** - Added Option 2 for minimal provisioning
+
+## What Gets Provisioned
+
+| Deployment Type | Resources | Estimated Cost |
+|---|---|---|
+| **Full** (`azd provision`) | Storage + Container Apps + Qdrant + Cosmos + Monitoring + App Service | $50+/month |
+| **Local** (`./provision-local.sh`) | Storage account only | ~$1/month |
+
+## Usage
+
+```bash
+# Full deployment (unchanged)
+azd provision
+
+# Local development (new)
+./provision-local.sh my-local-env
 ```
 
-## Next Steps
+## Benefits
 
-This PR lays the foundation for async processing. Future phases will:
-- Phase 4: Migrate notification system to use event bus workers
-- Phase 5: Migrate telemetry system with batching and circuit breakers
-- Phase 6: Remove legacy sync processing code
-- Phase 7: Add monitoring and production tuning
+- **90%+ resource reduction**: 1 storage account vs 10+ resources
+- **Faster provisioning**: Minutes instead of 20+ minutes  
+- **Lower cost**: ~$1/month vs $50+/month
+- **Better developer experience**: Local debugging, containerized Qdrant, faster iteration
+- **Easy cleanup**: Minimal resources to delete when done
 
-## Breaking Changes
+## Technical Details
 
-None. The system maintains full backward compatibility.
+The local template reuses existing core bicep modules but only provisions:
+- Resource group
+- Storage account with file shares (needed for Azure Container Instances)
 
-## Checklist
+Local development uses:
+- Containerized Qdrant (`http://qdrant:6333`) from devcontainer
+- Local application debugging via VS Code
+- User-configured OpenAI and GitHub App settings
 
-- [x] Tests pass
-- [x] Linter passes (`golangci-lint run`)
-- [x] No circular dependencies
-- [x] Backward compatible
-- [x] Performance requirements met
-- [x] Documentation updated
+Both templates are validated and compile successfully. The solution maintains full backward compatibility with existing workflows.
 
-## How to Test
+Fixes #72.
 
-1. Run tests: `go test ./internal/events/... ./internal/errors/...`
-2. Verify no circular dependencies compile
-3. Check deduplication with repeated errors
-4. Confirm non-blocking behavior under load
-
-🤖 Generated with [Claude Code](https://claude.ai/code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>
-
-<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
-## Summary by CodeRabbit
-
-* **New Features**
-  * Introduced an asynchronous event bus system for non-blocking error event processing with deduplication and metrics.
-  * Added error deduplication to suppress duplicate error events within a configurable time window.
-  * Provided integration between error reporting and the event bus for improved decoupling and extensibility.
-  * Added new error accessors for retrieving underlying error and message details.
-
-* **Bug Fixes**
-  * Improved thread safety and encapsulation in error context handling.
-
-* **Tests**
-  * Added comprehensive unit and integration tests for event bus, deduplication, and error-event integration.
-
-* **Refactor**
-  * Updated error category handling to use string values for improved consistency.
-  * Improved synchronization and state management in error hook and telemetry logic.
-
-* **Documentation**
-  * Expanded best practices and lessons learned on defensive coding, testing, atomic usage, performance, and error handling.
-<!-- end of auto-generated comment: release notes by coderabbit.ai -->",Claude_Code,7030001,tphakala,closed,2025-06-30T15:10:13Z,2025-06-30T15:35:07Z,2025-06-30T15:35:07Z,707764474,https://api.github.com/repos/tphakala/birdnet-go,https://github.com/tphakala/birdnet-go/pull/834,"analysisWe need to classify as 'performance' or 'non-performance'. The PR is about async notification and telemetry system, non-blocking event bus, deduplication, performance improvements. It addresses performance concerns from #825. It includes performance characteristics. So it's performance-related. So label 'performance'.assistantfinalperformance",8,0.09088296317105786,True
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `aka.ms`
+>   - Triggering command: `curl -fsSL REDACTED ` (dns block)
+>   - Triggering command: `/usr/bin/../../opt/az/bin/python3 -Im azure.cli bicep validate --file main.local.bicep ` (dns block)
+>   - Triggering command: `bicep lint main.local.bicep ` (dns block)
+> - `app.aladdin.microsoft.com`
+>   - Triggering command: `/usr/bin/../../opt/az/bin/python3 -Im azure.cli bicep validate --file main.local.bicep ` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+",Copilot,198982749,Copilot,open,2025-06-10T09:52:32Z,,,676195998,https://api.github.com/repos/microsoft/project-oagents,https://github.com/microsoft/project-oagents/pull/107,8,0.13570257987244996,True
 3097518060,66,Rewrite backend and DNS server in Rust with in-memory cache,"# Rust Backend Rewrite
 
 This PR implements a complete rewrite of the RequestRepo backend and DNS server in Rust, replacing Redis with an in-memory compressed cache while maintaining 1:1 API parity with the existing Python implementation.
@@ -1216,210 +1088,89 @@ https://app.devin.ai/sessions/053551a2f773437a96e8b3dc0f59f99a
 
 ## Requested by
 Dragos Albastroiu (albastroiudragos@gmail.com)
-",Devin,158243242,devin-ai-integration[bot],closed,2025-05-28T14:04:09Z,2025-05-28T17:11:05Z,2025-05-28T17:11:04Z,583054436,https://api.github.com/repos/adrgs/requestrepo,https://github.com/adrgs/requestrepo/pull/66,"analysisWe need to classify as performance or non-performance. The PR is rewriting backend and DNS server in Rust with in-memory cache, replacing Redis. It mentions performance improvements, memory usage, etc. The primary purpose is to improve performance. So label 'performance'.assistantfinalperformance",8,0.09023570479063912,False
-3210834321,13204,chore(shed): update trace-finding in lotus-shed miner fees & fees-inspect with a better top-down filter,"This PR implements a better top-down filtering approach for trace-finding in the `lotus-shed miner fees` and `lotus-shed miner fees-inspect` commands, as requested in the issue.
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-28T14:04:09Z,2025-05-28T17:11:05Z,2025-05-28T17:11:04Z,583054436,https://api.github.com/repos/adrgs/requestrepo,https://github.com/adrgs/requestrepo/pull/66,8,0.12828146450053382,False
+3275149041,1884,N-API Go html-to-markdown,"## Summary
+- Replace unstable koffi FFI with robust N-API implementation
+- Add hybrid fallback system: N-API → koffi → JavaScript
+- Integrate N-API build into Docker and CI pipeline
 
-## Problem
+## Key Features
+- 🛡️ Memory safe: Eliminates CGO mutex deadlocks and corruption
+- ⚡ High performance: Direct C++ interface, no FFI overhead
+- 🔄 Thread safe: Built-in N-API thread safety mechanisms
+- 📦 Zero config: Automatic fallback if modules unavailable
+- 🎯 Compatible: Drop-in replacement for existing parseMarkdown()
 
-Previously, both commands used a bottom-up filtering approach that would trace any execution involving the target miner address. This resulted in noisy output with many irrelevant traces that didn't follow the actual cron execution flow.
+## Technical Details
+- Go static library with timeout protection (30s)
+- C++ N-API wrapper with sync/async interfaces
+- Multi-stage Docker build for automated compilation
+- Comprehensive test suite and validation scripts
+- Smart module loading with graceful degradation
 
-## Solution
+## Files Added
+- `sharedLibs/go-html-to-md-napi/` - Complete N-API module
+- `validate-html-conversion.js` - Integration test suite
+- Updated Dockerfile with N-API build stage
+- Hybrid html-to-markdown.ts with intelligent fallback
 
-The new implementation adds hierarchical trace filtering that follows the expected cron execution flow:
+## Migration Path
+1. N-API module loads automatically if available
+2. Falls back to existing koffi implementation
+3. Final fallback to JavaScript TurndownService
+4. Zero breaking changes to existing code
 
-- **Depth 0**: SystemActorAddr (f00) → CronActorAddr (f03) method 2 (EpochTick)
-- **Depth 1**: CronActorAddr (f03) → StoragePowerActorAddr (f04) method 5 (OnEpochTickEnd)  
-- **Depth 2+**: StoragePowerActorAddr (f04) → miner actors method 12 (OnDeferredCronEvent), plus any miner-related calls
+This resolves the koffi-related runtime panics and provides a stable,
+high-performance HTML-to-Markdown conversion system.
 
-This matches the actual protocol flow described in the issue:
+🤖 Generated with [Claude Code](https://claude.ai/code)
 
-```
-f00->f03[2]:0                         # System calls Cron EpochTick
-    f03->f04[5]:0                     # Cron calls Power OnEpochTickEnd
-        f04->f02[3]:0                 # Power calls Reward ThisEpochReward
-        f04->f01083949[12]:0          # Power calls Miner OnDeferredCronEvent
-            f01083949->f099[0]:...    # Miner pays fees to burn address
-            f01083949->f04[4]:0       # Miner reports back to Power
-        f04->f02[4]:0                 # Power calls Reward again
-    f03->f05[9]:0                     # Cron calls Market actor
-```
+Co-Authored-By: Claude <noreply@anthropic.com>
+    
+<!-- This is an auto-generated description by cubic. -->
+---
 
-## Changes Made
+## Summary by cubic
+Replaced the unstable koffi FFI HTML-to-Markdown integration with a new N-API Go module, adding a hybrid fallback system (N-API → koffi → JavaScript) and updating the Docker and CI build to support the new module.
 
-1. **Updated `printExec` function** in the `fees` command with depth-based filtering logic
-2. **Updated `traceBurns` function** in the `fees-inspect` command with the same filtering approach
-3. **Preserved existing behavior** for deeper trace levels (depth >= 2) where miner interactions occur
-4. **Added comprehensive filtering** for shallow depths (0 and 1) to focus on the cron execution path
+- **New Features**
+  - Added a memory-safe, thread-safe N-API wrapper for the Go HTML-to-Markdown library with both sync and async interfaces.
+  - Automatic fallback to koffi or JavaScript if the N-API module is unavailable.
+  - Integrated N-API build and validation into Docker and CI.
+  - Included a test suite and validation script to ensure conversion reliability.
+
+<!-- End of auto-generated description by cubic. -->
+
+",Claude_Code,66118807,mogery,open,2025-07-29T22:34:55Z,,,787076358,https://api.github.com/repos/mendableai/firecrawl,https://github.com/mendableai/firecrawl/pull/1884,8,0.11116105291490841,False
+3200836668,2529,Ensure at least once delivery in ClickHouse,"Apply `wait_end_of_query=1` to ClickHouse INSERT and DDL operations to ensure at least once delivery and DDL acknowledgment.
+
+Initially, `wait_end_of_query=1` was incorrectly applied globally, which would have severely degraded SELECT query performance by forcing full response buffering. This PR corrects the implementation to apply the setting only to INSERT and DDL queries, preserving streaming and concurrency for SELECTs.",Cursor,4429209,callicles,closed,2025-07-03T22:50:53Z,2025-07-04T17:08:37Z,2025-07-04T17:08:37Z,668493044,https://api.github.com/repos/514-labs/moose,https://github.com/514-labs/moose/pull/2529,8,0.10849017218087535,False
+3075815710,443,Enhance devcontainer.json for prebuilds and Azure CLI installation,"This PR addresses two important enhancements for the development environment:
+
+## Changes
+
+1. **Added prebuild support**
+   - Added `updateContentCommand` to devcontainer.json to enable GitHub Codespaces prebuilds
+   - This will significantly speed up container startup times when using GitHub Codespaces
+
+2. **Automated Azure CLI updates**
+   - Added automatic Azure CLI installation/update to the post-create script
+   - Added `curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash` to setup_env.sh
+   - This resolves the documented issue where users sometimes need to manually update the Azure CLI
 
 ## Benefits
 
-- **Cleaner output**: Filters out unrelated execution traces that don't follow the cron flow
-- **Faster processing**: Skips irrelevant trace branches early in the recursion
-- **Better debugging**: Highlights the actual execution path that leads to fee payments
-- **Protocol consistency**: Matches the designed cron execution flow
+- **Faster development environment setup**: Prebuilds will make GitHub Codespaces launch faster
+- **More reliable Azure CLI experience**: The CLI will always be updated when the container starts
+- **Better experience for time-constrained environments**: Reduces manual steps needed to get started with the sample
 
-## Testing
+These changes make the development experience more seamless, especially in time-constrained lab environments.
 
-- Validated actor addresses match expected values (f00=System, f03=Cron, f04=Power)
-- Verified method numbers correspond to expected calls (2=EpochTick, 5=OnEpochTickEnd, 12=OnDeferredCronEvent)
-- Tested filtering logic with various valid/invalid trace scenarios
-- Confirmed code compiles and follows existing style patterns
+Fixes #319.
 
-Fixes #13203.
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `https://api.github.com/repos/filecoin-project/filecoin-ffi/releases/tags/v1.33.1-dev`
->   - Triggering command: `curl --retry 3 --location REDACTED` (http block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
-
-
-
-<!-- START COPILOT CODING AGENT TIPS -->
 ---
 
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-08T02:50:11Z,2025-07-08T06:51:15Z,2025-07-08T06:51:15Z,193681111,https://api.github.com/repos/filecoin-project/lotus,https://github.com/filecoin-project/lotus/pull/13204,"analysisWe need to classify whether the primary purpose is performance. The PR is about updating trace-finding with better top-down filter, cleaner output, faster processing, skipping irrelevant trace branches early. That is a performance improvement: faster processing, skipping irrelevant branches. The description says ""Faster processing: Skips irrelevant trace branches early in the recursion"". That is a performance improvement. So classify as 'performance'.assistantfinalperformance",8,0.08709811731152708,False
-3186447377,2086,feat!: simplify tracing by removing S3 push/pull and using atomic file writes,"This PR backports the tracer refactor from PR #1437 onto the main branch, significantly simplifying the tracing system by removing complex S3 push/pull functionality and replacing it with a reliable atomic file writing mechanism.
-
-## Summary of Changes
-
-### Files Removed (934 lines deleted):
-- `libs/trace/buffered_file.go` (101 lines) - Complex buffered file implementation with read/write coordination
-- `libs/trace/fileserver.go` (331 lines) - S3 push/pull HTTP server functionality
-- `libs/trace/local_tracer_test.go` (183 lines) - Old complex tests with S3 dependencies
-
-### Files Added/Modified:
-- **New**: `libs/trace/cached_file.go` (115 lines) - Simple channel-based atomic file writer
-- **New**: `libs/trace/cached_file_test.go` (81 lines) - Focused tests for cached file functionality  
-- **New**: `libs/trace/README.md` - Documentation for simplified trace usage
-- **Modified**: `libs/trace/local_tracer.go` - Simplified from ~250 to ~120 lines, removed S3/HTTP functionality
-- **Modified**: `config/config.go` - Added deprecation warnings for `TracePushConfig`/`TracePullAddress`
-- **Modified**: `config/toml.go` - Added deprecation warnings in config comments
-- **Modified**: `libs/trace/decoder.go` - Changed `ReadString` to `ReadBytes` for better performance
-- **Modified**: Various files - Added `//nolint:staticcheck` comments for deprecated config usage
-
-## Key Improvements
-
-✅ **Simplified Architecture**: Removed complex buffered file + S3 system, replaced with simple cached file writes  
-✅ **Atomic Writes**: New system ensures only complete JSON events are written, preventing data corruption  
-✅ **Better Performance**: Channel-based caching with configurable batch sizes and parallel writes  
-✅ **Cleaner Code**: 490+ lines removed, much simpler to understand and maintain  
-✅ **Reliable Data**: Eliminates incomplete JSON writes that made trace files unreadable  
-✅ **Backward Compatible**: Existing config works, deprecated fields marked properly  
-
-## Breaking Changes
-
-- **Removed S3 automatic push/pull functionality** - Users should now collect trace files manually using `scp`, `aws s3 cp`, or similar tools
-- **Removed HTTP pull server** - No more `/get_table` endpoint for remote trace collection
-- **Removed environment variable S3 config** - `TRACE_PUSH_*` environment variables no longer supported
-
-## Migration Guide
-
-The tracer now focuses solely on reliable local file writing. To collect trace data:
-
-**Before (automatic S3 push):**
-```toml
-trace_push_config = ""s3_config.json""
-```
-
-**After (manual collection):**
-```bash
-# Copy files after experiment completes
-scp -r user@host:/path/to/.celestia-app/data/traces /local/path
-# or
-aws s3 cp /path/to/.celestia-app/data/traces s3://bucket/prefix --recursive
-```
-
-## Validation
-
-- All existing tests pass
-- New comprehensive test suite for cached file functionality
-- Integration test validates end-to-end trace writing
-- Build and config validation successful
-
-This change makes the tracer much more reliable and maintainable by removing the complexity of automatic S3 uploads and HTTP servers that were prone to data corruption issues.
-
-Fixes #2085.
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,open,2025-06-29T18:36:58Z,,,221931137,https://api.github.com/repos/celestiaorg/celestia-core,https://github.com/celestiaorg/celestia-core/pull/2086,"analysisWe need to classify as 'performance' or 'non-performance'. The PR is about simplifying tracing, removing S3 push/pull, atomic file writes, channel-based caching, better performance. It mentions ""Better Performance"" and ""channel-based caching with configurable batch sizes and parallel writes"". But is the primary purpose to improve performance? The main goal is simplifying architecture, reliability, maintainability, but also mentions performance improvements. The keywords: performance, better performance, channel-based caching, parallel writes. The classification: performance. The primary purpose seems to be performance improvement? The title: ""simplify tracing by removing S3 push/pull and using atomic file writes"". The summary: ""Better Performance"". So yes, performance. So label 'performance'.assistantfinalperformance",8,0.08646377240264067,False
-3177258847,40,Expand tracing instrumentation to gen_witness and PCS prove methods,"This PR expands the existing tracing infrastructure to provide detailed timing breakdown for `gen_witness` and PCS prove methods, enabling better performance analysis and debugging.
-
-## Changes Made
-
-### gen_witness Method Instrumentation
-- **Circuit synthesis timing**: Added `circuit_synthesize` span to measure time spent in circuit constraint generation
-- **R1CS creation timing**: Added `r1cs_instance_and_witness` span with nested timing for:
-  - `create_r1cs_witness`: Time to create witness commitment
-  - `create_r1cs_instance`: Time to create R1CS instance
-- **Derandomization timing**: Added `derandomize_witness_instance` span for witness/instance derandomization
-
-### PCS Prove Method Instrumentation
-
-#### IPA (Inner Product Argument) Implementation
-- **Setup phase**: Added `ipa_setup` span for initial transcript and commitment key preparation
-- **Recursion phase**: Added `ipa_recursion` span with round count for the main IPA folding loop
-- **Preparation phase**: Added `ipa_prove_prepare` and `ipa_prove_argument` spans in the PC interface
-
-#### Hyrax Implementation  
-- **Setup phase**: Added `hyrax_prove_setup` span for polynomial factorization and evaluation point preparation
-- **Binding phase**: Added `hyrax_prove_bind` span for computing vector-matrix products
-- **Commitment phase**: Added `hyrax_prove_commit` span for MSM operations
-- **IPA phase**: Added `hyrax_prove_ipa` span for the inner product argument
-
-## Example Output
-
-The instrumentation provides clear nested timing breakdown:
-
-```
-circuit_synthesize elapsed_ms=602
-create_r1cs_witness elapsed_ms=85
-create_r1cs_instance elapsed_ms=0  
-r1cs_instance_and_witness elapsed_ms=85
-derandomize_witness_instance elapsed_ms=0
-...
-hyrax_prove_setup elapsed_ms=44
-hyrax_prove_bind elapsed_ms=97
-hyrax_prove_commit elapsed_ms=107
-ipa_setup elapsed_ms=3
-ipa_recursion elapsed_ms=2044 rounds=9
-hyrax_prove_ipa elapsed_ms=2048
-pcs_prove elapsed_ms=2297
-```
-
-## Design Principles
-
-- **Minimal overhead**: Only instruments operations that consume significant time (>1ms typically)
-- **Clear nesting**: Uses the existing `start_span!` macro to ensure proper span hierarchy
-- **Readable code**: Instrumentation doesn't obscure the original logic
-- **Consistent naming**: Uses descriptive span names that clearly indicate the operation being timed
-
-## Testing
-
-- All existing tests continue to pass
-- Code passes `cargo fmt` and `cargo clippy` checks
-- Verified instrumentation works correctly with sha256 example
-- No performance regressions introduced
-
-Fixes #39.
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-06-25T23:49:08Z,2025-06-26T20:35:31Z,2025-06-26T20:35:31Z,668062221,https://api.github.com/repos/microsoft/Spartan2,https://github.com/microsoft/Spartan2/pull/40,"analysisWe need to classify the pull request as 'performance' or 'non-performance'. The PR expands tracing instrumentation to provide detailed timing breakdown for gen_witness and PCS prove methods, enabling better performance analysis and debugging. It adds instrumentation spans for measuring time. The primary purpose is to improve performance analysis, not necessarily to improve performance directly. But the classification criteria: ""Performance-related pull requests may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs."" The PR title: ""Expand tracing instrumentation to gen_witness and PCS prove methods"". The body mentions ""enabling better performance analysis and debugging."" It doesn't directly optimize code, but it's about performance instrumentation. The classification likely 'performance' because it's about performance analysis. The guidelines: ""Performance-related pull requests may contain keywords such as... performance, perform"". The body contains ""performance analysis"". So yes, it's performance. So classify as 'performance'.assistantfinalperformance",8,0.0824458110018293,False
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-05-20T06:27:24Z,2025-05-26T04:56:41Z,,819995419,https://api.github.com/repos/microsoft/document-generation-solution-accelerator,https://github.com/microsoft/document-generation-solution-accelerator/pull/443,8,0.10324130219485234,False
 3261008079,1840,feat: rewrite sitemap XML parsing from JavaScript to Rust (ENG-2904),"# feat: rewrite sitemap XML parsing from JavaScript to Rust (ENG-2904)
 
 ## Summary
@@ -1507,57 +1258,13 @@ Rewrote sitemap XML parsing from JavaScript to Rust to improve performance, whil
 
 <!-- End of auto-generated description by cubic. -->
 
-",Devin,158243242,devin-ai-integration[bot],closed,2025-07-24T19:30:35Z,2025-07-24T22:02:48Z,2025-07-24T22:02:48Z,787076358,https://api.github.com/repos/mendableai/firecrawl,https://github.com/mendableai/firecrawl/pull/1840,"analysisWe need to classify as 'performance' or 'non-performance'. The PR is rewriting XML parsing from JS to Rust to improve performance. It explicitly states ""improve performance of sitemap parsing operations"". So it's performance.assistantfinalperformance",8,0.07706970973588273,False
-3275149041,1884,N-API Go html-to-markdown,"## Summary
-- Replace unstable koffi FFI with robust N-API implementation
-- Add hybrid fallback system: N-API → koffi → JavaScript
-- Integrate N-API build into Docker and CI pipeline
+",Devin,158243242,devin-ai-integration[bot],closed,2025-07-24T19:30:35Z,2025-07-24T22:02:48Z,2025-07-24T22:02:48Z,787076358,https://api.github.com/repos/mendableai/firecrawl,https://github.com/mendableai/firecrawl/pull/1840,8,0.10137506433332175,False
+3148216316,456,Add context window percentage to ClickHouse,"A new spec file, `context-window-percentage-storage.md`, was created in a new `.specs/` directory.
 
-## Key Features
-- 🛡️ Memory safe: Eliminates CGO mutex deadlocks and corruption
-- ⚡ High performance: Direct C++ interface, no FFI overhead
-- 🔄 Thread safe: Built-in N-API thread safety mechanisms
-- 📦 Zero config: Automatic fallback if modules unavailable
-- 🎯 Compatible: Drop-in replacement for existing parseMarkdown()
+The spec details the addition of a `context_window_usage_percent` field to the ClickHouse runs table.
 
-## Technical Details
-- Go static library with timeout protection (30s)
-- C++ N-API wrapper with sync/async interfaces
-- Multi-stage Docker build for automated compilation
-- Comprehensive test suite and validation scripts
-- Smart module loading with graceful degradation
-
-## Files Added
-- `sharedLibs/go-html-to-md-napi/` - Complete N-API module
-- `validate-html-conversion.js` - Integration test suite
-- Updated Dockerfile with N-API build stage
-- Hybrid html-to-markdown.ts with intelligent fallback
-
-## Migration Path
-1. N-API module loads automatically if available
-2. Falls back to existing koffi implementation
-3. Final fallback to JavaScript TurndownService
-4. Zero breaking changes to existing code
-
-This resolves the koffi-related runtime panics and provides a stable,
-high-performance HTML-to-Markdown conversion system.
-
-🤖 Generated with [Claude Code](https://claude.ai/code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>
-    
-<!-- This is an auto-generated description by cubic. -->
----
-
-## Summary by cubic
-Replaced the unstable koffi FFI HTML-to-Markdown integration with a new N-API Go module, adding a hybrid fallback system (N-API → koffi → JavaScript) and updating the Docker and CI build to support the new module.
-
-- **New Features**
-  - Added a memory-safe, thread-safe N-API wrapper for the Go HTML-to-Markdown library with both sync and async interfaces.
-  - Automatic fallback to koffi or JavaScript if the N-API module is unavailable.
-  - Integrated N-API build and validation into Docker and CI.
-  - Included a test suite and validation script to ensure conversion reliability.
-
-<!-- End of auto-generated description by cubic. -->
-
-",Claude_Code,66118807,mogery,open,2025-07-29T22:34:55Z,,,787076358,https://api.github.com/repos/mendableai/firecrawl,https://github.com/mendableai/firecrawl/pull/1884,"analysisWe need to classify as performance or non-performance. The PR title: ""N-API Go html-to-markdown"". The description includes ""⚡ High performance: Direct C++ interface, no FFI overhead"". Also ""Memory safe"", ""Thread safe"". The primary purpose: improve performance by replacing FFI with N-API. So it's performance. The classification: 'performance'.assistantfinalperformance",8,0.07351909130414909,False
+*   **Purpose**: To store the pre-calculated context window usage as a percentage (0-100), simplifying analytical queries that currently require complex joins and on-the-fly calculations.
+*   **Data Type**: `UInt8` (0-255), consistent with existing percentage fields. A default of `0` indicates unknown or unavailable context window data.
+*   **Calculation**: The percentage will be computed in `ClickhouseRun.from_domain()` when a run is saved. It uses `input_token_count`, `output_token_count`, and the `model_context_window_size` extracted from `LLMCompletion.usage` within the run.
+*   **Searchability**: A new `SearchField.CONTEXT_WINDOW_USAGE` will enable direct filtering of runs by this percentage.
+*   **Outcome**: A PR has been prepared with this spec, providing a roadmap for the implementation, including database migration, model updates, and testing strategy.",Cursor,11172,pierrevalade,open,2025-06-16T00:40:35Z,,,899127822,https://api.github.com/repos/WorkflowAI/WorkflowAI,https://github.com/WorkflowAI/WorkflowAI/pull/456,8,0.08580756632420664,False

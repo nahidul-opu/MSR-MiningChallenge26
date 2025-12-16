@@ -1,275 +1,238 @@
-id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
-3128864357,213,Improve interpreter const-eval,"## Summary
-- support const-evaluation of pure function calls directly in the interpreter
-- avoid recursion by disabling pure evaluation when invoked from `EvalPureCall`
-
-## Testing
-- `go test ./... --vet=off -v`
-
-------
-https://chatgpt.com/codex/tasks/task_e_684633d1eab483209e2372d231591902",OpenAI_Codex,1218621,tamnd,closed,2025-06-09T01:15:28Z,2025-06-09T01:33:25Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/213,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve interpreter const-eval"". Summary: support const-evaluation of pure function calls directly in the interpreter, avoid recursion by disabling pure evaluation when invoked from EvalPureCall. This is about interpreter const-eval, likely improving performance by evaluating constants at compile time? It's about interpreter const-eval, which is a performance improvement? The description: ""support const-evaluation of pure function calls directly in the interpreter"" and ""avoid recursion by disabling pure evaluation when invoked from EvalPureCall"". This is about performance optimization of interpreter. It likely improves performance. The keywords: ""performance"" not explicitly but ""const-eval"" is about compile-time evaluation, which is performance. The instruction says performance-related PR may contain keywords like latency, optimization, slow, etc. But not necessary. But the content indicates improvement of interpreter const-eval, which is a performance improvement. So classify as 'performance'.assistantfinalperformance",14,1.0,False
-3202713587,5051,Inline runtime value conversions,"## Summary
-- reduce helper function calls by adding `Value.ToAny` and `FromAny`
-- update VM code to use these methods
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,Topic,Probability,Representative_document
+3240157506,9343,Improve Fortran constant list folding,"## Summary
+- add constant list propagation to the Fortran compiler
+- fold `len`, `count`, `append`, `union`, `except`, etc. when lists are stored in variables
+- document new capability in `tests/machine/x/fortran/README.md`
+- record progress in `compiler/x/fortran/TASKS.md`
 
 ## Testing
 - `go test ./...`
 
 ------
-https://chatgpt.com/codex/tasks/task_e_6867d0367dbc8320be533837b00bca4a",OpenAI_Codex,1218621,tamnd,closed,2025-07-04T13:12:57Z,2025-07-04T13:13:15Z,2025-07-04T13:13:15Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/5051,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Inline runtime value conversions"". Summary: reduce helper function calls by adding Value.ToAny and FromAny, update VM code to use these methods. This is about reducing helper function calls, likely improving performance. The description mentions performance improvement. So classify as 'performance'.assistantfinalperformance",14,1.0,False
-3186768137,4017,Improve constant folding in VM compiler,"## Summary
-- enhance constant folding in `runtime/vm` to handle identity cases
-- add helper functions to recognize zero and one numeric values
-- regenerate IR snapshots via `go test -tags=slow ./tests/vm -run TestVM_IR -update`
-
-## Testing
-- `go vet ./...`
-- `go test -tags=slow ./tests/vm -run TestVM_IR -update --vet=off`
-
-------
-https://chatgpt.com/codex/tasks/task_e_686183f9c4e08320809ddcda2753fce7",OpenAI_Codex,1218621,tamnd,open,2025-06-30T00:49:13Z,,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4017,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve constant folding in VM compiler"". Summary: enhance constant folding, add helper functions, regenerate IR snapshots. This is about compiler optimization, constant folding. That is a performance improvement. So classify as 'performance'.assistantfinalperformance",14,1.0,False
-3128873567,215,Improve Go compiler call folding,"## Summary
-- enhance Go compiler with memoization for pure call folding
-- cache results for `EvalPureCall` to avoid repeated interpreter calls
+https://chatgpt.com/codex/tasks/task_e_6878e86c20c08320a63456631fb49b9d",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T16:17:26Z,2025-07-17T16:17:41Z,2025-07-17T16:17:40Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9343,14,1.0,True
+3240293813,9363,Improve Fortran constant folding,"## Summary
+- enhance Fortran compiler constant folding
+- fold `len` for constant strings
+- document new optimization in README and TASKS
 
 ## Testing
 - `go test ./...`
 
 ------
-https://chatgpt.com/codex/tasks/task_e_684636ede88083208dab6649636b62db",OpenAI_Codex,1218621,tamnd,closed,2025-06-09T01:24:27Z,2025-06-09T01:25:08Z,2025-06-09T01:25:08Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/215,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Go compiler call folding"". Summary: ""enhance Go compiler with memoization for pure call folding"" ""cache results for EvalPureCall to avoid repeated interpreter calls"". This is about performance: memoization to avoid repeated interpreter calls, likely improving speed. So classification: performance.assistantfinalperformance",14,1.0,False
-3128960984,222,Enable AOT folding in interpreter,"## Summary
-- add `FoldPureCalls` for ahead-of-time constant folding
-- expose folding via `--aot` flag in CLI and use it in benchmarks
-- move TS runtime helpers before program execution
-- update test outputs for new TypeScript layout
+https://chatgpt.com/codex/tasks/task_e_6879243a44f48320af68a4631a1439b9",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T17:03:04Z,2025-07-17T17:03:19Z,2025-07-17T17:03:19Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9363,14,1.0,False
+3240180435,9350,fortran: fold len/count on constant lists,"## Summary
+- improve Fortran compiler constant folding
+- track lengths of constant lists for `len` and `count`
+- document the new optimisation
 
 ## Testing
-- `go test ./compile/ts -update`
-- `go test ./...`
-- `make bench`
+- `go test ./compiler/x/fortran -run TestFortranCompiler_VMValid_Golden -tags slow -count=1`
 
 ------
-https://chatgpt.com/codex/tasks/task_e_68464444e6f88320a65863d87dc55eac",OpenAI_Codex,1218621,tamnd,closed,2025-06-09T02:37:23Z,2025-06-09T02:38:39Z,2025-06-09T02:38:39Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/222,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Enable AOT folding in interpreter"". Summary: add FoldPureCalls for ahead-of-time constant folding, expose folding via --aot flag in CLI and use it in benchmarks, move TS runtime helpers before program execution, update test outputs for new TS layout. This is about constant folding, ahead-of-time optimization, performance improvement. It mentions benchmarks. So it's performance. So label 'performance'.assistantfinalperformance",14,1.0,False
-3128851898,211,Implement simple compile-time folding for pure calls,"## Summary
-- detect function purity in type checker
-- mark `len` and `str` builtins as pure
-- add helpers for purity checks and literal detection
-- provide interpreter-based constant evaluation for pure calls
-- fold calls with literal arguments during Go, Python and TypeScript compilation
+https://chatgpt.com/codex/tasks/task_e_6879223147d08320a00dddbdab02d1c0",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T16:26:10Z,2025-07-17T16:26:22Z,2025-07-17T16:26:22Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9350,14,1.0,False
+3240351285,9378,fortran: fold membership constants,"## Summary
+- fold membership checks on constant integer or string lists at compile time
+- document membership folding in TASKS
+- mention optimized membership in machine README
 
 ## Testing
-- `go test ./...`
+- `go test ./compiler/x/fortran -tags=slow -count=1` *(fails: 24 passed, 76 failed)*
 
 ------
-https://chatgpt.com/codex/tasks/task_e_68462f61b1308320972189c70571e703",OpenAI_Codex,1218621,tamnd,closed,2025-06-09T01:03:32Z,2025-06-09T01:04:13Z,2025-06-09T01:04:13Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/211,"analysisWe need to classify the pull request as performance or non-performance. The PR description: ""Implement simple compile-time folding for pure calls"" - compile-time folding is an optimization that reduces runtime overhead by evaluating pure functions at compile time. This is a performance improvement. The description mentions ""detect function purity"", ""mark len and str builtins as pure"", ""add helpers for purity checks and literal detection"", ""provide interpreter-based constant evaluation for pure calls"", ""fold calls with literal arguments during Go, Python and TypeScript compilation"". This is definitely a performance optimization. So classification: 'performance'.assistantfinalperformance",14,1.0,False
-3170148477,2781,Implement folding of pure calls in VM,"## Summary
-- fold pure function calls during VM compilation
-- store constant let bindings in the compiler environment
-- update golden IR outputs to reflect constant folding
+https://chatgpt.com/codex/tasks/task_e_68792cde63108320a83946a3f4f6a80a",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T17:24:51Z,2025-07-17T17:25:03Z,2025-07-17T17:25:03Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9378,14,1.0,False
+3242395273,9542,Improve Fortran compiler constant propagation,"## Summary
+- extend Fortran compiler with new constant scalar maps
+- propagate integers, booleans, floats, and maps through assignments
+- fold `values` builtin when its argument refers to a constant map
 
 ## Testing
-- `go test ./...`
+- `go test ./compiler/x/fortran -tags slow -run TestFortranCompiler_VMValid_Golden -count=1` *(fails: unsupported expression at line 1)*
 
 ------
-https://chatgpt.com/codex/tasks/task_e_685a1f658ca08320955b305d838bb813",OpenAI_Codex,1218621,tamnd,closed,2025-06-24T03:54:17Z,2025-06-24T03:54:28Z,2025-06-24T03:54:28Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2781,"analysisWe need to classify the pull request as performance or non-performance. The PR title: ""Implement folding of pure calls in VM"". Summary: fold pure function calls during VM compilation, store constant let bindings in compiler environment, update golden IR outputs to reflect constant folding. This is about constant folding, which is an optimization. It improves performance by reducing runtime overhead. So it's a performance-related PR. So classification: 'performance'.assistantfinalperformance",14,1.0,True
-3170127249,2777,Add VM constant folding support,"## Summary
-- implement constant folding and pure function evaluation in VM compiler
-- register functions for compile-time evaluation
-- add golden outputs reflecting folding
-- add test covering pure function folding
-
-## Testing
-- `go test ./tests/vm -run TestVM_IR -update`
-- `go test ./tests/vm -run TestVM_ValidPrograms -update`
-- `go test ./tests/vm`
-
-------
-https://chatgpt.com/codex/tasks/task_e_685a1ac0efb08320a4b3bd41deb5690a",OpenAI_Codex,1218621,tamnd,closed,2025-06-24T03:43:09Z,2025-06-24T04:09:19Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2777,"analysisWe need to classify as performance or non-performance. The PR adds constant folding support in VM compiler, pure function evaluation, register functions for compile-time evaluation, golden outputs, tests. This is about optimization at compile time, constant folding, pure function evaluation. That is performance improvement. So classify as 'performance'.assistantfinalperformance",14,1.0,True
-3170126845,2776,Enable constant folding of pure functions in VM,"## Summary
-- support compile-time evaluation of pure functions in the VM compiler
-- register functions in the type environment so they can be folded
-- store constant values from `let` statements for later folding
-- update IR golden files for folded calls
-
-## Testing
-- `go test ./tests/vm -run TestVM_IR -count=1`
-- `go test ./...`
-
-
-------
-https://chatgpt.com/codex/tasks/task_e_685a1abe71b0832097a30b7c27808534",OpenAI_Codex,1218621,tamnd,closed,2025-06-24T03:42:50Z,2025-06-24T04:09:08Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2776,"analysisWe need to classify as performance or non-performance. The PR title: ""Enable constant folding of pure functions in VM"". Summary: compile-time evaluation of pure functions, register functions, store constant values, update IR golden files. This is about compile-time optimization, constant folding. That is a performance improvement. So classify as 'performance'.assistantfinalperformance",14,1.0,True
-3170118902,2773,Implement constant fold in vm,"## Summary
-- allow compiler to evaluate constant expressions
-- update VM functions to use scoped environments for constant folding
-- regenerate IR golden files for new behavior
-
-## Testing
-- `go test ./...`
-
-
-------
-https://chatgpt.com/codex/tasks/task_e_685a1ab0f1b0832082362ba8500b7988",OpenAI_Codex,1218621,tamnd,closed,2025-06-24T03:36:48Z,2025-06-24T04:08:34Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2773,"analysisWe need to classify the pull request as 'performance' or 'non-performance'. The PR title: ""Implement constant fold in vm"". Summary: allow compiler to evaluate constant expressions, update VM functions to use scoped environments for constant folding, regenerate IR golden files for new behavior. This is about constant folding, which is a compiler optimization. It may improve performance by evaluating constants at compile time, reducing runtime overhead. So it's a performance improvement. The description mentions ""allow compiler to evaluate constant expressions"" which is an optimization. So classification: 'performance'.
-
-Check if any other aspects: It's about constant folding, which is a compile-time optimization. That is performance. So answer: performance.assistantfinalperformance",14,1.0,False
-3186001186,3944,Implement pure function folding in VM,"## Summary
-- fold pure function calls at compile time using VM
-- regenerate IR output for `fun_call` test
+https://chatgpt.com/codex/tasks/task_e_6879ffdd986083208b021a0ca87d817c",OpenAI_Codex,1218621,tamnd,closed,2025-07-18T08:33:24Z,2025-07-18T08:36:49Z,2025-07-18T08:36:49Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9542,14,1.0,False
+3241741490,9475,Improve Fortran set-op folding,"## Summary
+- enhance Fortran compiler to fold chained set operations when all operands are constants
+- note the new feature in TASKS and machine README
 
 ## Testing
 - `go test ./...`
 
 ------
-https://chatgpt.com/codex/tasks/task_e_68610cee11448320b16094586265a74e",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T10:07:59Z,2025-07-01T03:06:05Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3944,"analysisWe need to classify the pull request as performance or non-performance. The title: ""Implement pure function folding in VM"". Summary: ""fold pure function calls at compile time using VM"". This is about compile-time optimization, but is it performance? It's about folding pure function calls at compile time, which is an optimization that may improve performance. The description: ""regenerate IR output for fun_call test"". This is a compile-time optimization. The keywords: ""fold pure function calls at compile time using VM"". This is an optimization. The classification: performance. The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. This PR is about compile-time optimization, which is performance. So classification: performance.assistantfinalperformance",14,1.0,False
-3187015246,4055,Optimize VM pure call folding,"## Summary
-- fold user-defined pure function calls during VM compilation using the VM's constant evaluator
-- add test covering folding with a global constant
+https://chatgpt.com/codex/tasks/task_e_6879c1193bcc8320bb57e994fd7506e7",OpenAI_Codex,1218621,tamnd,closed,2025-07-18T03:43:44Z,2025-07-18T03:44:46Z,2025-07-18T03:44:46Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9475,14,1.0,False
+3241727428,9464,Improve Fortran constant folding,"## Summary
+- extend the Fortran compiler with tracking for boolean and float list constants
+- fold `len`, `count`, `append`, `union`, `union_all`, `except`, and `intersect` when applied to constant boolean or float lists
+- expose helpers `literalBoolUnary`, `literalFloatUnary` and propagate literal bool/float expressions
+- document the new optimisation in the Fortran README and TASKS
 
 ## Testing
-- `go test ./tests/vm -tags slow -run TestVM_IR`
-- `go test ./tests/vm -tags slow -run TestVM_TPCH -count=1 -timeout 5m` *(fails: interrupted due to long runtime)*
+- `go test -c ./compiler/x/fortran -tags slow`
 
 ------
-https://chatgpt.com/codex/tasks/task_e_6861e70f65a883208351807b1e6cce36",OpenAI_Codex,1218621,tamnd,closed,2025-06-30T03:39:36Z,2025-06-30T03:40:03Z,2025-06-30T03:40:03Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4055,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize VM pure call folding"". Summary: fold user-defined pure function calls during VM compilation using the VM's constant evaluator; add test covering folding with a global constant. This is about optimization of VM compilation, likely performance improvement. Keywords: optimize, folding, constant evaluator. It's about performance. So classification: performance.assistantfinalperformance",14,0.42805246115610224,False
-3128988850,224,Apply fold let logic to interpreter,"## Summary
-- update interpreter folding logic so `let`-bound constants are stored in the environment
-- fold pure calls using these constants when possible
+https://chatgpt.com/codex/tasks/task_e_6879bbe43f988320873ee8bb5f2f1d9f",OpenAI_Codex,1218621,tamnd,closed,2025-07-18T03:35:35Z,2025-07-18T03:35:46Z,2025-07-18T03:35:46Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9464,14,1.0,True
+3238766901,9275,Improve Fortran constant folding,"## Summary
+- constant-fold list set operations (`union`, `union_all`, `except`, `intersect`) when both operands are integer literals
+- run Fortran VM valid tests without using prewritten sources
+- note the new behaviour in documentation
 
 ## Testing
-- `go test ./...` *(fails: golden mismatch in compile/go)*
+- `go test -tags slow -run TestFortranCompiler_VMValid_Golden -v` *(fails: gfortran not found)*
 
 ------
-https://chatgpt.com/codex/tasks/task_e_68464b49bdc4832099fefb33681d0724",OpenAI_Codex,1218621,tamnd,closed,2025-06-09T02:58:28Z,2025-06-09T03:07:56Z,2025-06-09T03:07:56Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/224,"analysisWe need to classify the pull request as performance or non-performance. The PR title: ""Apply fold let logic to interpreter"". Body: ""update interpreter folding logic so let-bound constants are stored in the environment; fold pure calls using these constants when possible"". This is about interpreter optimization, constant folding, pure call folding. It's about performance improvement. So classification: 'performance'.assistantfinalperformance",14,0.4126151500253398,False
-3128943107,221,Add golden test for Go constant folding,"## Summary
-- add constant folding recognition for let-bound literals
-- memoize constant calls with literal substitution
-- ensure Go compiler folds `str(a)` when `a` is constant
-- golden test covers pure call folding
+https://chatgpt.com/codex/tasks/task_e_6878b9d7302c8320a86eef43a1838a96",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T09:05:48Z,2025-07-17T09:06:50Z,2025-07-17T09:06:50Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9275,14,1.0,False
+3238725592,9254,Improve Fortran compiler constant folding,"## Summary
+- inline constant results for `len` and `count` when called on list literals
+- document new behaviour in TASKS and machine README
 
 ## Testing
-- `go test ./...`
+- `go test ./compiler/x/fortran -run VMValid_Golden -tags slow -count=1`
 
 ------
-https://chatgpt.com/codex/tasks/task_e_6846418087848320a3e4bf58855f5216",OpenAI_Codex,1218621,tamnd,closed,2025-06-09T02:20:58Z,2025-06-09T03:09:57Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/221,"analysisWe need to classify whether the primary purpose is performance. The PR adds golden test for Go constant folding, adds constant folding recognition for let-bound literals, memoize constant calls with literal substitution, ensure Go compiler folds str(a) when a is constant, golden test covers pure call folding. This is about constant folding, which is a compile-time optimization. It's about performance? Constant folding improves performance by reducing runtime overhead. The PR is about adding tests for constant folding, not necessarily implementing new performance improvements. But the changes include memoizing constant calls with literal substitution, which is a performance optimization. The primary purpose seems to be to improve performance by enabling constant folding. So classify as 'performance'.assistantfinalperformance",14,0.34197148670154426,False
-3166573874,2684,Add constant expression folding,"## Summary
-- evaluate constant expressions during folding
-- integrate constant folding into `FoldPureCalls`
+https://chatgpt.com/codex/tasks/task_e_6878b73f3d3c8320b491a00a2c87115b",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T08:52:23Z,2025-07-17T08:52:36Z,2025-07-17T08:52:36Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9254,14,1.0,False
+3239345955,9319,Enhance Fortran compiler,"## Summary
+- fold simple integer `append` calls at compile time
+- document progress in Fortran TASKS
 
 ## Testing
-- `go test ./...`
-
+- `go test ./compiler/x/fortran -run TestFortranCompiler_VMValid_Golden -tags slow`
 
 ------
-https://chatgpt.com/codex/tasks/task_e_6858bb1ec430832082dcc7bd8456a320",OpenAI_Codex,1218621,tamnd,closed,2025-06-23T02:43:25Z,2025-06-23T02:51:04Z,2025-06-23T02:51:04Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2684,"analysisWe need to classify the pull request as performance or non-performance. The PR title: ""Add constant expression folding"". Summary: evaluate constant expressions during folding, integrate constant folding into FoldPureCalls. This is about compiler optimization, constant folding. That is a performance improvement? Constant folding reduces runtime cost by evaluating at compile time. It's an optimization. The classification: performance. The guidelines: performance-related PRs may contain keywords like optimization, speed, etc. This PR is about constant folding, which is an optimization. So classify as 'performance'.assistantfinalperformance",14,0.3386579075540279,False
-3186297519,3977,Improve VM constant folding for OpIn,"## Summary
-- extend VM optimizer to constant fold `in` operations
-- regenerate IR outputs
+https://chatgpt.com/codex/tasks/task_e_6878e41b54688320a41b4c874d2b577f",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T12:10:30Z,2025-07-17T12:11:07Z,2025-07-17T12:11:07Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9319,14,1.0,False
+3242791087,9665,Improve Rust compiler constant list append,"## Summary
+- extend Rust compiler with `constList` tracking
+- fold `append` calls with constant lists into a single vector literal
+- document improvement in Rust README and TASKS
+- regenerate `append_builtin.rs` code
 
 ## Testing
-- `go test ./...`
-- `go run cmd/mochi-bench/main.go`
+- `go test ./compiler/x/rust -tags slow -run VM -count=1 -update`
+
 
 ------
-https://chatgpt.com/codex/tasks/task_e_68615f11639c8320ba0299b0ea3c0f40",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T15:52:55Z,2025-07-01T12:02:03Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3977,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve VM constant folding for OpIn"". Summary: extend VM optimizer to constant fold `in` operations, regenerate IR outputs. This is about optimization of VM, constant folding. That is a performance improvement. So classify as 'performance'.assistantfinalperformance",14,0.28928707024565437,False
-3202673408,5040,Improve in-operator codegen for slices,"## Summary
-- add `isComparableSimple` helper
-- inline `slices.Contains` for `in` when element type is comparable
-- document new optimisation in Go backend README
+https://chatgpt.com/codex/tasks/task_e_687a20b5d54c8320872643530da3c16e",OpenAI_Codex,1218621,tamnd,closed,2025-07-18T10:43:07Z,2025-07-18T10:43:16Z,2025-07-18T10:43:16Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9665,14,0.41406542741887725,False
+3241693904,9439,Improve Fortran compiler constant folding,"## Summary
+- fold constant string lists in `append` and set operations
+- precompute membership checks when the list contains constant strings
+- track constant string lists during code generation
 
 ## Testing
-- `go test ./...`
+- `go test ./compiler/x/fortran -tags slow -count=1`
 
 ------
-https://chatgpt.com/codex/tasks/task_e_6867ce468b2c83208f2479cd7aac128c",OpenAI_Codex,1218621,tamnd,closed,2025-07-04T12:59:14Z,2025-07-04T12:59:27Z,2025-07-04T12:59:27Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/5040,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve in-operator codegen for slices"". Summary: add helper, inline slices.Contains for in when element type is comparable, document new optimisation. This is about code generation optimization, likely performance improvement. Keywords: ""optimize"", ""inline"", ""performance"". So classify as 'performance'.assistantfinalperformance",14,0.21990980814499494,False
-3128867544,214,Add memoization for pure functions,"## Summary
-- memoize pure function calls in the interpreter to avoid re-execution
+https://chatgpt.com/codex/tasks/task_e_6879b66c299c832098b5ccdace2e0b91",OpenAI_Codex,1218621,tamnd,closed,2025-07-18T03:13:06Z,2025-07-18T03:13:35Z,2025-07-18T03:13:35Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9439,14,0.41283345887541245,True
+3224348044,7860,Improve C compiler constant folding,"## Summary
+- track literal integer lists in compiler
+- fold `append` on constant int lists
+
+## Testing
+- `go test ./compiler/x/c -tags slow -run TestCCompiler_ValidPrograms -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68715f9b9e94832087da86b731f099e6",OpenAI_Codex,1218621,tamnd,closed,2025-07-11T22:11:59Z,2025-07-11T22:12:12Z,2025-07-11T22:12:12Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7860,14,0.3098895684182642,False
+3241753827,9480,Add constant string list inference to C backend,"## Summary
+- improve C compiler by tracking string list constants
+- precompute len/count/min/max for constant string lists
+- regenerate golden outputs
+- update compilation status and task log
+
+## Testing
+- `go test -tags slow ./compiler/x/c -run TestCCompiler_VMValid_Golden -update` *(fails: group_by_multi_join_sort, save_jsonl_stdout, tree_sum, update_stmt)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_6879c16a1c8483208ed805fdaf4bd6ef",OpenAI_Codex,1218621,tamnd,closed,2025-07-18T03:50:55Z,2025-07-18T03:51:20Z,2025-07-18T03:51:20Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9480,14,0.2696112012778921,False
+3227087590,8622,Add list deallocation in C backend,"## Summary
+- free allocated result lists when compiling to C
+- append results to free list in `compileQueryExpr`
+- track allocations in the compiler
+- regenerate C output for `cross_join`
+- note enhancement in C `TASKS.md`
+
+## Testing
+- `go build -tags slow ./cmd/...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68745b757a288320bbcea20af92942e0",OpenAI_Codex,1218621,tamnd,closed,2025-07-14T01:40:17Z,2025-07-14T01:40:32Z,2025-07-14T01:40:32Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/8622,14,0.2500406251759793,False
+3224871375,7914,Improve C backend list handling,"## Summary
+- expand C helper functions with `isListBoolType`
+- treat `len` selector on constant lists with compile-time length
+- index bool lists as arrays instead of struct data
+
+## Testing
+- `go test ./... -run TestDummy -count=1`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6871f0db1430832090e6cb81e7eb3e1b",OpenAI_Codex,1218621,tamnd,closed,2025-07-12T05:43:56Z,2025-07-12T05:44:07Z,2025-07-12T05:44:07Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7914,14,0.23130123619865273,False
+3225111162,7934,Update C backend to use stack arrays,"## Summary
+- add helper for `contains_array_int` and generate it when a list expression is backed by a stack array
+- emit `contains_array_int` instead of `contains_list_int` when possible
+- use `listLenExpr` and `listItemExpr` for query loops
+- regenerate C machine outputs
+
+## Testing
+- `go test ./compiler/x/c -run TestCCompiler_ValidPrograms -tags slow -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6872288ed9c88320812146efd45b5b2f",OpenAI_Codex,1218621,tamnd,closed,2025-07-12T09:35:57Z,2025-07-12T09:37:03Z,2025-07-12T09:37:03Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7934,14,0.20730782807628856,False
+3202700175,5046,Improve C backend type inference and inline string ops,"## Summary
+- improve `listElemType` inference to avoid `AnyType`
+- inline string index and slice operations instead of calling runtime helpers
+- drop unused helper flags when deciding string headers
 
 ## Testing
 - `make test`
 
 ------
-https://chatgpt.com/codex/tasks/task_e_684634ec7918832090120fbac1f9e1ae",OpenAI_Codex,1218621,tamnd,closed,2025-06-09T01:17:59Z,2025-06-09T01:18:39Z,2025-06-09T01:18:39Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/214,analysisWe need to classify whether the primary purpose is performance. The PR adds memoization for pure functions to avoid re-execution. That is a performance improvement. So label 'performance'.assistantfinalperformance,14,0.138358996354333,False
-3128916725,219,Add optional memoization in interpreter,"## Summary
-- add a flag to toggle memoization of pure functions
-- wire the flag into `mochi run` and `mochi test`
-- skip memoization logic unless enabled
+https://chatgpt.com/codex/tasks/task_e_6867d011c5b483208fa0bf0500371c72",OpenAI_Codex,1218621,tamnd,closed,2025-07-04T13:08:13Z,2025-07-04T13:08:26Z,2025-07-04T13:08:26Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/5046,14,0.02166762063495525,False
+3238674493,9244,Improve C# list indexing,"## Summary
+- enhance `compilePostfix` to emit direct indexing when the list or string type is known
+- add generated `list_index.cs` with expected output
+- update C# machine README
 
 ## Testing
-- `go test ./...`
-- `go run ./cmd/mochi-bench > /tmp/bench_default.txt`
-- `MOCHI_MEMO=1 go run ./cmd/mochi-bench > /tmp/bench_memo.txt`
-
+- `go vet ./...`
 
 ------
-https://chatgpt.com/codex/tasks/task_e_68463dfc054c8320b7b2441ca3b852b6",OpenAI_Codex,1218621,tamnd,closed,2025-06-09T01:57:48Z,2025-06-09T02:00:05Z,2025-06-09T02:00:05Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/219,"analysisWe need to classify whether the primary purpose is performance. The PR adds optional memoization in interpreter, flag to toggle memoization of pure functions, skip memoization logic unless enabled. This is about performance optimization: memoization can improve performance. The description mentions ""skip memoization logic unless enabled"" and tests for bench. So it's performance. So label 'performance'.assistantfinalperformance",14,0.11231134839473256,False
-3166655793,2686,Add simple interpreter inlining,"## Summary
-- add `inlineCandidates` and `callCounts` maps to Interpreter
-- record small functions as inline candidates
-- count calls and inline hot, pure single-expression functions
-- initialize helper Interpreters with these maps
+https://chatgpt.com/codex/tasks/task_e_6878b1d7ed3c8320adcc27eeaeee9360",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T08:37:36Z,2025-07-17T08:38:09Z,2025-07-17T08:38:09Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9244,14,0.021424008995835686,False
+3128833247,209,Improve compiler string slicing,"## Summary
+- specialize string slicing helpers for Go, Python and TypeScript compilers
+- pick specialized helper based on inferred type
+- add slice compilation test
 
 ## Testing
 - `go test ./...`
 
 ------
-https://chatgpt.com/codex/tasks/task_e_6858cbbc7a3483209f88c35706070449",OpenAI_Codex,1218621,tamnd,closed,2025-06-23T03:44:29Z,2025-06-23T05:35:20Z,2025-06-23T05:35:19Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2686,"analysisWe need to classify whether the primary purpose of the pull request is to improve performance. The PR adds simple interpreter inlining, adding inlineCandidates and callCounts maps to Interpreter, record small functions as inline candidates, count calls and inline hot, pure single-expression functions, initialize helper Interpreters with these maps. This is about performance optimization: inlining functions to reduce overhead, improve speed. So it's a performance PR. So output 'performance'.assistantfinalperformance",14,0.11203888764651213,False
-3266975233,13747,Add memoized Fibonacci implementation,"## Summary
-- download task 365 from Rosetta Code (Fibonacci sequence)
-- implement memoized Fibonacci example in Mochi
-- provide golden output running under vm
-
-## Testing
-- `MOCHI_ROSETTA_ONLY=fibonacci-sequence-5 go test ./runtime/vm -tags=slow -run Rosetta -count=1`
-
-------
-https://chatgpt.com/codex/tasks/task_e_6885fc1c9f58832085ac629902367180",OpenAI_Codex,1218621,tamnd,closed,2025-07-27T10:30:01Z,2025-07-27T10:31:34Z,2025-07-27T10:31:34Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/13747,"analysisWe need to classify whether the primary purpose is performance. The PR adds memoized Fibonacci implementation. That is about performance? Memoization improves performance of Fibonacci calculation. The PR is adding a memoized implementation, likely to improve performance of Fibonacci example. The description: ""Add memoized Fibonacci implementation"". That is a performance improvement. So classify as 'performance'.assistantfinalperformance",14,0.10391201569021405,False
-3221615770,7599,Add optimized Ackermann implementation,"## Summary
-- implement an optimized variant of the Ackermann function in Mochi
-- add golden output for the new program
-
-## Testing
-- `go test ./tools/rosetta -tags slow -run TestMochiTasks/ackermann-function-2 -count=1`
-
-
-------
-https://chatgpt.com/codex/tasks/task_e_68709b4979148320aa0a248e58eadfab",OpenAI_Codex,1218621,tamnd,closed,2025-07-11T05:41:53Z,2025-07-11T05:42:04Z,2025-07-11T05:42:04Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7599,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Add optimized Ackermann implementation"". The body: implement an optimized variant of the Ackermann function in Mochi, add golden output. No mention of performance, speed, optimization? The title says ""optimized"". That could be performance. But the body doesn't mention performance metrics. The instruction: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, etc. The title contains ""optimized"". That is a keyword. So likely performance. The PR is about implementing an optimized variant of Ackermann. That is performance improvement. So classify as 'performance'.assistantfinalperformance",14,0.08983871769428241,False
-3128898273,217,Improve argsKey for memoization,"## Summary
-- improve memoization key generation by avoiding JSON serialization
-- update benchmark outputs
-
-## Testing
-- `go test ./...`
-- `make bench`
-
-------
-https://chatgpt.com/codex/tasks/task_e_68463ad76088832095208b6cd5da14a9",OpenAI_Codex,1218621,tamnd,closed,2025-06-09T01:43:25Z,2025-06-09T01:46:48Z,2025-06-09T01:46:47Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/217,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Improve argsKey for memoization"". Summary: ""improve memoization key generation by avoiding JSON serialization"". That is about memoization key generation, likely to improve performance by avoiding JSON serialization overhead. The body mentions benchmark outputs. So it's performance improvement. So classification: 'performance'.assistantfinalperformance",14,0.0883214602589275,False
-3168509434,2721,Optimize interpreter performance,"## Summary
-- cache builtin function table to avoid map allocations
-- add environment pooling helpers for reusing Env objects
-- use AcquireEnv/ReleaseEnv in interpreter for loops, if-statements and function calls
-- lower inline call threshold
+https://chatgpt.com/codex/tasks/task_e_68460df9198083209ebd9148bd814d0c",OpenAI_Codex,1218621,tamnd,closed,2025-06-09T00:46:12Z,2025-06-09T00:58:55Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/209,14,0.020448357460557755,False
+3198134004,4798,Improve C++ type inference,"## Summary
+- improve selector and if-expression type inference for the C++ backend
 
 ## Testing
 - `go test ./...`
 
 ------
-https://chatgpt.com/codex/tasks/task_e_68596837f34c83208cb32ac21acf786b",OpenAI_Codex,1218621,tamnd,closed,2025-06-23T14:56:56Z,2025-06-23T15:13:30Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2721,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Optimize interpreter performance"". The body mentions caching builtin function table, environment pooling, AcquireEnv/ReleaseEnv, lower inline call threshold. These are performance improvements. So classification: 'performance'.assistantfinalperformance",14,0.087730686575371,False
-3152227912,1268,Optimize interpreter ops,"## Summary
-- centralize built-in operator implementations in a shared table
-- route applyBinaryValue and applyUnaryValue through this table
+https://chatgpt.com/codex/tasks/task_e_686617f5b2b8832083d24f4694f551d1",OpenAI_Codex,1218621,tamnd,closed,2025-07-03T05:56:13Z,2025-07-03T05:56:24Z,2025-07-03T05:56:24Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4798,14,0.019769402761342307,False
+3128738345,207,Improve Go string indexing,"## Summary
+- specialize Go compiler index logic
+- add `_indexString` helper
+- update golden output for string indexing
 
 ## Testing
-- `go fmt ./...`
-- `go test ./...` *(fails: golden mismatch)*
-
-------
-https://chatgpt.com/codex/tasks/task_e_685108101fdc8320a06210f0d1abe097",OpenAI_Codex,1218621,tamnd,closed,2025-06-17T06:29:21Z,2025-06-17T06:35:29Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/1268,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize interpreter ops"". Summary: centralize built-in operator implementations in a shared table, route applyBinaryValue and applyUnaryValue through this table. This is about interpreter ops, likely performance improvement. Keywords: optimize, centralize, route. No explicit performance keywords but ""Optimize"" indicates performance. So classify as 'performance'.assistantfinalperformance",14,0.06735537405353499,False
-3135397128,146,Avoid double wrapping keymap descriptions,"## Summary
-- optimize keymap rendering by wrapping description text only once
-
-## Testing
-- `cargo check`
-- `cargo test`
+- `go test ./compile/go`
+- `go test ./...`
 
 
 ------
-https://chatgpt.com/codex/tasks/task_e_6848fdb80910832a9920ad5b82ffa9e7",OpenAI_Codex,2025065,panarch,closed,2025-06-11T03:57:48Z,2025-06-11T03:58:35Z,,812496927,https://api.github.com/repos/gluesql/glues,https://github.com/gluesql/glues/pull/146,"analysisWe need to classify as performance or non-performance. The PR title: ""Avoid double wrapping keymap descriptions"". Summary: ""optimize keymap rendering by wrapping description text only once"". This is about rendering optimization, likely performance improvement. Keywords: optimize, rendering, wrapping description text only once. It's about performance. So classify as 'performance'.assistantfinalperformance",14,0.06664365953176936,False
+https://chatgpt.com/codex/tasks/task_e_68460b505d208320bae3bfb485cb136a",OpenAI_Codex,1218621,tamnd,closed,2025-06-08T22:23:02Z,2025-06-08T22:23:50Z,2025-06-08T22:23:50Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/207,14,0.01921001100491771,False
+3158684496,2003,Improve C++ backend type inference,"## Summary
+- detect variable types from initial values instead of always using `auto`
+- avoid copies when iterating over containers by using const references
+- add a small helper for primitive type detection
+
+## Testing
+- `go vet ./...`
+- `go test ./...`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_685370de48648320b4b91019db80c93e",OpenAI_Codex,1218621,tamnd,closed,2025-06-19T02:26:12Z,2025-06-19T02:32:32Z,2025-06-19T02:32:32Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2003,14,0.01864502476251156,False

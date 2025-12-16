@@ -1,2188 +1,1087 @@
-id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
-3269032263,79,Add SIMD optimizations for 23.5% performance improvement,"## Summary
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,Topic,Probability,Representative_document
+3142181649,19,Replace CLI subprocess approach with Claude Code SDK,"## Description
 
-This PR implements comprehensive SIMD optimizations for the probe code search engine, addressing the challenge that **BM25 SIMD wasn't providing expected performance gains due to sparse vector characteristics**. Instead of abandoning SIMD, we pivoted to target string processing operations where SIMD acceleration excels.
+Replace the current CLI subprocess execution approach with the Claude Code SDK for better performance, type safety, and error handling. This is a clean replacement that maintains the same interface while providing significant performance improvements.
 
-### The Journey: From BM25 to String Processing SIMD
+## Type of Change
 
-**Initial Challenge:** After implementing BM25 SIMD optimizations, we discovered they weren't delivering meaningful performance improvements. The core issue was that BM25 operates on sparse vectors (most terms have zero scores), making vectorized operations less effective than anticipated.
+Please add the appropriate label(s) to this PR and check the relevant box(es):
 
-**Strategic Pivot:** Rather than abandon SIMD entirely, we analyzed the codebase to identify workloads that could genuinely benefit from SIMD acceleration. We found that string processing operations - tokenization and pattern matching - were ideal candidates as they process dense character data where SIMD truly shines.
+- [ ] 🐛 `bug` - Bug fix (non-breaking change which fixes an issue)
+- [x] ✨ `feature` - New feature (non-breaking change which adds functionality)
+- [ ] 💥 `breaking` - Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] 📚 `documentation` - Documentation update
+- [x] ⚡ `performance` - Performance improvement
+- [ ] 🔨 `refactor` - Code refactoring
+- [ ] 🧪 `test` - Adding or updating tests
+- [ ] 🔧 `chore` - Maintenance, dependencies, tooling
 
-**Implementation Approach:** We implemented two separate architect-driven solutions:
-1. SIMD-accelerated camelCase splitting in tokenization
-2. SIMD-accelerated multi-term pattern matching
+## Changes Made
 
-**Evolution to Production:** The implementation evolved through several key phases:
-- Initial SIMD tokenization showing 7.2% improvement
-- Integration challenges with parallel processing requiring Arc wrappers
-- Hybrid pattern matching combining SIMD with ripgrep fallbacks
-- Thread safety improvements replacing environment variable manipulation
-- Default-enabled configuration with opt-out flags
+- **Complete replacement**: CLI subprocess execution → Claude Code SDK
+- **Same interface**: `executeClaudeCommand` function maintains identical signature
+- **Identical output**: Same JSON message structure (`system`, `assistant`, `result` types)
+- **Simplified implementation**: No feature flags, fallbacks, or complex configuration
+- **Working directory**: Maintains project root execution behavior
+- **Dependencies**: Added `npm:@anthropic-ai/claude-code` to deno.lock
 
-### Performance Improvements
+## Testing
 
-#### Detailed Performance Analysis
+- [x] Tests pass locally (`make test`)
+- [x] Code is formatted (`make format`)
+- [x] Code is linted (`make lint`)
+- [x] Type checking passes (`make typecheck`)
+- [x] All quality checks pass (`make check`)
+- [x] Manual testing performed - Verified SDK produces identical JSON output format
 
-**Test Environment:**
-- Query: ""yaml workflow agent multi-agent user input""
-- Target: ~/go/src/semantic-kernel/ (large codebase)
-- Method: Built binaries comparison (cargo build --release)
+## Checklist
 
-**Comprehensive Timing Breakdown:**
+- [x] My code follows the project's style guidelines
+- [x] I have performed a self-review of my own code
+- [x] I have commented my code, particularly in hard-to-understand areas
+- [ ] I have made corresponding changes to the documentation
+- [ ] I have added/updated tests for my changes
+- [x] All tests pass
 
-| Metric | Old Version | New Version (SIMD) | Improvement | Time Saved |
-|--------|-------------|-------------------|-------------|------------|
-| **Total Time** | 1053.97ms | 929.82ms | **11.8%** | **124.15ms** |
-| File Scanning | 24.44ms (2.3%) | 23.63ms (2.5%) | 3.3% | 0.81ms |
-| **Term Matching** | 867.00ms (82.3%) | 719.75ms (77.4%) | **17.0%** | **147.25ms** |
-| AST Parsing | 118.65ms (11.3%) | 139.02ms (14.9%) | -17.2% | -20.37ms |
-| Ranking | 35.42ms (3.4%) | 39.49ms (4.2%) | -11.5% | -4.07ms |
-| Result Formatting | 8.46ms (0.8%) | 7.93ms (0.9%) | 6.3% | 0.53ms |
+## Screenshots (if applicable)
 
-**Key Insights:**
-- **Massive term matching improvement:** 17.0% faster (147.25ms saved)
-- **Overall performance gain:** 11.8% improvement despite some overhead
-- **Primary bottleneck addressed:** Term matching (82.3% → 77.4% of total time)
+N/A - Backend implementation change with no UI modifications.
 
-#### SIMD Tokenization Benchmark
+## Additional Notes
 
-**Simple Query Performance:**
-```
-Query: ""agent workflow""
-Target: ~/go/src/semantic-kernel/
+This addresses issue #18 with a clean, simple replacement approach:
 
-Before SIMD tokenization: 841.74ms
-After SIMD tokenization: 780.90ms
-Improvement: 7.2% (60.84ms faster)
-```
+**Performance Benefits:**
+- Eliminates process spawning overhead for each request
+- Direct memory access instead of IPC communication
+- Native JavaScript error handling
 
-#### Comparative Strategy Analysis
+**Compatibility:**
+- Zero breaking changes to API
+- Identical JSON output format maintained
+- Same function interface for minimal integration impact
 
-**Hybrid vs Always-SIMD vs Always-Ripgrep Testing:**
-```
-Pattern Matching Strategy Comparison:
-├── Hybrid (SIMD + Ripgrep): 13.9% improvement (best overall)
-├── Always-SIMD: 11.2% improvement  
-└── Always-Ripgrep: baseline performance
+**Simplicity:**
+- No feature flags or configuration complexity
+- Clean, focused implementation
+- Easier to maintain and understand
 
-Conclusion: Hybrid approach optimal for diverse pattern complexity
-```
-
-### SIMD Features Implemented
-
-#### 1. SIMD-Accelerated Tokenization (`src/search/simd_tokenization.rs`)
-- Fast camelCase boundary detection using character classification tables
-- SIMD-accelerated ASCII character processing with 256-element lookup table
-- Smart fallback to scalar implementation for Unicode or complex patterns like OAuth2, XML, HTTP
-- Thread-safe configuration system replacing environment variable manipulation
-- Handles complex patterns: `XMLHttpRequest` → `[""xml"", ""http"", ""request""]`
-
-#### 2. SIMD Pattern Matching (`src/search/simd_pattern_matching.rs`)
-- Multi-pattern string matching using memchr and aho-corasick
-- **Hybrid Intelligence:** Automatically detects pattern complexity and chooses optimal strategy:
-  - SIMD for simple literal patterns (faster)
-  - Ripgrep for complex regex patterns (maintains compatibility)
-- Pattern complexity analysis checks for regex metacharacters like `\b`, `(?i)`
-- Seamless integration with existing search pipeline
-
-#### 3. Enhanced SIMD Ranking (`src/search/result_ranking.rs`)
-- Element-wise SIMD multiplication for BM25 scoring using SimSIMD
-- Optimized sparse-to-dense vector conversion reducing memory allocations
-- Memory allocation optimization for better cache performance
-- Thread-safe configuration without environment variable races
-
-### Architecture Improvements & Problem Solving
-
-#### Thread Safety Crisis & Resolution
-**Problem:** Initial implementation used `std::env::set_var()` for recursive call prevention, causing thread safety issues in concurrent scenarios.
-
-**Solution:** Implemented `SimdConfig` struct with explicit configuration passing:
-```rust
-pub struct SimdConfig {
-    pub simd_enabled: bool,
-    pub in_recursive_call: bool,
-}
-```
-This eliminated all environment variable manipulation and race conditions.
-
-#### Merge Strategy Evolution
-**Challenge:** Rebasing the feature branch on main created complex merge conflicts.
-
-**Resolution:** Switched from rebase to merge strategy, which provided cleaner conflict resolution. Used a specialized agent to handle complex `search_runner.rs` conflicts, resulting in the optimal hybrid SIMD/ripgrep implementation.
-
-#### C# Language Support Fix
-**Issue Discovered:** During benchmarking, found that C# files were showing ""unknown"" language.
-
-**Root Cause:** Missing C# mapping in formatter and tree-sitter compatibility issue.
-
-**Fix:** Added proper C# language detection and fixed unsafe transmute operations.
-
-### Technical Deep Dive
-
-#### Character Classification Table Optimization
-```rust
-// SIMD lookup table for fast ASCII character classification
-static CHAR_CLASS_TABLE: [u8; 256] = [
-    // Each byte: bit 0 = uppercase, bit 1 = lowercase, bit 2 = digit
-    // Enables SIMD boundary detection in single table lookup
-];
-```
-
-#### Hybrid Pattern Selection Logic
-```rust
-let use_simd = crate::search::simd_pattern_matching::is_simd_pattern_matching_enabled()
-    && pattern_strings.iter().all(|p| \!p.contains(r""\b"") && \!p.contains(""(?i)""));
-```
-
-#### Configuration System Design
-- **Default Behavior:** SIMD enabled by default for maximum performance
-- **Opt-out Flags:** `DISABLE_SIMD_TOKENIZATION=1`, `DISABLE_SIMD_PATTERN_MATCHING=1`, `DISABLE_SIMD_RANKING=1`
-- **Graceful Fallback:** Automatic detection of SIMD capability and intelligent degradation
-
-### Dependencies & Integration
-
-**New Dependencies:**
-- `memchr = ""2.7""` - SIMD-accelerated string searching (used by ripgrep internally)
-- `wide = ""0.7""` - SIMD vector operations for character classification
-- `aho-corasick = ""1.1""` - Multi-pattern string matching with SIMD acceleration
-
-**Integration Points:**
-- Seamless integration with existing tokenization pipeline
-- Backward-compatible API with configuration parameter addition
-- Zero breaking changes to public interfaces
-
-### Quality Assurance & Testing
-
-#### Comprehensive Test Coverage
-- **Equivalence Testing:** SIMD results must match scalar implementations exactly
-- **Thread Safety Testing:** Concurrent execution with different configurations
-- **Complex Pattern Testing:** XMLHttpRequest, OAuth2Provider, parseJSON2HTML5
-- **Performance Regression Testing:** Automated benchmarking against baseline
-
-#### Error Resolution Journey
-- **Character table size mismatch:** Fixed 257→256 element array
-- **Private function access:** Resolved import scope issues
-- **Type mismatches:** Fixed f64→f32 conversions for SimSIMD
-- **Merge conflicts:** Strategic resolution preserving both SIMD and ripgrep benefits
-- **Test failures:** Fixed boundary detection for complex camelCase patterns
-
-### Production Readiness
-
-#### Backward Compatibility
-- Full backward compatibility maintained
-- Graceful degradation on platforms without SIMD support
-- No breaking changes to public APIs
-- Existing tests pass with SIMD optimizations enabled
-
-#### Performance Validation
-- **Real-world Testing:** Benchmarks against actual codebases (semantic-kernel)
-- **Multiple Query Types:** Both simple and complex query patterns tested
-- **Consistent Improvements:** 7.2% to 17.0% improvements across different scenarios
-
-### Future Implications
-
-This implementation demonstrates that **strategic SIMD application** yields better results than broad SIMD adoption. By focusing on string processing operations where SIMD naturally excels, we achieved significant performance improvements while maintaining code clarity and reliability.
-
-The hybrid approach preserves the benefits of both worlds: SIMD speed for simple operations and ripgrep's sophisticated regex engine for complex patterns.
+Closes #18
 
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
-Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,14009,buger,closed,2025-07-28T09:35:31Z,2025-07-28T13:49:09Z,2025-07-28T13:49:09Z,943383028,https://api.github.com/repos/buger/probe,https://github.com/buger/probe/pull/79,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Add SIMD optimizations for 23.5% performance improvement"". The body clearly describes performance improvements, SIMD optimizations, benchmarks, etc. So it's performance.assistantfinalperformance",11,1.0,True
-3184463362,30291,Fix RealParent garbage collection warning to reduce noise in production apps,"> [!NOTE]
-> Are you waiting for the changes in this PR to be merged?
-> It would be very helpful if you could [test the resulting artifacts](https://github.com/dotnet/maui/wiki/Testing-PR-Builds) from this PR and let us know in a comment if this change resolves your issue. Thank you!
+Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,80381,sugyan,closed,2025-06-13T04:05:15Z,2025-06-13T14:14:33Z,2025-06-13T14:14:33Z,999285986,https://api.github.com/repos/sugyan/claude-code-webui,https://github.com/sugyan/claude-code-webui/pull/19,11,1.0,True
+3200679276,4304,Implement lazy loading for RegistryInstance to improve latency in operations where the registry does not need to be read,"👨 
 
-## Description
+Before:
 
-This PR fixes the noisy ""The RealParent on Microsoft.Maui.Controls.Shapes.RoundRectangle has been Garbage Collected"" warnings that have been flooding production app logs since .NET MAUI SR6, particularly on iOS.
+```
+julia> @time Pkg.instantiate()
+  0.390297 seconds (1.95 M allocations: 148.381 MiB, 16.29% gc time, 31.03% compilation time: 68% of which was recompilation)
+```
+
+After:
+```
+julia> @time Pkg.instantiate()
+  0.161872 seconds (456.14 k allocations: 27.898 MiB, 9.75% gc time, 86.52% compilation time: 60% of which was recompilation)
+```
+
+
+-----
+
+🤖 
+
+- Change RegistryInstance to mutable struct with lazily loaded fields
+- Defer expensive operations (decompression, Registry.toml parsing) until needed
+- Add ensure_registry_loaded\!() to trigger loading on first access
+- Use getproperty() to automatically load when accessing name, uuid, repo, description, or pkgs
+- Fix #4301 by reducing initial registry creation overhead
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+",Claude_Code,1282691,KristofferC,closed,2025-07-03T21:18:03Z,2025-07-04T08:34:04Z,2025-07-04T08:34:04Z,82341193,https://api.github.com/repos/JuliaLang/Pkg.jl,https://github.com/JuliaLang/Pkg.jl/pull/4304,11,1.0,False
+3090065215,19,Add Claude CLI support with Strategy Pattern architecture (v0.6.0),"## 🚀 Major Enhancement: Claude CLI Support & Strategy Pattern Architecture
+
+This PR introduces comprehensive Claude CLI support with a robust Strategy Pattern architecture, bringing the MCP installer to v0.6.0 with significant performance and extensibility improvements.
+
+## ✨ New Features
+
+### Claude CLI Integration
+- **Automatic Detection**: Detects if `claude` CLI is available at startup
+- **Immediate Availability**: Servers installed via CLI are available instantly (no restart required)
+- **Graceful Fallback**: Falls back to Claude Desktop config if CLI unavailable
+- **Enhanced UX**: Clear feedback on installation method and availability status
+
+### Strategy Pattern Architecture
+- **Extensible Design**: Clean interface ready for multiple installation environments
+- **Performance Optimized**: Early strategy detection (1 call vs 4 calls per operation)
+- **Future-Ready**: Prepared for Docker, Kubernetes, VS Code Extensions, and more
+- **Maintainable**: Eliminated conditional branching duplication throughout codebase
+
+## 🏗️ Technical Improvements
+
+### Architecture Changes
+- Added `InstallationStrategy` interface with concrete implementations:
+  - `ClaudeCliStrategy` - For `claude` CLI installations
+  - `ClaudeDesktopStrategy` - For traditional config file approach
+- Global strategy initialization at server startup
+- Unified installation interface across all environments
+
+### Performance Enhancements
+- **Before**: 4 `hasClaudeCLI()` calls per installation operation
+- **After**: 1 `hasClaudeCLI()` call per server startup
+- Eliminated redundant environment detection
+- Streamlined installation flow
+
+### Code Quality
+- Removed legacy `installToClaudeCLI`/`installToClaudeDesktop` functions
+- Simplified conditional logic throughout the codebase
+- Better separation of concerns
+- Enhanced error handling and user feedback
+
+## 📦 Installation & Usage
+
+### For Claude CLI (New - Recommended):
+```bash
+claude mcp add mcp-installer npx --args @o2alexanderfedin/mcp-installer
+```
+
+### For Claude Desktop (Existing):
+```json
+{
+  ""mcpServers"": {
+    ""mcp-installer"": {
+      ""command"": ""npx"",
+      ""args"": [""@o2alexanderfedin/mcp-installer""]
+    }
+  }
+}
+```
+
+## 🔄 Backward Compatibility
+
+✅ **No Breaking Changes**: All existing Claude Desktop installations continue to work exactly as before
+✅ **Enhanced Experience**: Existing users get improved performance and better error messages
+✅ **Seamless Migration**: No action required for current users
+
+## 🧪 Testing
+
+- ✅ TypeScript compilation passes
+- ✅ Build system works correctly  
+- ✅ Module loads without runtime errors
+- ✅ Backward compatibility verified
+- ✅ Strategy pattern functionality confirmed
+
+## 📋 Commits Included
+
+1. **Add Claude CLI support with automatic detection and fallback** (`8e50814`)
+   - Core Claude CLI integration
+   - Automatic detection logic
+   - Enhanced README documentation
+
+2. **Remove unused function to fix TypeScript compilation** (`dd6e4a9`)
+   - Clean up legacy code
+   - Fix compilation issues
+
+3. **Refactor installation logic using Strategy Pattern** (`a778373`)
+   - Complete Strategy Pattern implementation
+   - Performance optimizations
+   - Code simplification
+
+4. **Bump version to 0.6.0** (`ce7ed5c`)
+   - Version update for release
+
+## 🎯 Future Roadmap
+
+This architecture enables easy addition of new installation environments:
+- Docker containers (`docker run` commands)
+- Kubernetes deployments (`kubectl apply`)
+- VS Code Extensions (`.vscode/settings.json`)
+- JetBrains IDEs (plugin configuration)
+- Cloud deployments (AWS Lambda, Google Cloud Functions)
+
+---
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,77516945,o2alexanderfedin,open,2025-05-26T05:38:39Z,,,894640711,https://api.github.com/repos/anaisbetts/mcp-installer,https://github.com/anaisbetts/mcp-installer/pull/19,11,1.0,True
+3141541564,882,Direct FFI Integration for idb_companion,"## Summary
+
+This PR introduces a Direct FFI (Foreign Function Interface) integration as a lightweight alternative to the gRPC-based architecture. This enables direct function calls from Rust to Objective-C with microsecond latency.
+
+## Key Benefits
+
+- **Performance**: 500x faster than gRPC (microseconds vs milliseconds)
+- **Size**: 40x smaller binary (~500KB vs ~20MB)
+- **Simplicity**: No async runtime, no protobuf serialization
+- **Zero dependencies**: Just the Foundation framework
+
+## What's Included
+
+### Core Implementation
+- `idb_direct.h` - C interface definition
+- `idb_direct_simple.m` - Stub implementation for testing
+- `idb_direct.m` - Full implementation (with framework API updates needed)
+- Rust FFI bindings with safe wrappers
+
+### Documentation
+- [Direct FFI Advantages](rust-client-simple/DIRECT_FFI_ADVANTAGES.md)
+- [Implementation Plan](rust-client-simple/DIRECT_FFI_IMPLEMENTATION_PLAN.md)
+- [Embedded Companion Plan](rust-client-simple/EMBEDDED_COMPANION_PLAN.md)
+
+### CI/CD
+- New GitHub workflow for FFI builds
+- Automated artifact packaging
+
+## Testing
+
+```bash
+cd rust-client-simple
+cargo build --features ffi --bin idb-tap-ffi
+./target/debug/idb-tap-ffi
+```
+
+## Current Status
+
+- ✅ FFI interface defined and working
+- ✅ Rust bindings complete
+- ✅ Stub implementation for testing
+- 🚧 Real implementation needs framework API compatibility fixes
+
+## Next Steps
+
+1. Resolve framework API compatibility issues
+2. Complete real touch event implementation
+3. Add screenshot support
+4. Performance benchmarking vs gRPC
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,40346430,arkavo-com,closed,2025-06-12T20:58:00Z,2025-06-12T20:59:11Z,,41870517,https://api.github.com/repos/facebook/idb,https://github.com/facebook/idb/pull/882,11,1.0,False
+3124595999,388,Add Python stub file generation with documentation parsing,"### Summary
+
+This PR adds comprehensive Python stub file (.pyi) generation for the LVGL MicroPython bindings, providing full IDE support with autocompletion, type hints, and rich documentation.
+
+**Key Features:**
+- 🚀 **Fast Parallel Processing**: 6 seconds vs. minutes (uses all CPU cores)
+- 📝 **Rich Documentation**: Automatic extraction from 1400+ LVGL functions  
+- 🎯 **IDE Integration**: Full autocompletion and type hints (.pyi files)
+- ⚡ **Separate Build**: Doesn't slow down main MicroPython builds
+- 🔧 **Smart Formatting**: Bullet points, text wrapping, proper Python conventions
+- 🔗 **Source Navigation**: File:line references to original C implementation
+
+The implementation includes:
+1. **Stub Generation**: Creates `.pyi` files with proper Python type hints
+2. **Documentation Parsing**: Extracts Doxygen comments from C headers using parallel processing
+3. **Smart Parameter Handling**: Converts `obj` to `self` for class methods
+4. **Performance Optimization**: Processes 209 header files in ~6 seconds using all CPU cores
+5. **Source References**: Adds file:line references for navigation to C implementation
+
+### Testing
+
+Tested on Unix port with full stub generation:
+- Processes 209 LVGL header files using parallel processing
+- Extracts documentation from 1423 functions
+- Generates type hints for 41 widget classes and 64 enums
+- Produces comprehensive `.pyi` files for IDE consumption
+
+The generated stubs provide full autocompletion and documentation in modern Python IDEs like VS Code, PyCharm, etc.
+
+### Trade-offs and Alternatives
+
+**Trade-offs:**
+- Adds ~6 seconds to generate full documentation (but as separate optional target)
+- Increases repository size slightly with documentation files
+
+**Alternatives considered:**
+- External documentation parsing libraries (rejected to minimize dependencies)
+- Manual stub file maintenance (rejected due to maintenance burden)
+- No documentation extraction (rejected as it provides significant developer value)
+
+The implementation uses custom regex-based Doxygen parsing to avoid external dependencies while providing exactly the functionality needed for LVGL's documentation format.
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,3318786,andrewleech,open,2025-06-06T12:10:03Z,,,167166039,https://api.github.com/repos/lvgl/lv_binding_micropython,https://github.com/lvgl/lv_binding_micropython/pull/388,11,1.0,False
+3226043406,4902,feat: lazy load CLI command actions for improved startup performance,"## Summary
+
+This PR implements lazy loading for CLI command actions as outlined in TODO.md, resulting in a **15.7% overall improvement** in CLI startup performance.
+
+### Key Changes:
+- Separated command registration (lightweight) from action execution (heavyweight)
+- Applied dynamic imports for all command actions
+- Optimized checkNodeVersion to remove heavy imports
+- Kept main.ts completely unchanged as required
+
+## Performance Results
+
+### Overall Performance
+- **Main branch average:** 971.84ms
+- **Feature branch average:** 819.00ms
+- **Improvement:** 152.84ms (15.7% faster)
+
+### Top 5 Most Improved Commands
+
+| Command | Main (ms) | Feature (ms) | Improvement (ms) | % Faster |
+|---------|-----------|--------------|------------------|----------|
+| validate | 988.45 | 820.17 | 168.28 | 17.0% |
+| init | 998.59 | 831.59 | 167.00 | 16.7% |
+| export | 991.45 | 826.09 | 165.36 | 16.7% |
+| show | 990.22 | 826.54 | 163.68 | 16.5% |
+| share | 985.84 | 823.22 | 162.62 | 16.5% |
+
+### All Commands Performance Comparison
+
+| Command | Main (ms) | Feature (ms) | Improvement (ms) |
+|---------|-----------|--------------|------------------|
+| help | 950.48 | 803.65 | 146.83 |
+| eval | 965.16 | 812.03 | 153.13 |
+| eval help | 962.44 | 809.09 | 153.35 |
+| init | 998.59 | 831.59 | 167.00 |
+| view | 961.37 | 807.18 | 154.19 |
+| list | 965.70 | 809.64 | 156.06 |
+| show | 990.22 | 826.54 | 163.68 |
+| auth login | 965.89 | 806.39 | 159.50 |
+| auth logout | 965.12 | 808.45 | 156.67 |
+| auth whoami | 960.51 | 808.14 | 152.37 |
+| cache clear | 973.60 | 822.12 | 151.48 |
+| config show | 967.38 | 812.36 | 155.02 |
+| delete | 963.28 | 810.41 | 152.87 |
+| export | 991.45 | 826.09 | 165.36 |
+| import | 959.79 | 809.01 | 150.78 |
+| share | 985.84 | 823.22 | 162.62 |
+| validate | 988.45 | 820.17 | 168.28 |
+| debug | 969.55 | 819.36 | 150.19 |
+| model-scan | 975.96 | 823.60 | 152.36 |
+| generate dataset | 989.25 | 833.66 | 155.59 |
+| generate assertions | 980.55 | 827.68 | 152.87 |
+
+## Commands Refactored
+
+- ✅ eval
+- ✅ init  
+- ✅ view
+- ✅ generate (dataset, assertions)
+- ✅ share
+- ✅ show
+- ✅ list
+- ✅ cache
+- ✅ config
+- ✅ auth
+- ✅ delete
+- ✅ export
+- ✅ import
+- ✅ validate
+- ✅ debug
+- ✅ modelScan
+
+## Testing
+
+All CI checks pass:
+- ✅ Build
+- ✅ Lint
+- ✅ Format
+- ✅ Tests
+- ✅ Circular dependencies check
+- ✅ Python tests
+- ✅ Integration tests
+
+## Breaking Changes
+
+None - all changes are internal optimizations that maintain the same external API.
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,7235481,mldangelo,open,2025-07-13T02:47:49Z,,,633927609,https://api.github.com/repos/promptfoo/promptfoo,https://github.com/promptfoo/promptfoo/pull/4902,11,1.0,False
+3210327689,489,Refactor asset conversion/management: Move to CLI tool and enable direct WAD loading,"This PR implements a comprehensive refactoring of OpenKeeper's asset conversion and management system to address the requirements outlined in #486.
+
+## 🎯 Key Changes
+
+### 1. Standalone Asset Converter CLI
+- **New `AssetConverterCLI.java`**: Replaces GUI-based conversion integrated into game startup
+- **Command-line interface** with options for custom DK II folder, force overwrite, and skipping models
+- **Gradle integration**: Added `assetConverterCLI` task for easy execution
+- **Cross-platform friendly**: Enables Android builds without requiring runtime conversion
+
+```bash
+# Convert all assets
+./gradlew assetConverterCLI
+
+# Skip model conversion and load directly from WAD
+./gradlew assetConverterCLI -PcliArgs=""--skip-models""
+```
+
+### 2. Direct WAD File Loading
+- **New `WadAssetLocator.java`**: Loads assets directly from original DK II files
+- **Priority system**: Extracted assets take precedence over WAD files for modding
+- **Support for multiple formats**:
+  - KMF models from `Meshes.WAD`
+  - Textures from `EngineTextures.dat`
+  - Sounds from `Sounds.WAD`
+
+### 3. Removed .j3o Model Generation
+- **Modified `ConvertModels.java`**: Extracts raw KMF files instead of converting to .j3o
+- **Runtime loading**: Models converted from KMF to JME objects at runtime using existing `KmfModelLoader`
+- **Better editability**: Raw KMF files can be viewed/modified by external tools
+- **Reduced storage**: Eliminates duplicate data in both KMF and .j3o formats
+
+### 4. Game Startup Optimization
+- **Modified `Main.java`**: Removed asset conversion dependency from startup
+- **Faster launches**: Game starts immediately without conversion delays
+- **Dual asset loading**: Registers both `FileLocator` (extracted) and `WadAssetLocator` (original)
+
+## 🚀 Benefits
+
+### For Users
+- **Instant startup**: No more waiting for asset conversion when launching the game
+- **Smaller disk usage**: Can skip model conversion entirely
+- **Better modding support**: Easy to replace individual assets while keeping others original
+
+### For Developers
+- **Cross-platform builds**: Especially important for Android deployment (#218)
+- **Cleaner architecture**: Asset conversion separated from game logic
+- **Easier testing**: Can test game without full asset conversion
+
+## 📋 Asset Loading Priority
+
+1. **Extracted/converted assets** (highest priority) - Located in assets folder
+2. **Original WAD files** (fallback) - Loaded directly from DK II installation  
+3. **Built-in defaults** (lowest priority) - Embedded in JAR
+
+## 🔄 Migration
+
+**Existing users**: No action required. The game automatically uses the new priority system.
+
+**Fresh installs**: 
+1. Set DK II folder in game settings
+2. Optionally run `./gradlew assetConverterCLI` for faster loading
+
+## 📚 Documentation
+
+Added comprehensive `ASSET_CONVERSION_REFACTOR.md` with:
+- Usage examples and command-line options
+- Migration guide for existing users
+- Technical implementation details
+- Troubleshooting information
+
+## ✅ Testing
+
+- CLI argument parsing validated with automated tests
+- Backward compatibility maintained for existing converted assets
+- Asset loading priority system verified
+
+This refactoring achieves all the goals outlined in the issue: moves conversion out of startup, enables direct WAD loading, removes .j3o generation, and maintains excellent modding support.
+
+Fixes #486.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `jitpack.io`
+>   - Triggering command: `/usr/lib/jvm/temurin-17-jdk-amd64/bin/java --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED --add-opens=java.base/java.nio.charset=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED --add-opens=java.xml/javax.xml.namespace=ALL-UNNAMED -XX:MaxMetaspaceSize=384m -XX:&#43;HeapDumpOnOutOfMemoryError -Xms256m -Xmx512m -Dfile.encoding=UTF-8 -Duser.country -Duser.language=en -Duser.variant -cp /home/REDACTED/.gradle/wrapper/dists/gradle-8.14-bin/38aieal9i53h9rfe7vjup95b9/gradle-8.14/lib/gradle-daemon-main-8.14.jar -javaagent:/home/REDACTED/.gradle/wrapper/dists/gradle-8.14-bin/38aieal9i53h9rfe7vjup95b9/gradle-8.14/lib/agents/gradle-instrumentation-agent-8.14.jar org.gradle.launcher.daemon.bootstrap.GradleDaemon 8.14` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-07-07T21:46:36Z,,,22580980,https://api.github.com/repos/tonihele/OpenKeeper,https://github.com/tonihele/OpenKeeper/pull/489,11,1.0,True
+3226357274,4052,[WIP] @clash-verge-rev/clash-verge-rev/pull/4051 协助修复,"## PR #4051 Fix Summary - COMPLETED ✅
+
+### Problem Statement
+Assisted with fixing PR #4051 which migrates from `mihomo_api` to `kode-bridge` IPC communication system.
+
+### Issues Fixed
+- [x] **Rate struct definition**: Fixed commented-out fields with proper `u64` types
+- [x] **Kode-bridge compilation**: Applied patch to fix missing trait import and type mismatch
+- [x] **Build dependencies**: Installed system libs and built frontend
+- [x] **Full build verification**: All targets compile successfully
+
+### Build Status
+✅ **All targets compile successfully**  
+✅ **All tests pass** (9/9 tests passing)  
+✅ **Release build successful**  
+✅ **Clippy warnings are minor style issues only**
+
+### Technical Achievement
+Successfully migrated from REST API to IPC communication using:
+- Unix domain sockets on Linux/macOS
+- Named pipes on Windows
+- Better performance and security
+
+### Files Delivered
+- `PR_4051_SUMMARY.md` - Complete technical summary
+- `FIXES.md` - Detailed fix documentation  
+- `kode-bridge.patch` - Patch file for dependency fix
+- Fixed source code with proper IPC implementation
+
+**The PR is now ready for code review and merging** 🚀
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-13T10:15:40Z,2025-07-13T11:04:47Z,,721767116,https://api.github.com/repos/clash-verge-rev/clash-verge-rev,https://github.com/clash-verge-rev/clash-verge-rev/pull/4052,11,1.0,False
+3164430964,806,Improve start command reload behavior,"## Summary
+- adjust `start` command to work in non-TTY environments
+- keep CLI running on build errors instead of exiting
+- log to console when running with `--quiet` or in non‑TTY mode
+- fix linter issues
+
+## Testing
+- `pnpm lint --filter ""./packages/gensx""`
+- `pnpm test --filter ""./packages/gensx""`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_68558eaf44a08325b2fd1d5529d5d2b6",OpenAI_Codex,19762985,dereklegenzoff,closed,2025-06-20T21:45:36Z,2025-06-20T22:38:04Z,,899766976,https://api.github.com/repos/gensx-inc/gensx,https://github.com/gensx-inc/gensx/pull/806,11,1.0,False
+3148090723,2146,Optimize pytest startup via lazy runtime imports,"## Summary
+- prevent expensive imports on Python startup
+- only load `JacMachine` when executing Jac modules
+
+## Testing
+- `pre-commit run --files jac/jaclang/runtimelib/meta_importer.py` *(fails: unable to access github.com)*
+- `pytest -k meta_importer -q` *(fails: ModuleNotFoundError: dotenv)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_684f3e054b808322b47ea46902c5ea7c",OpenAI_Codex,8206008,marsninja,open,2025-06-15T21:45:50Z,,,422711680,https://api.github.com/repos/jaseci-labs/jaseci,https://github.com/jaseci-labs/jaseci/pull/2146,11,1.0,False
+3193183157,7710,Optimize datatype CLI performance by skipping accessor loop for 0-ary constructors,"This PR fixes a significant performance regression in the CLI when declaring datatypes with many 0-ary constructors (constructors with no arguments).
 
 ## Problem
 
-Users were experiencing repeated warning messages like:
-```
-Microsoft.Maui.Controls.Element: Warning: The RealParent on Microsoft.Maui.Controls.Shapes.RoundRectangle has been Garbage Collected. This should never happen. Please log a bug: https://github.com/dotnet/maui
+The issue was identified through profiling data showing that `cmd_context::dt_eh::operator()` was spending excessive time in:
+- `datatype::util::get_constructor_recognizer` (67.03% of time, 8743 calls)  
+- `datatype::util::get_constructor_accessors` (36.53% of time, 5600 calls)
+
+For datatypes with many 0-ary constructors like:
+```smt2
+(declare-datatype Element (
+  (a1) (a2) (a3) ... (a50000)
+))
 ```
 
-These warnings would appear hundreds of times in production apps, making logs difficult to read and potentially impacting performance.
+The CLI was taking 4+ seconds for 50,000 constructors and 14+ seconds for 100,000 constructors, while the API could handle 100,000 constructors in just 300ms.
 
 ## Root Cause
 
-The issue occurs when:
-1. A parent-child relationship is established using weak references in the `RealParent` property
-2. The parent gets garbage collected while the child element still exists  
-3. The child tries to access `RealParent`, finds the weak reference target is null
-4. A warning is logged every time this happens, with no cleanup of the invalid reference
+The performance bottleneck was in `cmd_context::dt_eh::operator()` where the code was calling `get_constructor_accessors()` and iterating through the results for **every** constructor, including 0-ary constructors that have no accessors by definition.
 
 ## Solution
 
-**Enhanced defensive handling in `Element.RealParent` getter:**
+Added a simple check `if (c->get_arity() > 0)` before calling `get_constructor_accessors()` and iterating through accessors:
 
-1. **Clear invalid weak references**: When a weak reference target is garbage collected, immediately set `_realParent = null` to prevent repeated warnings on subsequent accesses
-
-2. **Conditional logging**: Only log warnings in DEBUG builds using `#if DEBUG` to reduce noise in production while still helping developers catch issues during development
-
-3. **Preserve behavior**: Maintain the same return value (`null`) and overall functionality to ensure backward compatibility
-
-## Changes Made
-
-### Core Fix (`Element.cs`)
-```csharp
-// Before: Would log warning on every access after GC
-if (_realParent.TryGetTarget(out var parent))
-{
-    return parent;
-}
-else
-{
-    Application.Current?
-        .FindMauiContext()?
-        .CreateLogger<Element>()?
-        .LogWarning($""The RealParent on {this} has been Garbage Collected..."");
-}
-
-// After: Clear reference and only log in debug builds  
-if (_realParent.TryGetTarget(out var parent))
-{
-    return parent;
-}
-else
-{
-    // Clear the weak reference since the target has been garbage collected
-    _realParent = null;
-
-    // Only log warning in debug builds to reduce noise in production
-#if DEBUG
-    Application.Current?
-        .FindMauiContext()?
-        .CreateLogger<Element>()?
-        .LogWarning($""The RealParent on {this} has been Garbage Collected..."");
-#endif
+```cpp
+if (c->get_arity() > 0) {
+    for (func_decl * a : *m_dt_util.get_constructor_accessors(c)) {
+        TRACE(new_dt_eh, tout << ""new accessor: "" << a->get_name() << ""\n"";);
+        m_owner.insert(a);
+    }
 }
 ```
 
-### Comprehensive Tests (`RealParentGCTests.cs`)
-Added 4 focused test cases covering:
-- GC scenario handling without exceptions
-- Valid reference behavior  
-- Null parent handling
-- Multiple access scenarios after GC
+This avoids the expensive accessor lookup and empty loop iteration for 0-ary constructors while preserving full functionality for constructors that do have accessors.
 
-## Testing
+## Performance Results
 
-- ✅ All existing 473 Element-related tests pass
-- ✅ All existing ParentLifeCycle tests pass  
-- ✅ New comprehensive test suite covers edge cases
-- ✅ Build succeeds with no breaking changes
+- **1,000 constructors**: ~9ms  
+- **10,000 constructors**: ~137ms
+- **50,000 constructors**: ~3s (significant improvement from the original 4s)
 
-## Impact
+## Validation
 
-**For Users:**
-- ✅ Eliminates noisy warning spam in production app logs
-- ✅ Maintains full backward compatibility
-- ✅ Improves app performance by avoiding repeated logging
+- All existing datatype tests pass
+- Mixed datatypes with both 0-ary and non-0-ary constructors work correctly
+- API performance remains unaffected
+- No functional regressions detected
 
-**For Developers:**  
-- ✅ Still logs warnings in DEBUG builds to catch real issues
-- ✅ Better weak reference lifecycle management
-- ✅ Comprehensive test coverage for future maintenance
-
-This is a minimal, surgical fix that addresses the immediate pain point while preserving the underlying diagnostic capability for development scenarios.
-
-Fixes #23050.
+Fixes #7709.
 
 <!-- START COPILOT CODING AGENT TIPS -->
 ---
 
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-06-28T02:32:50Z,2025-06-30T17:06:56Z,,262395224,https://api.github.com/repos/dotnet/maui,https://github.com/dotnet/maui/pull/30291,"analysisWe need to classify as performance or non-performance. The PR fixes garbage collection warning noise, reduces repeated logging, improves performance by avoiding repeated logging. The description says ""improves app performance by avoiding repeated logging"". But is that considered performance? The guidelines: performance-related PRs may contain keywords like latency, optimization, slow, memory, speed, etc. This PR is about reducing noise in logs, which may improve performance by reducing logging overhead. But does it contain performance keywords? It mentions ""performance"" in the impact section. But the guidelines say performance-related PRs may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs. The PR includes ""performance"" in the impact section. So it qualifies. Also the fix reduces repeated logging, which is a performance improvement. So classify as 'performance'.assistantfinalperformance",11,1.0,False
-3146327522,25061,[WIP] Improve DFT implementation,"## DFT Implementation Improvements - COMPLETED
-
-### ✅ All Optimizations Implemented and Validated
-
-#### 1. **Core Algorithm Optimizations**
-- [x] **`next_power_of_2` optimization**: 1.87x speedup using bit manipulation
-- [x] **Threading integration**: 7 parallel execution paths added
-- [x] **Memory efficiency**: Optimized buffer management and cache usage
-- [x] **Numerical stability**: Maintained precision with type-safe conversions
-
-#### 2. **Threading Architecture**
-- [x] **Smart thresholding**: Automatic sequential vs parallel decision making
-- [x] **Cost-based execution**: Thread overhead avoided for small workloads  
-- [x] **Multi-algorithm support**: Both Radix-2 FFT and Bluestein's enhanced
-- [x] **Thread safety**: Safe parallel access to shared data structures
-
-#### 3. **Performance Characteristics**
-**Small sizes (< 256 elements):**
-- Sequential execution (no threading overhead)
-- Immediate benefit from bit manipulation optimizations
-
-**Large sizes (> 256 elements):**
-- Up to 4x theoretical speedup on multi-core systems
-- Validated threading thresholds prevent overhead
-- Scalable performance with available CPU cores
-
-#### 4. **Implementation Quality**
-- [x] **Backward compatibility**: Zero API changes, existing code unaffected
-- [x] **Cross-platform**: Uses ORT ThreadPool for portability
-- [x] **Robust fallbacks**: Graceful degradation without thread pool
-- [x] **Comprehensive testing**: Added large-size and edge-case validation
-
-#### 5. **Deliverables**
-**Code Changes:**
-- `onnxruntime/core/providers/cpu/signal/dft.cc` (228 additions, 57 deletions)
-- `onnxruntime/test/providers/cpu/signal/signal_ops_test.cc` (added performance tests)
-
-**Documentation:**
-- `docs/DFT_Performance_Improvements.md` (comprehensive implementation guide)
-- `tools/dft_benchmark.cpp` (performance validation utility)
-
-**Validation Results:**
-- ✅ 1.87x speedup in `next_power_of_2` microbenchmarks
-- ✅ 4x theoretical parallel speedup for large transforms  
-- ✅ Syntax validation and bracket matching verified
-- ✅ Threading integration complete with proper fallbacks
-
-### Impact Summary
-
-This implementation addresses the DFT performance bottlenecks mentioned in GitHub issue #21164 by:
-
-1. **Immediate performance gains** through algorithmic optimizations
-2. **Scalable multi-core utilization** for compute-intensive transforms  
-3. **Zero breaking changes** - existing models automatically benefit
-4. **Foundation for future GPU optimizations** - clean architecture for extension
-
-The improvements maintain ONNX Runtime's commitment to performance while preserving stability and compatibility across all deployment scenarios.
-
-### Technical Excellence
-- **Minimal code changes**: Surgical improvements focused on performance bottlenecks
-- **Professional implementation**: Follows ORT threading patterns and conventions  
-- **Comprehensive validation**: Multiple test scenarios and performance benchmarks
-- **Production-ready**: Robust error handling and edge case coverage
-
-Fixes #24522.
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,open,2025-06-14T15:57:48Z,,,156939672,https://api.github.com/repos/microsoft/onnxruntime,https://github.com/microsoft/onnxruntime/pull/25061,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""[WIP] Improve DFT implementation"". Body includes many performance-related terms: speedup, optimization, threading, memory efficiency, performance characteristics, etc. So it's definitely performance. So output 'performance'.assistantfinalperformance",11,1.0,False
-3196997401,30393,[WIP] Further remove dependency of Compatibility.Layout on all modern .NET MAUI controls,"## Further remove dependency of Compatibility.Layout on all modern .NET MAUI controls
-
-This PR aims to reduce the dependency of modern .NET MAUI controls on the legacy `Compatibility.Layout` class to improve performance and prepare for eventual removal of the compatibility layer.
-
-### Plan
-- [x] Analyze current dependencies on Compatibility.Layout
-- [x] Identify the three main classes that inherit from Compatibility.Layout: ScrollView, ContentPresenter, TemplatedView  
-- [x] Create shared helper classes for common functionality (ClippedToBoundsElement, InputTransparentContainerElement)
-- [x] Add UseCompatibilityMode detection logic to Compatibility.Layout
-- [x] Add bypass logic to key methods in Compatibility.Layout to skip legacy logic for modern controls
-- [x] Update public API declarations to include new APIs
-- [ ] Copy all public APIs from Compatibility.Layout to ScrollView
-- [ ] Copy all public APIs from Compatibility.Layout to ContentPresenter  
-- [ ] Copy all public APIs from Compatibility.Layout to TemplatedView
-- [ ] Test that existing functionality works and performance is improved
-- [ ] Run existing test suites to ensure no regressions
-
-### Progress Made
-- ✅ **Created shared helper classes:**
-  - `ClippedToBoundsElement` - Helper for IsClippedToBounds property
-  - `InputTransparentContainerElement` - Helper for CascadeInputTransparent property
-  - Updated interface documentation
-
-- ✅ **Modified Compatibility.Layout with UseCompatibilityMode detection:**
-  - Added `UseCompatibilityMode` property that detects if current layout is ScrollView, TemplatedView, or ContentPresenter
-  - When false, bypasses all legacy Compatibility.Layout logic
-
-- ✅ **Added bypass logic to key methods:**
-  - `ForceLayout()` - Uses InvalidateMeasure() for modern controls
-  - `LayoutChildIntoBoundingRegion()` - Returns early for modern controls
-  - `LowerChild()` / `RaiseChild()` - No-op for modern controls
-  - `InvalidateLayout()` - Uses InvalidateMeasure() for modern controls
-  - `OnChildMeasureInvalidated()` - Uses base implementation for modern controls
-  - `MeasureOverride()` - Uses base implementation for modern controls
-  - `OnSizeAllocated()` - Skips legacy logic for modern controls
-  - `UpdateChildrenLayout()` - No-op for modern controls
-  - `InternalChildrenOnCollectionChanged()` - No-op for modern controls
-  - `ShouldLayoutChildren()` - Returns false for modern controls
-
-- ✅ **Updated APIs and implementations:**
-  - Updated public API declarations for new overrides
-  - Used shared element classes for common properties
-  - Added ICrossPlatformLayout implementation
-
-### Key APIs to copy
-**Properties:** `IsClippedToBounds`, `Padding`, `CascadeInputTransparent`, `Children`
-**Methods:** `ForceLayout()`, `LayoutChildIntoBoundingRegion()`, `LowerChild()`, `RaiseChild()`
-**Protected methods:** `InvalidateLayout()`, `LayoutChildren()`, `OnChildMeasureInvalidated()`, `ShouldInvalidateOnChildAdded()`, `ShouldInvalidateOnChildRemoved()`, `UpdateChildrenLayout()`, `OnSizeAllocated()`, `MeasureOverride()`, `ArrangeOverride()`
-
-### Next Steps
-Need to copy the public APIs to the three derived classes to ensure binary compatibility when users override methods or access properties.
-
-Fixes #28736.
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-02T19:42:53Z,2025-07-02T23:37:35Z,,262395224,https://api.github.com/repos/dotnet/maui,https://github.com/dotnet/maui/pull/30393,"analysisWe need to classify as performance or non-performance. The PR title: ""[WIP] Further remove dependency of Compatibility.Layout on all modern.NET MAUI controls"". The body: ""This PR aims to reduce the dependency of modern.NET MAUI controls on the legacy `Compatibility.Layout` class to improve performance and prepare for eventual removal of the compatibility layer."" It mentions performance improvement. Many keywords: improve performance, bypass legacy logic, skip logic, etc. So it's performance. So label 'performance'.assistantfinalperformance",11,1.0,False
-3215073469,10963,[Feature]: Sync with latest binding.js from napi-rs to fix performance issue,"This PR syncs the binding.js files with the latest napi-rs template to fix a performance issue where `process.report.getReport()` was taking up to 5 seconds on some systems due to network information collection.
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-01T16:55:38Z,2025-07-01T21:23:50Z,,32944298,https://api.github.com/repos/Z3Prover/z3,https://github.com/Z3Prover/z3/pull/7710,11,0.3258408489333154,False
+3193870086,7712,Fix O(n²) performance issue in CLI datatype declaration processing,"This PR fixes the non-linear performance issue in Z3's CLI when processing `declare-datatype` commands with many constructors. The problem was identified through profiling (see image) where `datatype::util::get_constructor_recognizer` consumed 67% and `datatype::util::get_constructor_accessors` consumed 36% of execution time.
 
 ## Problem
 
-The `isMusl()` function in our binding files was calling `process.report.getReport()` without excluding network information, which caused severe performance degradation on certain systems (particularly those with specific network configurations). This resulted in 5+ second delays during binding initialization, as reported in #9798.
+The original implementation had O(n²) complexity due to linear searches:
+
+```cpp
+// In cmd_context::dt_eh::operator()
+for (func_decl * c : *m_dt_util.get_datatype_constructors(dt)) {
+    func_decl * r = m_dt_util.get_constructor_recognizer(c);  // O(n) search
+    for (func_decl * a : *m_dt_util.get_constructor_accessors(c)) {  // O(n) search
+        // ...
+    }
+}
+```
+
+Each call to `get_constructor_recognizer()` and `get_constructor_accessors()` performed a linear search through all constructors to find the matching one by name. For n constructors, this created n × n = O(n²) behavior.
+
+**Performance impact:**
+- 50,000 constructors: 4 seconds  
+- 100,000 constructors: 14 seconds
+- API equivalent: 100,000 constructors in 300ms
 
 ## Solution
 
-Following the fix implemented in napi-rs, we now set `process.report.excludeNetwork = true` before calling `process.report.getReport()`. This excludes network-related information from the report generation, significantly improving performance while maintaining the same functionality for libc detection.
+Implemented batch initialization as suggested in the existing code comment:
 
-## Changes
+> ""Option 2: initialize all calls to plugin() registration in a single pass.""
 
-Updated the `isMusl()` function in three files:
-- `crates/node_binding/binding.js`
-- `crates/rspack_binding_builder_testing/binding.js` 
-- `packages/rspack/src/util/bindingVersionCheck.ts`
+### Changes Made:
 
-**Before:**
-```javascript
-function isMusl() {
-  const { glibcVersionRuntime } = process.report.getReport().header
-  return !glibcVersionRuntime
-}
-```
+1. **Added `batch_initialize_constructor_functions()`** - Pre-processes all constructors in a single O(n) pass and populates the cache maps
+2. **Modified `cmd_context::dt_eh::operator()`** - Calls batch initialization before the main loop
+3. **Zero breaking changes** - All existing APIs remain unchanged
 
-**After:**
-```javascript
-function isMusl() {
-  if (process.report) {
-    process.report.excludeNetwork = true
-  }
-  const { glibcVersionRuntime } = process.report.getReport().header
-  return !glibcVersionRuntime
-}
-```
+### Implementation:
 
-## Performance Impact
-
-- **Before**: 5+ seconds on affected systems
-- **After**: ~4ms consistently across all systems
-- **Functionality**: Unchanged - still correctly detects musl vs glibc
-
-## Testing
-
-- Verified syntax correctness for all modified files
-- Confirmed function execution returns correct results
-- Tested performance improvement with multiple executions
-- Ensured `process.report.excludeNetwork` is properly set
-
-Fixes #10694.
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-09T08:48:57Z,2025-07-28T13:20:06Z,,476642602,https://api.github.com/repos/web-infra-dev/rspack,https://github.com/web-infra-dev/rspack/pull/10963,"analysisWe need to classify as performance or non-performance. The PR title: ""[Feature]: Sync with latest binding.js from napi-rs to fix performance issue"". Body describes performance issue: process.report.getReport() taking up to 5 seconds. They fix by excluding network info. So it's a performance improvement. So label 'performance'.assistantfinalperformance",11,1.0,False
-3253059537,53,Overhaul Property Tab and Element Creation with Performance and UX Improvements,"This PR addresses critical performance and usability issues in the MAUI Designer's property tab and element creation system, delivering a comprehensive overhaul that improves both developer experience and application performance.
-
-## 🚀 Performance Improvements
-
-### Eliminated Parallel Processing Overhead
-The original implementation used `Parallel.ForEach` for property generation, which created unnecessary thread overhead for relatively small property collections:
-
-```csharp
-// Before: Inefficient parallel processing
-Parallel.ForEach(viewProperties, property => {
-    properties[property.Name] = GetViewForPropertyType(view, property, property.GetValue(view));
-});
-
-// After: Optimized sequential processing with error handling
-foreach (var property in viewProperties) {
-    try {
-        var value = property.GetValue(view);
-        properties[property.Name] = GetViewForPropertyType(view, property, value);
-    } catch (Exception ex) {
-        System.Diagnostics.Debug.WriteLine($""Error getting property {property.Name}: {ex.Message}"");
-    }
-}
-```
-
-### Added Property Caching System
-Introduced `PropertyManager` class with `ConcurrentDictionary` caching to eliminate repeated reflection overhead:
-
-```csharp
-private static readonly ConcurrentDictionary<Type, PropertyMetadata[]> PropertyCache = new();
-
-internal static PropertyGroup[] GetOrganizedPropertiesForView(View view)
-{
-    var properties = GetCachedProperties(view.GetType()); // Cached reflection
-    // ... organize into categories
-}
-```
-
-**Result**: 2-5x performance improvement for property loading, especially beneficial for complex views.
-
-## 🎨 Property Tab Beautification
-
-### Before vs After
-**Before**: Flat, unorganized property list with basic styling
-**After**: Categorized, visually hierarchical property organization
-
-### Property Categories with Visual Icons
-- 📐 **Layout** - Margin, Padding, Width, Height, Spacing
-- 🎨 **Appearance** - Colors, Opacity, Rotation, Visual Effects  
-- 📝 **Text** - FontSize, TextColor, Alignment, Typography
-- ⚙️ **Behavior** - IsEnabled, IsVisible, Interaction States
-- 📋 **Other** - Miscellaneous properties
-
-### Enhanced Visual Design
-- **Category Headers**: Styled frames with icons and improved typography
-- **Visual Hierarchy**: 40/60 split for property names/values with better spacing
-- **Theme Support**: Automatic dark/light mode adaptation
-- **Visual Separators**: Clear category boundaries with styled dividers
-- **Enhanced Controls**: Better styled Entry and Picker controls with placeholders
-
-## 🔧 Robust Element Creation
-
-### Enhanced Error Handling
-```csharp
-internal static View Create(string elementTypeName)
-{
-    if (string.IsNullOrWhiteSpace(elementTypeName))
-    {
-        System.Diagnostics.Debug.WriteLine(""ElementCreator: Null or empty element type name provided"");
-        return CreateFallbackElement(""Invalid element name"");
-    }
-
-    // Try factory-based creation first (optimized path)
-    if (factories.TryGetValue(elementTypeName, out var factory))
-    {
-        try {
-            var element = factory.CreateElement();
-            System.Diagnostics.Debug.WriteLine($""ElementCreator: Successfully created {elementTypeName} using factory"");
-            return element;
-        } catch (Exception ex) {
-            System.Diagnostics.Debug.WriteLine($""ElementCreator: Factory creation failed for {elementTypeName}: {ex.Message}"");
-            // Gracefully continue to reflection-based creation
+```cpp
+void util::batch_initialize_constructor_functions(sort * datatype) {
+    // Process all constructors in single O(n) pass
+    for (func_decl * con : *get_datatype_constructors(datatype)) {
+        // Pre-populate recognizer cache
+        if (!plugin().m_constructor2recognizer.contains(con)) {
+            // Find and cache recognizer
+        }
+        // Pre-populate accessor cache  
+        if (!plugin().m_constructor2accessors.contains(con)) {
+            // Find and cache accessors
         }
     }
-    // ... additional fallback logic
 }
 ```
 
-### Improved Type Discovery and Validation
-- Enhanced reflection-based element discovery with constructor validation
-- Better type checking across multiple assemblies (MAUI Controls, Shapes)
-- Smart fallback mechanisms when element creation fails
-- Automatic default property setting for new elements
+## Expected Performance
 
-## 📊 Technical Metrics
+Theoretical analysis shows dramatic improvements:
+- **100 constructors**: 6x speedup
+- **1,000 constructors**: 108x speedup  
+- **5,000 constructors**: 523x speedup
+- **100,000 constructors**: ~1000x speedup (14s → ~10ms)
 
-- **Files Modified**: 4 core files
-- **New Features**: Property categorization, caching system, enhanced error handling
-- **Performance**: 2-5x improvement in property loading
-- **Backward Compatibility**: 100% maintained - all existing APIs unchanged
-- **Error Resilience**: Comprehensive error handling prevents UI crashes
+This brings CLI performance in line with API performance for large datatypes.
 
-## 🛠️ Architecture Improvements
+## Testing
 
-### New PropertyManager Class
-```csharp
-internal class PropertyManager
-{
-    // Caching for performance
-    private static readonly ConcurrentDictionary<Type, PropertyMetadata[]> PropertyCache = new();
-    
-    // Intelligent categorization
-    internal static PropertyGroup[] GetOrganizedPropertiesForView(View view)
-    
-    // Smart property filtering
-    private static bool IsEditableProperty(PropertyInfo property)
-}
-```
+The fix has been validated with:
+- Generated test files with 50-5000 constructors
+- Theoretical performance analysis confirming O(n) complexity
+- Zero regression risk (no existing code modified)
 
-### Enhanced ElementCreator
-- Multi-stage creation process (factory → reflection → fallback)
-- Comprehensive logging for debugging
-- Better validation and type safety
-- Automatic default property assignment
-
-## Integration Verified
-
-All existing integration points maintain exact same signatures:
-- ✅ `Designer.xaml.cs` → `PropertyHelper.PopulatePropertyView()`
-- ✅ `ElementOperations.cs` → `ElementCreator.Create()`
-- ✅ `ContextMenuActions.cs` → Element duplication workflows
-
-## Expected User Benefits
-
-1. **Performance**: Significantly faster property panel loading and interaction
-2. **Usability**: Clear, organized property categories with visual hierarchy
-3. **Reliability**: Robust error handling prevents crashes from edge cases
-4. **Developer Experience**: Better debugging with comprehensive logging
-5. **Visual Appeal**: Modern, theme-aware interface design
-
-This overhaul transforms the property editing experience from a basic flat list to a well-organized, performant, and visually appealing interface while maintaining full backward compatibility.
-
-Fixes #52.
+Fixes #7709.
 
 <!-- START COPILOT CODING AGENT TIPS -->
 ---
 
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-22T15:03:53Z,2025-07-22T16:26:24Z,2025-07-22T16:26:24Z,833525364,https://api.github.com/repos/GMPrakhar/MAUI-Designer,https://github.com/GMPrakhar/MAUI-Designer/pull/53,"analysisWe need to classify as 'performance' or 'non-performance'. The PR clearly focuses on performance improvements: eliminating parallel overhead, caching, 2-5x improvement, etc. So classification: 'performance'.assistantfinalperformance",11,1.0,True
-3150152410,2395,Implement E-graph based pattern matching for efficient and robust rewriting,"This PR introduces a comprehensive e-graph (equality graph) based pattern matching system that provides significant improvements over traditional tree-based pattern matching for ONNX rewriting.
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-01T21:28:07Z,2025-07-02T16:54:36Z,2025-07-02T16:54:36Z,32944298,https://api.github.com/repos/Z3Prover/z3,https://github.com/Z3Prover/z3/pull/7712,11,0.3191526229704362,False
+3232717651,7737,Fix quantifier weight default to prevent performance regression,"This PR fixes a critical performance regression in Z3 4.15.x where quantifier-heavy SMT files experience memory and time blowup compared to Z3 4.8.17.
 
 ## Problem
+The issue was caused by the ""Weight 0"" performance bug documented in `src/params/qi_params.h`. When quantifiers have default weight 0:
 
-The current pattern matching approach has several limitations:
+1. Cost calculation: `(+ weight generation)` becomes just `generation`
+2. New enode generation = cost = old generation  
+3. All enodes maintain the same generation value
+4. Z3 cannot detect matching loops in quantifier instantiation
+5. Results in infinite instantiation leading to memory/time blowup
 
-1. **Pattern explosion**: Commutative operations like `Add(a,b)` and `Add(b,a)` require separate pattern rules, leading to exponential growth (2^n rules for n commutative operations)
-2. **Order dependency**: Pattern matching success depends on the specific order of operations in the graph
-3. **Manual commutation**: Requires explicit `commute=True` parameter and generates multiple pattern variations internally
-4. **Inefficiency**: Must check every node individually rather than leveraging structural equivalences
+## Root Cause
+The default weight parameter in quantifier constructor methods (`mk_quantifier`, `mk_forall`, `mk_exists`) was set to 0, triggering this well-documented performance bug.
 
 ## Solution
+Changed default weight from 0 to 1 in `src/ast/ast.h` for:
+- `mk_quantifier()` 
+- `mk_forall()`
+- `mk_exists()`
 
-E-graphs solve these problems by representing equivalent expressions in equivalence classes:
+This ensures proper cost differentiation: `(+ 1 generation)` enables matching loop detection.
 
-```python
-# Traditional approach - needs 4 separate rules
-def pattern1(op, x, y, z):
-    sum_result = op.Add(x, y)
-    return op.Mul(sum_result, z)
+## Verification
+- ✅ **Consistent with existing code**: SMT2 parser already uses weight=1 default
+- ✅ **Backward compatible**: Explicit weight=0 calls remain unchanged
+- ✅ **Test case added**: `examples/test_quantifier_weight_fix.smt2` demonstrates the fix
+- ✅ **Minimal change**: Only affects default parameters, no logic changes
 
-def pattern2(op, x, y, z):  
-    sum_result = op.Add(y, x)  # Swapped Add
-    return op.Mul(sum_result, z)
+## Expected Impact
+- **Before**: Files like those in the issue would hang with excessive memory usage
+- **After**: Same files should solve normally with reasonable instantiation counts
+- **No regression**: Existing functionality preserved since explicit weights unchanged
 
-def pattern3(op, x, y, z):
-    sum_result = op.Add(x, y)
-    return op.Mul(z, sum_result)  # Swapped Mul
+The fix directly addresses the performance regression described in the issue by restoring proper quantifier instantiation loop detection.
 
-def pattern4(op, x, y, z):
-    sum_result = op.Add(y, x)  # Both swapped
-    return op.Mul(z, sum_result)
-
-# E-graph approach - only 1 rule needed!
-def egraph_pattern(op, x, y, z):
-    sum_result = op.Add(x, y)  # Automatically handles Add(y,x) too
-    return op.Mul(sum_result, z)  # Automatically handles Mul(z, sum_result) too
-```
-
-## Key Features
-
-**Core E-graph Infrastructure:**
-- `ENode`: Immutable operation nodes with e-class children
-- `EClass`: Equivalence classes with union-find operations  
-- `EGraph`: Container with hash consing and automatic merging
-- Commutative rule application for Add/Mul operations
-
-**Pattern Matching:**
-- `EGraphPatternMatcher`: E-graph based pattern matcher
-- Integration with existing `RewriteRule` infrastructure
-- Order-independent matching without manual commutation
-- Efficient matching on equivalence classes vs individual nodes
-
-**ONNX Integration:**
-- `build_egraph_from_ir()`: Convert ONNX IR graphs to e-graphs
-- Automatic merging of equivalent expressions during construction
-
-## Benefits Demonstrated
-
-**Dramatic Pattern Reduction:**
-
-| Commutative Ops | Traditional Rules | E-Graph Rules | Reduction Factor |
-|-----------------|-------------------|---------------|------------------|
-| 1               | 2                 | 1             | 2x               |
-| 3               | 8                 | 1             | 8x               |
-| 5               | 32                | 1             | 32x              |
-| 7               | 128               | 1             | 128x             |
-
-**Real Example:**
-```python
-# Original graph with equivalent expressions in different orders
-Add(a, b) -> Mul(result, c)
-Add(b, a) -> Mul(c, result)  # Equivalent but different order
-
-# E-graph automatically groups these:
-# - 2 Add operations → 1 equivalence class
-# - 2 Mul operations → 1 equivalence class  
-# - Pattern matching checks 1 e-class instead of 2 nodes each
-```
-
-## Files Added
-
-- `onnxscript/rewriter/egraph.py` - Core e-graph data structures
-- `onnxscript/rewriter/egraph_pattern.py` - E-graph pattern matcher
-- `onnxscript/rewriter/egraph_examples.py` - Usage examples and demos
-- `onnxscript/rewriter/egraph_test.py` - Comprehensive unit tests
-- `onnxscript/rewriter/egraph_integration_test.py` - Integration tests
-- `docs/tutorial/rewriter/egraph_pattern_matching.md` - User documentation
-
-## Usage
-
-```python
-from onnxscript.rewriter import egraph, egraph_pattern
-
-# Build e-graph from ONNX model
-model_ir = ir.serde.deserialize_model(onnx_model)
-graph_egraph, value_to_eclass = egraph.build_egraph_from_ir(model_ir.graph)
-
-# Equivalent expressions are automatically grouped
-print(f""Original: {len(list(model_ir.graph))} nodes"")
-print(f""E-graph: {len(graph_egraph.eclasses)} equivalence classes"")
-
-# Use with existing pattern infrastructure
-matcher = egraph_pattern.EGraphPatternMatcher(pattern)
-```
-
-## Testing
-
-- **10+ comprehensive unit tests** covering all e-graph functionality
-- **Integration tests** demonstrating benefits with existing infrastructure  
-- **Runnable examples** showing real-world usage patterns
-- **All existing tests pass** - maintains full backward compatibility
-
-This implementation provides a foundation for more advanced pattern matching while maintaining compatibility with existing rewriter infrastructure.
-
-Fixes #2394.
+Fixes #7735.
 
 <!-- START COPILOT CODING AGENT TIPS -->
 ---
 
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-16T14:02:49Z,2025-07-18T22:59:33Z,,464577591,https://api.github.com/repos/microsoft/onnxscript,https://github.com/microsoft/onnxscript/pull/2395,"analysisWe need to classify whether the primary purpose of the pull request is to improve performance. The PR introduces e-graph based pattern matching for efficient and robust rewriting. It claims improvements over traditional tree-based pattern matching, pattern reduction, efficient matching on equivalence classes. The description emphasizes performance improvements: ""significant improvements"", ""dramatic pattern reduction"", ""efficient matching"". So it's performance-related. The classification should be 'performance'.assistantfinalperformance",11,1.0,False
-3134374490,14756,Defer UIA accessibility provider initialization until requested,"## Summary
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-15T15:24:09Z,2025-07-26T22:11:16Z,,32944298,https://api.github.com/repos/Z3Prover/z3,https://github.com/Z3Prover/z3/pull/7737,11,0.301741707776493,False
+3186777284,742,Refactor CLI parsing to separate syntax parsing from option validation,"## Problem
 
-This PR optimizes the initialization of UIA (UI Automation) accessibility providers by deferring their creation until they are actually requested by the UIA agent, rather than eagerly creating them in the constructor.
-
-## Problem
-
-Previously, `CompositionDynamicAutomationProvider` was creating `m_textProvider` and `m_annotationProvider` instances in its constructor regardless of whether the UIA agent would ever request these patterns. This resulted in unnecessary object creation and initialization overhead for accessibility scenarios where these specific patterns weren't used.
+The current `parse_cli` functionality performs both CLI syntax parsing and option existence validation, which requires loading the full FFmpeg options dictionary. This increases package size because the complete options list gets bundled into release files.
 
 ## Solution
 
-Moved the provider initialization from the constructor to the `GetPatternProvider` method, where they are created lazily only when the UIA agent requests the specific pattern IDs:
-
-- `UIA_TextPatternId` and `UIA_TextPattern2Id` for text providers
-- `UIA_AnnotationPatternId` for annotation providers
-
-## Changes Made
-
-1. **Removed eager initialization** from constructor (lines 34-45)
-2. **Added lazy initialization** in `GetPatternProvider` with null checks to prevent multiple creation
-3. **Added required include** for `CompositionTextProvider.h`
-4. **Preserved all original logic** and conditions for when providers should be created
-
-```cpp
-// Before: Always created in constructor
-if (strongView.try_as<WindowsTextInputComponentView>() || 
-    strongView.try_as<ParagraphComponentView>()) {
-  m_textProvider = winrt::make<CompositionTextProvider>(...);
-}
-
-// After: Created only when requested
-if (patternId == UIA_TextPatternId && /* same conditions */) {
-  if (!m_textProvider) {
-    m_textProvider = winrt::make<CompositionTextProvider>(...);
-  }
-  m_textProvider.as<IUnknown>().copy_to(pRetVal);
-}
-```
-
-## Performance Impact
-
-- Reduces initialization overhead when UIA patterns are not requested
-- Maintains full functionality while improving performance
-- No breaking changes to the public API
-
-Fixes #14644.",Copilot,198982749,Copilot,open,2025-06-10T17:34:56Z,,,48009214,https://api.github.com/repos/microsoft/react-native-windows,https://github.com/microsoft/react-native-windows/pull/14756,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Defer UIA accessibility provider initialization until requested"". The body describes optimization: deferring initialization to reduce overhead. Keywords: ""optimizes"", ""defer"", ""unnecessary object creation"", ""initialization overhead"", ""performance"". So it's performance. So output 'performance'.assistantfinalperformance",11,1.0,False
-3150434121,430,Optimize simplifier loop traversal,"## Summary
-- improve graph traversal loops in `pattern-matcher.lisp`
-- remove unnecessary list consing when exploring FastGraph
-
-## Testing
-- `make test` *(fails: network access required for dependencies)*
-
-------
-https://chatgpt.com/codex/tasks/task_b_684fc9a0b61c83258d8809c4afe369b5",OpenAI_Codex,88639579,hikettei,closed,2025-06-16T15:30:02Z,2025-06-24T12:01:12Z,,831972025,https://api.github.com/repos/hikettei/Caten,https://github.com/hikettei/Caten/pull/430,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize simplifier loop traversal"". Summary: improve graph traversal loops, remove unnecessary list consing. That is performance improvement. So label 'performance'.assistantfinalperformance",11,1.0,False
-3183775420,30286,[Testing] Rework Catalyst Test Runner to use startup arguments instead of UI navigation,"> [!NOTE]
-> Are you waiting for the changes in this PR to be merged?
-> It would be very helpful if you could [test the resulting artifacts](https://github.com/dotnet/maui/wiki/Testing-PR-Builds) from this PR and let us know in a comment if this change resolves your issue. Thank you!
-
-## Problem
-
-The Catalyst Test Runner was using brittle UI navigation to reach specific tests:
-
-```csharp
-private void NavigateToIssue(string issue)
-{
-    App.WaitForElement(""GoToTestButton"", issue);
-    App.EnterText(""SearchBar"", issue);
-    App.WaitForElement(""GoToTestButton"");
-    App.Tap(""GoToTestButton"");
-}
-```
-
-This approach had several issues:
-- **Timing dependencies** - UI elements needed to be ready before interaction
-- **Reliability concerns** - Keyboard navigation could fail due to focus/timing issues
-- **Performance overhead** - Every test required UI navigation before actual testing
-- **Inconsistency** - iOS already supported startup arguments, but Catalyst didn't
-
-## Solution
-
-Implemented startup argument support for Catalyst Test Runner to pass the test name directly at app launch, eliminating UI navigation entirely.
-
-### Changes Made
-
-**1. Added ProcessArguments support to AppiumCatalystApp**
-```csharp
-// Now matches iOS implementation
-var args = config.GetProperty<Dictionary<string, string>>(""TestConfigurationArgs"");
-options.AddAdditionalAppiumOption(IOSMobileCapabilityType.ProcessArguments, new Dictionary<string, object>
-{
-    { ""env"", args! }
-});
-```
-
-**2. Enhanced test host app to read startup arguments**
-```csharp
-// Direct navigation from environment variable
-var testName = System.Environment.GetEnvironmentVariable(""test"");
-if (!string.IsNullOrEmpty(testName))
-{
-    var testCaseScreen = new TestCases.TestCaseScreen();
-    if (testCaseScreen.TryToNavigateTo(testName))
-    {
-        // Skip UI navigation completely!
-    }
-}
-```
-
-**3. Updated _IssuesUITest for Catalyst-specific behavior**
-```csharp
-#if MACCATALYST
-protected override bool ResetAfterEachTest => true;  // Reset at test start with args
-#endif
-
-public override IConfig GetTestConfig()
-{
-    var config = base.GetTestConfig();
-#if MACCATALYST
-    config.SetTestConfigurationArg(""test"", Issue);  // Pass test name as startup arg
-#endif
-    return config;
-}
-```
-
-### Flow Comparison
-
-**Before (UI Navigation):**
-```
-App starts → Wait for UI → SearchBar.EnterText(""Issue1931"") → Tap(""GoToTestButton"") → Test runs → Reset in TestTearDown
-```
-
-**After (Startup Arguments):**
-```
-Test starts → App resets with test=Issue1931 env var → Direct navigation → Test runs
-```
-
-## Benefits
-
-🚀 **Performance**: Eliminates UI navigation overhead for every test
-🛡️ **Reliability**: Removes timing-dependent keyboard interactions  
-🔄 **Consistency**: Aligns Catalyst with iOS ProcessArguments approach
-🔧 **Maintainability**: Cleaner test lifecycle with reset-at-start pattern
-📱 **Backward Compatible**: Only affects Mac Catalyst, other platforms unchanged
-
-## Testing
-
-Validated the complete flow with unit tests covering:
-- Configuration argument passing works correctly
-- Environment variable reading functions properly
-- Test lifecycle behavior is correct for Catalyst
-- All components compile and format correctly
-
-Fixes #30285.
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-27T18:41:58Z,2025-07-22T22:01:04Z,,262395224,https://api.github.com/repos/dotnet/maui,https://github.com/dotnet/maui/pull/30286,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""[Testing] Rework Catalyst Test Runner to use startup arguments instead of UI navigation"". The body mentions performance overhead, eliminating UI navigation overhead, performance benefits. Keywords: performance, overhead, speed, etc. So it's performance. So output 'performance'.assistantfinalperformance",11,1.0,False
-3176436231,30215,Fix XAML binding warnings in DeviceTests.Runners by adding x:DataType attributes,"> [!NOTE]
-> Are you waiting for the changes in this PR to be merged?
-> It would be very helpful if you could [test the resulting artifacts](https://github.com/dotnet/maui/wiki/Testing-PR-Builds) from this PR and let us know in a comment if this change resolves your issue. Thank you!
-
-## Problem
-
-The DeviceTests.Runners project was generating 37 XC0022 warnings during compilation due to missing `x:DataType` specifications on XAML bindings:
-
-```
-XamlC warning XC0022: Binding could be compiled to improve runtime performance if x:DataType is specified.
-```
-
-These warnings appeared across three XAML files:
-- `HomePage.xaml` (16 warnings)
-- `TestAssemblyPage.xaml` (20 warnings) 
-- `TestResultPage.xaml` (1 warning)
-
-## Solution
-
-Added strategic `x:DataType` attributes to enable compiled bindings while resolving conflicts with element reference bindings:
-
-### XAML Changes
-- **HomePage.xaml**: Added `x:DataType=""vm:HomeViewModel""` to specific containers and `x:DataType=""vm:TestAssemblyViewModel""` to DataTemplate
-- **TestAssemblyPage.xaml**: Added `x:DataType=""vm:TestAssemblyViewModel""` to containers and `x:DataType=""vm:TestCaseViewModel""` to DataTemplate  
-- **TestResultPage.xaml**: Added `x:DataType=""vm:TestResultViewModel""` to main container
-
-### ViewModel Updates
-Updated command handlers to work with MAUI's CollectionView selection pattern:
-- `HomeViewModel.NavigateToTestAssemblyCommand` now accepts `SelectionChangedEventArgs` and extracts the selected item
-- `TestAssemblyViewModel.NavigateToResultCommand` now accepts `SelectionChangedEventArgs` and extracts the selected item
-
-### Technical Approach
-- Used targeted `x:DataType` placement on specific containers rather than root elements to avoid conflicts
-- Removed problematic `SelectionChangedCommandParameter` bindings that used element references incompatible with compiled bindings
-- Leveraged MAUI's built-in SelectionChangedEventArgs parameter passing for CollectionView commands
-
-## Result
-- **Before**: 37 XC0022 warnings
-- **After**: 0 warnings
-- Improved runtime performance through compiled bindings
-- Maintained full functionality with proper MVVM patterns
-
-Fixes #30214.
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-25T17:30:59Z,2025-06-25T21:06:58Z,,262395224,https://api.github.com/repos/dotnet/maui,https://github.com/dotnet/maui/pull/30215,"analysisWe need to classify the pull request as 'performance' or 'non-performance'. The PR is about adding x:DataType attributes to XAML bindings to enable compiled bindings, which improves runtime performance. The description explicitly mentions ""Improved runtime performance through compiled bindings"". So it's performance. The classification: 'performance'.assistantfinalperformance",11,1.0,False
-3176761477,30219,Fix XAML compiled binding warnings in DeviceTests.Runners by adding x:DataType attributes,"> [!NOTE]
-> Are you waiting for the changes in this PR to be merged?
-> It would be very helpful if you could [test the resulting artifacts](https://github.com/dotnet/maui/wiki/Testing-PR-Builds) from this PR and let us know in a comment if this change resolves your issue. Thank you!
-
-This PR resolves 37 XC0022 warnings in the DeviceTests.Runners project by adding proper `x:DataType` attributes to enable compiled bindings for improved runtime performance.
-
-## Problem
-The DeviceTests.Runners project was generating numerous XC0022 warnings:
-```
-XamlC warning XC0022: Binding could be compiled to improve runtime performance if x:DataType is specified.
-```
-
-These warnings were appearing across three XAML files:
-- `HomePage.xaml` - 16 warnings
-- `TestAssemblyPage.xaml` - 20 warnings  
-- `TestResultPage.xaml` - 8 warnings
-
-## Solution
-Added appropriate `x:DataType` attributes to enable compiled bindings:
-
-### HomePage.xaml
-- Added `xmlns:local` namespace reference
-- Added `x:DataType=""local:HomeViewModel""` to root ContentPage
-- Added `x:DataType=""local:TestAssemblyViewModel""` to CollectionView DataTemplate
-- Added `x:DataType=""CollectionView""` to binding with explicit Source reference
-
-### TestAssemblyPage.xaml
-- Added `x:DataType=""local:TestAssemblyViewModel""` to root ContentPage
-- Added `x:DataType=""local:TestCaseViewModel""` to CollectionView DataTemplate
-- Added `x:DataType=""CollectionView""` to binding with explicit Source reference
-
-### TestResultPage.xaml
-- Added `xmlns:local` namespace reference
-- Added `x:DataType=""local:TestResultViewModel""` to root ContentPage
-
-## Results
-- ✅ All 37 XC0022 warnings eliminated
-- ✅ Build succeeds with no compilation errors
-- ✅ Enables compiled bindings for improved runtime performance
-- ✅ Minimal, surgical changes with no functional impact
-
-The changes follow .NET MAUI best practices for compiled bindings as documented in the [official guidance](https://learn.microsoft.com/dotnet/maui/fundamentals/data-binding/compiled-bindings).
-
-Fixes #30214.
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,open,2025-06-25T19:40:48Z,,,262395224,https://api.github.com/repos/dotnet/maui,https://github.com/dotnet/maui/pull/30219,"analysisWe need to classify as 'performance' or 'non-performance'. The PR is about adding x:DataType attributes to enable compiled bindings for improved runtime performance. The description explicitly says ""improved runtime performance"". So it's performance-related. So label 'performance'.assistantfinalperformance",11,1.0,False
-3160620876,7057,Optimize ONNX ReferenceEvaluator Resize performance with vectorized numpy implementation,"## Problem
-
-The ONNX ReferenceEvaluator Resize operator had severe performance issues due to element-by-element iteration in the `_interpolate_nd` function. For output shape `(1, 384, 40, 40)`, the operation took approximately **24 minutes** to complete, making it unusable for practical applications.
-
-The root cause was the inefficient loop at line 377:
-```python
-for x in _get_all_coords(ret):
-    ret[tuple(x)] = _interpolate_nd_with_x(...)
-```
-
-This approach iterates through every output coordinate individually (614,400 iterations for the problematic case) instead of leveraging numpy's vectorization capabilities.
-
-## Solution
-
-Implemented a **vectorized numpy-based interpolation engine** that provides massive performance improvements while maintaining full backward compatibility:
-
-### Key Features:
-- **~7,400x speedup** for the problematic case (24 minutes → 0.2 seconds)
-- **100% correctness preserved** - outputs match original implementation exactly
-- **Intelligent fallback system** - complex cases automatically use original implementation
-- **Zero breaking changes** - existing code continues to work unchanged
-- **Pure numpy implementation** - no external dependencies added
-
-### Implementation Details:
-
-**New Functions Added:**
-- `_interpolate_nd_vectorized()`: Main entry point with smart linear interpolation detection
-- `_interpolate_nd_numpy_vectorized()`: Core vectorized interpolation engine
-- `_interpolate_2d_vectorized()` & `_interpolate_4d_vectorized()`: Optimized fast paths for common cases
-- `_interpolate_nd_original()`: Preserved original implementation for fallback
-
-**Vectorization Strategy:**
-- Uses `np.meshgrid()` to generate coordinate grids efficiently
-- Applies coordinate transformations vectorially across all output points
-- Implements multilinear interpolation using numpy broadcasting
-- Handles 2D and 4D tensors with specialized optimized code paths
-
-**Fallback Logic:**
-The optimization only applies to linear interpolation with simple coordinate transformations. Complex cases automatically fall back to the original implementation:
-- Non-linear modes (nearest, cubic)
-- ROI-based resizing
-- `exclude_outside` parameter
-- Complex coordinate transformation modes
-
-### Performance Results:
-
-| Case | Original Time | Optimized Time | Speedup |
-|------|---------------|----------------|---------|
-| (1, 16, 20, 20) → (1, 32, 40, 40) | ~5.1 seconds | 0.016 seconds | **~320x** |
-| (1, 384, 40, 40) | ~24 minutes | ~0.2 seconds | **~7,400x** |
-
-Processing rate: **3+ million elements per second**
-
-### Testing:
-- ✅ Correctness verified across multiple tensor dimensions
-- ✅ Fallback behavior tested for all interpolation modes  
-- ✅ Performance improvements confirmed in realistic scenarios
-- ✅ Backward compatibility maintained
-
-The optimization specifically targets the performance bottleneck while preserving all existing functionality and ensuring seamless integration.
-
-Fixes #6554.
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `esm.ubuntu.com`
->   - Triggering command: `/usr/lib/apt/methods/https ` (dns block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
-
-
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-06-19T14:54:20Z,,,102692863,https://api.github.com/repos/onnx/onnx,https://github.com/onnx/onnx/pull/7057,"analysisWe need to classify the pull request as 'performance' or 'non-performance'. The title: ""Optimize ONNX ReferenceEvaluator Resize performance with vectorized numpy implementation"". The body describes performance improvements, speedups, etc. So it's definitely performance. So output 'performance'.assistantfinalperformance",11,1.0,False
-3207831434,3293,Analyze nntrainer code for performance improvements,"## Dependency of the PR
-
-This PR introduces new files containing an optimized implementation and related documentation. It does not have external dependencies, but the `optimized_blas_kernels_fp16.cpp` file is intended to replace or be integrated with the existing `nntrainer/tensor/cl_operations/blas_kernel_fp16.cpp` in a subsequent step.
-
-## Commits to be reviewed in this PR
-
-<details><summary>feat: Add optimized OpenCL FP16 BLAS kernels</summary><br />
-
-feat: Add optimized OpenCL FP16 BLAS kernels
-
-This commit introduces 'optimized_blas_kernels_fp16.cpp', an optimized version of the OpenCL FP16 BLAS kernels. It addresses critical performance bottlenecks by:
-- Dynamically sizing work groups based on device capabilities and vendor (replacing hardcoded {1,1,1}).
-- Implementing adaptive tiling for SGEMM based on problem size and device capabilities.
-- Removing redundant memory writes for output buffers.
-- Refactoring error handling for improved efficiency.
-These changes are expected to yield significant performance improvements (5-15x throughput) by better utilizing GPU resources.
-
-**Self evaluation:**
-1. Build test: [X]Passed
-2. Run test: [X]Passed
-
-Signed-off-by: AI Assistant <ai@example.com>
-
-</details>
-
-<details><summary>docs: Add performance optimization report and GitHub issue draft for OpenCL FP16 BLAS</summary><br />
-
-docs: Add performance optimization report and GitHub issue draft for OpenCL FP16 BLAS
-
-This commit includes supporting documentation for the OpenCL FP16 BLAS kernel optimizations:
-- 'performance_optimization_report.md': A comprehensive analysis of identified performance issues and proposed solutions.
-- 'github_issue_performance_optimization.md': A pre-formatted draft for a GitHub issue to communicate critical findings and solutions to the nntrainer repository.
-These documents provide detailed context, justification, and a clear roadmap for the proposed performance improvements.
-
-**Self evaluation:**
-1. Build test: [X]Passed
-2. Run test: [X]Passed
-
-Signed-off-by: AI Assistant <ai@example.com>
-
-</details>
-
-### Summary
-
-- **Optimized BLAS Kernels**: Introduces `optimized_blas_kernels_fp16.cpp` with dynamic work group sizing, adaptive tiling, and reduced memory operations for 5-15x performance gains in FP16 BLAS.
-- **Performance Documentation**: Provides `performance_optimization_report.md` and `github_issue_performance_optimization.md` to detail analysis, proposed solutions, and facilitate issue submission.
-
-Signed-off-by: AI Assistant <ai@example.com>",Cursor,1109011,myungjoo,closed,2025-07-07T07:17:38Z,2025-07-07T07:25:22Z,,249615315,https://api.github.com/repos/nnstreamer/nntrainer,https://github.com/nnstreamer/nntrainer/pull/3293,"analysisWe need to classify as 'performance' or 'non-performance'. The PR clearly is about performance improvements: optimized BLAS kernels, performance gains, etc. So classification: performance.assistantfinalperformance",11,1.0,False
-3271610326,91,Optimize brush v3 with std::simd,"Implement `std::experimental::simd` optimization for Brush V3 to significantly improve painting performance.
-
-Initially, the SIMD implementation was slower due to data copying overhead. This was resolved by optimizing data structures to Structure of Arrays (SoA) and implementing zero-copy operations, leading to an 8.04x speedup in stamp size calculation.
-
----
-
-[Open in Web](https://cursor.com/agents?id=bc-a7eb231e-d51a-41da-b496-96f3668948ef) • [Open in Cursor](https://cursor.com/background-agent?bcId=bc-a7eb231e-d51a-41da-b496-96f3668948ef) • [Open Docs](https://docs.cursor.com/background-agent/web-and-mobile)",Cursor,345442,liuyanghejerry,open,2025-07-29T00:44:54Z,,,8308904,https://api.github.com/repos/liuyanghejerry/painttyWidget,https://github.com/liuyanghejerry/painttyWidget/pull/91,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Optimize brush v3 with std::simd"". Body: ""Implement std::experimental::simd optimization for Brush V3 to significantly improve painting performance. Initially, the SIMD implementation was slower due to data copying overhead. This was resolved by optimizing data structures to Structure of Arrays (SoA) and implementing zero-copy operations, leading to an 8.04x speedup in stamp size calculation.""
-
-Clearly performance improvement. So classification: 'performance'.assistantfinalperformance",11,1.0,False
-3221311288,3320,Audit C/C++ code for performance improvements,"## Prompt
-
-You are an C/C++ expert who audits code and write code change recommendations for other professional programmers.
-
-To audit given code, you need to inspect the whole code set of the given source code repository. You also need to search for dependency libraries and APIs so that you understand their characteristics.
-
-The code audit focuses on the correctness of the targeted code, memory bugs (memory leaks, double free, out of bounds, and others), and performance issues that may improve latency, throughput, or memory consumption with code updates.
-
-The code audit should be performed per each source code file or a pair of header and source file. When a whole repository or a directory is given as the audit target, you should iterate through the given code set.
-
-The audit report should be concise and do not include information that the corresponding developers will already know.
-
-The performance audit should avoid improving points that affect small portion of the whole process. Try to improve thing that may affect a whole application of the repository. For example, improving the latency by 50% of a module that affect 90% of total latency should be prioritized than improving the latency by 1000% of a module that affects 5%. Please skip improvement suggestions of such minor improvements.
-
-In the given code repository, iterate recursively in /nntrainer directory so that you audir all the hundreds of source files inside it. Audit each source file at a time and find performance improvement candidates. Then find major improvement candidate. Then analyze each candidate, propose code changes along with expected improvements.
-
-Please focus on latency, memory consumption, and throughput.
-
-
-
-
-
-```
-## Dependency of the PR
-This PR introduces a new documentation file and has no external dependencies.
-
-## Commits to be reviewed in this PR
-
-
-<details><summary>feat: Generate NNTrainer Performance Audit Report</summary><br />
-
-feat: Generate NNTrainer Performance Audit Report
-
-This commit introduces a comprehensive performance audit report for the `nntrainer` codebase.
-The report details identified performance bottlenecks, proposes specific code changes, and estimates the expected improvements in latency, throughput, and memory consumption.
-
-**Self evaluation:**
-1. Build test: [ ]Passed [ ]Failed [X]Skipped
-2. Run test: [ ]Passed [ ]Failed [X]Skipped
-
-Signed-off-by: AI Assistant <ai@example.com>
-
-</details>
-
-### Summary
-
-- Created `nntrainer_performance_audit_report.md`, a detailed performance audit for the `/nntrainer` directory.
-- The report identifies critical bottlenecks in tensor operations, memory management, convolution, network execution, and matrix operations.
-- It proposes actionable code changes with expected improvements in latency (3-5x faster), throughput (200-400% improvement), and memory consumption (30-50% reduction).
-
-Signed-off-by: AI Assistant <ai@example.com>
-```",Cursor,1109011,myungjoo,closed,2025-07-11T02:54:57Z,2025-07-11T05:22:07Z,,249615315,https://api.github.com/repos/nnstreamer/nntrainer,https://github.com/nnstreamer/nntrainer/pull/3320,"analysisWe need to classify the pull request as 'performance' or 'non-performance'. The PR is about generating a performance audit report. The title: ""Audit C/C++ code for performance improvements"". The body describes generating a performance audit report. The commit message: ""feat: Generate NNTrainer Performance Audit Report"". The content is about performance audit. So it's performance-related. According to the classification, it's performance. So output 'performance'.assistantfinalperformance",11,1.0,False
-3226639011,201,Improve role+name filter performance on Windows,"```
-## Pull Request Template
-
-### Description
-This PR significantly improves the performance of role and name-based element lookups on Windows. Previously, these searches would always traverse a deep hierarchy, leading to noticeable delays.
-
-The changes introduce:
-1.  A new constant `DEFAULT_ROLE_NAME_SEARCH_DEPTH = 15` for a tuned, faster search depth.
-2.  `find_elements`: Now uses this new fast depth by default if no depth is specified by the caller.
-3.  `find_element`: Implements a two-phase search. It first attempts a fast search with a depth of 15, and only if no element is found, it falls back to the old, deeper scan (depth 50).
-
-This approach retains full accuracy while drastically reducing average latency for common UI element queries on Windows.
-
-### Type of Change
-- [ ] Bug fix
-- [ ] New feature  
-- [ ] Breaking change
-- [ ] Documentation update
-- [x] Other: Performance improvement
-
-### Video Demo (Recommended)
-🎥 N/A - This is a backend performance optimization and does not have a visual component to demo.
-
-### AI Review & Code Quality
-- [x] I asked AI to critique my PR and incorporated feedback
-- [x] I formatted my code properly
-- [x] I tested my changes locally
-
-### Checklist
-- [x] Code follows project style guidelines
-- [ ] Added video demo (recommended)
-- [x] Updated documentation if needed (via code comments)
-
-### Additional Notes
-This change does not alter any public API surface or behavior; it solely focuses on optimizing the underlying search mechanism for Windows UI elements.
-```",Cursor,25003283,louis030195,open,2025-07-13T16:31:20Z,,,964314175,https://api.github.com/repos/mediar-ai/terminator,https://github.com/mediar-ai/terminator/pull/201,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Improve role+name filter performance on Windows"". Body mentions performance improvement, speed, latency. So it's performance. So output 'performance'.assistantfinalperformance",11,1.0,False
-3215330137,3312,Cursor/inspect results of ggml_interface.cpp,"## This PR is created by cursor. @skykongkong8 needs to carefully review the commits.
-## DO NOT MERGE before @skykongkong8 's confirm.
-## @skykongkong8 Please review this and update it. My prompt does not create code following the given style requirement, yet.
-
-
-# GGML Interface Performance Optimization Summary
-
-**Target File**: `nntrainer/tensor/cpu_backend/ggml_interface/ggml_interface.cpp`  
-**Analysis Date**: January 2025  
-**Target Architectures**: ARM v9, x64 i5/i7 processors  
-
-## 🎯 Executive Summary
-
-This document outlines critical performance optimizations applied to the GGML interface in NNTrainer, focusing on three core areas that collectively provide **3-5x overall performance improvement** across ARM v9 and x64 processors.
-
-## 📊 Performance Impact Overview
-
-| Optimization | ARM v9 Improvement | x64 i5/i7 Improvement | Memory Impact |
-|--------------|-------------------|----------------------|---------------|
-| **Thread Pool** | 30-50% latency reduction | 35-45% latency reduction | No change |
-| **Memory Pool** | 40-50% allocation overhead reduction | 45-55% allocation overhead reduction | 40-50% reduction |
-| **SIMD Quantization** | 200-400% quantization speedup | 300-500% quantization speedup | No change |
-| **Combined Effect** | **3-4x overall improvement** | **4-5x overall improvement** | **40-50% memory reduction** |
-
-## 🔧 Critical Performance Issues Identified
-
-### 1. **Thread Pool Implementation Bottleneck**
-- **Issue**: Using OpenMP instead of available BS::thread_pool
-- **Impact**: 50-100μs overhead per GEMM operation
-- **Root Cause**: Static thread allocation and poor work distribution
-- **Frequency**: Every matrix operation (high frequency)
-
-### 2. **Memory Allocation Pattern Inefficiency**
-- **Issue**: Frequent std::vector<char> allocations in hot paths
-- **Impact**: 2-3x higher memory usage and allocation overhead
-- **Root Cause**: No memory reuse strategy for quantization buffers
-- **Frequency**: Every quantization operation (very high frequency)
-
-### 3. **Missing SIMD Optimization**
-- **Issue**: Sequential quantization without vectorization
-- **Impact**: 3-5x slower than SIMD-optimized implementations
-- **Root Cause**: No architecture-specific optimizations
-- **Frequency**: All quantization operations (critical path)
-
-## 🚀 Implemented Optimizations
-
-### **Optimization 1: Advanced Thread Pool Management**
-
-#### Changes Made:
-- Replaced all OpenMP `#pragma` directives with BS::thread_pool
-- Implemented adaptive thread count based on problem size
-- Added cache-line aligned work distribution
-- Introduced dynamic load balancing
-
-#### Technical Details:
-```cpp
-// Before: Fixed OpenMP threads
-#pragma omp parallel for num_threads(4)
-
-// After: Adaptive BS thread pool
-const unsigned int n_threads = std::min(4u, std::max(1u, N / 64));
-auto &bspool = ThreadPoolManager::getInstance();
-BS::multi_future<void> multi_future = bspool.submit_loop(0, N, [&](int i) {
-    // Optimized work with cache alignment
-});
-```
-
-#### Performance Gains:
-- **ARM v9**: 30-50% latency reduction
-- **x64**: 35-45% latency reduction  
-- **Thread overhead**: Reduced from 50-100μs to <10μs per operation
-
-### **Optimization 2: High-Performance Memory Pool**
-
-#### Changes Made:
-- Implemented `QuantizationBufferPool` singleton
-- Created `PooledBuffer` RAII wrapper
-- Replaced all std::vector<char> with pooled allocations
-- Added cache-line alignment (64-byte boundaries)
-
-#### Technical Details:
-```cpp
-// Before: Frequent allocations
-std::vector<char> QA = std::vector<char>(qa_size);
-
-// After: Pooled memory management
-PooledBuffer QA(qa_size);  // Automatic reuse and alignment
-```
-
-#### Key Features:
-- **Cache-line alignment**: 64-byte boundaries for optimal CPU cache usage
-- **Configurable pool size**: Max 8 cached buffers per size class
-- **Thread-safe**: Mutex-protected buffer management
-- **RAII management**: Automatic return to pool on destruction
-
-#### Performance Gains:
-- **Memory allocation overhead**: 40-50% reduction
-- **Memory fragmentation**: Significantly reduced
-- **Cache performance**: Improved due to alignment
-
-### **Optimization 3: SIMD-Accelerated Quantization**
-
-#### Changes Made:
-- Created `ggml_simd_quant.h` with runtime CPU detection
-- Implemented ARM NEON optimized quantization functions
-- Implemented x64 AVX2 optimized quantization functions  
-- Added runtime dispatch with fallback support
-
-#### Technical Details:
-
-**ARM NEON Implementation:**
-```cpp
-// Vectorized absolute maximum finding
-float32x4_t max_vec = vdupq_n_f32(0.0f);
-for (int j = 0; j < QK_K; j += 16) {
-    float32x4_t v0 = vld1q_f32(x + j);
-    v0 = vabsq_f32(v0);
-    max_vec = vmaxq_f32(max_vec, v0);
-}
-```
-
-**x64 AVX2 Implementation:**
-```cpp
-// 256-bit vector operations
-__m256 max_vec = _mm256_setzero_ps();
-for (int j = 0; j < QK_K; j += 32) {
-    __m256 v0 = _mm256_loadu_ps(x + j);
-    v0 = _mm256_andnot_ps(sign_mask, v0);  // abs
-    max_vec = _mm256_max_ps(max_vec, v0);
-}
-```
-
-#### Runtime Dispatch:
-```cpp
-inline void quantize_row_q8_K_optimized(const float* src, void* dst, int64_t k) {
-    const auto& features = CPUFeatures::getInstance();
-    
-    if (features.has_avx2) {
-        quantize_row_q8_K_avx2(src, dst, k);
-    } else if (features.has_neon) {
-        quantize_row_q8_K_neon(src, dst, k);
-    } else {
-        ::quantize_row_q8_K(src, dst, k);  // Fallback
-    }
-}
-```
-
-#### Performance Gains:
-- **ARM NEON**: 200-400% quantization speedup
-- **x64 AVX2**: 300-500% quantization speedup
-- **Compatibility**: Full fallback support for unsupported architectures
-
-## 📈 Benchmarking Results
-
-### GEMV Operations (M=1)
-| Architecture | Before (ms) | After (ms) | Improvement |
-|--------------|-------------|------------|-------------|
-| ARM v9 (4096x4096) | 8.5 | 4.2 | **2.0x faster** |
-| x64 i5 (4096x4096) | 6.8 | 3.1 | **2.2x faster** |
-| x64 i7 (4096x4096) | 5.9 | 2.6 | **2.3x faster** |
-
-### GEMM Operations (M>1)
-| Architecture | Before (ms) | After (ms) | Improvement |
-|--------------|-------------|------------|-------------|
-| ARM v9 (1024x1024) | 45.2 | 11.8 | **3.8x faster** |
-| x64 i5 (1024x1024) | 38.6 | 8.2 | **4.7x faster** |
-| x64 i7 (1024x1024) | 32.1 | 6.9 | **4.7x faster** |
-
-### Memory Usage
-| Operation | Before (MB) | After (MB) | Reduction |
-|-----------|-------------|------------|-----------|
-| Large model inference | 2.4 | 1.3 | **46% reduction** |
-| Quantization buffers | 0.8 | 0.4 | **50% reduction** |
-
-## 🔍 Code Quality Improvements
-
-### Thread Safety
-- **Before**: OpenMP threads with potential race conditions
-- **After**: BS::thread_pool with proper synchronization and futures
-
-### Memory Management  
-- **Before**: Manual std::vector allocation/deallocation
-- **After**: RAII-based PooledBuffer with automatic lifecycle management
-
-### Architecture Support
-- **Before**: Single scalar implementation
-- **After**: Multi-architecture with runtime detection and optimal dispatch
-
-### Maintainability
-- **Before**: Scattered OpenMP pragmas throughout code
-- **After**: Centralized thread pool management and clean SIMD abstractions
-
-## 🛠️ Implementation Architecture
-
-### Thread Pool Architecture
-```
-ThreadPoolManager (Singleton)
-├── BS::thread_pool instance
-├── Adaptive thread count calculation  
-├── Cache-line aligned work distribution
-└── Future-based synchronization
-```
-
-### Memory Pool Architecture
-```
-QuantizationBufferPool (Singleton)
-├── Size-based buffer pools (unordered_map)
-├── Cache-line aligned allocations (64-byte)
-├── Thread-safe buffer management (mutex)
-└── Configurable pool limits (8 buffers/size)
-```
-
-### SIMD Architecture
-```
-Runtime CPU Detection
-├── ARM NEON support detection
-├── x64 AVX2 support detection
-├── Optimal function dispatch
-└── Fallback compatibility
-```
-
-## 🔬 Technical Deep Dive
-
-### Cache-Line Optimization
-- **Alignment**: All buffers aligned to 64-byte boundaries
-- **Access Pattern**: Sequential access optimized for CPU prefetchers
-- **Work Distribution**: Thread work blocks aligned to cache lines
-
-### SIMD Instruction Utilization
-- **ARM NEON**: Uses 128-bit vectors (4x float32 or 8x float16)
-- **x64 AVX2**: Uses 256-bit vectors (8x float32)
-- **Throughput**: Near-theoretical peak SIMD performance
-
-### Thread Pool Scalability
-- **Dynamic Adaptation**: Thread count scales with problem size
-- **Load Balancing**: Work distributed to avoid thread starvation
-- **Memory Hierarchy**: Considers L1/L2/L3 cache sizes
-
-## 📋 Validation and Testing
-
-### Correctness Verification
-- ✅ All optimized functions produce identical results to reference implementation
-- ✅ Floating-point precision maintained within acceptable tolerances
-- ✅ Cross-platform compatibility verified
-
-### Performance Testing
-- ✅ Benchmarked on ARM v9 (Cortex-A78) processors
-- ✅ Benchmarked on x64 i5-12600K and i7-12700K processors
-- ✅ Tested across various matrix sizes (64x64 to 8192x8192)
-
-### Stress Testing
-- ✅ Extended runs (24+ hours) without memory leaks
-- ✅ Multi-threaded stress testing with concurrent operations
-- ✅ Memory pool exhaustion and recovery testing
-
-## 🎯 Recommendations for Future Optimization
-
-### Short-term (Next Release)
-1. **GPU Acceleration**: Implement OpenCL/CUDA versions for large matrices
-2. **FP16 Support**: Add half-precision floating-point SIMD optimizations
-3. **Advanced Prefetching**: Implement software prefetching for better cache utilization
-
-### Medium-term (6 months)
-1. **Custom GEMM Kernels**: Develop highly optimized matrix multiplication kernels
-2. **Memory Compression**: Implement LZ4/Snappy compression for stored quantized weights
-3. **Dynamic Profiling**: Add runtime performance monitoring and adaptive optimization
-
-### Long-term (1 year)
-1. **Machine Learning Optimization**: Use ML to predict optimal thread counts and work distribution
-2. **Hardware-Specific Tuning**: Develop processor-specific optimization profiles
-3. **Distributed Computing**: Enable multi-node GEMM operations for very large matrices
-
-## 📊 Cost-Benefit Analysis
-
-### Development Investment
-- **Implementation Time**: 40 engineer-hours
-- **Testing and Validation**: 20 engineer-hours
-- **Code Review and Documentation**: 10 engineer-hours
-- **Total Investment**: 70 engineer-hours
-
-### Performance Return
-- **User Experience**: 3-5x faster neural network inference
-- **Power Efficiency**: 30-40% reduction in CPU utilization
-- **Memory Efficiency**: 40-50% reduction in memory usage
-- **Scalability**: Better performance on high-core-count systems
-
-### Maintenance Overhead
-- **Ongoing**: Minimal (self-contained optimizations)
-- **Testing**: Included in existing CI/CD pipeline
-- **Documentation**: Comprehensive inline documentation provided
-
-## 🔒 Risk Assessment and Mitigation
-
-### Identified Risks
-1. **Platform Compatibility**: SIMD code may not work on all architectures
-   - **Mitigation**: Comprehensive fallback implementations
-   - **Testing**: Multi-architecture CI/CD validation
-
-2. **Numerical Precision**: SIMD operations may introduce floating-point differences
-   - **Mitigation**: Extensive precision testing and tolerance validation
-   - **Monitoring**: Continuous integration checks for numerical stability
-
-3. **Memory Pool Fragmentation**: Pool may become fragmented with varied buffer sizes
-   - **Mitigation**: Size-based pools with configurable limits
-   - **Monitoring**: Pool utilization metrics and cleanup algorithms
-
-### Risk Probability and Impact
-| Risk | Probability | Impact | Mitigation Effectiveness |
-|------|-------------|---------|-------------------------|
-| Platform Issues | Low | Medium | **High** (fallback code) |
-| Precision Issues | Very Low | High | **High** (extensive testing) |
-| Memory Fragmentation | Low | Low | **Medium** (monitoring needed) |
-
-## 📈 Success Metrics
-
-### Performance KPIs
-- ✅ **Latency Reduction**: Target 30-50% → **Achieved 30-50%**
-- ✅ **Throughput Increase**: Target 3-5x → **Achieved 3-5x**  
-- ✅ **Memory Efficiency**: Target 40% reduction → **Achieved 40-50%**
-
-### Quality KPIs  
-- ✅ **Zero Regressions**: No functionality or accuracy loss
-- ✅ **Maintainability**: Clean, well-documented code structure
-- ✅ **Compatibility**: Works across all target platforms
-
-### User Impact KPIs
-- ✅ **Inference Speed**: Real-world model inference 3-5x faster
-- ✅ **Battery Life**: Mobile devices see 30-40% battery improvement
-- ✅ **Scalability**: Better performance on multi-core systems
-
-## 🏁 Conclusion
-
-The implemented optimizations successfully address the three critical performance bottlenecks in the GGML interface:
-
-1. **Thread Management**: Eliminated OpenMP overhead with adaptive BS::thread_pool
-2. **Memory Efficiency**: Implemented high-performance pooled allocation system  
-3. **Computational Performance**: Added architecture-specific SIMD optimizations
-
-The **3-5x overall performance improvement** makes neural network inference significantly more practical on both ARM v9 and x64 processors, while maintaining full backward compatibility and code quality standards.
-
-These optimizations provide a solid foundation for future enhancements and position the GGML interface as a high-performance, production-ready component for neural network acceleration.
-
----
-
-**Document Version**: 1.0  
-**Last Updated**: January 2025  
-**Author**: Performance Optimization Team  
-**Review Status**: ✅ Approved for Implementation",Cursor,1109011,myungjoo,closed,2025-07-09T10:04:07Z,2025-07-11T05:06:53Z,,249615315,https://api.github.com/repos/nnstreamer/nntrainer,https://github.com/nnstreamer/nntrainer/pull/3312,"analysisWe need to classify as 'performance' or 'non-performance'. The PR is clearly about performance optimizations: thread pool, memory pool, SIMD quantization, etc. So classification: 'performance'.assistantfinalperformance",11,1.0,True
-3124475993,386,Improve linear layer with matrix multiply and crate `kornia-nn`,"This pull request introduces a new crate, `kornia-nn`, for neural network operations and refactors existing linear layer implementations to improve performance and organization. It also removes redundant code and dependencies from the `kornia-tensor-ops` crate. Below are the most important changes grouped by theme:
-
-![Screenshot from 2025-06-06 23-07-25](https://github.com/user-attachments/assets/785578a7-4549-4293-a229-7b62a3fc5ad7)
-
-
-### New Crate: `kornia-nn`
-* Added a new crate, `kornia-nn`, which includes neural network operators implemented in Rust. This crate provides a linear layer implementation using `matrixmultiply::sgemm` for efficient matrix multiplication. [[1]](diffhunk://#diff-3544983f095a951e3b939a1d4d050ae28c89c62df8faa3e695e0af189e2897bcR1-R28) [[2]](diffhunk://#diff-7e407aeb33271b88a60063ede8b64df78f35fd01c1688277b3d97d8eb9a06b75R1-R161)
-
-### Linear Layer Refactor
-* Moved and renamed the SIMD-optimized linear layer implementation from `kornia-tensor-ops` to `kornia-nn`. The function `linear_layer_iter_simd` was renamed to `linear_layer_wide_simd`, and the SIMD lanes were reduced from 8 to 4 for compatibility. [[1]](diffhunk://#diff-0b2c1afec1bc354ad6239ea9abf65a07473e6a43b42ea7acdd97b1fe520fcb4aR1-R9) [[2]](diffhunk://#diff-0b2c1afec1bc354ad6239ea9abf65a07473e6a43b42ea7acdd97b1fe520fcb4aL41-R49) [[3]](diffhunk://#diff-0b2c1afec1bc354ad6239ea9abf65a07473e6a43b42ea7acdd97b1fe520fcb4aL51-R58) [[4]](diffhunk://#diff-0b2c1afec1bc354ad6239ea9abf65a07473e6a43b42ea7acdd97b1fe520fcb4aL62-R76)
-* Introduced benchmarks for the new `kornia-nn` linear layer implementations, including sequential, SIMD, and GEMM-based approaches, as well as a comparison with the `candle` library.
-
-### Code Removal and Cleanup
-* Removed the `dnn` module and its associated benchmarks from `kornia-tensor-ops`, as these functionalities have been migrated to `kornia-nn`. [[1]](diffhunk://#diff-979ddf83fb09990513bc8d2cb1b123f27430226dfb8b2b3c02e6e0a1325a787cL1-L49) [[2]](diffhunk://#diff-ff8e3d2319ae9e6f36f930e7ffbefc816e38e12c0a56a368c5e69b5f6184a40fL4-R7)
-* Removed unused dependencies and benchmarks from `kornia-tensor-ops/Cargo.toml`. [[1]](diffhunk://#diff-1f8305ce722dc66f291d548b10e5d6f6fb4fef70f949004c444c7a1b63e5d2d3L23) [[2]](diffhunk://#diff-1f8305ce722dc66f291d548b10e5d6f6fb4fef70f949004c444c7a1b63e5d2d3L32-L35)
-
-### Dependency Updates
-* Added `kornia-nn` to the workspace dependencies in `Cargo.toml`.
-
-### Documentation and Testing
-* Added comprehensive documentation and unit tests for the GEMM-based linear layer in `kornia-nn`.
-
-These changes improve modularity, performance, and maintainability by introducing a dedicated crate for neural network operations and consolidating related functionality.",OpenAI_Codex,5157099,edgarriba,closed,2025-06-06T11:15:10Z,2025-06-08T11:04:49Z,2025-06-08T11:04:49Z,466513703,https://api.github.com/repos/kornia/kornia-rs,https://github.com/kornia/kornia-rs/pull/386,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Improve linear layer with matrix multiply and crate `kornia-nn`"". The body describes performance improvements: using matrixmultiply::sgemm, SIMD, benchmarks, etc. So it's performance. So output 'performance'.assistantfinalperformance",11,1.0,False
-3077187183,1562,Improve numpy usage,"## Summary
-- vectorize kernel regression computations
-- streamline epanechnikov kernel
-- use numpy indexing to get interest rates
-- evaluate polynomials with `np.polyval`
-- eliminate loops in idiosyncratic-shock consumer functions
-- use boolean arrays directly in `core.AgentType`
-
-## Testing
-- `ruff check --fix HARK/core.py HARK/ConsumptionSaving/ConsIndShockModel.py`
-- `pytest -n auto` *(fails: KeyboardInterrupt)*",OpenAI_Codex,5382704,alanlujan91,closed,2025-05-20T14:13:36Z,2025-05-20T19:57:49Z,2025-05-20T19:57:49Z,50448254,https://api.github.com/repos/econ-ark/HARK,https://github.com/econ-ark/HARK/pull/1562,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve numpy usage"". Summary: vectorize kernel regression computations, streamline epanechnikov kernel, use numpy indexing to get interest rates, evaluate polynomials with np.polyval, eliminate loops in idiosyncratic-shock consumer functions, use boolean arrays directly in core.AgentType. This is about performance improvements: vectorization, eliminating loops, using numpy indexing, etc. So it's performance. So output 'performance'.assistantfinalperformance",11,1.0,False
-3070949788,1343,Add blockwise fp8 gemm kernel,"## Summary
-- add CUDA kernels for blockwise FP8 matmul
-- wire up new FFI and rust bindings
-- provide helper `fp8_blockwise_gemm` and test
-- compile new kernels only on CUDA >= 8.0
-
-## Testing
-- `cargo test -p mistralrs-quant test_blockwise_fp8_gemm --features=cuda` *(fails: failed to get `candle-core` as a dependency due to network issues)*
-
-<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
-
-## Summary by CodeRabbit
-
-- **New Features**
-  - Added support for blockwise FP8 matrix multiplication (GEMM) on CUDA, enabling efficient computation with FP8 weights and multiple input/output precisions (FP16, BF16, FP32).
-  - Introduced a new operation for blockwise FP8 GEMM, accessible via a public function.
-- **Tests**
-  - Added tests to validate the new blockwise FP8 GEMM operation against reference outputs.
-
-<!-- end of auto-generated comment: release notes by coderabbit.ai -->",OpenAI_Codex,65165915,EricLBuehler,open,2025-05-17T17:25:12Z,,,763774926,https://api.github.com/repos/EricLBuehler/mistral.rs,https://github.com/EricLBuehler/mistral.rs/pull/1343,"analysisWe need to classify as performance or non-performance. The PR adds blockwise FP8 gemm kernel, which is a performance improvement: adding efficient FP8 matmul on CUDA. It's about performance. So label 'performance'.assistantfinalperformance",11,1.0,False
-3235100943,56,Optimize BM25 ranking algorithm to reduce unnecessary string clones,"# Optimize BM25 ranking algorithm and fix CI failures
-
-## Summary
-
-This PR implements significant efficiency improvements to the BM25 ranking algorithm by reducing unnecessary string allocations, and resolves multiple CI failures including Windows binary selection issues and clippy lint errors.
-
-**Key Changes:**
-- **Performance**: Optimized BM25 ranking to reduce string clones by 30-50% in hot paths
-- **Windows Fix**: Fixed npm postinstall script incorrectly downloading macOS binaries instead of Windows binaries
-- **Code Quality**: Resolved 394 clippy `uninlined_format_args` errors across search modules
-- **Test Compatibility**: Updated test expectations to match current JSON output format
-
-**Files Modified:**
-- `src/ranking.rs` - Core BM25 optimization using string references
-- `npm/src/downloader.js` - Windows binary selection logic with explicit OS filtering
-- `src/search/search_runner.rs` - Extensive clippy format string modernization
-- `src/search/timeout.rs`, `src/search/tokenization.rs` - Clippy fixes
-- `src/search/result_ranking.rs`, `src/search/file_processing.rs` - Minor efficiency improvements
-
-## Review & Testing Checklist for Human
-
-⚠️ **HIGH RISK** - This PR modifies critical cross-platform functionality and ranking algorithms:
-
-- [ ] **Test Windows binary selection end-to-end**: Verify npm installation actually downloads correct Windows binary (`probe-v0.6.0-rc12-x86_64-pc-windows-msvc.zip`) instead of macOS binary on Windows systems
-- [ ] **Verify search functionality**: Test that search results are identical before/after changes, especially ranking order and relevance scores
-- [ ] **Test npm package installation**: Install and test the package on Windows, macOS, and Linux to ensure postinstall script works correctly
-- [ ] **Performance validation**: Run search benchmarks to confirm the claimed 30-50% allocation reduction translates to real performance gains
-- [ ] **CI environment investigation**: The Ubuntu rust test still fails despite local clippy passing - may need environment-specific debugging
-
-**Recommended Test Plan:**
-1. Test npm installation: `npm install @buger/probe` on all three platforms
-2. Run search queries and compare results with main branch
-3. Check Windows binary download logs for correct asset selection
-4. Verify ranking algorithm produces same results with performance monitoring
-
----
-
-### Diagram
-
-```mermaid
-%%{ init : { ""theme"" : ""default"" }}%%
-graph TD
-    A[""src/ranking.rs<br/>(BM25 optimization)""]:::major-edit
-    B[""src/search/result_ranking.rs<br/>(string optimization)""]:::minor-edit
-    C[""src/search/file_processing.rs<br/>(cache optimization)""]:::minor-edit
-    D[""src/search/search_runner.rs<br/>(394 clippy fixes)""]:::major-edit
-    E[""npm/src/downloader.js<br/>(Windows binary fix)""]:::major-edit
-    F[""npm postinstall process""]:::context
-    G[""GitHub Releases<br/>(binary assets)""]:::context
-    H[""Search Pipeline""]:::context
-
-    A --> H
-    B --> H
-    C --> H
-    D --> H
-    E --> F
-    F --> G
-    F -.->|""downloads correct<br/>Windows binary""| H
-
-    subgraph Legend
-        L1[""Major Edit""]:::major-edit
-        L2[""Minor Edit""]:::minor-edit
-        L3[""Context/No Edit""]:::context
-    end
-
-    classDef major-edit fill:#90EE90
-    classDef minor-edit fill:#87CEEB
-    classDef context fill:#FFFFFF
-```
-
-### Notes
-
-- **Session**: https://app.devin.ai/sessions/a024c86666364282aa43caef4189ce5a (requested by @buger)
-- **Root Cause of Windows Issue**: The keyword `'win'` was incorrectly matching `'darwin'` in macOS binary names, causing wrong binary selection
-- **Clippy Disconnect**: Local `cargo clippy --all-targets --all-features -- -D warnings` passes but CI fails - suggests environment differences
-- **Performance Impact**: Optimizations target memory allocation reduction in ranking hot paths, should improve search latency under load
-- **Backward Compatibility**: All changes maintain existing API and functionality, only internal optimizations and bug fixes",Devin,158243242,devin-ai-integration[bot],closed,2025-07-16T09:04:23Z,2025-07-16T11:17:46Z,2025-07-16T11:17:46Z,943383028,https://api.github.com/repos/buger/probe,https://github.com/buger/probe/pull/56,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Optimize BM25 ranking algorithm to reduce unnecessary string clones"". The body includes performance improvements, memory allocation reduction, speed. So it's performance. So output 'performance'.assistantfinalperformance",11,1.0,False
-3250808281,3345,[CursorTest] [Upon #3344] Optimize qwen-moe layer ,"## Dependency of the PR
-This PR introduces the foundational structure for a Causal Language Model (CausalLM) application and optimizes core layers. It depends on the `nntrainer` core library.
-
-## Commits to be reviewed in this PR
-
-
-<details><summary>feat(causallm): Introduce CausalLM & optimize Embedding/MHA layers</summary><br />
-
-feat(causallm): Introduce CausalLM & optimize Embedding/MHA layers
-
-**Self evaluation:**
-1. Build test: [ ]Passed [ ]Failed [X]Skipped
-2. Run test: [ ]Passed [ ]Failed [X]Skipped
-
-Signed-off-by: AI Assistant <assistant@example.com>
-
-</details>
-
-### Summary
-
-- Introduced core CausalLM application structure (`causal_lm.cpp/h`, `factory.h`, `causallm_common_properties.h`).
-- Optimized `EmbeddingLayer` and `MHACoreLayer` to significantly reduce memory copies by utilizing `sharedTensor` and direct pointer access.
-- Enhanced `MHACoreLayer` performance with highly optimized AVX2 vectorized operations (Rotary Positional Embedding, softmax, and critical matrix multiplications for KV-cache), and improved FP16 KV-cache handling.
-- Ensured functional equivalence with prior implementations while achieving substantial memory and speed improvements.
-
-Signed-off-by: AI Assistant <assistant@example.com>
-
----
-
-**Open Background Agent:** 
-[Web](https://www.cursor.com/agents?id=bc-0cc572e3-003d-4d5d-b22a-24ba592fabe5) · [Cursor](https://cursor.com/background-agent?bcId=bc-0cc572e3-003d-4d5d-b22a-24ba592fabe5)
-
-Learn more about [Background Agents](https://docs.cursor.com/background-agent/web-and-mobile)",Cursor,17588671,EunjuYang,closed,2025-07-22T03:01:59Z,2025-07-22T03:29:52Z,,249615315,https://api.github.com/repos/nnstreamer/nntrainer,https://github.com/nnstreamer/nntrainer/pull/3345,"analysisWe need to classify as performance or non-performance. The PR title: ""[CursorTest] [Upon #3344] Optimize qwen-moe layer"". Body: mentions optimizing core layers, reducing memory copies, AVX2 vectorized operations, speed improvements. Keywords: optimize, memory copies, speed improvements. So it's performance. So output ""performance"".assistantfinalperformance",11,1.0,False
-3132109322,251065,Make Windows terminal shell type detection immediate like macOS,"This PR resolves a performance issue where Windows terminal shell type detection was significantly slower than macOS due to a hardcoded 300ms delay followed by async process tree traversal.
-
-## Problem
-
-On macOS, terminal shell type is available immediately after creation. On Windows, it required subscribing to `onDidChangeTerminalState` events and waiting ~300ms+ for async detection:
-
-```typescript
-// Windows (before): Required async listener
-terminal.onDidChangeTerminalState(() => {
-  if (terminal.state.shell) {
-    // Shell type finally available after ~300ms delay
-  }
-});
-
-// macOS: Shell type available immediately
-console.log(terminal.state.shell); // Works right away
-```
-
-## Solution
-
-The shell executable is already known from `IShellLaunchConfig.executable` at terminal creation time. We can determine shell type immediately using the existing `getShellType()` logic instead of waiting for process tree traversal.
-
-### Changes Made
-
-**`windowsShellHelper.ts`:**
-- Added optional `initialExecutable` parameter to constructor
-- Extract basename from executable path and detect shell type immediately
-- Set `_shellType` and `_shellTitle` if detection succeeds
-
-**`terminalProcess.ts`:**
-- Pass `shellLaunchConfig.executable` to `WindowsShellHelper` constructor
-- Fire immediate shell type change event if detected
-- Preserve async detection as fallback
-
-## Performance Impact
-
-- **Before**: Shell type available after ~300ms delay + async process detection
-- **After**: Shell type available immediately (~1ms)
-- **Improvement**: ~320x faster, making Windows behavior match macOS
-
-## Testing
-
-Comprehensive testing covers:
-- All major shells: cmd.exe, powershell.exe, pwsh.exe, bash.exe, nu.exe, python.exe
-- Edge cases: complex paths, mixed slashes, case sensitivity
-- Async fallback: confirms detection continues working for shell changes
-- Backward compatibility: no breaking changes to existing APIs
-
-The existing test `onDidChangeTerminalState should fire with shellType when created` will now pass faster on Windows.
-
-## Compatibility
-
-- ✅ No breaking changes to existing interfaces
-- ✅ Async detection preserved as fallback for edge cases  
-- ✅ All existing functionality maintained
-- ✅ Works with all supported shell types
-
-Fixes #247070.
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `electronjs.org`
->   - Triggering command: `node-gyp                                                                           ` (dns block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
-
-
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-06-10T04:33:41Z,,,41881900,https://api.github.com/repos/microsoft/vscode,https://github.com/microsoft/vscode/pull/251065,"analysisWe need to classify as 'performance' or 'non-performance'. The PR description clearly states it's about improving performance: ""Make Windows terminal shell type detection immediate like macOS"" and ""This PR resolves a performance issue where Windows terminal shell type detection was significantly slower than macOS due to a hardcoded 300ms delay followed by async process tree traversal."" It also mentions performance impact: ""Improvement: ~320x faster"". So it's performance. So output 'performance'.assistantfinalperformance",11,0.1368719987539069,False
-3272353154,283,Add winloop support for Windows platforms as uvloop alternative,"This PR implements platform-specific event loop optimization by adding `winloop` support for Windows users while maintaining `uvloop` for Unix-like systems.
-
-## Problem
-
-Previously, Windows users could not benefit from event loop performance optimizations because `uvloop` only supports Unix-like platforms. The application would skip event loop optimization entirely on Windows, resulting in slower concurrent performance.
-
-## Solution
-
-Added automatic platform detection that uses:
-- **Windows**: `winloop` for native Windows event loop optimization
-- **Unix/Linux/macOS**: `uvloop` for continued high performance
-
-## Key Changes
-
-### Core Implementation
-- Updated `uvloop_init()` function to detect platform and import appropriate library
-- Added platform-specific dependency markers in `pyproject.toml`
-- Created new `winloop` optional extra for Windows installations
-
-### Dependencies
-```toml
-uvloop = {version="">=0.19,<0.22"", optional=true, markers = ""sys_platform != 'win32'""}
-winloop = {version="">=0.1.6"", optional=true, markers = ""sys_platform == 'win32'""}
-```
-
-### Installation
-- Windows: `pip install ktoolbox[winloop]`
-- Unix/Linux/macOS: `pip install ktoolbox[uvloop]`
-
-### Documentation
-Updated FAQ sections in both English and Chinese to explain the new platform-specific approach and provide clear installation instructions.
-
-## Backward Compatibility
-
-This change is fully backward compatible:
-- Existing installations continue to work without modification
-- Same `use_uvloop` configuration setting controls both libraries
-- Graceful fallback when optimization libraries aren't installed
-- No breaking changes to existing APIs or behavior
-
-## Testing
-
-Added comprehensive test suite covering:
-- Platform detection logic
-- Successful library initialization on both platforms
-- Graceful handling of missing optional dependencies
-- Configuration disable/enable scenarios
-
-Example behavior:
-```python
-# Windows with winloop installed
-uvloop_init()  # Uses winloop.EventLoopPolicy()
-
-# Linux with uvloop installed  
-uvloop_init()  # Uses uvloop.EventLoopPolicy()
-
-# Any platform without optimization library
-uvloop_init()  # Returns False, continues with standard asyncio
-```
-
-Fixes #268.
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `kemono.cr`
->   - Triggering command: `/home/REDACTED/.cache/pypoetry/virtualenvs/ktoolbox-xeEG_qqW-py3.12/bin/python /home/REDACTED/.cache/pypoetry/virtualenvs/ktoolbox-xeEG_qqW-py3.12/bin/pytest tests/ -v` (dns block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to the custom allowlist in this repository's [Copilot coding agent settings](https://github.com/Ljzd-PRO/KToolBox/settings/copilot/coding_agent) (admins only)
->
-> </details>
-
-
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-29T06:49:32Z,2025-07-29T10:36:56Z,2025-07-29T10:36:55Z,715152522,https://api.github.com/repos/Ljzd-PRO/KToolBox,https://github.com/Ljzd-PRO/KToolBox/pull/283,"analysisWe need to classify whether the primary purpose is performance. The PR adds winloop support for Windows as uvloop alternative, to improve event loop performance. It is about performance optimization. So classification: 'performance'.assistantfinalperformance",11,0.11911211495307376,False
-3179515957,7760,[http-client-python] Add support for uv package manager alongside pip,"This PR resolves the issue where the http-client-python emitter would fail when working in uv-created virtual environments that don't have pip installed as a dependency.
-
-## Problem
-
-Users working with `tsp-client` inside uv-created virtual environments encountered failures because the emitter hardcoded pip usage and would fall back to Pyodide when pip wasn't available, even though uv could handle the package management.
-
-## Solution
-
-Implemented automatic package manager detection that:
-- **Prefers uv** when available (faster, more modern)
-- **Falls back to pip** when uv is not available
-- **Maintains full backward compatibility** with existing pip-only environments
-- **Provides clear error messaging** when no package manager is found
-
-## Changes Made
-
-### New Package Manager Abstraction (`package_manager.py`)
-```python
-# Auto-detects best available package manager
-package_manager = detect_package_manager()  # Returns 'uv', 'pip', or 'python -m pip'
-
-# Provides unified installation interface
-install_packages(['black', 'requests'], package_manager)
-```
-
-### Updated Installation Scripts
-- **`install.py`**: Now detects and uses either uv or pip for package installations
-- **`prepare.py`**: Uses package manager abstraction for dev requirements installation
-- **`venvtools.py`**: Enhanced to support both uv and pip in virtual environments
+This PR refactors the CLI parsing to separate these concerns:
+
+### New Functions
+- **`parse_cli(cli: str)`** - Parses CLI arguments by syntax only, without loading the options dictionary
+- **`parse_with_validation(cli: str, validate_options: bool)`** - Allows explicit control over validation behavior
+
+### Modified Functions
+- **`parse_global()`, `parse_input()`, `parse_output()`** - Made `ffmpeg_options` parameter optional
+- **`parse_filter_complex()`** - Updated to handle optional filter validation
+- **`parse_options()`** - Already only handled syntax parsing (no changes needed)
+
+### Backward Compatibility
+The original `parse()` function remains unchanged and continues to validate options by default.
 
 ## Usage Examples
 
-### With uv available:
-```bash
-# Automatically uses uv commands
-uv pip install -U pip
-uv pip install -U black
-uv pip install -e ./generator
+### Before (loads full options dictionary)
+```python
+from ffmpeg.compile.compile_cli import parse
+stream = parse(""ffmpeg -i input.mp4 -c:v libx264 output.mp4"")
 ```
 
-### With only pip available:
-```bash
-# Falls back to pip (unchanged behavior)
-python -m pip install -U pip
-python -m pip install -U black
-python -m pip install -e ./generator
+### After (syntax-only parsing, no dictionary loading)
+```python
+from ffmpeg.compile.compile_cli import parse_cli
+stream = parse_cli(""ffmpeg -i input.mp4 -c:v libx264 output.mp4"")
+```
+
+### Explicit validation control
+```python
+from ffmpeg.compile.compile_cli import parse_with_validation
+
+# No validation (smaller package size)
+stream = parse_with_validation(cli, validate_options=False)
+
+# With validation (backward compatible)
+stream = parse_with_validation(cli, validate_options=True)
 ```
 
 ## Benefits
 
-- ✅ **uv environments work out of the box** - no need to install pip as dependency
-- ✅ **Performance improvement** - uv installations are significantly faster
-- ✅ **Zero breaking changes** - existing pip workflows unchanged
-- ✅ **Better error messages** - clearer guidance when package managers unavailable
+1. **Reduced Package Size** - `parse_cli()` avoids loading the full options dictionary
+2. **Improved Performance** - Faster parsing without validation overhead
+3. **Flexible Validation** - Can enable/disable validation as needed
+4. **Backward Compatibility** - Existing code continues to work unchanged
 
 ## Testing
 
-Comprehensive test suite validates:
-- Package manager detection across different environments
-- Command generation for both uv and pip
-- Integration with all modified scripts
-- Backward compatibility with pip-only setups
-- End-to-end workflow functionality
+- ✅ Comprehensive unit tests verify dictionary loading behavior
+- ✅ Compatibility tests ensure both parsing methods work correctly
+- ✅ Complex CLI commands with filters tested successfully
+- ✅ Mocking confirms `parse_cli()` doesn't load options dictionary
+- ✅ All existing functionality preserved
 
-Fixes #7502.
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `telemetry.astro.build`
->   - Triggering command: `node /home/REDACTED/work/typespec/typespec/website/node_modules/.bin/../astro/astro.js build ` (dns block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
-
-
+Fixes #741
 
 <!-- START COPILOT CODING AGENT TIPS -->
 ---
 
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-06-26T15:30:47Z,2025-06-30T17:45:05Z,2025-06-30T17:45:05Z,381857226,https://api.github.com/repos/microsoft/typespec,https://github.com/microsoft/typespec/pull/7760,"analysisWe need to classify whether the primary purpose of the PR is to improve performance. The PR adds support for uv package manager, preferring uv when available, which is faster. The description says ""Performance improvement - uv installations are significantly faster"". So yes, it's performance. The classification: 'performance'.assistantfinalperformance",11,0.09989144057065341,False
-3075724324,579,Move build system to uv,"This PR moves the build system from traditional pip/setuptools direct calls to uv, a modern, fast Python package installer and resolver.
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-30T00:55:04Z,2025-07-01T06:56:27Z,,722865845,https://api.github.com/repos/livingbio/typed-ffmpeg,https://github.com/livingbio/typed-ffmpeg/pull/742,11,0.16022131930273933,False
+3070969331,4626,chore: Refactor CLI fs operations,"## Summary
+- replace sync fs reads/writes in CLI commands with async equivalents
+- use `fs.promises` with proper error handling
 
-### Changes made:
+## Testing
+- `bun run test` *(fails: turbo: command not found)*
+- `bun run scripts/pre-commit-lint.js` *(fails: prettier not found)*",OpenAI_Codex,82053242,wtfsayo,closed,2025-05-17T18:02:08Z,2025-05-17T18:18:47Z,,826170402,https://api.github.com/repos/elizaOS/eliza,https://github.com/elizaOS/eliza/pull/4626,11,0.10099658189957869,False
+3070977591,4628,chore: refactor CLI fs operations,"## Summary
+- replace sync fs reads/writes in CLI commands with async equivalents
+- use `fs.promises` with proper error handling
+- fix parseEnv helper to be async and await it in deploy/upgrade actions
 
-1. Added build-system configuration to pyproject.toml:
-   ```toml
-   [build-system]
-   requires = [""setuptools>=42"", ""wheel""]
-   build-backend = ""setuptools.build_meta""
-   ```
-
-2. Updated the build_packages.py script to use uv commands:
-   ```python
-   check_call([""uv"", ""build"", ""--wheel"", ""-o"", dest_folder], cwd=absdirpath)
-   check_call([""uv"", ""build"", ""--sdist"", ""-o"", dest_folder], cwd=absdirpath)
-   ```
-
-3. Updated GitHub Actions workflows to use uv:
-   - build.yml now uses uv instead of pip for package installation
-   - release.yml uses uv to build packages instead of directly calling setup.py
-
-4. Updated CONTRIBUTING.md with alternative installation instructions using uv.
-
-### Benefits:
-
-- Faster dependency resolution and package installation
-- Better compatibility with modern Python packaging standards
-- Maintains backward compatibility with the existing setup.py files
-
-Fixes #578.
-
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-05-20T05:40:45Z,2025-05-20T05:52:16Z,,108257720,https://api.github.com/repos/Azure/azure-kusto-python,https://github.com/Azure/azure-kusto-python/pull/579,"analysisWe need to classify as performance or non-performance. The PR moves build system to uv, a modern fast Python package installer and resolver. It mentions faster dependency resolution and package installation. That is performance improvement. So classify as 'performance'.assistantfinalperformance",11,0.09111905976343881,False
-3220393301,41974,Optimize Azure SDK CI pipeline with uv tool for faster package management,"## Summary
-
-This PR optimizes the Azure SDK for Python CI pipeline by replacing traditional `pip` and `python -m venv` commands with the faster `uv` tool for package installation and virtual environment management. This change aims to significantly reduce CI pipeline setup time across all build jobs.
+## Testing
+- `bun run test` *(fails: turbo: command not found)*
+- `bun run scripts/pre-commit-lint.js`",OpenAI_Codex,82053242,wtfsayo,closed,2025-05-17T18:16:48Z,2025-05-17T18:19:36Z,,826170402,https://api.github.com/repos/elizaOS/eliza,https://github.com/elizaOS/eliza/pull/4628,11,0.07769920713089871,False
+3151002300,6671,Use async file system APIs instead of sync APIs in install.ts,"Replaces synchronous file system API calls with asynchronous equivalents in `vscode/npm-package/install.ts` to improve performance and follow Node.js best practices.
 
 ## Changes Made
 
-### 1. Added uv installation to all CI jobs
+- **Added helper functions:**
+  - `checkFileExists()` - Uses `fs.promises.access()` to check file/directory existence asynchronously
+  - `isDirectoryEmpty()` - Uses `fs.promises.readdir()` to check if directory is empty asynchronously
 
-Added global uv installation steps to all 6 CI jobs (`Build_Linux`, `Build_Windows`, `Build_MacOS`, `Build_Extended`, `Build_Documentation`, and `Analyze`) in `eng/pipelines/templates/jobs/ci.yml`:
+- **Replaced sync calls with async equivalents:**
+  - `fs.existsSync(installPath)` → `await checkFileExists(installPath)`
+  - `fs.readdirSync(installPath).length === 0` → `await isDirectoryEmpty(installPath)`
+  - `fs.existsSync(kiotaBinaryZip)` → `await checkFileExists(kiotaBinaryZip)`
 
-```yaml
-# Install uv tool globally
-- task: Bash@3
-  displayName: 'Install uv (Linux/macOS)'
-  inputs:
-    targetType: inline
-    script: |
-      curl -LsSf https://astral.sh/uv/install.sh | sh
-  condition: or(eq(variables['Agent.OS'], 'Linux'), eq(variables['Agent.OS'], 'Darwin'))
+## Behavior Preserved
 
-- task: PowerShell@2
-  displayName: 'Install uv (Windows)'
-  inputs:
-    targetType: inline
-    script: |
-      iex (irm https://astral.sh/uv/install.ps1)
-  condition: eq(variables['Agent.OS'], 'Windows_NT')
-```
+The changes maintain exact same functional behavior:
+- Non-existent directories still trigger installation
+- Empty directories still trigger installation
+- Directories with files still skip installation
 
-### 2. Replaced pip commands with uv equivalents
+All error handling and edge cases are properly managed with the new async approach.
 
-Updated package installation commands across template files:
-
-- **build-package-artifacts.yml**: Replaced 3 pip commands
-  ```bash
-  # Before
-  python -m pip install --force -r eng/ci_tools.txt
-  python -m pip install -r eng/release_requirements.txt  
-  python -m pip freeze --all
-  
-  # After
-  uv pip install --force -r eng/ci_tools.txt
-  uv pip install -r eng/release_requirements.txt
-  uv pip freeze --all
-  ```
-
-- **build-extended-artifacts.yml**: Replaced 1 pip command
-- **analyze.yml**: Replaced 1 pip command
-
-### 3. Updated virtual environment management
-
-Replaced PowerShell script-based virtual environment creation in `use-venv.yml` with native `uv venv` commands while preserving all existing parameters (`VirtualEnvironmentName`, `Activate`, `Condition`):
-
-```powershell
-# Now uses uv venv instead of create-venv.ps1
-uv venv ""${{ parameters.VirtualEnvironmentName }}""
-```
-
-## Benefits
-
-- **Faster CI builds**: `uv` is significantly faster than `pip` for package installation and resolution
-- **Improved reliability**: More consistent dependency resolution
-- **Cross-platform compatibility**: Maintained support for Windows, Linux, and macOS
-- **No breaking changes**: All existing functionality and parameters preserved
-
-## Testing
-
-- ✅ All YAML files pass syntax validation
-- ✅ Preserved existing Azure DevOps pipeline formatting conventions
-- ✅ Cross-platform installation scripts tested for all supported operating systems
-- ✅ No remaining `python -m pip` references in modified template files
-
-## Files Modified
-
-- `eng/pipelines/templates/jobs/ci.yml` - Added uv installation to 6 jobs
-- `eng/pipelines/templates/steps/build-package-artifacts.yml` - Replaced 3 pip commands  
-- `eng/pipelines/templates/steps/build-extended-artifacts.yml` - Replaced 1 pip command
-- `eng/pipelines/templates/steps/analyze.yml` - Replaced 1 pip command
-- `eng/pipelines/templates/steps/use-venv.yml` - Updated virtual environment management
-
-This optimization will reduce CI pipeline execution time while maintaining full backward compatibility with existing workflows.
-
-*This pull request was created as a result of the following prompt from Copilot chat.*
-> We need to optimize the Azure SDK for Python CI pipeline to use the `uv` tool for installing packages and creating virtual environments, instead of directly using `pip` or `python -m venv`. Specifically:
-> 
-> 1. In eng/pipelines/templates/jobs/ci.yml, add a global `uv` installation step at the top of each job (`Build_Linux`, `Build_Windows`, `Build_MacOS`, `Build_Extended`, `Build_Documentation`, and `Analyze`). Insert the following YAML block as the first step under `steps:` for each job:
-> 
-> ```yaml
-> # Install uv tool globally
-> - task: Bash@3
->   displayName: 'Install uv (Linux/macOS)'
->   inputs:
->     targetType: inline
->     script: |
->       curl -LsSf https://astral.sh/uv/install.sh | sh
->   condition: or(
->     eq(variables['Agent.OS'], 'Linux'),
->     eq(variables['Agent.OS'], 'Darwin')
->   )
-> 
-> - task: PowerShell@2
->   displayName: 'Install uv (Windows)'
->   inputs:
->     targetType: inline
->     script: |
->       iex (irm https://astral.sh/uv/install.ps1)
->   condition: eq(variables['Agent.OS'], 'Windows_NT')
-> ```
-> 
-> 2. Replace all direct `python -m pip install` and `python -m pip freeze` invocations in YAML under eng/pipelines/templates (specifically build-package-artifacts.yml, build-extended-artifacts.yml, analyze.yml) with `uv pip install` and `uv pip freeze` respectively.
-> 
-> 3. Update eng/pipelines/templates/steps/use-venv.yml to create and activate virtual environments using `uv` instead of the existing `create-venv.ps1` script. Replace the existing `pwsh` steps with `uv venv create` and `uv venv activate` commands, preserving the `VirtualEnvironmentName`, `Activate`, and `Condition` parameters.
-> 
-> These changes aim to reduce setup time by leveraging the `uv` tool's optimized environment and package management capabilities throughout the CI pipeline.
+Fixes #6165.
 
 <!-- START COPILOT CODING AGENT TIPS -->
 ---
 
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-07-10T19:10:36Z,,,4127088,https://api.github.com/repos/Azure/azure-sdk-for-python,https://github.com/Azure/azure-sdk-for-python/pull/41974,"analysisWe need to classify the PR as 'performance' or 'non-performance'. The PR is about optimizing CI pipeline with uv tool for faster package management. It explicitly mentions faster CI builds, reduced execution time. This is performance improvement. So label 'performance'.assistantfinalperformance",11,0.09108733826228538,False
-2837131747,81,chore: migrate from Poetry to uv,"# Migrate from Poetry to uv
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-06-16T19:04:49Z,2025-06-17T20:07:53Z,2025-06-17T20:07:52Z,323665366,https://api.github.com/repos/microsoft/kiota,https://github.com/microsoft/kiota/pull/6671,11,0.07622131698972974,False
+3245346788,195,feat: simplify Node.js runtime with Hono v1.17.0 absolute path support,"## Summary
+- Update @hono/node-server from v1.15.0 to v1.17.0 for absolute path support  
+- Simplify Node.js runtime implementation by removing complex relative path calculations
+- Improve code maintainability and eliminate working directory dependencies
 
-This PR migrates the project from Poetry to uv for dependency management, offering faster installation times and improved reproducibility.
+## Type of Change
 
-## Changes
-- Replace Poetry with uv for dependency management
-- Update Dockerfile to use uv for dependency installation
-- Add requirements.txt and requirements.dev.txt files
-- Update documentation with uv setup instructions
-- Add migration guide for existing developers
+Please add the appropriate label(s) to this PR and check the relevant box(es):
 
-## Development Workflow Changes
-- Dependencies are now managed with `uv pip install` instead of `poetry install`
-- Virtual environments are created with `uv venv`
-- Pre-commit hooks updated to use uv
+- [ ] 🐛 `bug` - Bug fix (non-breaking change which fixes an issue)
+- [x] ✨ `feature` - New feature (non-breaking change which adds functionality)
+- [ ] 💥 `breaking` - Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] 📚 `documentation` - Documentation update
+- [x] ⚡ `performance` - Performance improvement
+- [ ] 🔨 `refactor` - Code refactoring
+- [ ] 🧪 `test` - Adding or updating tests
+- [ ] 🔧 `chore` - Maintenance, dependencies, tooling
 
-## Docker Build Process Updates
-- Removed Poetry-specific commands and configurations
-- Added `--system` flag for uv installations in containers
-- Updated multi-stage build process to use requirements files
+## Changes Made
 
-## CI/CD Pipeline Updates
-- Dependencies installed using `uv pip install --system`
-- Virtual environments not used in Docker containers
-- Pre-commit hooks ensure code quality
+- **Dependency Update**: Upgraded `@hono/node-server` to v1.17.0 which adds absolute path support
+- **Code Simplification**: Replaced 10 lines of complex relative path calculation with 1 line of absolute path
+- **Import Cleanup**: Removed unused `relative` import from `node:path`
+- **Improved Robustness**: Static file serving no longer depends on working directory
+
+## Before/After Comparison
+
+### Before (10 lines of complex logic)
+```typescript
+const staticAbsPath = join(__dirname, ""../static"");
+let staticRelPath = relative(process.cwd(), staticAbsPath);
+if (staticRelPath === """") {
+  staticRelPath = ""."";
+}
+```
+
+### After (1 line, simple and clear)
+```typescript
+const staticPath = join(__dirname, ""../static"");
+```
 
 ## Testing
-✅ Successfully tested:
-- Virtual environment creation with `uv venv`
-- Dependency installation with `uv pip install`
-- All required packages installed correctly
-- FastAPI and other core dependencies working
 
-Link to Devin run: https://app.devin.ai/sessions/2430149b78eb49f6bff9c52e97afdb17
-Requested by: dvanliere@wealthsimple.com",Devin,158243242,devin-ai-integration[bot],closed,2025-02-07T03:11:16Z,2025-02-07T03:33:31Z,,658937026,https://api.github.com/repos/wealthsimple/llm-gateway,https://github.com/wealthsimple/llm-gateway/pull/81,"analysisWe need to classify as performance or non-performance. The PR is migrating from Poetry to uv, which offers faster installation times. The description says ""offering faster installation times and improved reproducibility."" That is performance improvement. The keywords: faster, performance. So classify as 'performance'.assistantfinalperformance",11,0.09005727068802534,False
+- [x] Tests pass locally (`make test`)
+- [x] Code is formatted (`make format`)
+- [x] Code is linted (`make lint`)
+- [x] Type checking passes (`make typecheck`)
+- [x] All quality checks pass (`make check`)
+- [x] Manual testing performed: Verified static file serving works with absolute paths
+
+## Checklist
+
+- [x] My code follows the project's style guidelines
+- [x] I have performed a self-review of my own code
+- [x] I have commented my code, particularly in hard-to-understand areas
+- [x] I have made corresponding changes to the documentation
+- [x] I have added/updated tests for my changes
+- [x] All tests pass
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,80381,sugyan,closed,2025-07-19T14:33:10Z,2025-07-19T14:41:39Z,2025-07-19T14:41:39Z,999285986,https://api.github.com/repos/sugyan/claude-code-webui,https://github.com/sugyan/claude-code-webui/pull/195,11,0.054332982620076305,False
+3190247421,216,Reduce Vercel deployment time by 2x,"<!-- One very short sentence on the WHAT and WHY of the PR. E.g. ""Remove pathHash attribute because it is confirmed unused."" or ""Add DNS round robin to improve load distribution."" -->
+Reduce Vercel deploy time by offloading TypeScript checks and optimizing build steps.
+
+<!-- OPTIONAL: If the WHY of the PR is not obvious, perhaps because it fixed a gnarly bug, explain it in a short paragraph here. E.g. ""Commit a73bb98 introduced a bug where the class list was filtered to only work for MDC files, hence we partially revert it here."" -->
+The previous Vercel build process spent nearly 4 minutes on TypeScript checking. This PR configures Vercel to skip type checking during deployment, instead running it in a dedicated GitHub Actions workflow. Additional optimizations include improved Webpack configuration, faster dependency installation, and refined Vercel build commands, aiming for a 2x reduction in deploy time.",Cursor,11430621,benjaminshafii,closed,2025-07-01T00:21:53Z,2025-07-01T20:54:18Z,,883825890,https://api.github.com/repos/different-ai/zero-finance,https://github.com/different-ai/zero-finance/pull/216,11,0.049612814586897584,False
+3034997303,13284,Optimize CLI dependencies,"# Dependency Optimization for CLI Package
+
+This PR optimizes the dependency footprint of the Vercel CLI package, achieving the following:
+
+- Reduced compressed node_modules size from ~125MB to ≤50MB (actual: 620KB)
+- Reduced total package count by ≥40% (from ~194 to ≤115)
+- Eliminated direct usage of deprecated packages
+- Reduced libraries with multiple versions from 17 to ≤3
+
+## Approach
+
+1. Replaced heavy libraries with lighter alternatives
+   - `chalk` → `picocolors` (80% smaller, same functionality)
+   - `node-fetch` → native `fetch` (available in Node.js 18+)
+
+2. Inlined small utility packages (<200 LOC, MIT/ISC)
+   - `ms`
+   - `bytes`
+   - `strip-ansi`
+   - `title`
+
+3. Consolidated duplicate version libraries
+   - Updated `semver` from 5.7.2 to 7.5.4
+
+4. Removed deprecated packages
+   - Replaced `codecov` with `c8`
+   - Replaced `glob` with `fast-glob`
+   - Removed `@types/jest-expect-message`
+
+## Testing
+
+- Build successful with `pnpm build`
+- Tests pass with `pnpm test`
+- Import paths fixed for inlined packages
+
+Link to Devin run: https://app.devin.ai/sessions/b5f8c7fe322e4e388b6ce1a3d82ee200
+
+Requested by: lee@vercel.com
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-02T01:23:55Z,2025-05-10T14:30:15Z,,67753070,https://api.github.com/repos/vercel/vercel,https://github.com/vercel/vercel/pull/13284,11,0.046466841292421845,False
+3206861578,301,"Release v4.8.0: Bundle Size Optimization, Enhanced Coverage & Documentation","# 🚀 Release v4.8.0: Major Bundle Size Optimization & Quality Improvements
+
+## 📦 Bundle Size Reduction
+- **Removed es-toolkit dependency** - Eliminates external dependency bloat
+- **Implemented custom helper functions** - Replaced with lightweight, purpose-built utilities
+- **Significant bundle size reduction** - Improved loading performance for all consumers
+- **Zero breaking changes** - Public API remains fully compatible
+
+## 🧪 Test Coverage Excellence  
+- **Achieved 95%+ code coverage** (94.96% statement coverage)
+- **100% function coverage** across all modules
+- **100% coverage** for `helpers.ts` and `jsonCompare.ts`
+- **Added 17 comprehensive test cases** (82 total tests)
+- **Enhanced edge case testing** - Function types, Date objects, JSONPath parsing
+- **Error handling validation** - Invalid operations and boundary conditions
+
+## 📚 Documentation & Examples
+- **Overhauled README with Star Wars theme** - Engaging, thematically consistent examples
+- **Improved technical accuracy** - Fixed variable naming and data consistency
+- **Enhanced API documentation** - Clearer usage examples and options
+- **Added comprehensive release notes** - Detailed v4.8.0 changelog
+- **Better SEO optimization** - Improved discoverability keywords
+
+## 🔧 CI/CD & Workflow Improvements
+- **Updated GitHub Actions** - Latest action versions (checkout@v4, setup-node@v4)
+- **Enhanced security** - Proper permissions, npm provenance enabled
+- **Improved performance** - Added concurrency control, npm caching, timeouts
+- **Better visibility** - Job summaries, artifact upload, coverage reporting
+- **Fixed deprecations** - Resolved ::set-output warnings, updated CodeQL
+
+## 🎯 Quality Assurance
+- **All tests passing** ✅ (82/82 tests)
+- **No breaking changes** ✅ - Backward compatibility maintained
+- **Performance validated** ✅ - Equal or better performance vs. previous version
+- **Bundle analysis** ✅ - Confirmed size reduction without functionality loss
+- **Security enhanced** ✅ - Updated workflows, removed vulnerabilities
+
+## 📋 Validation Checklist
+- [x] Bundle size significantly reduced
+- [x] All existing functionality preserved
+- [x] Comprehensive test coverage (95%+)
+- [x] Documentation improved and accurate
+- [x] CI/CD pipelines modernized
+- [x] No breaking changes introduced
+- [x] Performance benchmarks maintained
+- [x] Security best practices implemented
+
+## 🔄 Migration Guide
+**No migration required** - This is a drop-in replacement with zero breaking changes. Simply update to v4.8.0 and enjoy the smaller bundle size!
+
+---
+
+**Closes:** #299  
+**Impact:** Major performance improvement with enhanced maintainability  
+**Risk:** Low - Extensive testing and validation completed",OpenAI_Codex,965766,ltwlf,closed,2025-07-06T18:19:33Z,2025-07-06T19:45:05Z,2025-07-06T19:45:05Z,224980941,https://api.github.com/repos/ltwlf/json-diff-ts,https://github.com/ltwlf/json-diff-ts/pull/301,11,0.04103048204212892,False
+3206743230,300,"Replace es-toolkit/compat with es-toolkit for difference, intersection, and keyBy","This PR optimizes the bundle size and performance by replacing imports from `es-toolkit/compat` with the standard `es-toolkit` module for the `difference`, `intersection`, and `keyBy` functions in `jsonDiff.ts`.
+
+## Changes Made
+
+1. **Updated import statement**: Changed from `es-toolkit/compat` to `es-toolkit` for better performance and smaller bundle size
+2. **Enhanced keyBy compatibility**: Modified `convertArrayToObj` function to handle string keys by converting them to property accessor functions, maintaining backward compatibility
+
+## Why This Change is Safe
+
+The analysis of the current usage patterns shows:
+- `intersection(oldObjKeys, newObjKeys)` - called with exactly two arrays from `Object.keys()`
+- `difference(newObjKeys, oldObjKeys)` and `difference(oldObjKeys, newObjKeys)` - called with exactly two arrays from `Object.keys()`
+- `keyBy(arr, uniqKey)` - used in standard manner with array and key parameter
+
+None of the Lodash compatibility features from `es-toolkit/compat` were being utilized, making this migration straightforward and beneficial.
+
+## Testing
+
+- All existing tests pass (61/61) ✅
+- Build completes successfully ✅
+- Linting passes ✅
+- Manual verification of diff functionality with embedded object keys ✅
+
+## Benefits
+
+- **Smaller bundle size**: Removes compatibility layer overhead
+- **Better performance**: Direct usage of optimized es-toolkit functions
+- **No breaking changes**: Full backward compatibility maintained
+
+Fixes #299.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-06T16:16:57Z,2025-07-06T16:32:40Z,2025-07-06T16:32:40Z,224980941,https://api.github.com/repos/ltwlf/json-diff-ts,https://github.com/ltwlf/json-diff-ts/pull/300,11,0.037141367311154236,False
+3156177738,2073,Replace custom JSON patch implementation with fast-json-patch library,"# Replace custom JSON patch implementation with fast-json-patch library
+
+## Summary
+This PR replaces the custom `applyPatchOperations` implementation in the `db-structure` package with the `fast-json-patch` library's `applyPatch` function while maintaining full backward compatibility.
+
+## Changes
+- **File modified**: `frontend/packages/db-structure/src/operation/applyPatchOperations.ts`
+- **Approach**: Hybrid implementation that uses `fast-json-patch` for standard operations and custom logic for paths with special characters (`~`) to preserve original behavior
+- **Dependencies**: Leverages existing `fast-json-patch` v3.1.1 dependency (already installed)
+
+## Implementation Details
+The new implementation:
+1. **Uses `fast-json-patch` for most operations** - Leverages the library's performance and correctness
+2. **Custom handling for special characters** - Operations with `~` in paths use custom logic to match original behavior (no JSON Pointer unescaping)
+3. **Graceful error handling** - Falls back to custom nested path creation when the library throws errors for missing paths
+4. **Maintains exact API** - Same function signature and behavior as the original implementation
+
+## Testing
+- ✅ **All existing tests pass**: 15/15 tests in `applyPatchOperations.test.ts`
+- ✅ **Full package test suite passes**: 219/219 tests in db-structure package
+- ✅ **Lint checks pass**: Biome, TypeScript, and ESLint all pass
+- ✅ **No breaking changes**: Existing usage in `supabase.ts` and other files remains unchanged
+
+## Benefits
+- **Performance**: Leverages optimized library implementation for most operations
+- **Maintainability**: Reduces custom code while preserving required behavior
+- **Reliability**: Uses well-tested library with proper JSON Pointer handling
+- **Backward compatibility**: All existing functionality preserved
+
+## Link to Devin run
+https://app.devin.ai/sessions/9a624d80120e420abad0dec521e3832d
+
+## Requested by
+hirotaka.miyagi@route06.co.jp
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-18T09:38:18Z,2025-06-19T08:27:21Z,,839216423,https://api.github.com/repos/liam-hq/liam,https://github.com/liam-hq/liam/pull/2073,11,0.03343443932661481,False
+3216135866,837,fix!: Update publishObject to use json patches,"```
+## Proposed changes
+
+feat: Implement JSON Patch with string optimizations for publishObject
+
+This pull request significantly reduces network traffic and improves performance for `publishObject` by sending only incremental changes as JSON patches, which is especially beneficial for streaming scenarios like LLM output.
+
+Key changes include:
+*   **JSON Patch Implementation**: `publishObject` now uses RFC 6902 compliant JSON patches to send differences between object states.
+*   **String Optimizations**: Introduced custom `string-append` and `string-diff` operations for highly efficient updates to string values (e.g., appending tokens in streaming text).
+*   **Message Format Update**: The `WorkflowObjectMessage` format has been updated to include a `patches` array and `isInitial` flag, replacing the previous `data` field.
+*   **State Management**: Added internal state tracking for published objects and exposed utility functions (`clearObjectState`, `clearAllObjectStates`, `applyObjectPatches`) for consumers to reconstruct object states.
+*   **Dependencies**: Added `fast-json-patch` and `diff` libraries.
+*   **Tests**: Comprehensive tests have been added and updated to cover the new functionality and optimizations.
+
+**Breaking Change**: This is a breaking change as the `WorkflowObjectMessage` format has changed. Consumers of workflow messages must be updated to handle the new JSON patch format.
+```",Cursor,4382100,jmoseley,closed,2025-07-09T14:23:09Z,2025-07-09T19:40:08Z,2025-07-09T19:40:08Z,899766976,https://api.github.com/repos/gensx-inc/gensx,https://github.com/gensx-inc/gensx/pull/837,11,0.03110263069761121,False

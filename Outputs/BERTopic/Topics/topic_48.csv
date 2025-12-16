@@ -1,0 +1,251 @@
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,Topic,Probability,Representative_document
+3102876964,711,Fix AI chat query execution to only run when chat pane is open,"Fixes OPS-1876.
+
+## Problem
+
+The `useAiAssistantChat` hook was invoking `queryFn` regardless of whether the AI chat pane is open, leading to unnecessary API calls and potential side effects when the pane is closed.
+
+## Solution
+
+Modified `useAiAssistantChat` to read `isAiChatOpened` directly from the application state using `useAppStore` and added it as the `enabled` option in the `useQuery` configuration. This ensures the query function is only executed when the AI chat pane is actually open.
+
+## Changes
+
+- **Added import** for `useAppStore` in `ai-assistant-chat-hook.ts`
+- **Added state reading** of `isAiChatOpened` from the store within the hook
+- **Added query guard** using `enabled: isAiChatOpened` in the `useQuery` options
+- **Added comprehensive unit tests** to validate the new guard logic
+
+## Testing
+
+The implementation includes focused unit tests that verify:
+- Query function is not called when AI chat is closed (`isAiChatOpened === false`)
+- Query function is called when AI chat is opened (`isAiChatOpened === true`) 
+- Query function starts executing when chat state changes from closed to opened
+
+## Benefits
+
+- **Performance improvement**: Eliminates unnecessary API calls when chat is closed
+- **Cleaner architecture**: Centralizes state management through the existing app store
+- **Maintainability**: No breaking changes to existing component interfaces
+- **Reliability**: Prevents potential side effects from unintended query execution
+
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-05-30T10:51:18Z,2025-05-30T14:10:23Z,,945671748,https://api.github.com/repos/openops-cloud/openops,https://github.com/openops-cloud/openops/pull/711,48,1.0,True
+3087038655,93,Fix message ordering in chat API,"## Summary
+- reorder system state message after user messages to optimize caching
+
+## Testing
+- `npm run build`
+- `npm run lint` *(fails: Unexpected any, unused vars)*",OpenAI_Codex,2830514,ryokun6,closed,2025-05-23T17:24:42Z,2025-06-12T05:23:14Z,,923332984,https://api.github.com/repos/ryokun6/ryos,https://github.com/ryokun6/ryos/pull/93,48,1.0,False
+3073532077,50,Optimize chat system prompts,"## Summary
+- split static instructions and dynamic state in `chat.ts`
+- send both system prompts before user messages for caching
+
+## Testing
+- `npm run lint` *(fails: unexpected any and other warnings)*",OpenAI_Codex,2830514,ryokun6,closed,2025-05-19T11:38:12Z,2025-05-19T11:38:33Z,2025-05-19T11:38:33Z,923332984,https://api.github.com/repos/ryokun6/ryos,https://github.com/ryokun6/ryos/pull/50,48,1.0,False
+3113519735,128,Split IE prompt for caching,"## Summary
+- cache static IE generation prompt using `system`
+- generate dynamic system message for URL/year
+
+## Testing
+- `npm run lint` *(fails: unexpected any/unused vars in unrelated files)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_683ed636d87c832498567962ed9e4c3e",OpenAI_Codex,2830514,ryokun6,closed,2025-06-03T11:10:49Z,2025-06-03T11:11:06Z,2025-06-03T11:11:06Z,923332984,https://api.github.com/repos/ryokun6/ryos,https://github.com/ryokun6/ryos/pull/128,48,1.0,False
+3185789444,8605,feat(worker): Implement bulk event sending method,"%23%23%23 What changed%3F Why was the change needed%3F
+
+*   **What:** Implemented a new `/send/bulk` endpoint in the socket worker and refactored the `SocketWorkerService` to utilize it.
+*   **Why:** To allow sending multiple events (e.g., a new message, unread count, unseen count) in a single HTTP request, significantly reducing network overhead and improving performance for common event dispatch flows. Previously, these events were sent via separate HTTP calls.
+
+%23%23%23 Screenshots
+
+<!-- If the changes are visual, include screenshots or screencasts. -->
+
+<details>
+<summary><strong>Expand for optional sections</strong></summary>
+
+%23%23%23 Related enterprise PR
+
+<!-- A link to a dependent pull request  -->
+
+%23%23%23 Special notes for your reviewer
+
+*   The new `/send/bulk` endpoint supports up to 100 messages per request and provides detailed success/failure reporting for individual messages within the bulk operation.
+*   The `SocketWorkerService` now combines the main message, unread count, and unseen count updates into a single bulk request when a `RECEIVED` event with a `messageId` is processed.
+
+</details>",Cursor,8872447,scopsy,closed,2025-06-29T05:51:20Z,2025-06-29T10:56:55Z,,400215964,https://api.github.com/repos/novuhq/novu,https://github.com/novuhq/novu/pull/8605,48,1.0,False
+3144466175,4,Implement local storage persistence,"A new persistence utility, `src/lib/persistence.ts`, was introduced to manage `localStorage` operations for AI configuration and user input. It defines Zod schemas (`AIConfigSchema`, `UserInputSchema`) for robust validation, ensuring data integrity and preventing buggy states. Safe `localStorage` operations handle potential errors like incognito mode or storage quotas.
+
+`src/lib/model-store.ts` was refactored to use this utility, consolidating `selectedModel` and `enabledTools` persistence under a single `ai-config` key. Updates are now only persisted when values genuinely change, optimizing performance.
+
+`src/lib/chat-store.ts` was updated to persist `input` to a separate `user-input` key. Input persistence is debounced by 300ms to prevent excessive writes during typing, and a `beforeunload` listener ensures the latest input is saved. Chat resets now clear the persisted input.
+
+In `src/components/chat.tsx`, `useMemo` was applied to model selection to prevent unnecessary re-renders. `src/components/multimodal-input.tsx` and `src/hooks/use-chat-integration.ts` were updated to retrieve `enabledTools` from `useModelStore`, reflecting the consolidated AI configuration.",Cursor,56125930,f1shy-dev,closed,2025-06-13T18:49:45Z,2025-06-13T18:49:52Z,2025-06-13T18:49:52Z,998301272,https://api.github.com/repos/intern3-chat/intern3-chat,https://github.com/intern3-chat/intern3-chat/pull/4,48,1.0,False
+3275952470,2777,fix: update schemaDesignTool to directly update workflow state,"## Issue
+
+- resolve: Root cause issue where `schemaDesignTool` only updates the database but doesn't update workflow state, causing `invokeSchemaDesignToolNode` to make redundant database fetches for state synchronization
+
+## Why is this change needed?
+
+The original architecture had a separation between tool execution and state updates:
+1. `schemaDesignTool` would update the database via `repositories.schema.createVersion()`
+2. `invokeSchemaDesignToolNode` would then make a separate database fetch to sync the workflow state
+3. This created potential race conditions and unnecessary database calls
+
+This change eliminates the redundant database fetch by having the tool directly return the updated schema data, which the workflow node can use to update state immediately.
+
+## Changes Made
+
+### 1. Modified `schemaDesignTool.ts`
+- Changed return value from plain string to JSON containing:
+  - `message`: Success message
+  - `schemaData`: The new schema from `result.newSchema`
+  - `latestVersionNumber`: Incremented version number
+
+### 2. Updated `invokeSchemaDesignToolNode.ts`
+- Added `extractSchemaDataFromToolResult()` function to parse tool JSON response
+- Replaced database fetch logic with direct use of tool response data
+- Added proper error handling using neverthrow and valibot validation
+- Removed unused helper functions `wasSchemaDesignToolSuccessful` and `fetchUpdatedSchemaWithResult`
+
+### 3. Updated tests
+- Modified `schemaDesignTool.test.ts` to handle new JSON response format
+- Added proper typing for parsed response
+
+## Architecture Diagram
+
+```mermaid
+%%{ init : { ""theme"" : ""default"" }}%%
+graph TD
+    A[schemaDesignTool] --> B[repositories.schema.createVersion]
+    B --> C[Database Updated]
+    A --> D[Return JSON with schema data]
+    D --> E[invokeSchemaDesignToolNode]
+    E --> F[Parse JSON response]
+    F --> G[Update workflow state directly]
+    
+    style D fill:#e1f5fe
+    style F fill:#e1f5fe
+    style G fill:#e1f5fe
+```
+
+## Critical Review Points
+
+⚠️ **High Priority Items to Verify:**
+
+1. **Data Consistency**: Verify that `result.newSchema` from `createVersion()` exactly matches what would be fetched from the database
+2. **Version Number Handling**: Confirm that `latestVersionNumber + 1` calculation aligns with database version management
+3. **Error Handling**: Review the neverthrow error handling chain in `extractSchemaDataFromToolResult()`
+4. **Type Safety**: Validate that the valibot schema properly covers all expected data structures
+5. **Integration Testing**: The workflow node integration wasn't directly tested - consider testing the full flow
+
+## Potential Risks
+
+- **Backward Compatibility**: Tool return format changed from string to JSON (should be isolated to this workflow)
+- **State Synchronization**: Removing the database fetch could cause issues if tool and DB state diverge
+- **Testing Coverage**: Limited integration testing of the full workflow node behavior
+
+## Testing
+
+- ✅ All existing `schemaDesignTool` tests pass with new JSON format
+- ✅ Lint and type checking pass
+- ⚠️ Integration testing of full workflow node not performed
+
+---
+
+**Link to Devin run**: https://app.devin.ai/sessions/d8e21da1edbc49c3b2119275ebf5417c  
+**Requested by**: noritaka.ikeda@route06.co.jp",Devin,158243242,devin-ai-integration[bot],open,2025-07-30T07:15:24Z,,,839216423,https://api.github.com/repos/liam-hq/liam,https://github.com/liam-hq/liam/pull/2777,48,1.0,True
+3074294403,320,Integrate chatAudioIO module,"# Integrate chatAudioIO module
+
+This PR integrates the chatAudioIO module from Moddable SDK 5.6.0 by refactoring the microphone implementation to use embedded:io/audio/in instead of pins/audioin. This improves real-time audio capabilities for stack-chan.
+
+## Changes:
+- Updated manifest_microphone.json to include io/audioin manifest
+- Refactored microphone.ts to use embedded:io/audio/in
+- Updated main.ts to check for embedded:io/audio/in availability
+- Updated manifest.json to include chatAudioIO module
+
+Link to Devin run: https://app.devin.ai/sessions/de064430de0d4c179e502e1d2686155f
+Requested by: Shinya Ishikawa
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-19T15:42:40Z,2025-05-28T14:33:26Z,,374381865,https://api.github.com/repos/stack-chan/stack-chan,https://github.com/stack-chan/stack-chan/pull/320,48,1.0,False
+3058809612,1399,Fix: Cache system info to prevent re-fetching on page navigation,"# Cache System Info to Prevent Re-fetching on Page Navigation
+
+## Problem
+Currently, the system information (including version number) is re-fetched every time a page navigation occurs in the LangBot web interface. This is unnecessary and can cause performance issues.
+
+## Solution
+- Added localStorage caching for system information
+- System info is now only fetched on initial load or page refresh
+- Added a `refreshSystemInfo()` method for manual refresh when needed
+
+## Testing
+- Verified that version number in sidebar remains consistent when navigating between pages
+- Verified that version number is updated when the page is refreshed
+
+## Link to Devin run
+https://app.devin.ai/sessions/76bdfc13b08e4003a2de93b9d80cc6fb
+
+Requested by: Junyan Qin (Chin)
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-13T05:33:38Z,2025-05-13T07:32:44Z,,575321313,https://api.github.com/repos/langbot-app/LangBot,https://github.com/langbot-app/LangBot/pull/1399,48,1.0,False
+3152003781,2037,Optimize Chat API/Job schema transfer by removing HTTP payload overhead,"# Optimize Chat API/Job schema transfer by removing HTTP payload overhead
+
+## Summary
+
+This PR optimizes the Chat API/Job system by removing unnecessary `schemaData` transfer through HTTP payloads and leveraging the existing repository pattern for schema retrieval within the Job context.
+
+## Problem
+
+The current implementation had significant inefficiencies:
+
+1. **Large HTTP payloads**: `schemaData` was being passed through HTTP request bodies in both the API route and Job trigger, resulting in large JSON transfers
+2. **Redundant data transfer**: Schema data was being sent via HTTP when the Job already had access to retrieve it directly from the database
+3. **Unnecessary coupling**: Frontend components needed to pass schema data they didn't actually use
+
+## Solution
+
+### Changes Made
+
+1. **API Route optimization** (`frontend/apps/app/app/api/chat/route.ts`)
+   - Removed `schemaData` from `chatRequestSchema` validation
+   - Eliminated `schemaSchema` import as it's no longer needed
+
+2. **Job payload optimization** (`frontend/internal-packages/jobs/src/trigger/chatJobs.ts`)
+   - Updated `ChatJobPayload` type to exclude `schemaData`
+   - Implemented schema fetching using `repositories.schema.getSchema(designSessionId)`
+   - Added proper error handling for schema retrieval failures
+   - Used sophisticated type inference to maintain type safety
+
+3. **Frontend cleanup** 
+   - **Chat Component** (`frontend/apps/app/components/Chat/Chat.tsx`): Removed `schemaData` from `sendChatMessage` calls
+   - **Message Service** (`frontend/apps/app/components/Chat/services/aiMessageService.ts`): 
+     - Removed `schemaData` from `SendChatMessageParams` interface
+     - Updated `callChatAPI` function signature
+     - Removed `Schema` import as it's no longer needed
+
+## Benefits
+
+- **Reduced network overhead**: Eliminates large schema JSON from HTTP request bodies
+- **Improved performance**: Faster API calls due to smaller payloads
+- **Better architecture**: Proper separation of concerns - data fetching happens where it's needed
+- **Maintained functionality**: All existing Chat features work exactly the same
+
+## Technical Details
+
+- Leverages existing `@liam-hq/agent` repository pattern
+- Uses `SupabaseSchemaRepository.getSchema(designSessionId)` for schema retrieval
+- Maintains type safety through sophisticated TypeScript type inference
+- Passes all linting checks (biome, ESLint, TypeScript)
+
+## Testing
+
+- ✅ All linting checks pass (`pnpm lint`)
+- ✅ TypeScript compilation successful
+- ✅ No breaking changes to existing interfaces
+- ✅ Repository pattern integration verified
+
+Link to Devin run: https://app.devin.ai/sessions/2ab1690f94024a83bc558366ab65fac8
+
+Requested by: hirotaka.miyagi@route06.co.jp
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-17T04:17:12Z,2025-06-17T07:08:49Z,2025-06-17T07:08:49Z,839216423,https://api.github.com/repos/liam-hq/liam,https://github.com/liam-hq/liam/pull/2037,48,1.0,True

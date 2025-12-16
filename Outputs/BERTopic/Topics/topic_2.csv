@@ -1,528 +1,305 @@
-id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
-3138362649,1847,✨ feat: implement MODEXP precompile (EIP-198) with EIP-2565 gas optimization,"## Summary
-
-- Implements MODEXP precompile at address 0x05 
-- Full EIP-198 compliance with modular exponentiation
-- EIP-2565 gas calculation optimization
-- Comprehensive test suite with edge cases
-- Gas overflow protection and input validation
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,Topic,Probability,Representative_document
+3273233066,1037,feat: implement comprehensive species tracking system with seasonal/yearly detection badges,"## Summary
+This PR implements a comprehensive species tracking system that displays visual badges on the DailySummaryCard to indicate when species are new, new this year, or new this season. The implementation includes proper database queries, caching, and UI enhancements.
 
 ## Key Features
 
-- Efficient gas calculation with complexity analysis
-- Proper handling of zero cases (0^0 = 1, base^0 = 1)
-- Input validation and DoS protection
-- Big-endian integer parsing for Ethereum compatibility
-- Comprehensive test coverage including edge cases
+### 🏷️ Species Tracking Badges
+- **⭐ Star Icon**: Species detected for the first time ever (lifetime new)
+- **📅 Calendar Icon**: Species detected for the first time this year 
+- **🍃 Leaf Icon**: Species detected for the first time this season
+- Each badge type has configurable time windows (default: 14 days lifetime, 30 days yearly, 21 days seasonal)
 
-## Test Results
+### 🗄️ Database Enhancements
+- **New Method**: `GetSpeciesFirstDetectionInPeriod()` - retrieves first detection of each species within a date range
+- **Improved Queries**: Separate queries for lifetime vs. seasonal/yearly tracking for better accuracy
+- **Better Performance**: Optimized database queries with proper indexing
 
-All Zig tests pass ()
+### 📊 API Improvements  
+- **Enhanced Analytics**: `/api/v2/analytics/species/daily` now includes tracking status fields
+- **Date-based Status**: Species status computed relative to selected date, not current date
+- **Comprehensive Response**: Added `is_new_species`, `is_new_this_year`, `is_new_this_season` fields
 
-🤖 Generated with [Claude Code](https://claude.ai/code)
+### 🎨 Frontend Updates
+- **Animated Icons**: Smooth CSS animations for badge appearance/disappearance  
+- **Smart Display**: Badges only shown when species qualify for ""new"" status
+- **Responsive Design**: Icons adapt to different screen sizes
+- **Accessibility**: Proper tooltips and semantic markup
 
-Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,35039927,roninjin10,closed,2025-06-11T23:40:21Z,2025-06-12T02:24:02Z,2025-06-12T02:24:02Z,601475124,https://api.github.com/repos/evmts/tevm-monorepo,https://github.com/evmts/tevm-monorepo/pull/1847,"analysisWe need to classify as performance or non-performance. The PR implements MODEXP precompile with gas optimization. The description mentions ""EIP-2565 gas optimization"" and ""Efficient gas calculation"". This is about gas calculation optimization, which is performance improvement. The keywords include ""optimization"", ""gas optimization"", ""efficient"". So it's performance. So label 'performance'.assistantfinalperformance",2,1.0,False
-3254647682,59071,skip unnecessary alias-check in collect(::AbstractArray) from copyto\!,"As discussed on Slack with @MasonProtter & @jakobnissen, `collect` currently does a usually cheap - but sometimes expensive - aliasing check (via `unalias`->`mightalias`->`dataid` -> `objectid`) before copying contents over; this check is unnecessary, however, since the source array is newly created and cannot possibly alias the input.
+### 🧪 Testing & Quality
+- **Comprehensive Tests**: 15+ test scenarios covering edge cases
+- **Integration Tests**: Real database interactions with SQLite
+- **Mock Implementations**: Complete test helpers for all datastore methods
+- **Race Condition Testing**: Concurrent access validation
 
-This PR fixes that by swapping from `copyto\!` to `copyto_unaliased\!` in the `_collect_indices` implementations where the swap is straightforward (e.g., it is not so straightforward for the fallback `_collect_indices(indsA, A)`, so I skipped it there).
+## Technical Implementation
 
-This improves the following example substantially:
-```julia
-struct GarbageVector{N} <: AbstractVector{Int}
-    v :: Vector{Int}
-    garbage :: NTuple{N, Int}
-end
-GarbageVector{N}(v::Vector{Int}) where N = GarbageVector{N}(v, ntuple(identity, Val(N)))
-Base.getindex(gv::GarbageVector, i::Int) = gv.v[i]
-Base.size(gv::GarbageVector) = size(gv.v)
-
-using BenchmarkTools
-v = rand(Int, 10)
-gv = GarbageVector{100}(v)
-@btime collect($v);  # 30 ns (v1.10.4)  -> 30 ns (PR)
-@btime collect($gv); # 179 ns (v1.10.4) -> 30 ns (PR)
+### Database Schema
+```sql
+-- New method for period-specific queries
+GetSpeciesFirstDetectionInPeriod(startDate, endDate, limit, offset)
+-- Returns first detection of each species within the date range
 ```
 
-Rebased version of JuliaLang/julia#55748
+### Configuration
+```yaml
+realtime:
+  species_tracking:
+    enabled: true
+    new_species_window_days: 14    # Lifetime tracking window
+    yearly_tracking:
+      enabled: true
+      window_days: 30              # Yearly tracking window  
+    seasonal_tracking:
+      enabled: true
+      window_days: 21              # Seasonal tracking window
+```
+
+### API Response Format
+```json
+{
+  ""species"": [
+    {
+      ""common_name"": ""Eurasian Blackcap"",
+      ""is_new_species"": true,        # ⭐ Star badge
+      ""is_new_this_year"": false,     # 📅 Calendar badge
+      ""is_new_this_season"": true,    # 🍃 Leaf badge
+      ""days_since_first"": 2,
+      ""days_this_year"": 45,
+      ""days_this_season"": 2
+    }
+  ]
+}
+```
+
+## Bug Fixes
+- **Seasonal Data Loading**: Fixed issue where seasonal tracking showed all species as ""new this season""
+- **Date Calculations**: Corrected DaysThisYear computation for accurate year tracking
+- **Cache Invalidation**: Fixed cache not clearing on year/season transitions
+- **Mock Updates**: Updated all test mocks to include new interface methods
+
+## Files Changed
+- **Frontend**: DailySummaryCard.svelte, DashboardPage.svelte, types, styles
+- **Backend**: Species tracker, analytics API, datastore methods, configuration
+- **Tests**: Comprehensive unit, integration, and mock tests
+- **Documentation**: Updated configuration examples and API documentation
+
+## Testing
+- ✅ All existing tests pass
+- ✅ New integration tests with real database
+- ✅ Mock implementations updated
+- ✅ Manual testing with API endpoints
+- ✅ Race condition testing for concurrent access
+
+## Breaking Changes
+None - all changes are backward compatible.
+
+## Migration Notes
+- New configuration options are optional with sensible defaults
+- Database schema changes are additive (new method only)
+- API response includes new fields but doesn't remove existing ones
 
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
-Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,1814174,ChrisRackauckas,closed,2025-07-23T02:52:46Z,2025-07-23T23:55:54Z,,1644196,https://api.github.com/repos/JuliaLang/julia,https://github.com/JuliaLang/julia/pull/59071,"analysisWe need to classify whether the primary purpose is to improve performance. The PR title: ""skip unnecessary alias-check in collect(::AbstractArray) from copyto!"" The body explains that they skip alias-check, improving performance. So it's a performance improvement. So label 'performance'.assistantfinalperformance",2,1.0,False
-3138341820,2255,Optimize BigInt hex conversion,"## Summary
-- improve `BigInt::to_hex` performance by using `StringBuilder`
+Co-Authored-By: Claude <noreply@anthropic.com>
+
+<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
+## Summary by CodeRabbit
+
+* **New Features**
+  * Introduced multi-period species tracking with lifetime, yearly, and seasonal windows.
+  * Added badges and animated icons for new species in dashboards.
+  * Enhanced daily species summary and detection responses with tracking metadata and season info.
+  * Notifications generated for new species detections.
+
+* **Performance Improvements**
+  * Optimized dashboard with caching, memoized URL builders, and incremental updates.
+  * Added composite database indexes for faster species tracking queries.
+
+* **Configuration**
+  * Added configurable species tracking options: window durations, yearly resets, seasonal definitions.
+
+* **Bug Fixes**
+  * Improved modal overlay behavior to prevent accidental closure.
+
+* **Documentation**
+  * Updated comments and accessibility notes.
+
+* **Tests**
+  * Added extensive unit and integration tests for species tracking, seasonal/yearly transitions, notifications, and database analytics.
+
+* **Chores**
+  * Added new icons and CSS animations for UI feedback.
+<!-- end of auto-generated comment: release notes by coderabbit.ai -->",Claude_Code,7030001,tphakala,closed,2025-07-29T11:21:11Z,2025-07-29T13:49:45Z,2025-07-29T13:49:45Z,707764474,https://api.github.com/repos/tphakala/birdnet-go,https://github.com/tphakala/birdnet-go/pull/1037,2,1.0,True
+3074773765,506,[WIP] Avoid reopening /dev/kvm or /dev/mshv for every new sandbox,"Thanks for assigning this issue to me. I'm starting to work on it and will keep this PR's description up to date as I form a plan and make progress.
+
+Original issue description:
+
+> We should just reuse the same one to avoid unnecessary file operations
+
+
+Fixes #503.
+
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-05-19T19:10:44Z,2025-05-19T23:12:44Z,,883829350,https://api.github.com/repos/hyperlight-dev/hyperlight,https://github.com/hyperlight-dev/hyperlight/pull/506,2,1.0,False
+3219254404,286,Reimplement hydration using new diffing/committing architecture,"## Summary
+
+Reimplements hydration in `src/crank.ts` to work with the new diffing/committing separation architecture. The previous hydration logic was commented out and non-functional. This implementation enables parallel hydration of sibling components and provides graceful fallback for hydration mismatches.
+
+## Key Changes
+
+### Core Implementation
+- **Reimplement `Renderer.hydrate()` method** that was previously throwing ""Reimplement hydration"" error
+- **Add hydration tracking to Retainer class** with `IsHydrating` flag and `hydrationData` property
+- **Integrate with new architecture** using existing `diffChildren`/`commitChildren` rather than old monolithic approach
+
+### Hydration Flow
+- **Initialize hydration context** by calling `renderer.hydrate()` for root element to get DOM children
+- **Propagate hydration state** through retainer tree via `IsHydrating` flag
+- **Assign DOM nodes in order** during diffing phase using `getNextHydrationChild()` helper
+- **Pass hydration data** to `text()` and `raw()` renderer calls during commit phase
+
+### Error Handling & Fallback
+- **Detect tag mismatches** when `renderer.hydrate()` returns `undefined`
+- **Clear hydration flag** and fall back to regular rendering for mismatched subtrees
+- **Handle missing DOM children** gracefully without breaking rendering
+- **Enable hydration warnings** for debugging mismatch scenarios
+
+### Parallel Sibling Support
+The new implementation addresses the requirement that **sibling components no longer need to hydrate serially**:
+- DOM nodes are assigned during synchronous diffing phase
+- Async components can render in parallel during commit phase  
+- Hydration data consumption maintains proper order without blocking
+
+## Component Support
+- ✅ **Function components** (sync & async)
+- ✅ **Generator components** (sync & async)
+- ✅ **Fragment components** 
+- ✅ **Raw elements** with HTML injection
+- ✅ **Event handler preservation** during hydration
+- ✅ **Component refresh** after hydration
 
 ## Testing
-- `moon info`
-- `moon test` *(fails: no output)*
+Unskipped and fixed multiple hydration test cases:
+- Basic element hydration (`simple`)
+- Component hydration (`sync function component`, `sync generator component`, `async function component`)
+- Fragment hydration (`fragment`)
+- Mismatch handling (`mismatched tag`, `mismatched text`) 
+- Advanced scenarios (`async sibling components resolve out of order`, `raw element`, `refresh`)
 
-------
-https://chatgpt.com/codex/tasks/task_e_68499a1746208320b6d98eb4cbce0581",OpenAI_Codex,747051,bobzhang,closed,2025-06-11T23:21:52Z,2025-06-23T06:46:51Z,2025-06-23T06:46:51Z,749681472,https://api.github.com/repos/moonbitlang/core,https://github.com/moonbitlang/core/pull/2255,"analysisWe need to classify the pull request as performance or non-performance. The title: ""Optimize BigInt hex conversion"". Summary: ""improve BigInt::to_hex performance by using StringBuilder"". That is clearly a performance improvement. So classification: 'performance'.assistantfinalperformance",2,1.0,False
-3146329050,25066,[WIP] [tracking] Improve Sequence operator handling,"Analyzing sequence operator handling efficiency improvements in ONNX Runtime
+## Example Usage
 
-**Overview**: The current sequence operator implementation relies heavily on tensor copies as noted in the TODO comment. This PR aims to improve efficiency by reducing unnecessary tensor copying through better use of move semantics and avoiding redundant allocations.
+```jsx
+// Before: throws ""Reimplement hydration"" error
+renderer.hydrate(<button onclick={handleClick}>Click</button>, document.body);
 
-**Plan**:
-- [x] Analyze current sequence operator implementation and identify inefficiencies
-- [x] Understand the current test structure and codebase organization
-- [x] Optimize SequenceInsert to reduce tensor copying where possible
-- [x] Optimize SequenceConstruct to use move semantics when appropriate
-- [x] Add CreateTensorOrtValue function to enable direct OrtValue creation with move semantics
-- [ ] Create performance benchmark tests to measure current copying overhead
-- [ ] Investigate SequenceAt optimization opportunities (limited due to operational requirements)
-- [ ] Run existing tests to ensure no regression
-- [ ] Validate performance improvements with benchmarks
+// After: successfully hydrates existing DOM
+document.body.innerHTML = ""<button>Click</button>"";
+const button = document.body.firstChild;
+renderer.hydrate(<button onclick={handleClick}>Click</button>, document.body);
+// Preserves existing DOM node and adds event handler
+console.log(document.body.firstChild === button); // true
+```
 
-**Key optimizations implemented**:
-- Added `CreateTensorOrtValue()` function that creates OrtValue directly with move semantics instead of creating Tensor first then converting
-- Updated SequenceInsert and SequenceConstruct to use the optimized function
-- This reduces the number of copy operations and temporary object creation
-- Maintains compatibility with DataTransferManager for cross-EP support
+## Breaking Changes
+None - this implements previously non-functional hydration without changing existing APIs.
 
-**Note**: SequenceErase is already well-optimized as it avoids copying non-erased tensors. SequenceAt requires copying due to operational requirements but uses efficient DataTransferManager.
+Fixes the hydration system to work with the modern Crank architecture while maintaining backward compatibility and improving performance through parallel sibling hydration.
 
-Fixes #18355.
+*This pull request was created as a result of the following prompt from Copilot chat.*
+> The goal is to reimplement hydration in src/crank.ts. The current hydration logic is commented out or non-functional, and several hydration-related tests in test/hydration.tsx are skipped (such as mismatched tag and mismatched text tests). Now that diffing and committing are done in two separate steps, hydrating sibling components does not need to be run in series. 
+> 
+> Steps to complete:
+> 1. Review the old hydration implementation (search for commented-out or stubbed hydration code in src/crank.ts).
+> 2. Restore or rewrite the hydration logic so that it works with the new diffing/committing separation and does not require serial hydration of siblings.
+> 3. Ensure that skipped hydration tests in test/hydration.tsx (such as ""mismatched tag"" and ""mismatched text"") can be unskipped and pass.
+> 4. Refactor or clean up any legacy or unnecessary code from the old hydration logic if present.
+> 5. Ensure all relevant hydration tests pass, including edge cases of mismatches and raw element hydration.
+> 
+> References:
+> - src/crank.ts for main hydration logic
+> - test/hydration.tsx for hydration-related tests
+> - The new structure where diffing and committing are separate
+> - It is no longer necessary to hydrate sibling components in series
+> 
+> Do not change other unrelated code.
+> 
+> If possible, add comments explaining new or tricky logic in the hydration implementation.
 
 <!-- START COPILOT CODING AGENT TIPS -->
 ---
 
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-06-14T16:00:00Z,,,156939672,https://api.github.com/repos/microsoft/onnxruntime,https://github.com/microsoft/onnxruntime/pull/25066,"analysisWe need to classify as performance or non-performance. The PR title: ""[WIP] [tracking] Improve Sequence operator handling"". Body: mentions reducing tensor copying, move semantics, performance improvements. Keywords: efficiency, reduce copying, performance improvements. So it's performance. So label 'performance'.assistantfinalperformance",2,1.0,False
-3220760486,299,Reduce memory allocations in display code,"## Summary
-- store timezone data as flash strings
-- place Serial message literals in flash using `F()`
-- store WebUI error messages in flash
-",OpenAI_Codex,2579336,jniebuhr,closed,2025-07-10T21:25:13Z,2025-07-13T17:03:05Z,2025-07-13T17:03:05Z,876327247,https://api.github.com/repos/jniebuhr/gaggimate,https://github.com/jniebuhr/gaggimate/pull/299,"analysisWe need to classify as performance or non-performance. The PR title: ""Reduce memory allocations in display code"". Body: store timezone data as flash strings, place Serial message literals in flash using F(), store WebUI error messages in flash. This is about memory usage, reducing allocations, using flash strings to reduce RAM usage. That is performance improvement (memory optimization). So classification: performance.assistantfinalperformance",2,1.0,False
-3220636286,1047,Add helper for ragged paged attention,"## Summary
-- gate optional TPU ragged paged attention import
-- introduce `ragged_paged_attention` helper to dispatch to TPU or reference code
-- use new helper from `paged_decode`
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-10T12:54:35Z,2025-07-10T22:03:25Z,2025-07-10T22:03:24Z,206439707,https://api.github.com/repos/bikeshaving/crank,https://github.com/bikeshaving/crank/pull/286,2,1.0,True
+3175455636,3394,refactor toc components to client,"## Summary
+- make PagesList a client component and simplify props
+- transform PageDocumentItem, PageGroupItem and PageLinkItem into client components
+- precompute TOC entries in TableOfContents
+- add encodeClientTableOfContents helper
+- relax PageIcon type
 
-## Testing
-- `pre-commit run --files src/levanter/layers/attention.py`
-- `pytest tests -m ""not entry and not slow and not ray""` *(fails: ModuleNotFoundError for jax, equinox, etc.)*
+Fix RND-7417
+
+By doing this on https://mariadb.com/docs/release-notes, we can go from a 1.3Mb RSC to a 800Kb one
 
 ------
-https://chatgpt.com/codex/tasks/task_e_687023c7a5fc83319a642eb2548a03f7",OpenAI_Codex,9633,dlwh,closed,2025-07-10T20:41:57Z,2025-07-10T20:42:21Z,2025-07-10T20:42:21Z,496005961,https://api.github.com/repos/stanford-crfm/levanter,https://github.com/stanford-crfm/levanter/pull/1047,"analysisWe need to classify whether the primary purpose of the PR is to improve performance. The PR adds helper for ragged paged attention, gating optional TPU ragged paged attention import, introduces ragged_paged_attention helper to dispatch to TPU or reference code, use new helper from paged_decode. This seems to be about adding a helper for ragged paged attention, likely to improve performance by using TPU-specific implementation. The description mentions ""gate optional TPU ragged paged attention import"" and ""use new helper from paged_decode"". This is likely a performance improvement: ragged paged attention is a performance optimization for attention. So classification: 'performance'.
-
-Check if any other context: The PR is about adding a helper for ragged paged attention, which is a performance optimization. So yes, performance.assistantfinalperformance",2,1.0,False
-3183021016,20687,Implement array length minify optimization,"## Summary
-- optimize property accesses on array literals when minifying
-- add a bundler test for array length folding
-
-## Testing
-- `bun bd test test/bundler/bundler_minify.test.ts` *(fails: Configuring incomplete, errors occurred)*
-
-------
-https://chatgpt.com/codex/tasks/task_e_685ea751ffa4832886a1a0b55859074c",OpenAI_Codex,709451,Jarred-Sumner,closed,2025-06-27T14:21:26Z,2025-07-20T08:39:28Z,,357728969,https://api.github.com/repos/oven-sh/bun,https://github.com/oven-sh/bun/pull/20687,"analysisWe need to classify the pull request as performance or non-performance. The title: ""Implement array length minify optimization"". Summary: ""optimize property accesses on array literals when minifying"". This is about minification, which is a performance optimization? It's about code size and speed? It's about minifying, which reduces code size, potentially improving load time. The keywords: ""optimize"", ""minify"", ""array length folding"". This is about optimization of minification, which is a performance improvement. The classification: performance. So output ""performance"".assistantfinalperformance",2,1.0,False
-3222683231,7751,Improve Java compiler string concatenation,"## Summary
-- enhance Java backend to use `StringBuilder` when translating string concatenations
-- add new follow-up items to Java machine README
-
-## Testing
-- `go test ./...`
-
-------
-https://chatgpt.com/codex/tasks/task_e_6870f08bdb6083208d78e4956c95bd2a",OpenAI_Codex,1218621,tamnd,closed,2025-07-11T12:09:49Z,2025-07-11T12:10:02Z,2025-07-11T12:10:02Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7751,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Java compiler string concatenation"". Summary: ""enhance Java backend to use StringBuilder when translating string concatenations"". That is a performance improvement: using StringBuilder reduces string concatenation overhead. So classification: performance.assistantfinalperformance",2,1.0,False
-3104406142,823,Improve vector performance,"## Summary
-- cache tail size in `PersistentVector` and `TransientVector`
-- update tail size when modifying transient vectors
-",OpenAI_Codex,5256287,Chemaclass,closed,2025-05-30T22:38:34Z,2025-05-30T23:00:10Z,2025-05-30T23:00:10Z,257098489,https://api.github.com/repos/phel-lang/phel-lang,https://github.com/phel-lang/phel-lang/pull/823,"analysisWe need to classify as performance or non-performance. The title: ""Improve vector performance"". Body: caching tail size, update tail size when modifying transient vectors. This is about performance optimization. So classification: performance.assistantfinalperformance",2,1.0,False
-3137138306,2253,Optimize string operations,"## Summary
-- avoid creating intermediate strings by using `write_substring`
-- remove unused TODO comments in string methods
-- update array joining helpers to directly append views
-
-## Testing
-- `moon fmt`
-- `moon info`
-
-------
-https://chatgpt.com/codex/tasks/task_e_6849936bc8548320a98083b692ec4327",OpenAI_Codex,747051,bobzhang,closed,2025-06-11T14:51:38Z,2025-06-11T15:33:27Z,2025-06-11T15:33:26Z,749681472,https://api.github.com/repos/moonbitlang/core,https://github.com/moonbitlang/core/pull/2253,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize string operations"". Body: mentions avoid creating intermediate strings, use write_substring, remove unused TODO comments, update array joining helpers to directly append views. This is about performance optimization of string operations. So classification: performance.assistantfinalperformance",2,1.0,False
-3234031765,1066,Optimize page table slicing,"## Summary
-- optimize loops in page_table
-- slice updated sequences and token counts by num_active
-- update tests for new PageBatchInfo signature
-
-## Testing
-- `pre-commit run --files src/levanter/layers/page_table.py`
-- `pytest tests/test_page_table.py -q`
-
-------
-https://chatgpt.com/codex/tasks/task_e_6876ec7ca3dc83318ce01950914aa611",OpenAI_Codex,9633,dlwh,closed,2025-07-16T00:16:42Z,2025-07-16T00:16:51Z,2025-07-16T00:16:50Z,496005961,https://api.github.com/repos/stanford-crfm/levanter,https://github.com/stanford-crfm/levanter/pull/1066,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize page table slicing"". Summary: ""optimize loops in page_table"", ""slice updated sequences and token counts by num_active"", ""update tests for new PageBatchInfo signature"". This is about optimizing loops, slicing, performance. So it's performance. So output 'performance'.assistantfinalperformance",2,1.0,False
-3071827885,120,Improve string/comment parsing performance,"## Summary
-- avoid repeated concatenations while parsing strings and comments
-- accumulate characters in lists and join at the end
-
-## Testing
-- `python3 -m pytest -q` *(fails: No module named pytest)*",OpenAI_Codex,4247706,mangiucugna,closed,2025-05-18T14:27:00Z,2025-05-18T14:37:56Z,,688141049,https://api.github.com/repos/mangiucugna/json_repair,https://github.com/mangiucugna/json_repair/pull/120,"analysisWe need to classify the pull request as 'performance' or 'non-performance'. The title: ""Improve string/comment parsing performance"". The body: mentions avoid repeated concatenations, accumulate characters in lists and join at the end. This is clearly performance improvement. So classification: 'performance'.assistantfinalperformance",2,1.0,False
-3223281368,82,Use of generators to reduce memory usage via a LazyMultiSet,"Also converts almost all operators to use them wherever possible.
-
-We should benchmark this against main to see how what it does with the memory usage and allocations.",Cursor,31130,samwillis,open,2025-07-11T15:19:11Z,,,884778513,https://api.github.com/repos/electric-sql/d2ts,https://github.com/electric-sql/d2ts/pull/82,"analysisWe need to classify the pull request as performance or non-performance. The title: ""Use of generators to reduce memory usage via a LazyMultiSet Also converts almost all operators to use them wherever possible."" Body: ""We should benchmark this against main to see how what it does with the memory usage and allocations.""
-
-Keywords: memory usage, reduce memory usage, benchmark, allocations. This is performance improvement. So classify as 'performance'.assistantfinalperformance",2,1.0,False
-3264767865,1102,Optimize careless LM evaluation,"## Summary
-- incorporate `DataLoader` for text windows
-- store character ranges alongside examples
-- add configuration options to trade memory for throughput
-- batch suffix probability gathering to reduce host transfers
-
-## Testing
-- `python -m py_compile src/levanter/main/eval_careless_lm.py`
-- `pytest -q` *(fails: ImportError while importing tests)*
-
-------
-https://chatgpt.com/codex/tasks/task_e_68841b9691448327bde32d2d8d99cfb0",OpenAI_Codex,30680697,ahmeda14960,open,2025-07-26T00:44:55Z,,,496005961,https://api.github.com/repos/stanford-crfm/levanter,https://github.com/stanford-crfm/levanter/pull/1102,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize careless LM evaluation"". Summary: incorporate DataLoader for text windows, store character ranges, add config options to trade memory for throughput, batch suffix probability gathering to reduce host transfers. This is clearly performance optimization. So label 'performance'.assistantfinalperformance",2,1.0,False
-3099945080,809,Optimize vector iteration,"## Summary
-- reduce overhead in RangeIterator
-",OpenAI_Codex,5256287,Chemaclass,closed,2025-05-29T10:50:20Z,2025-05-29T10:55:18Z,2025-05-29T10:55:18Z,257098489,https://api.github.com/repos/phel-lang/phel-lang,https://github.com/phel-lang/phel-lang/pull/809,"analysisWe need to classify as performance or non-performance. The title: ""Optimize vector iteration"". Summary: ""- reduce overhead in RangeIterator"". This is about performance optimization. So label 'performance'.assistantfinalperformance",2,1.0,False
-3142406085,2266,Improve retain performance,"## Summary
-- refactor `Array::retain` to avoid repeated length lookups and reads
-
-## Testing
-- `moon fmt`
-- `moon info`
-- `moon check`
-- `moon test`
-
-------
-https://chatgpt.com/codex/tasks/task_e_684ba864a968832085bc835c8821880c",OpenAI_Codex,747051,bobzhang,closed,2025-06-13T06:21:03Z,2025-06-13T07:36:47Z,2025-06-13T07:36:47Z,749681472,https://api.github.com/repos/moonbitlang/core,https://github.com/moonbitlang/core/pull/2266,"analysisWe need to classify as performance or non-performance. The title: ""Improve retain performance"". The body: refactor Array::retain to avoid repeated length lookups and reads. That is a performance improvement. So classification: performance.assistantfinalperformance",2,1.0,False
-3142207549,2265,Improve list rev_fold performance,"## Summary
-- avoid array allocation in list `rev_fold`
-- implement direct recursion for `rev_foldi`
-- run `moon fmt` and `moon info`
-
-## Testing
-- `moon fmt`
-- `moon info`
-
-------
-https://chatgpt.com/codex/tasks/task_e_684b84f0d1148320bbfa1f922c8f1f42",OpenAI_Codex,747051,bobzhang,closed,2025-06-13T04:24:38Z,2025-06-15T12:05:50Z,,749681472,https://api.github.com/repos/moonbitlang/core,https://github.com/moonbitlang/core/pull/2265,"analysisWe need to classify as 'performance' or 'non-performance'. The title: ""Improve list rev_fold performance"". The body mentions avoid array allocation, direct recursion, etc. It's clearly performance improvement. So label 'performance'.assistantfinalperformance",2,1.0,False
-3207776307,1040,Add paged decode helper to Llama transformer,"## Summary
-- add helper `_forward` to reuse logic between decoding calls
-- implement per-layer paged decode using the new helper
-- handle alternate axis names in `default_ragged_paged_attention`
-- rename variables flagged by ruff
-
-## Testing
-- `ruff check src/levanter/models/llama.py src/levanter/layers/attention.py`
-- `black src/levanter/models/llama.py src/levanter/layers/attention.py`
-- `pytest -q tests/test_paged_attention.py::test_ragged_paged_attention_single_seq -vv`
-
-------
-https://chatgpt.com/codex/tasks/task_e_6868cef10c0c83318ca7130fcbfc9d96",OpenAI_Codex,9633,dlwh,closed,2025-07-07T06:56:16Z,2025-07-10T23:37:13Z,,496005961,https://api.github.com/repos/stanford-crfm/levanter,https://github.com/stanford-crfm/levanter/pull/1040,"analysisWe need to classify whether the primary purpose of the PR is to improve performance. The PR adds a paged decode helper to Llama transformer, implements per-layer paged decode, handles alternate axis names, rename variables flagged by ruff. The test is about paged attention. This seems to be about performance optimization: paged decode is a performance improvement for transformer decoding. So classification: 'performance'.assistantfinalperformance",2,1.0,False
-3070936351,4050,chore: Improve memory usage when sharing results,"## Summary
-- add batched sample and counting helpers on `Eval`
-- stream results in `sendChunkedResults`
-",OpenAI_Codex,1080611,sklein12,closed,2025-05-17T17:00:54Z,2025-05-19T21:58:14Z,2025-05-19T21:58:14Z,633927609,https://api.github.com/repos/promptfoo/promptfoo,https://github.com/promptfoo/promptfoo/pull/4050,"analysisWe need to classify as performance or non-performance. The title: ""chore: Improve memory usage when sharing results"". Body: add batched sample and counting helpers on Eval, stream results in sendChunkedResults. This is about memory usage, which is performance. So classify as 'performance'.assistantfinalperformance",2,1.0,False
-3141942061,2262,Optimize loops by caching length,"## Summary
-- optimize loops in `Bytes::to_array` and `Bytes` addition
-- reduce `length()` calls in array reversal functions
-- cache size in `Deque::to_array`
-
-## Testing
-- `moon fmt`
-- `moon info`
-- `moon check --verbose`
-- `moon test`
-
-------
-https://chatgpt.com/codex/tasks/task_e_684ae1d2a7d483209a8fab3f9a02c07b",OpenAI_Codex,747051,bobzhang,closed,2025-06-13T01:11:54Z,2025-06-13T01:36:06Z,2025-06-13T01:36:06Z,749681472,https://api.github.com/repos/moonbitlang/core,https://github.com/moonbitlang/core/pull/2262,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize loops by caching length"". Summary: optimize loops in Bytes::to_array and Bytes addition, reduce length() calls in array reversal functions, cache size in Deque::to_array. This is clearly performance optimization. So label 'performance'.assistantfinalperformance",2,1.0,False
-3200979351,1429,Optimize logits worker I/O,"## Summary
-- cut per-element conversions in sliding logits worker
-- store logits batches as record batches in Parquet
-- compute log-probs on device before moving tensors to CPU
-
-## Testing
-- `pre-commit run --files marin/generation/sliding_logits.py` *(fails: command not found)*
-- `pytest -q` *(fails: ModuleNotFoundError: No module named 'ray')*
-
-------
-https://chatgpt.com/codex/tasks/task_e_6867227b07bc8327916802ace9a0cc74",OpenAI_Codex,30680697,ahmeda14960,closed,2025-07-04T00:58:38Z,2025-07-04T01:12:51Z,2025-07-04T01:12:51Z,775839592,https://api.github.com/repos/marin-community/marin,https://github.com/marin-community/marin/pull/1429,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize logits worker I/O"". Summary: cut per-element conversions, store logits batches as record batches in Parquet, compute log-probs on device before moving tensors to CPU. This is about performance optimization: I/O, conversions, compute on device. So classification: performance.assistantfinalperformance",2,1.0,False
-3201015713,1431,Speed up P(z) and fix Parquet write,"## Summary
-- compute P(z) on device before transferring logits to CPU
-- build rows with explicit dtype to satisfy PyArrow
-
-## Testing
-- `ruff check --output-format concise marin/generation/sliding_logits.py`
-- `black --check marin/generation/sliding_logits.py`
-- `pytest -q` *(fails: ModuleNotFoundError: No module named 'ray')*
-
-
-------
-https://chatgpt.com/codex/tasks/task_e_6867227b07bc8327916802ace9a0cc74",OpenAI_Codex,30680697,ahmeda14960,closed,2025-07-04T01:20:53Z,2025-07-04T01:23:57Z,2025-07-04T01:23:57Z,775839592,https://api.github.com/repos/marin-community/marin,https://github.com/marin-community/marin/pull/1431,"analysisWe need to classify as performance or non-performance. The PR title: ""Speed up P(z) and fix Parquet write"". Summary: compute P(z) on device before transferring logits to CPU; build rows with explicit dtype to satisfy PyArrow. This is about speed up P(z) and fix Parquet write. So it's performance improvement. So label 'performance'.assistantfinalperformance",2,1.0,False
-3267314311,1489,Fix inference OOM by streaming dataset,"## Summary
-- avoid loading entire dataset in memory when running classification inference
-- stream input shards in batches and write results incrementally
-
-## Testing
-- `pytest tests/processing/tokenize -q`
-
-
-------
-https://chatgpt.com/codex/tasks/task_e_68866679275483318b55e211a2a91eee",OpenAI_Codex,9633,dlwh,open,2025-07-27T18:17:29Z,,,775839592,https://api.github.com/repos/marin-community/marin,https://github.com/marin-community/marin/pull/1489,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Fix inference OOM by streaming dataset"". Body: avoid loading entire dataset in memory, stream input shards in batches, write results incrementally. This is about memory usage, performance. It's about reducing memory consumption, which is performance improvement. So classify as 'performance'.assistantfinalperformance",2,1.0,False
-3226180108,1056,Improve sample_lm generation,"## Summary
-- jit-loop the autoregressive decode in `sample_lm`
-- remove unused timing logic
-
-## Testing
-- `pre-commit run --all-files`
-
-------
-https://chatgpt.com/codex/tasks/task_e_6872fb5b14248331a6da4edac2e82635",OpenAI_Codex,9633,dlwh,closed,2025-07-13T06:20:47Z,2025-07-19T06:39:31Z,,496005961,https://api.github.com/repos/stanford-crfm/levanter,https://github.com/stanford-crfm/levanter/pull/1056,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve sample_lm generation"". Body: ""jit-loop the autoregressive decode in sample_lm, remove unused timing logic"". This is about performance: JIT loop, remove timing logic. So classification: performance.assistantfinalperformance",2,1.0,False
-3203674177,380,Optimize dataset storage with pyarrow,"Implement PyArrow-based incremental checkpoint storage with deduplication to reduce disk usage and enhance debugging capabilities.
-
-Closes #221 
-
-Previously, DocETL stored complete intermediate datasets as separate JSON files for each operation, leading to significant storage redundancy and inefficient disk usage, particularly when data records were identical or overlapped across pipeline steps. This change introduces a new architecture that stores unique records once in a central PyArrow dataset and uses an index to reference them, drastically reducing the overall storage footprint. It also adds programmatic inspection tools and documentation for easier pipeline debugging.",Cursor,6224969,shreyashankar,closed,2025-07-04T20:45:02Z,2025-07-07T19:32:05Z,,826111692,https://api.github.com/repos/ucbepic/docetl,https://github.com/ucbepic/docetl/pull/380,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize dataset storage with pyarrow"". Body: describes reducing disk usage, deduplication, storage footprint. This is about storage efficiency, disk usage, deduplication. That is performance improvement? It's about storage efficiency, which is a performance aspect (disk usage, speed of storage). The guidelines: performance-related PRs may contain keywords like memory, optimization, leak, speed, perf, etc. This PR mentions ""reduce disk usage"" and ""enhance debugging capabilities"". It's about storage optimization. That qualifies as performance. So classify as 'performance'.assistantfinalperformance",2,1.0,False
-3174654401,4855,ref(relay): Use `to_owned` instead of `to_string`.,"~~AI~~ :shipit: 
-
-Another W for not using AI, Cursor replaces 105 occurrences for a few dollars and 30 minutes agent, me googling syntax of ripgrep and xargs and writing the regex ~10 minutes and it finds 1000+ more occurrences. Cursor also only did the trivial case (which the regex just does better). 
-
-#skip-changelog",Cursor,255721,Dav1dde,closed,2025-06-25T08:11:01Z,2025-06-25T08:49:37Z,2025-06-25T08:49:37Z,117757315,https://api.github.com/repos/getsentry/relay,https://github.com/getsentry/relay/pull/4855,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""ref(relay): Use `to_owned` instead of `to_string`."" Body: some commentary about using Cursor, etc. The change is replacing to_string with to_owned. That is a performance improvement? to_owned vs to_string: to_owned creates a new owned string from a borrowed string slice? Actually to_string creates a new String by cloning the string slice? to_owned also clones? In Rust, to_owned is similar to clone for types that implement ToOwned. For &str, to_owned is same as to_string? But to_owned may be more efficient? I think to_owned is more efficient because it uses the underlying allocation? But the change is likely a small performance improvement. The PR is about refactoring code to use to_owned instead of to_string. That is a performance improvement. So classify as 'performance'.assistantfinalperformance",2,1.0,False
-3233988388,1065,Optimize PageTable allocation loop,"## Summary
-- page_table: iterate allocations only for updated sequences
-- skip allocation for invalid sequence IDs
-
-## Testing
-- `pre-commit run --files src/levanter/layers/page_table.py`
-- `pytest tests/test_paged_attention.py -k test_ragged_paged_attention_incremental_single_seq -vv` *(fails: ValueError during broadcasting)*
-
-------
-https://chatgpt.com/codex/tasks/task_e_6876e5422f2083318b8bb6b5937bbf81",OpenAI_Codex,9633,dlwh,closed,2025-07-15T23:48:19Z,2025-07-15T23:49:55Z,2025-07-15T23:49:55Z,496005961,https://api.github.com/repos/stanford-crfm/levanter,https://github.com/stanford-crfm/levanter/pull/1065,"analysisWe need to classify the pull request as performance or non-performance. The title: ""Optimize PageTable allocation loop"". Summary: ""page_table: iterate allocations only for updated sequences; skip allocation for invalid sequence IDs"". This is about optimizing allocation loop, likely performance improvement. Keywords: optimize, allocation loop, skip allocation. It's about performance. So classification: 'performance'.assistantfinalperformance",2,1.0,False
-3189896520,1413,Add TPU-compatible logits inference,"## Summary
-- run compute_logits on TPU via XLA multiprocessing
-- write out per-core shards then merge
-- update forward logits tutorial
-
-## Testing
-- `pre-commit run --files marin/generation/logits.py experiments/tutorials/exp1350_forward_logits.py` *(fails: command not found)*
-- `pytest -q tests/quickstart-data` *(fails: ModuleNotFoundError: No module named 'ray')*
-
-------
-https://chatgpt.com/codex/tasks/task_e_6862ed00e7e883278bfe1292cfce04df",OpenAI_Codex,30680697,ahmeda14960,closed,2025-06-30T21:24:01Z,2025-06-30T21:24:29Z,2025-06-30T21:24:29Z,775839592,https://api.github.com/repos/marin-community/marin,https://github.com/marin-community/marin/pull/1413,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Add TPU-compatible logits inference"". Summary: run compute_logits on TPU via XLA multiprocessing, write out per-core shards then merge, update forward logits tutorial. This is about adding TPU compatibility, likely to improve performance by using TPU. The keywords: ""TPU"", ""XLA"", ""multiprocessing"", ""shards"", ""merge"". It's about performance improvement. So classification: 'performance'.assistantfinalperformance",2,1.0,False
-3079638107,11432,Allow ParticleBuffer to shrink buffers,"## Summary
-- extend `ParticleBufferOptions` with a `minSize` field
-- keep track of `_minSize` and reduce allocated space when particle counts drop
-- test ParticleBuffer growth and shrinkage behaviour
-
-## Testing
-- `npm test` *(fails: run-s not found)*",OpenAI_Codex,3112434,GoodBoyDigital,open,2025-05-21T09:52:11Z,,,7741856,https://api.github.com/repos/pixijs/pixijs,https://github.com/pixijs/pixijs/pull/11432,"analysisWe need to classify whether the primary purpose is performance improvement. The PR: ""Allow ParticleBuffer to shrink buffers"". Summary: extend options with minSize, keep track of _minSize and reduce allocated space when particle counts drop, test growth and shrinkage. This is about memory usage, reducing allocated space, performance. It's about memory optimization. So it's performance. So label 'performance'.assistantfinalperformance",2,0.34293882298548206,False
-3048846835,11865,Make `set_len` a tokio-epoll-uring operation,"# Make `set_len` a tokio-epoll-uring operation
-
-Fixes #11817
+https://chatgpt.com/codex/tasks/task_b_685be68bd9808328be2b79d10dfbed0d",OpenAI_Codex,2964339,conico974,closed,2025-06-25T12:23:50Z,2025-06-26T09:35:03Z,2025-06-26T09:35:03Z,18280236,https://api.github.com/repos/GitbookIO/gitbook,https://github.com/GitbookIO/gitbook/pull/3394,2,1.0,False
+3145777953,2828,feat: Cache RPC health check in local storage for 1 hour,"This PR implements caching for RPC health check data to prevent unnecessary API calls on every page load.
 
 ## Changes
-- Added a new `ftruncate` operation to the tokio-epoll-uring library
-- Updated the `set_len` method in `io_engine.rs` to use the new operation
-- Follows the same pattern as other operations like `fsync` and `fdatasync`
 
-## Testing
-- Ran unit tests with `cargo nextest run --workspace --exclude walproposer`
+- **Added cache key utility**: Added `rpcHealthCacheKey` function to generate consistent cache keys for each network
+- **Implemented caching functions**: Created `getLocalRpcHealthCache` and `setLocalRpcHealthCache` functions with 1-hour expiration logic
+- **Modified RPC endpoint initialization**: Updated `getInitialRpcEndpoints` to check cache before making API calls
+- **Added cache validation**: Includes timestamp validation and automatic cleanup of expired/invalid cache entries
 
-Link to Devin run: https://app.devin.ai/sessions/1b08d1ef4cbe4872a0c46f7d01d6d490
-Requested by: christian@neon.tech
-",Devin,158243242,devin-ai-integration[bot],closed,2025-05-08T12:24:26Z,2025-05-08T12:55:44Z,,351806852,https://api.github.com/repos/neondatabase/neon,https://github.com/neondatabase/neon/pull/11865,"analysisWe need to classify as performance or non-performance. The PR title: ""Make set_len a tokio-epoll-uring operation"". The body: adds ftruncate operation, updates set_len to use new operation. This seems like adding a new operation to use epoll-uring for set_len. This likely improves performance? The change is to use a new operation for set_len, which might be more efficient. But is it explicitly performance? The description: ""Make set_len a tokio-epoll-uring operation"". That implies using epoll-uring for set_len, which is likely a performance improvement. The body doesn't mention speed, latency, etc. But the change is to use a new operation that likely improves performance. The classification guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. The PR doesn't contain those keywords. But the title ""Make set_len a tokio-epoll-uring operation"" implies a change to use epoll-uring, which is a performance improvement. But the guidelines say performance-related PRs may contain keywords. But not all performance PRs contain those keywords. The guidelines are not strict. We need to decide. The change is to use epoll-uring for set_len, which is likely a performance improvement. So classify as performance.assistantfinalperformance",2,0.33558316522704634,False
-3225959128,1055,Avoid network downloads in tests,"## Summary
-- add `local_gpt2_tokenizer` fixture to load GPT2 tokenizer from local files
-- switch GPT2-using tests to rely on this fixture
-- use passthrough tokenizer for validation-set test
+## Behavior
 
-## Testing
-- `pre-commit run --all-files`
-- `pytest tests/test_supervised.py tests/test_sft.py tests/test_text.py -m ""not entry and not slow and not ray""`
+The caching mechanism works as follows:
 
-------
-https://chatgpt.com/codex/tasks/task_e_68719c180a4883319e292ffc9037e739",OpenAI_Codex,9633,dlwh,closed,2025-07-13T00:17:21Z,2025-07-13T16:23:35Z,2025-07-13T16:23:35Z,496005961,https://api.github.com/repos/stanford-crfm/levanter,https://github.com/stanford-crfm/levanter/pull/1055,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Avoid network downloads in tests"". Summary: add local tokenizer fixture, switch tests to rely on this fixture, use passthrough tokenizer for validation-set test. This is about avoiding network downloads, making tests faster? It's about test speed, but not necessarily performance of the library. It's about making tests faster by not downloading. The classification: performance? The guidelines: performance-related PRs may contain keywords like speed, perf, etc. This PR mentions ""Avoid network downloads in tests"" which reduces test runtime. That is a performance improvement in tests. But is that considered performance? The guidelines say performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. This PR is about making tests faster, but it's not about the library's performance. However, it's still a performance improvement. The primary purpose is to avoid network downloads in tests, making tests faster. That is a performance improvement. So classify as 'performance'.assistantfinalperformance",2,0.3342746099501353,False
-3146857680,143,Switch DeepEquals stack to ArrayDeque,"## Summary
-- switch stack in `deepEquals` and `deepHashCode` from `LinkedList` to `ArrayDeque`
-- update imports
-- add helper to insert collections into stack
+1. **Cache check**: Before calling the staking API, check if valid cached health data exists (within 1 hour)
+2. **Use cached data**: If fresh cached data is available, use it instead of making an API call
+3. **Fetch and cache**: If cache is missing or expired, fetch from API and cache the result with timestamp
+4. **Cache cleanup**: Automatically removes expired or corrupted cache entries
 
-## Testing
-- `mvn -q test` *(fails: `mvn` not found)*
+## Benefits
 
-------
-https://chatgpt.com/codex/tasks/task_b_684dfa8f5374832a98fa248a2db0ddf5",OpenAI_Codex,5373774,jdereg,closed,2025-06-14T22:48:02Z,2025-06-14T22:48:25Z,2025-06-14T22:48:25Z,12670630,https://api.github.com/repos/jdereg/java-util,https://github.com/jdereg/java-util/pull/143,"analysisWe need to classify the pull request as performance or non-performance. The PR title: ""Switch DeepEquals stack to ArrayDeque"". Summary: switch stack in deepEquals and deepHashCode from LinkedList to ArrayDeque, update imports, add helper to insert collections into stack. This is about using ArrayDeque instead of LinkedList. That likely improves performance because ArrayDeque is more efficient for stack operations. So it's a performance improvement. So classification: 'performance'.assistantfinalperformance",2,0.3007207668176187,False
-3074502051,7794,Refactor verifyReplicationTasks,"## Summary
-- simplify verifyReplicationTasks logic for clarity
-- enable concurrent verification of replication tasks with configurable concurrency
+- **Reduced API calls**: Prevents redundant health checks on every page load
+- **Improved performance**: Faster app initialization when using cached data
+- **Bandwidth savings**: Reduces network requests to the staking API
+- **Graceful degradation**: Falls back to API calls when cache is unavailable
 
-## Testing
-- `go test ./service/worker/migration/... -run Test_verifyReplicationTasks -count=1` *(fails: download go1.24.1 toolchain)*",OpenAI_Codex,3085410,meiliang86,open,2025-05-19T17:06:53Z,,,215654064,https://api.github.com/repos/temporalio/temporal,https://github.com/temporalio/temporal/pull/7794,"analysisWe need to classify the pull request as performance or non-performance. The PR title: ""Refactor verifyReplicationTasks"". Summary: simplify logic, enable concurrent verification with configurable concurrency. That suggests concurrency improvement, potentially performance. But is it primarily performance? The description: ""enable concurrent verification of replication tasks with configurable concurrency"". That is a performance improvement: concurrency to speed up verification. So likely performance. The keywords: concurrency, speed, performance. So classify as 'performance'.assistantfinalperformance",2,0.27733263925807894,False
-3119357084,1429,Conditionally build seqlens tensors,"## Summary
-- generate cumulative seqlen tensors only when flash attention is enabled
-- ignore nested `mistral.rs` repo
+The cache stores health data with a timestamp and automatically expires after 1 hour, ensuring data freshness while providing performance benefits.
 
-## Testing
-- `cargo fmt`
-- `cargo test --workspace --quiet` *(fails: command was interrupted due to resource constraints)*
+Fixes #2827.
 
-------
-https://chatgpt.com/codex/tasks/task_e_6840d1743c4083229a4c1ea083fbdf90
+<!-- START COPILOT CODING AGENT TIPS -->
+---
 
-<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-06-14T08:28:44Z,2025-06-14T11:18:30Z,2025-06-14T11:18:29Z,456470362,https://api.github.com/repos/polkadot-cloud/polkadot-staking-dashboard,https://github.com/polkadot-cloud/polkadot-staking-dashboard/pull/2828,2,1.0,False
+3075207290,510,Avoid reopening /dev/kvm or /dev/mshv for every new sandbox,"This PR implements a solution to avoid reopening `/dev/kvm` or `/dev/mshv` device files for every new sandbox. Previously, each time a new sandbox was created, a new file handle was opened, causing unnecessary file operations.
 
-## Summary by CodeRabbit
+## Implementation details:
 
-- **Chores**
-	- Updated ignored files to exclude the `mistral.rs` directory from version control.
+1. Added static globals with `OnceLock` to cache hypervisor handles:
+   - `KVM_HANDLE` in the KVM module
+   - `MSHV_HANDLE` in the hyperv_linux module
 
-- **Bug Fixes**
-	- Improved handling of sequence length processing to ensure correct behavior when flash attention is enabled or disabled, preventing unnecessary computations when not needed.
+2. Created accessor functions that initialize the handles only once:
+   - `get_kvm_handle()` - returns a reference to the cached KVM handle
+   - `get_mshv_handle()` - returns a reference to the cached MSHV handle
 
-<!-- end of auto-generated comment: release notes by coderabbit.ai -->",OpenAI_Codex,65165915,EricLBuehler,closed,2025-06-04T23:16:33Z,2025-06-04T23:21:46Z,2025-06-04T23:21:46Z,763774926,https://api.github.com/repos/EricLBuehler/mistral.rs,https://github.com/EricLBuehler/mistral.rs/pull/1429,"analysisWe need to classify as performance or non-performance. The PR title: ""Conditionally build seqlens tensors"". Summary: generate cumulative seqlen tensors only when flash attention is enabled, ignore nested repo. The body mentions improved handling of sequence length processing to ensure correct behavior when flash attention is enabled or disabled, preventing unnecessary computations when not needed. This is about performance: reducing unnecessary computations, conditional building, optimization. So classify as 'performance'.assistantfinalperformance",2,0.2712251369289674,False
-3225389334,353,Implement chunked bucket ConcurrentList,"## Summary
-- rewrite `ConcurrentList` to use chunked atomic buckets
-- document the new approach in the user guide
-- note the change in `changelog.md`
+3. Modified hypervisor driver constructors to use these global handles:
+   - `KVMDriver::new()` now uses the cached KVM handle
+   - `HypervLinuxDriver::new()` now uses the cached MSHV handle
 
-## Testing
-- ❌ `mvn -q -Dtest=*ConcurrentTest* test` *(failed: mvn not installed)*
+4. Updated `is_hypervisor_present()` functions to use the global handles
 
-------
-https://chatgpt.com/codex/tasks/task_b_687266251fa4832aaa60efb70188caf7",OpenAI_Codex,5373774,jdereg,closed,2025-07-12T13:54:39Z,2025-07-12T13:54:50Z,2025-07-12T13:54:50Z,12670630,https://api.github.com/repos/jdereg/java-util,https://github.com/jdereg/java-util/pull/353,"analysisWe need to classify the pull request as performance or non-performance. The PR title: ""Implement chunked bucket ConcurrentList"". Summary: rewrite ConcurrentList to use chunked atomic buckets, document new approach, note change in changelog. This seems like a performance improvement: using chunked atomic buckets likely improves concurrency/performance. The description mentions performance? It doesn't explicitly mention performance, but the change is about rewriting to use chunked atomic buckets, which is likely a performance improvement. The guidelines: performance-related PRs may contain keywords like optimization, speed, etc. This PR doesn't contain those keywords. But the content indicates a rewrite for performance. The guidelines say ""Performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" The PR doesn't contain those keywords. But the content is about rewriting to use chunked atomic buckets, which is likely a performance improvement. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The guidelines: if it contains those keywords, classify as performance. If not, maybe non-performance. But the content indicates a performance improvement. The guidelines say ""Performance-related pull requests may contain keywords such as... or any other terms referring to how faster and efficiently software runs."" It doesn't say that if it doesn't contain those keywords, it's non-performance. But the guidelines are for classification. The PR is about rewriting to use chunked atomic buckets, which is likely a performance improvement. But the guidelines mention that performance-related PRs may contain keywords. It doesn't say that if they don't contain keywords, they are not performance. But the guidelines are for classification. We need to decide. The PR is about concurrency and chunked atomic buckets, which likely improves performance. So we should classify as 'performance'. The guidelines: ""Performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" The PR doesn't contain those keywords. But the content is about rewriting to use chunked atomic buckets. That is a performance improvement. The guidelines are not strict; they say ""may contain keywords"". So it's possible to classify as performance even if not containing keywords. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The PR is about rewriting to use chunked atomic buckets, which is likely a performance improvement. So classification: performance.assistantfinalperformance",2,0.2709918376800494,False
-3125825544,293,Fix buffer mismatch check,"## Summary
-- optimize verification so buffer copies only occur when the read count is less than the buffer size
+This change will significantly reduce the number of file operations, especially in scenarios that create many sandboxes (like the test that creates 1000 sandboxes).
 
-## Testing
-- `./gradlew test --no-daemon` *(fails: unresolved Firebase references)*
+The changes are minimal and focused specifically on caching the hypervisor handles without affecting other functionality.
 
-------
-https://chatgpt.com/codex/tasks/task_e_6843386496848320ba5de2416a851d8a",OpenAI_Codex,1151321,depau,closed,2025-06-06T20:44:10Z,2025-06-06T21:05:58Z,2025-06-06T21:05:58Z,147043230,https://api.github.com/repos/etchdroid/etchdroid,https://github.com/etchdroid/etchdroid/pull/293,"analysisWe need to classify the pull request as performance or non-performance. The title: ""Fix buffer mismatch check"". Summary: ""optimize verification so buffer copies only occur when the read count is less than the buffer size"". That is about optimization, reducing buffer copies, improving performance. Keywords: optimize, buffer copies, performance. So it's performance. So output: performance.assistantfinalperformance",2,0.2628633072615101,False
-3105888579,28,Use bumpalo for temporary buffers,"## Summary
-- add `bumpalo` dependency
-- use bump allocation in `RMinHash::update`
-- use bump allocation in `CMinHash::update`
-
-## Testing
-- `pytest -q` *(fails: ModuleNotFoundError: No module named 'rensa')*
-
-------
-https://chatgpt.com/codex/tasks/task_e_683b49da1b988332b03db8bb012b50f9",OpenAI_Codex,61982523,beowolx,closed,2025-05-31T18:33:27Z,2025-05-31T18:53:04Z,,746306477,https://api.github.com/repos/beowolx/rensa,https://github.com/beowolx/rensa/pull/28,"analysisWe need to classify whether the primary purpose is performance. The PR adds bumpalo for temporary buffers, uses bump allocation in RMinHash::update and CMinHash::update. This is about performance: bump allocation reduces allocations, improves speed. So classify as 'performance'.assistantfinalperformance",2,0.2592704989510354,False
-3146399914,118,Improve sparse buffer multiplication,"## Summary
-- add threaded buffer implementation with five-argument scaling
-- allow benchmarking with a buffer that stores additional zero entries
-- update benchmark output
-
-## Testing
-- `julia -t auto benchmark/sparse_buffer_mult.jl | tee benchmark/sparse_buffer_mult_output.txt` *(interrupted)*
-
-------
-https://chatgpt.com/codex/tasks/task_e_684b2fd24fd4832fb24bbb8a81955d53",OpenAI_Codex,13523097,thorek1,open,2025-06-14T17:31:20Z,,,571475096,https://api.github.com/repos/thorek1/MacroModelling.jl,https://github.com/thorek1/MacroModelling.jl/pull/118,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve sparse buffer multiplication"". Summary: add threaded buffer implementation with five-argument scaling, allow benchmarking with a buffer that stores additional zero entries, update benchmark output. This is about performance: adding threaded implementation, scaling, benchmarking. So it's performance.assistantfinalperformance",2,0.23476739691723114,False
-3213826108,4603,[Cursor] Fix some bugs,"## NOTE:
-
-This PR was created by a Cursor agent. Proceed with scrutiny.
-
-Fix router memory leaks by ensuring timeout cleanup and improve case sensitivity consistency in route path matching.
-",Cursor,5580297,tannerlinsley,closed,2025-07-08T21:33:35Z,2025-07-15T22:15:25Z,,165670309,https://api.github.com/repos/TanStack/router,https://github.com/TanStack/router/pull/4603,"analysisWe need to classify as performance or non-performance. The PR title: ""[Cursor] Fix some bugs"". Body: ""Fix router memory leaks by ensuring timeout cleanup and improve case sensitivity consistency in route path matching."" The description mentions memory leaks, ensuring timeout cleanup. Memory leaks are performance-related. Also ""improve case sensitivity consistency"" is not performance. But memory leaks definitely performance. So classification: performance.assistantfinalperformance",2,0.20469672740789258,False
-3250080019,24542,[fix][broker]Fix thread safety issues in BucketDelayedDeliveryTracker with StampedLock optimistic reads,"### Motivation
-
-Fixes #23190
-
-BucketDelayedDeliveryTracker had thread safety issues in frequently called methods like `containsMessage()` and `nextDeliveryTime()` that could lead to race conditions, incorrect duplicate detection, and scheduling inconsistencies under high concurrency loads.
-
-The issue manifested as:
-- Race conditions in `containsMessage()` leading to incorrect duplicate detection
-- Concurrent access issues in `nextDeliveryTime()` causing scheduling inconsistencies
-- Potential data corruption under high concurrency scenarios
-
-### Modifications
-
-- **Added StampedLock for high-performance concurrency control**
-  - Implemented optimistic read pattern for frequently called read operations
-  - Provides lock-free fast path when no concurrent writes are occurring
-  - Falls back gracefully to read locks when validation fails
-
-- **Applied optimistic reads to critical methods:**
-  - `containsMessage()` - Used for duplicate message detection
-  - `nextDeliveryTime()` - Called frequently for message scheduling
-
-- **Maintained existing write operation synchronization**
-  - Write operations continue to use `synchronized` for simplicity and safety
-  - Mixed approach optimal for typical read-heavy delayed delivery workloads
-
-- **Removed unused data structure**
-  - Eliminated unused `immutableBucketsMap` field to reduce memory overhead
-  - All bucket operations use the existing `immutableBuckets` RangeMap
-
-### Performance Improvements
-
-Benchmark results show excellent performance across various concurrency scenarios:
-- **Single-threaded reads**: ~305 million ops/s
-- **High concurrency (16 threads)**: ~2.6 billion ops/s  
-- **Mixed read/write ratios**: Consistent performance from 10:90 to 90:10
-- **Optimistic read success rate**: Very high under typical read-heavy workloads
-
-### Thread Safety Strategy
-
-- **Read operations**: Use StampedLock optimistic reads for maximum performance
-- **Write operations**: Continue using synchronized for safety and simplicity
-- **Data structures**: Leverage existing thread-safe collections (ConcurrentHashMap, etc.)
-
-### Verifying this change
-
-- **Added comprehensive thread safety test**: `BucketDelayedDeliveryTrackerThreadSafetyTest`
-- **Created performance benchmark**: `BucketDelayedDeliveryTrackerSimpleBenchmark` 
-- **All existing tests pass**
-- **No functional changes** - maintains full backward compatibility
-
-### Does this pull request potentially affect one of the following parts:
-
-If the box was checked, please highlight the changes:
-
-- [ ] Dependencies (add or upgrade a dependency)
-- [ ] The public API
-- [ ] The schema
-- [ ] The default behavior
-- [ ] The cluster topology
-- [ ] The ARM (kafka compatibility, producer/consumer compatibility)
-
-### Documentation
-
-- [ ] `doc` <!-- Your PR contains doc changes -->
-- [ ] `doc-required` <!-- Your PR changes impact docs and you will update later -->
-- [x] `doc-not-needed` <!-- Your PR changes do not impact docs -->
-- [ ] `doc-complete` <!-- Docs have been already added -->
-
-### Matching PR in forked repository
-
-PR in forked repository: [Link](https://github.com/Apurva007/pulsar/pull/7)
-
-🤖 Generated with [Claude Code](https://claude.ai/code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,10327630,Apurva007,closed,2025-07-21T21:21:39Z,2025-07-22T06:17:01Z,2025-07-22T06:17:01Z,62117812,https://api.github.com/repos/apache/pulsar,https://github.com/apache/pulsar/pull/24542,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""[fix][broker]Fix thread safety issues in BucketDelayedDeliveryTracker with StampedLock optimistic reads"". The body mentions performance improvements: ""Added StampedLock for high-performance concurrency control"", ""Benchmark results show excellent performance"", ""Optimistic read success rate"". The primary purpose is to improve performance via optimistic reads. So classification: 'performance'.assistantfinalperformance",2,0.19735862109400856,True
-3164861006,20535,experiment that probably won't merge: native yoga bindings,"Native Yoga bindings for Bun were implemented across several phases.
-
-*   Core C   binding files for `Config`, `Node`, Prototypes, and Constructors were created in `src/bun.js/bindings/`, and `cmake/sources/CxxSources.txt` was updated.
-*   JavaScriptCore's GC was integrated by defining IsoSubspaces and implementing `subspaceFor` in `JSYogaConfig.cpp` and `JSYogaNode.cpp` for native object memory management.
-*   The `JSYogaConfig` class, its prototype, and constructor were fully implemented, providing methods like `setUseWebDefaults`.
-*   The extensive `JSYogaNode` class was implemented, featuring flexible value parsing for setters (e.g., `setWidth`), hierarchy management (`insertChild`, `getChild`, `getParent`) by linking C   nodes to JS wrappers via `YGNodeSetContext`, and callback support (`setMeasureFunc`, `setDirtiedFunc`) with `JSC::Strong` references and `visitChildrenImpl` for GC tracing.
-*   Yoga enums were exposed as JavaScript constants via `JSYogaConstants.h/.cpp`.
-*   A central `JSYogaModule.h/.cpp` was created, combining `Config`, `Node`, and constants. `GlobalYoga.cpp` was added to expose `Yoga` on `globalThis`. `ZigGlobalObject.h/.cpp` was updated with lazy class structures for constructors, enabling `require('yoga-layout')` and `import Yoga from 'yoga-layout')`.
-*   Unit tests were created in `test/js/bun/` for `yoga-config.test.js`, `yoga-node.test.js`, and `yoga-constants.test.js`.
-
-This provides a native, API-compatible, and high-performance Yoga binding.",Cursor,709451,Jarred-Sumner,open,2025-06-21T07:27:15Z,,,357728969,https://api.github.com/repos/oven-sh/bun,https://github.com/oven-sh/bun/pull/20535,"analysisWe need to classify whether the primary purpose is to improve performance. The PR is about implementing native Yoga bindings for Bun. It mentions ""high-performance Yoga binding"". The description: ""Native Yoga bindings for Bun were implemented across several phases."" It says ""This provides a native, API-compatible, and high-performance Yoga binding."" The primary purpose is to provide native bindings, which likely improves performance. The PR is about adding native bindings, which is performance improvement. So classification: 'performance'.assistantfinalperformance",2,0.1882980405781564,False
-3078729881,5209,Trace: Fixes thread safety issue in Trace class causing high CPU usage,"## Issue
-When cross-region hedging is enabled in the Azure Cosmos DB .NET SDK, users experience high CPU usage due to thread safety issues when accessing dictionaries in the `Trace` class. The issue occurs in the `AddOrUpdateDatum` method where multiple parallel threads attempt to update the same dictionary without proper synchronization.
-
-## Changes
-- Added thread safety to the `Trace` class's dictionary operations by using locks
-- Modified three methods to ensure thread-safe access:
-  - `AddOrUpdateDatum(string, object)`
-  - `AddDatum(string, object)`
-  - `AddDatum(string, TraceDatum)`
-- Added a unit test to verify thread safety with concurrent dictionary access
-- Updated documentation in the `ITrace` interface to explicitly note thread-safety guarantees
-
-## Testing
-Created a multi-threaded test that simulates the concurrent access pattern that was causing the issue. The test creates 10 threads that all try to access the same dictionary simultaneously.
-
-## Impact
-These changes provide thread safety while having minimal performance impact since:
-- The locks are only acquired briefly during dictionary operations
-- The fix follows existing locking patterns in the codebase (like in the `AddChild` method)
-- The changes only affect dictionary access in the `Trace` class and don't introduce broader changes
-
-Fixes #5111.
+Fixes #503.
 
 > [!WARNING]
 >
@@ -531,31 +308,10 @@ Fixes #5111.
 >
 > #### I tried to connect to the following addresses, but was blocked by firewall rules:
 >
-> - `crl3.digicert.com`
->   - Triggering command: `dotnet build Microsoft.Azure.Cosmos/src/Microsoft.Azure.Cosmos.csproj ` (dns block)
->   - Triggering command: `/home/REDACTED/work/_temp/ghcca-node/node/bin/node /home/REDACTED/work/_temp/copilot-developer-action-main/dist/index.js ` (dns block)
->   - Triggering command: `dotnet test Microsoft.Azure.Cosmos/tests/Microsoft.Azure.Cosmos.Tests/Microsoft.Azure.Cosmos.Tests.csproj --filter FullyQualifiedName~Microsoft.Azure.Cosmos.Tests.Tracing.TraceTests.TestAddOrUpdateDatumThreadSafety ` (dns block)
-> - `crl4.digicert.com`
->   - Triggering command: `dotnet build Microsoft.Azure.Cosmos/src/Microsoft.Azure.Cosmos.csproj ` (dns block)
->   - Triggering command: `dotnet test Microsoft.Azure.Cosmos/tests/Microsoft.Azure.Cosmos.Tests/Microsoft.Azure.Cosmos.Tests.csproj --filter FullyQualifiedName~Microsoft.Azure.Cosmos.Tests.Tracing.TraceTests.TestAddOrUpdateDatumThreadSafety ` (dns block)
-> - `ocsp.digicert.com`
->   - Triggering command: `dotnet build Microsoft.Azure.Cosmos/src/Microsoft.Azure.Cosmos.csproj ` (dns block)
->   - Triggering command: `dotnet test Microsoft.Azure.Cosmos/tests/Microsoft.Azure.Cosmos.Tests/Microsoft.Azure.Cosmos.Tests.csproj --filter FullyQualifiedName~Microsoft.Azure.Cosmos.Tests.Tracing.TraceTests.TestAddOrUpdateDatumThreadSafety ` (dns block)
->   - Triggering command: `/home/REDACTED/work/_temp/ghcca-node/node/bin/node /home/REDACTED/work/_temp/copilot-developer-action-main/dist/index.js ` (dns block)
-> - `s.symcb.com`
->   - Triggering command: `dotnet build Microsoft.Azure.Cosmos/src/Microsoft.Azure.Cosmos.csproj ` (dns block)
->   - Triggering command: `dotnet test Microsoft.Azure.Cosmos/tests/Microsoft.Azure.Cosmos.Tests/Microsoft.Azure.Cosmos.Tests.csproj --filter FullyQualifiedName~Microsoft.Azure.Cosmos.Tests.Tracing.TraceTests.TestAddOrUpdateDatumThreadSafety ` (dns block)
-> - `s.symcd.com`
->   - Triggering command: `dotnet build Microsoft.Azure.Cosmos/src/Microsoft.Azure.Cosmos.csproj ` (dns block)
->   - Triggering command: `dotnet test Microsoft.Azure.Cosmos/tests/Microsoft.Azure.Cosmos.Tests/Microsoft.Azure.Cosmos.Tests.csproj --filter FullyQualifiedName~Microsoft.Azure.Cosmos.Tests.Tracing.TraceTests.TestAddOrUpdateDatumThreadSafety ` (dns block)
-> - `ts-crl.ws.symantec.com`
->   - Triggering command: `dotnet build Microsoft.Azure.Cosmos/src/Microsoft.Azure.Cosmos.csproj ` (dns block)
->   - Triggering command: `/home/REDACTED/work/_temp/ghcca-node/node/bin/node /home/REDACTED/work/_temp/copilot-developer-action-main/dist/index.js ` (dns block)
->   - Triggering command: `dotnet test Microsoft.Azure.Cosmos/tests/Microsoft.Azure.Cosmos.Tests/Microsoft.Azure.Cosmos.Tests.csproj --filter FullyQualifiedName~Microsoft.Azure.Cosmos.Tests.Tracing.TraceTests.TestAddOrUpdateDatumThreadSafety ` (dns block)
-> - `ts-ocsp.ws.symantec.com`
->   - Triggering command: `dotnet build Microsoft.Azure.Cosmos/src/Microsoft.Azure.Cosmos.csproj ` (dns block)
->   - Triggering command: `dotnet test Microsoft.Azure.Cosmos/tests/Microsoft.Azure.Cosmos.Tests/Microsoft.Azure.Cosmos.Tests.csproj --filter FullyQualifiedName~Microsoft.Azure.Cosmos.Tests.Tracing.TraceTests.TestAddOrUpdateDatumThreadSafety ` (dns block)
->   - Triggering command: `/home/REDACTED/work/_temp/ghcca-node/node/bin/node /home/REDACTED/work/_temp/copilot-developer-action-main/dist/index.js ` (dns block)
+> - `index.crates.io`
+>   - Triggering command: `/home/REDACTED/.rustup/toolchains/1.81.0-x86_64-REDACTED-linux-gnu/bin/cargo check ` (dns block)
+>   - Triggering command: `ping -c 1 index.crates.io ` (dns block)
+>   - Triggering command: `/home/REDACTED/.rustup/toolchains/1.81.0-x86_64-REDACTED-linux-gnu/bin/cargo build --profile=dev ` (dns block)
 >
 > If you need me to access, download, or install something from one of these locations, you can either:
 >
@@ -567,267 +323,1380 @@ Fixes #5111.
 
 ---
 
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-05-21T02:47:05Z,,,156260788,https://api.github.com/repos/Azure/azure-cosmos-dotnet-v3,https://github.com/Azure/azure-cosmos-dotnet-v3/pull/5209,"analysisWe need to classify as 'performance' or 'non-performance'. The PR is about thread safety issue causing high CPU usage. It adds locks to reduce CPU usage. It's about performance? The primary purpose is to fix thread safety issue causing high CPU usage. That is performance improvement? It's more about correctness, but also reduces CPU usage. The classification guidelines: performance-related PRs may contain keywords like latency, optimization, slow, memory, speed, etc. This PR mentions high CPU usage, thread safety, locks. It is about performance improvement? The primary purpose is to fix thread safety issue causing high CPU usage. That is a performance improvement. So classify as 'performance'.assistantfinalperformance",2,0.18048657332492335,False
-3132195957,20297,Prevent over-counting Blob memory usage,"### What does this PR do?
-
-<!-- **Please explain what your changes do**, example: -->
-
-<!--
-
-This adds a new flag --bail to bun test. When set, it will stop running tests after the first failure. This is useful for CI environments where you want to fail fast.
-
--->
-
-- [ ] Documentation or TypeScript types (it's okay to leave the rest blank in this case)
-- [ ] Code changes
-
-### How did you verify your code works?
-
-<!-- **For code changes, please include automated tests**. Feel free to uncomment the line below -->
-
-<!-- I wrote automated tests -->
-
-<!-- If JavaScript/TypeScript modules or builtins changed:
-
-- [ ] I included a test for the new code, or existing tests cover it
-- [ ] I ran my tests locally and they pass (`bun-debug test test-file-name.test`)
-
--->
-
-<!-- If Zig files changed:
-
-- [ ] I checked the lifetime of memory allocated to verify it's (1) freed and (2) only freed when it should be
-- [ ] I included a test for the new code, or an existing test covers it
-- [ ] JSValue used outside of the stack is either wrapped in a JSC.Strong or is JSValueProtect'ed
-- [ ] I wrote TypeScript/JavaScript tests and they pass locally (`bun-debug test test-file-name.test`)
--->
-
-<!-- If new methods, getters, or setters were added to a publicly exposed class:
-
-- [ ] I added TypeScript types for the new methods, getters, or setters
--->
-
-<!-- If dependencies in tests changed:
-
-- [ ] I made sure that specific versions of dependencies are used instead of ranged or tagged versions
--->
-
-<!-- If a new builtin ESM/CJS module was added:
-
-- [ ] I updated Aliases in `module_loader.zig` to include the new module
-- [ ] I added a test that imports the module
-- [ ] I added a test that require() the module
--->
-",Cursor,709451,Jarred-Sumner,open,2025-06-10T05:29:06Z,,,357728969,https://api.github.com/repos/oven-sh/bun,https://github.com/oven-sh/bun/pull/20297,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Prevent over-counting Blob memory usage"". The description: ""What does this PR do?"" and then a placeholder. The content: ""Prevent over-counting Blob memory usage"". That suggests it's about memory usage, maybe preventing memory overcounting. That is about memory usage, which is a performance-related issue. The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. The PR mentions memory usage. That is a performance issue. So classify as 'performance'.
-
-Thus answer: performance.assistantfinalperformance",2,0.17937474413041446,True
-3203264775,51,Fix unused buffer in floatWorker,"## Summary
-- remove unused buffer allocation in `FileSourceModule::floatWorker`
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-05-19T23:13:12Z,2025-05-20T18:08:18Z,,883829350,https://api.github.com/repos/hyperlight-dev/hyperlight,https://github.com/hyperlight-dev/hyperlight/pull/510,2,1.0,False
+3174068500,1141,Implement cached data layer in web,"## Summary
+- add server-side cached data helper in `data.ts`
+- make `fetchFromAPI` support caching options
+- use cached data in dashboard and poller pages
+- update network page to share cached poller lookups
 
 ## Testing
-- `g++ -std=c++17 -c source_modules/file_source/src/main.cpp -Icore/src -Isource_modules/file_source/src -Icore/src/dsp -Icore/src/utils -Icore/src/signal_path -Icore/src/gui -Idecoder_modules/radio/src` *(fails: imgui.h: No such file or directory)*
+- `make test` *(fails: TestStartAndStop in pkg/sync)*
 
 ------
-https://chatgpt.com/codex/tasks/task_e_6868012e344883278f5e3566ba7757cc",OpenAI_Codex,952071,sannysanoff,closed,2025-07-04T16:34:10Z,2025-07-04T18:00:46Z,2025-07-04T18:00:46Z,418222999,https://api.github.com/repos/sannysanoff/SDRPlusPlusBrown,https://github.com/sannysanoff/SDRPlusPlusBrown/pull/51,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Fix unused buffer in floatWorker"". Summary: remove unused buffer allocation in FileSourceModule::floatWorker. That is about removing unused buffer allocation, which is a memory optimization, but is it performance? Removing unused buffer allocation reduces memory usage, but also may improve performance slightly. The description: ""Fix unused buffer in floatWorker"". It's about removing unused buffer allocation. That is a memory optimization, but is it performance? The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, etc. This PR mentions ""unused buffer allocation"" which is memory usage. It might be considered performance improvement. The guidelines say ""memory"" is a keyword. So yes, it's performance. So classify as 'performance'.assistantfinalperformance",2,0.1600507262408561,False
-3087489797,655,Reduce memory usage in ReentrantFileLockTest,"## Summary
-- shrink number of subprocesses in `ReentrantFileLockTest`
-- run fewer iterations in each locker process
-
-The test occasionally failed with `os::commit_memory` errors when the
-child VMs consumed too much memory. Running fewer processes with fewer
-iterations keeps resource usage lower.
+https://chatgpt.com/codex/tasks/task_e_685b7333dd408320b41e4d6cdf3f6be0",OpenAI_Codex,1821930,mfreeman451,closed,2025-06-25T04:05:06Z,2025-06-25T04:06:03Z,2025-06-25T04:06:03Z,916252207,https://api.github.com/repos/carverauto/serviceradar,https://github.com/carverauto/serviceradar/pull/1141,2,1.0,False
+3159305613,2131,fix: memoization for markdown components,"## Summary
+- improve memoization of markdown components by taking tag name and element type into account
+- exclude `position` metadata property to fix `areNodesEqual` returning false when it should be true. also exclude `data` to be safe
+- add unit tests for `areNodesEqual`
 
 ## Testing
-- `mvn test` *(fails: `mvn: command not found`)*",OpenAI_Codex,109181,tgd,closed,2025-05-23T20:39:49Z,2025-05-23T20:45:56Z,,31261671,https://api.github.com/repos/OpenHFT/Chronicle-Bytes,https://github.com/OpenHFT/Chronicle-Bytes/pull/655,"analysisWe need to classify as performance or non-performance. The PR title: ""Reduce memory usage in ReentrantFileLockTest"". The body: shrink number of subprocesses, run fewer iterations, to reduce memory usage. This is about memory usage, which is performance-related? The instruction says performance-related PRs may contain keywords such as memory. Yes memory is included. So classify as 'performance'.assistantfinalperformance",2,0.14943017388701166,False
-3212206965,900,feat: add buffer pool for audio conversion,"## Summary
-This PR implements a float32 buffer pool for audio conversion operations, targeting the second memory allocation hotspot identified in our profiling analysis.
+- `pnpm test`
 
-## Changes
-- Implemented `Float32Pool` using `sync.Pool` for thread-safe buffer reuse
-- Modified `convert16BitToFloat32` to use the pool for standard buffer sizes
-- Added pool initialization during BirdNET startup
-- Implemented proper buffer lifecycle management with return after prediction
-- Added comprehensive unit tests, benchmarks, and fuzz tests
-- Created documentation explaining the implementation
 
-## Performance Impact
-```
-BenchmarkAudioConversionComparison/Original-16     4591    352197 ns/op    581647 B/op    1 allocs/op
-BenchmarkAudioConversionComparison/WithPool-16    12958     92816 ns/op        69 B/op    1 allocs/op
-```
+------
+https://chatgpt.com/codex/tasks/task_e_68513d58099c832cb66806e12ff37578
+<!-- ELLIPSIS_HIDDEN -->
 
-### Improvements:
-- **Memory allocation**: Reduced by 99.99% (581KB → 69 bytes)
-- **Performance**: 3.8x faster (352μs → 93μs)
-- **Hit rate**: 99.98% in steady state operation
 
-## Testing
-- ✅ Unit tests for pool operations and concurrency
-- ✅ Fuzz tests for conversion correctness
-- ✅ Benchmarks showing significant improvements
-- ✅ All linter issues resolved
+----
 
-## Design Decisions
-1. **Standard size only**: Pool only handles standard 3-second buffers (144,384 samples)
-2. **Early return**: Buffers returned immediately after BirdNET prediction
-3. **Graceful fallback**: Non-standard sizes allocate normally
-4. **No clearing**: Audio data doesn't require security clearing
+> [!IMPORTANT]
+> Improves memoization for markdown components by refining `areNodesEqual` and adding unit tests with Vitest setup.
+> 
+>   - **Memoization Improvements**:
+>     - `areNodesEqual` in `memoization.tsx` now considers `tagName` and `type` for comparison.
+>     - Excludes `position` and `data` from properties during comparison to prevent false negatives.
+>   - **Testing**:
+>     - Adds `memoization.test.tsx` with unit tests for `areNodesEqual`.
+>     - Introduces Vitest configuration in `vitest.config.ts`.
+>   - **Misc**:
+>     - Adds `test` and `test:watch` scripts to `package.json`.
+>     - Minor formatting change in `dot.css`.
+> 
+> <sup>This description was created by </sup>[<img alt=""Ellipsis"" src=""https://img.shields.io/badge/Ellipsis-blue?color=175173"">](https://www.ellipsis.dev?ref=assistant-ui%2Fassistant-ui&utm_source=github&utm_medium=referral)<sup> for b81924e6bddafa41e0042fae236a78f7439b270c. You can [customize](https://app.ellipsis.dev/assistant-ui/settings/summaries) this summary. It will automatically update as commits are pushed.</sup>
 
-🤖 Generated with [Claude Code](https://claude.ai/code)
 
-Co-Authored-By: Claude <noreply@anthropic.com>
-
-<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
-## Summary by CodeRabbit
-
-* **New Features**
-  * Introduced an optimized float32 buffer pool to improve memory efficiency during audio processing.
-  * Added automatic reuse of float32 buffers for 16-bit audio conversions, reducing memory allocations and potential garbage collection pauses.
-
-* **Documentation**
-  * Added detailed documentation on the float32 buffer pool, including usage, performance benefits, and integration details.
-
-* **Tests**
-  * Added comprehensive unit, fuzz, and benchmark tests for audio conversion and buffer pool functionality, covering correctness, performance, and concurrency scenarios.
-<!-- end of auto-generated comment: release notes by coderabbit.ai -->",Claude_Code,7030001,tphakala,closed,2025-07-08T11:43:33Z,2025-07-08T12:26:54Z,2025-07-08T12:26:54Z,707764474,https://api.github.com/repos/tphakala/birdnet-go,https://github.com/tphakala/birdnet-go/pull/900,"analysisWe need to classify as 'performance' or 'non-performance'. The PR is about adding buffer pool for audio conversion, reducing memory allocation and improving speed. It clearly is performance improvement. So label 'performance'.assistantfinalperformance",2,0.1368337014598475,False
-3215375260,2422,Fix bugs and consult AGENTS.md,"Fix multiple Unicode handling bugs and optimize string view creation for improved robustness and performance.
-
-The Unicode fixes address critical issues in JSON parsing and string iteration, preventing crashes and incorrect behavior when encountering malformed UTF-16 sequences, particularly surrogate pairs. Performance is improved by removing unnecessary intermediate object creations in string view functions.",Cursor,747051,bobzhang,closed,2025-07-09T10:15:40Z,2025-07-21T09:25:27Z,,749681472,https://api.github.com/repos/moonbitlang/core,https://github.com/moonbitlang/core/pull/2422,"analysisWe need to classify as performance or non-performance. The PR title: ""Fix bugs and consult AGENTS.md"". Body: ""Fix multiple Unicode handling bugs and optimize string view creation for improved robustness and performance."" It mentions performance improvements. So classification: performance.assistantfinalperformance",2,0.13627234141574804,False
-3124507979,20228,Cursor/fix next auth test timeouts and memory issues 43d5,"### What does this PR do?
-
-<!-- **Please explain what your changes do**, example: -->
-
-<!--
-
-This adds a new flag --bail to bun test. When set, it will stop running tests after the first failure. This is useful for CI environments where you want to fail fast.
-
--->
-
-- [ ] Documentation or TypeScript types (it's okay to leave the rest blank in this case)
-- [ ] Code changes
-
-### How did you verify your code works?
-
-<!-- **For code changes, please include automated tests**. Feel free to uncomment the line below -->
-
-<!-- I wrote automated tests -->
-
-<!-- If JavaScript/TypeScript modules or builtins changed:
-
-- [ ] I included a test for the new code, or existing tests cover it
-- [ ] I ran my tests locally and they pass (`bun-debug test test-file-name.test`)
-
--->
-
-<!-- If Zig files changed:
-
-- [ ] I checked the lifetime of memory allocated to verify it's (1) freed and (2) only freed when it should be
-- [ ] I included a test for the new code, or an existing test covers it
-- [ ] JSValue used outside of the stack is either wrapped in a JSC.Strong or is JSValueProtect'ed
-- [ ] I wrote TypeScript/JavaScript tests and they pass locally (`bun-debug test test-file-name.test`)
--->
-
-<!-- If new methods, getters, or setters were added to a publicly exposed class:
-
-- [ ] I added TypeScript types for the new methods, getters, or setters
--->
-
-<!-- If dependencies in tests changed:
-
-- [ ] I made sure that specific versions of dependencies are used instead of ranged or tagged versions
--->
-
-<!-- If a new builtin ESM/CJS module was added:
-
-- [ ] I updated Aliases in `module_loader.zig` to include the new module
-- [ ] I added a test that imports the module
-- [ ] I added a test that require() the module
--->
-",Cursor,709451,Jarred-Sumner,closed,2025-06-06T11:30:33Z,2025-06-06T11:30:43Z,2025-06-06T11:30:43Z,357728969,https://api.github.com/repos/oven-sh/bun,https://github.com/oven-sh/bun/pull/20228,"analysisWe need to classify as performance or non-performance. The PR title: ""Cursor/fix next auth test timeouts and memory issues"". The description mentions test timeouts and memory issues. That suggests performance? Memory issues could be performance. But the primary purpose: fix test timeouts and memory issues. That is about tests failing due to timeouts and memory leaks. That is performance-related? The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs.
-
-The PR mentions memory issues, timeouts. That is performance. So classify as 'performance'.assistantfinalperformance",2,0.12558951696480558,True
-3125979396,2245,Reduce LAN game timeout from 15 to 5 seconds for faster testing,"This PR addresses the issue where users get kicked when trying to open a new LAN lobby shortly after closing a game. The problem occurs because the server waits too long before shutting down after all players disconnect.
-
-## Problem
-When users close a LAN game and quickly try to open a new lobby (within ~25 seconds), they encounter these error messages:
-- `You have been kicked: This game is already started and is no longer accepting new players.`
-- `You have been disconnected from server.`
-
-This is especially problematic during testing, which often involves repeatedly starting games.
-
-## Root Cause
-The server waits 15 seconds after all players disconnect before shutting down (to allow reconnections). If users try to create a new lobby during this window, the old server is still running and rejects new connections.
-
-## Solution
-Reduce the local game timeout from 15 seconds to 5 seconds in `PlayerCollection.cs`. This change:
-
-- ✅ Reduces waiting time by 66% (from 15s to 5s)
-- ✅ Still provides reasonable reconnection window for genuine network issues
-- ✅ Greatly improves testing workflow for developers
-- ✅ Maintains backward compatibility
-- ✅ Zero risk to production/online games (only affects local games)
-
-## Changes Made
-- Modified `PlayerCollection.cs` line 158: Changed `TimeSpan.FromSeconds(15)` to `TimeSpan.FromSeconds(5)` for local games
-- Added comprehensive unit tests in `PlayerCollectionTimeoutTests.cs` to validate timeout behavior
-- Non-local games remain unchanged at 2 minutes for network stability
+<!-- ELLIPSIS_HIDDEN -->",OpenAI_Codex,122117267,AVGVSTVS96,closed,2025-06-19T07:35:48Z,2025-06-30T15:24:54Z,,722184017,https://api.github.com/repos/assistant-ui/assistant-ui,https://github.com/assistant-ui/assistant-ui/pull/2131,2,1.0,False
+3274097182,3887,[alpha_factory] expose middleware on app state,"## Summary
+- cache middleware objects on app.state for reuse
+- adjust static server tests to use these references
 
 ## Testing
-Created unit tests that verify:
-- Local games timeout after exactly 5 seconds
-- Non-local games still timeout after 2 minutes
-- New timeout is significantly faster than the previous 15-second delay
+- `pre-commit run --files alpha_factory_v1/core/interface/api_server.py tests/test_api_server_static.py`
+- `pytest tests/test_api_server_static.py`
 
-Fixes #2175.
+
+------
+https://chatgpt.com/codex/tasks/task_e_6888e8182fd08333b5d82a71439e2387",OpenAI_Codex,24208299,MontrealAI,closed,2025-07-29T15:36:33Z,2025-07-29T15:36:44Z,2025-07-29T15:36:44Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/3887,2,1.0,False
+2798302866,38759,feat: Make RightPane resizable,"## Description
+Replace drag-based resize with click-based expand/collapse for better performance and UX:
+- Implement click-to-toggle width behavior
+- Add smooth transitions for width changes
+- Improve performance with useCallback
+- Clean up unused code and improve type safety
+
+## Type of change
+- [ ] Bug fix (non-breaking change which fixes an issue)
+- [x] New feature (non-breaking change which adds functionality)
+
+## How Has This Been Tested?
+- [x] Manual testing of click-based resize
+- [x] Verified smooth transitions
+- [x] Tested width constraints
+
+## Automation
+/ok-to-test tags='@tag.All'
+
+<!-- This is an auto-generated comment: Cypress test results  -->
+> [!WARNING]
+> Tests have not run on the HEAD 525d0a1a1e69cdfe10041cadbf30f2d31a014b9a yet
+> <hr>Mon, 20 Jan 2025 11:13:16 UTC
+<!-- end of auto-generated comment: Cypress test results  -->
+
+
+Link to Devin run: https://app.devin.ai/sessions/f49c1f984c9245ff90954a4e58ad51f3
+
+",Devin,158243242,devin-ai-integration[bot],closed,2025-01-20T06:24:20Z,2025-01-22T06:37:31Z,,275993885,https://api.github.com/repos/appsmithorg/appsmith,https://github.com/appsmithorg/appsmith/pull/38759,2,1.0,False
+3244866747,565,Fix syntax highlighting flicker by replacing PrismAsyncLight with Shiki,"# Fix syntax highlighting flicker by replacing PrismAsyncLight with Shiki
+
+## Summary
+
+Fixes BUS-1445 by replacing the asynchronous `PrismAsyncLight` from `react-syntax-highlighter` with Shiki's synchronous highlighting to eliminate the brief flash of unstyled code that appears before syntax highlighting loads in the reasoning slide-out component.
+
+**Key changes:**
+- Replaced `react-syntax-highlighter` with Shiki v2.5.0 
+- Created `shiki-light-theme.ts` to maintain visual consistency with existing theme
+- Rewrote `SyntaxHighlighter.tsx` to use Shiki's synchronous highlighting
+- Removed react-syntax-highlighter dependencies from package.json
+- Maintained component interface compatibility for existing usage
+
+**Technical approach:** Shiki provides synchronous highlighting which eliminates the async loading flicker. The component now shows a brief loading state with unstyled code while Shiki initializes (much faster than PrismAsyncLight's language loading).
+
+## Review & Testing Checklist for Human
+
+⚠️ **CRITICAL**: The primary target component could not be tested due to authentication requirements.
+
+- [ ] **Test reasoning slide-out component with real data** - verify syntax highlighting appears immediately without flicker when opening uncached reasoning slide-outs
+- [ ] **Verify visual consistency** - compare YAML/SQL code blocks before and after to ensure theme conversion preserved styling
+- [ ] **Test all existing usage locations** - check `StreamingMessageCode` and `AppCodeBlock` components still render correctly
+- [ ] **Performance testing** - ensure Shiki initialization doesn't cause performance regressions compared to PrismAsyncLight
+- [ ] **Language support verification** - test YAML, SQL, JavaScript, TypeScript, JSON, and Markdown highlighting
+
+**Recommended test plan:**
+1. Open reasoning slide-out with code blocks and verify no flicker occurs
+2. Test streaming vs completed message states 
+3. Check code blocks in different contexts (chat, reasoning panel, etc.)
+4. Verify line numbers and styling match previous implementation
 
 ---
 
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-06T22:11:27Z,2025-06-06T23:31:58Z,2025-06-06T23:31:58Z,3222538,https://api.github.com/repos/octgn/OCTGN,https://github.com/octgn/OCTGN/pull/2245,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Reduce LAN game timeout from 15 to 5 seconds for faster testing"". The body describes reducing timeout to speed up testing. This is a performance improvement: reducing wait time. Keywords: faster, performance, speed, latency. So classify as 'performance'.assistantfinalperformance",2,0.11225001487493434,False
-3074482141,19766,Add BUN_OPTIONS env var,"## Summary
-- add a `parseOptionsEnv` helper for splitting environment option strings
-- support a new `BUN_OPTIONS` variable in `initArgv`
-- copy argv slices with `@memcpy` and avoid unnecessary allocations
+### Diagram
+
+```mermaid
+%%{ init : { ""theme"" : ""default"" }}%%
+graph TD
+    RSO[""Reasoning Slide-out<br/>Component""]
+    SMC[""StreamingMessageCode<br/>apps/web/src/components/ui/streaming/StreamingMessageCode.tsx""]:::context
+    SH[""SyntaxHighlighter<br/>apps/web/src/components/ui/typography/SyntaxHighlight/SyntaxHighlighter.tsx""]:::major-edit
+    Theme[""shiki-light-theme.ts<br/>apps/web/src/components/ui/typography/SyntaxHighlight/shiki-light-theme.ts""]:::major-edit
+    PKG[""package.json<br/>apps/web/package.json""]:::minor-edit
+    ACB[""AppCodeBlock<br/>apps/web/src/components/ui/typography/AppCodeBlock/AppCodeBlock.tsx""]:::context
+    
+    
+    RSO --> SMC
+    SMC --> SH
+    ACB --> SH
+    SH --> Theme
+    
+    SH -.->|""removed dependency""| PKG
+    
+    subgraph Legend
+        L1[Major Edit]:::major-edit
+        L2[Minor Edit]:::minor-edit  
+        L3[Context/No Edit]:::context
+    end
+    
+    classDef major-edit fill:#90EE90
+    classDef minor-edit fill:#87CEEB
+    classDef context fill:#FFFFFF
+```
+
+### Notes
+
+- **Session requested by:** @nate-kelley-buster (nate@buster.so)
+- **Session URL:** https://app.devin.ai/sessions/cc37a55719cf4f01836b9422c916471d
+- **Vercel deployment failed** due to pre-existing infrastructure issues (missing `@buster/server-shared` modules), not related to these changes
+- **Development server runs successfully** with the new implementation
+- **Theme conversion** manually mapped CSS custom properties to Shiki's theme format - visual verification needed
+- **Component props interface** changed from accepting all PrismAsyncLight props to a more limited set - compatibility maintained for known usage patterns",Devin,158243242,devin-ai-integration[bot],closed,2025-07-19T04:15:15Z,2025-07-23T03:54:40Z,2025-07-23T03:54:40Z,855264010,https://api.github.com/repos/buster-so/buster,https://github.com/buster-so/buster/pull/565,2,1.0,False
+3076237105,21409,feat: add segments prop to DataTableProvider,"# Add segments prop to DataTableProvider
+
+Adds an optional `segments` prop to `DataTableProvider`. When provided, the component will use these segments directly instead of fetching them via the `useSegments()` hook.
+
+This can be useful when we server-fetch as much data as possible and provide it to DataTableProvider, instead of it having to fetch everything on the client side.
 
 ## Testing
-- `bun agent test test/internal/ban-words.test.ts` *(fails: file rename error during WebKit setup)*",OpenAI_Codex,709451,Jarred-Sumner,closed,2025-05-19T16:58:54Z,2025-05-24T20:36:52Z,2025-05-24T20:36:52Z,357728969,https://api.github.com/repos/oven-sh/bun,https://github.com/oven-sh/bun/pull/19766,"analysisWe need to classify whether the primary purpose is performance. The PR adds BUN_OPTIONS env var, parseOptionsEnv helper, support new env var in initArgv, copy argv slices with @memcpy and avoid unnecessary allocations. That seems performance improvement: copying argv slices with @memcpy to avoid allocations. Also parseOptionsEnv helper maybe for performance? The mention of avoiding unnecessary allocations is performance. So classify as 'performance'.assistantfinalperformance",2,0.10296759833658461,False
-3191369762,19,Fix bugs in frontend blocks,"Fix various bugs in frontend blocks, including import inconsistencies, a memory leak, and accessibility issues.",Cursor,3749759,alexpate,closed,2025-07-01T08:32:50Z,2025-07-01T08:33:20Z,2025-07-01T08:33:20Z,744656234,https://api.github.com/repos/trylinky/linky,https://github.com/trylinky/linky/pull/19,"analysisWe need to classify as performance or non-performance. The PR title: ""Fix bugs in frontend blocks"". Body: ""Fix various bugs in frontend blocks, including import inconsistencies, a memory leak, and accessibility issues."" It mentions a memory leak. That is a performance issue? Memory leak is a performance issue. The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, etc. So memory leak qualifies. So classification: performance.assistantfinalperformance",2,0.10074768931159453,False
-3233770846,984,"fix: security, performance, and reliability issues in API","Fixes 3 critical bugs: insecure cookie parsing, `GlobalScope` memory leaks, and potential infinite loops in API pagination.",Cursor,80542861,mostafaalagamy,closed,2025-07-15T21:37:11Z,2025-07-16T17:08:53Z,2025-07-16T17:08:53Z,677376114,https://api.github.com/repos/mostafaalagamy/Metrolist,https://github.com/mostafaalagamy/Metrolist/pull/984,"analysisWe need to classify as performance or non-performance. The PR title: ""fix: security, performance, and reliability issues in API"". Body: ""Fixes 3 critical bugs: insecure cookie parsing, `GlobalScope` memory leaks, and potential infinite loops in API pagination.""
+- Verified with type checking
+- Tested manually by running the app locally
 
-We need to determine if primary purpose is to improve performance. The PR addresses security, performance, reliability. It fixes memory leaks (performance), infinite loops (performance). So yes, performance-related. So classification: 'performance'.assistantfinalperformance",2,0.09844438182427853,False
-3166367062,20578,Improve Headers construction,"## Summary
-- optimize Headers constructor when called without arguments
-- expose and use `toJSNewlyConstructed`
+## Link to Devin run
+https://app.devin.ai/sessions/15f079f584aa44ffaa01b27d380f7992
+
+Requested by: eunjae@cal.com
+
+    
+<!-- This is an auto-generated description by cubic. -->
+---
+
+## Summary by cubic
+Added an optional segments prop to DataTableProvider, allowing segments to be passed directly instead of always fetching them.
+
+- **New Features**
+  - DataTableProvider now uses provided segments if available.
+  - Falls back to fetching segments when the prop is not set.
+
+<!-- End of auto-generated description by cubic. -->
+
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-20T08:53:06Z,2025-05-20T20:30:32Z,2025-05-20T20:30:32Z,350360184,https://api.github.com/repos/calcom/cal.com,https://github.com/calcom/cal.com/pull/21409,2,1.0,False
+3131512724,2132,Optimize collapsible performance,"## Summary
+- avoid keeping heavy CodeMirror instances mounted when the code block is collapsed
 
 ## Testing
-- `bun bd test test/js/bun/http/bun-serve-headers.test.ts` *(fails: unable to download WebKit build)*
+- `bun format`
+- `bun lint` *(fails: `/usr/bin/bash: line 1: next: command not found`)*
+- `bun test` *(fails to run tests: missing modules)*
 
 ------
-https://chatgpt.com/codex/tasks/task_e_6858904715488328921daf5016807c78",OpenAI_Codex,709451,Jarred-Sumner,closed,2025-06-22T23:35:41Z,2025-06-24T00:31:46Z,,357728969,https://api.github.com/repos/oven-sh/bun,https://github.com/oven-sh/bun/pull/20578,"analysisWe need to classify the pull request as performance or non-performance. The title: ""Improve Headers construction"". Summary: ""optimize Headers constructor when called without arguments"" and ""expose and use `toJSNewlyConstructed`"". This is about optimizing the Headers constructor, likely performance improvement. Keywords: optimize, performance. So classification: performance.assistantfinalperformance",2,0.09699552810429149,False
-3078237999,19800,Add Zstd decompression to HTTP client,"## Summary
-- support `zstd` in HTTP Accept-Encoding and decoding
-- implement `ZstdReaderArrayList` for streaming decompression
-- update Decompressor and encoding logic to handle zstd
+https://chatgpt.com/codex/tasks/task_e_6847349ad2a483238b964fc3f9b9ef25
+<!-- ELLIPSIS_HIDDEN -->
+
+----
+
+> [!IMPORTANT]
+> Optimize performance by removing `forceMount` from `CollapsibleContent` in `collapsible-code-block.tsx` to prevent unnecessary DOM updates.
+> 
+>   - **Performance Optimization**:
+>     - Removed `forceMount` from `CollapsibleContent` in `collapsible-code-block.tsx` to prevent expensive DOM updates when the collapsible is closed.
+> 
+> <sup>This description was created by </sup>[<img alt=""Ellipsis"" src=""https://img.shields.io/badge/Ellipsis-blue?color=175173"">](https://www.ellipsis.dev?ref=onlook-dev%2Fonlook&utm_source=github&utm_medium=referral)<sup> for 135cce399a98dab2717a851f15e3784ce1091fc2. You can [customize](https://app.ellipsis.dev/onlook-dev/settings/summaries) this summary. It will automatically update as commits are pushed.</sup>
+
+<!-- ELLIPSIS_HIDDEN -->",OpenAI_Codex,31864905,Kitenite,closed,2025-06-09T21:16:46Z,2025-06-09T21:17:47Z,,820087727,https://api.github.com/repos/onlook-dev/onlook,https://github.com/onlook-dev/onlook/pull/2132,2,1.0,False
+3219981823,856,perf(web): use route matcher in edge middleware,Use Next.js `matcher` in edge middleware to optimize API route handling.,Cursor,7608555,jonahsnider,closed,2025-07-10T16:29:30Z,2025-07-10T17:17:08Z,2025-07-10T17:17:08Z,186939154,https://api.github.com/repos/zws-im/zws,https://github.com/zws-im/zws/pull/856,2,1.0,False
+3209964949,6310,ENG-889,"Closes [ENG-889](https://ethyca.atlassian.net/browse/ENG-889)
+
+### Description Of Changes
+
+- Moves serialization of datasets, which is a synchronous and potentially long-running operation (i.e. with large datasets) to the default fastAPI threadpool to avoid blocking main thread on the `async` endpoint
+- updates admin UI to call the API with `minimal=true` to avoid this codepath altogether when not needed
+
+
+
+### Steps to Confirm
+
+- [x] tested locally that the new FE code correctly queries for `minimal=true`on the integrations page and that successfully populates the dataset picker on the integrations page: 
+<img width=""1428"" alt=""image"" src=""https://github.com/user-attachments/assets/5069112c-2cef-4b2b-b368-a42f8a331400"" />
+- [x] tested locally that dataset YAML editor also still works even though it uses the new query for some purpose (not exactly sure what).
+    - (note: there's likely further improvements to make here, it looks like the API call to get the list of dataset records to display on the top view of the dataset page actually is getting the entire dataset definitions (not `minimal`); ideally we should just be retrieving the full dataset definition when we click into the particular dataset to edit it)
+<img width=""1418"" alt=""image"" src=""https://github.com/user-attachments/assets/b0ec5082-4d68-4a0b-9142-ee91527f6c78"" />
+
+### Pre-Merge Checklist
+
+* [x] Issue requirements met
+* [x] All CI pipelines succeeded
+* [x] `CHANGELOG.md` updated
+  * [ ] Add a https://github.com/ethyca/fides/labels/db-migration label to the entry if your change includes a DB migration
+  * [ ] Add a https://github.com/ethyca/fides/labels/high-risk label to the entry if your change includes a high-risk change (i.e. potential for performance impact or unexpected regression) that should be flagged
+  * [ ] Updates unreleased work already in Changelog, no new entry necessary
+* Followup issues:
+  * [ ] Followup issues created
+  * [ ] No followup issues
+* Database migrations:
+  * [ ] Ensure that your downrev is up to date with the latest revision on `main`
+  * [ ] Ensure that your `downgrade()` migration is correct and works
+    * [ ] If a downgrade migration is not possible for this change, please call this out in the PR description!
+  * [ ] No migrations
+* Documentation:
+  * [ ] Documentation complete, [PR opened in fidesdocs](https://github.com/ethyca/fidesdocs/pulls)
+  * [ ] Documentation [issue created in fidesdocs](https://github.com/ethyca/fidesdocs/issues/new/choose)
+  * [ ] If there are any new client scopes created as part of the pull request, remember to update public-facing documentation that references our scope registry
+  * [ ] No documentation updates required
+
+
+[ENG-889]: https://ethyca.atlassian.net/browse/ENG-889?atlOrigin=eyJpIjoiNWRkNTljNzYxNjVmNDY3MDlhMDU5Y2ZhYzA5YTRkZjUiLCJwIjoiZ2l0aHViLWNvbS1KU1cifQ",Cursor,9750285,adamsachs,closed,2025-07-07T18:54:40Z,2025-07-08T14:24:20Z,2025-07-08T14:24:20Z,336102115,https://api.github.com/repos/ethyca/fides,https://github.com/ethyca/fides/pull/6310,2,1.0,False
+3121531407,133,feat: implement 10x faster dashboard with server-side rendering - Con…,…vert dashboard to async server component with parallel data fetching and caching,Cursor,11430621,benjaminshafii,closed,2025-06-05T14:39:50Z,2025-06-05T15:01:25Z,2025-06-05T15:01:25Z,883825890,https://api.github.com/repos/different-ai/zero-finance,https://github.com/different-ai/zero-finance/pull/133,2,1.0,False
+3131264983,2127,fix: reduce DevTab rerenders on file tree,"## Description
+- memoize `FileTree` component
+- memoize sandbox helpers in DevTab
+- avoid creating new callbacks when refreshing or loading files
+
+## Related Issues
+
+- fixes rerender issues seen in file tree
+
+## Type of Change
+- [x] Bug fix
+- [ ] New feature
+- [ ] Documentation update
+- [ ] Release
+- [ ] Refactor
+- [ ] Other (please describe):
 
 ## Testing
-- `bun agent test test/js/web/fetch/client-fetch.test.ts` *(fails: CMake error downloading WebKit)*",OpenAI_Codex,709451,Jarred-Sumner,closed,2025-05-20T21:07:07Z,2025-05-21T06:26:48Z,2025-05-21T06:26:48Z,357728969,https://api.github.com/repos/oven-sh/bun,https://github.com/oven-sh/bun/pull/19800,"analysisWe need to classify whether the primary purpose is performance. The PR adds Zstd decompression to HTTP client. Zstd is a compression algorithm that is faster and more efficient. The PR adds support for zstd in Accept-Encoding and decoding, and implements streaming decompression. This is about compression, which can improve performance (network bandwidth, speed). The description: ""Add Zstd decompression to HTTP client"". This is about adding a new compression algorithm, which can improve performance by reducing data size and decompressing faster. So it's performance-related. The classification: 'performance'.assistantfinalperformance",2,0.08855782670259035,False
-3106804055,814,Improve Wget builder defaults and reading efficiency,"## Summary
-- use char buffer for better efficiency in `Wget.fetch`
-- create default connection provider lazily in `Wget.Builder`
-- document default value for `maxResponseBytes`
-- update appendable exception test to match new fetch behaviour
+- `bun format`
+- `bun lint` *(fails: script exited with code 127)*
+- `bun test` *(fails: missing dependencies)*
 
-## Testing
-- `mvn -q test` *(fails: `mvn: command not found`)*
+## Screenshots (if applicable)
+
+## Additional Notes
+
+- Codex couldn't run certain commands due to environment limitations. Consider configuring a setup script or internet access in your Codex environment to install dependencies.
 
 ------
-https://chatgpt.com/codex/tasks/task_e_683bffad4210832994604d39bc13f86a",OpenAI_Codex,1070321,peter-lawrey,closed,2025-06-01T07:46:49Z,2025-06-01T07:47:17Z,2025-06-01T07:47:17Z,31261793,https://api.github.com/repos/OpenHFT/Chronicle-Core,https://github.com/OpenHFT/Chronicle-Core/pull/814,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Wget builder defaults and reading efficiency"". Summary: use char buffer for better efficiency in Wget.fetch, create default connection provider lazily, document default value, update test. This is about reading efficiency, char buffer, performance. So it's performance. So output 'performance'.assistantfinalperformance",2,0.07445191423777812,False
-3106780046,813,Improve Wget builder defaults and reading efficiency,"## Summary
-- use char buffer for better efficiency in `Wget.fetch`
-- create default connection provider lazily in `Wget.Builder`
-- document default value for `maxResponseBytes`
+https://chatgpt.com/codex/tasks/task_e_6847341ae0288323b5248d822c8e1caa
+<!-- ELLIPSIS_HIDDEN -->
+
+
+----
+
+> [!IMPORTANT]
+> Optimize `FileTree` and `DevTab` components by memoizing components and callbacks to reduce unnecessary re-renders.
+> 
+>   - **Components**:
+>     - Memoize `FileTree` component in `file-tree.tsx` to prevent unnecessary re-renders.
+>     - Memoize `isSandboxReady`, `handleRefreshFiles`, and `loadFile` callbacks in `DevTab` in `index.tsx` to optimize performance.
+>   - **Behavior**:
+>     - Avoid creating new callbacks when refreshing or loading files in `DevTab`.
+>   - **Misc**:
+>     - Import `memo` in `file-tree.tsx` and `useCallback` in `index.tsx`.
+> 
+> <sup>This description was created by </sup>[<img alt=""Ellipsis"" src=""https://img.shields.io/badge/Ellipsis-blue?color=175173"">](https://www.ellipsis.dev?ref=onlook-dev%2Fonlook&utm_source=github&utm_medium=referral)<sup> for 393b6ce87cf3050668f88f8122e1997fd089dc47. You can [customize](https://app.ellipsis.dev/onlook-dev/settings/summaries) this summary. It will automatically update as commits are pushed.</sup>
+
+
+<!-- ELLIPSIS_HIDDEN -->",OpenAI_Codex,31864905,Kitenite,closed,2025-06-09T19:37:21Z,2025-06-09T19:46:21Z,2025-06-09T19:46:21Z,820087727,https://api.github.com/repos/onlook-dev/onlook,https://github.com/onlook-dev/onlook/pull/2127,2,1.0,False
+3137770850,2149,fix: Improve sandbox indexing logic,"## Description
+
+Adds safeguards to the sandbox manager to avoid re-indexing project files unnecessarily. Indexing is now skipped unless it has not yet run or a force flag is provided. The dev panel refresh actions were updated to request a forced re-index.
+
+## Related Issues
+
+
+## Type of Change
+- [x] Bug fix
 
 ## Testing
-- `mvn -q test` *(fails: `mvn: command not found`)*
+- `bun format`
+- `bun lint` *(fails: next not found)*
+- `bun test` *(fails: missing packages)*
+
+
 
 ------
-https://chatgpt.com/codex/tasks/task_e_683bffad4210832994604d39bc13f86a",OpenAI_Codex,1070321,peter-lawrey,closed,2025-06-01T07:25:10Z,2025-06-01T07:25:24Z,2025-06-01T07:25:24Z,31261793,https://api.github.com/repos/OpenHFT/Chronicle-Core,https://github.com/OpenHFT/Chronicle-Core/pull/813,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Wget builder defaults and reading efficiency"". Summary: use char buffer for better efficiency in Wget.fetch, create default connection provider lazily, document default value for maxResponseBytes. This is about reading efficiency, char buffer, lazy creation. That is performance improvement. So label 'performance'.assistantfinalperformance",2,0.0737427312314545,False
+https://chatgpt.com/codex/tasks/task_e_6849caea8400832397534bbfca812641
+<!-- ELLIPSIS_HIDDEN -->
+
+
+----
+
+> [!IMPORTANT]
+> Improves sandbox indexing logic by adding safeguards to prevent unnecessary re-indexing and updating components to use forced re-indexing when refreshing files.
+> 
+>   - **Behavior**:
+>     - Adds `isIndexed` and `isIndexing` flags to `SandboxManager` in `index.ts` to prevent unnecessary re-indexing.
+>     - Updates `index()` in `SandboxManager` to accept a `force` parameter, skipping indexing if already indexed unless forced.
+>     - Modifies `handleRefresh` in `file-tree.tsx` and `handleRefreshFiles` in `index.tsx` to call `index(true)` for forced re-indexing.
+>   - **Components**:
+>     - Updates `DevTab` in `index.tsx` to use forced re-indexing when refreshing files.
+>     - Updates `UnmemoizedFileTree` in `file-tree.tsx` to use forced re-indexing when refreshing files.
+>   - **Misc**:
+>     - Minor change to `TooltipTrigger` in `index.tsx` to use `asChild` prop.
+> 
+> <sup>This description was created by </sup>[<img alt=""Ellipsis"" src=""https://img.shields.io/badge/Ellipsis-blue?color=175173"">](https://www.ellipsis.dev?ref=onlook-dev%2Fonlook&utm_source=github&utm_medium=referral)<sup> for c058ce5b816fd469bfbc7e0eaa6d7041b50e0442. You can [customize](https://app.ellipsis.dev/onlook-dev/settings/summaries) this summary. It will automatically update as commits are pushed.</sup>
+
+
+<!-- ELLIPSIS_HIDDEN -->",OpenAI_Codex,31864905,Kitenite,closed,2025-06-11T18:34:19Z,2025-06-11T18:45:43Z,2025-06-11T18:45:43Z,820087727,https://api.github.com/repos/onlook-dev/onlook,https://github.com/onlook-dev/onlook/pull/2149,2,1.0,False
+3101459806,902,Optimize source file tree building,"## Summary
+- avoid quadratic path lookups in `wf_project.build_source_files`
+
+## Testing
+- `pip install -e .` *(fails: Could not find a version that satisfies the requirement poetry-core)*
+
+<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
+
+## Summary by CodeRabbit
+
+- **Bug Fixes**
+	- Improved reliability when handling file paths that contain duplicate directory names, ensuring correct directory checks in all cases.
+
+<!-- end of auto-generated comment: release notes by coderabbit.ai -->",OpenAI_Codex,149161,wassemgtk,closed,2025-05-29T20:51:58Z,2025-05-30T11:44:59Z,2025-05-30T11:44:59Z,460609164,https://api.github.com/repos/writer/writer-framework,https://github.com/writer/writer-framework/pull/902,2,1.0,False
+3129475228,1947,Convert RecentsSection from Client to Server Component,"# Convert RecentsSection from Client to Server Component
+
+## Summary
+Converted the `RecentsSection` component from a Client Component to a Server Component by removing client-side data fetching and replacing it with server-side data fetching using `await`.
+
+## Changes Made
+- **Removed `'use client'` directive** from both `RecentsSection.tsx` and `fetchRecentSessions.ts`
+- **Updated `fetchRecentSessions` service** to use server-side Supabase client (`@/libs/db/server`)
+- **Replaced client-side hooks** (`useEffect`, `useState`) with server-side data fetching
+- **Modified `GlobalNav` component** to fetch recent sessions data and pass as props to `RecentsSection`
+- **Removed loading state logic** as server components don't need client-side loading states
+
+## Technical Details
+- `fetchRecentSessions` now uses `await createClient()` for server-side database access
+- `GlobalNav` is now an async function that fetches data before rendering
+- `RecentsSection` receives sessions data via props instead of fetching client-side
+- Authentication context is properly handled server-side through Supabase server client
+
+## Files Modified
+- `frontend/apps/app/components/CommonLayout/GlobalNav/services/fetchRecentSessions.ts`
+- `frontend/apps/app/components/CommonLayout/GlobalNav/RecentsSection/RecentsSection.tsx`
+- `frontend/apps/app/components/CommonLayout/GlobalNav/GlobalNav.tsx`
+
+## Testing
+- ✅ Build passes (`pnpm build`)
+- ✅ Linting passes (biome, TypeScript, ESLint)
+- ✅ No TypeScript compilation errors
+
+## Link to Devin run
+https://app.devin.ai/sessions/ca08a6cc7b484ec683ad4105c9198769
+
+## Requested by
+hirotaka.miyagi@route06.co.jp
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-09T07:43:48Z,2025-06-09T11:32:31Z,2025-06-09T11:32:31Z,839216423,https://api.github.com/repos/liam-hq/liam,https://github.com/liam-hq/liam/pull/1947,2,1.0,False
+3022909076,21585,feat: improve DAG visualization in RisingWave UI,"# Improve DAG visualization in RisingWave UI
+
+This PR improves the visualization of DAGs in the RisingWave UI, making large and complex DAGs easier to read and interact with.
+
+## Changes
+
+- Replaced the current D3/dagre-based visualization with ReactFlow, which provides:
+  - Adaptive layout calculation
+  - Sub-DAG visualization when clicking on relations
+  - Drag & drop functionality
+  - Better performance with large DAGs
+- Added a ""Show All Nodes"" button to reset the sub-DAG view
+- Maintained existing styling and color coding for nodes and edges
+
+## Testing
+
+The implementation has been tested with complex DAGs to ensure readability and interaction.
+
+### Testing Instructions
+
+To test this implementation:
+
+1. Start a RisingWave cluster:
+```bash
+./risedev d
+```
+
+2. Create test data for a complex DAG:
+```bash
+./risedev slt e2e_test/nexmark/create_sources.slt.part
+./risedev psql -c 'CREATE TABLE dimension (v1 int);'
+./risedev psql -c 'CREATE MATERIALIZED VIEW mv AS SELECT auction.* FROM dimension join auction on auction.id-auction.id = dimension.v1;'
+./risedev psql -c 'CREATE MATERIALIZED VIEW mv2 AS SELECT * FROM mv;'
+./risedev psql -c 'CREATE MATERIALIZED VIEW mv3 AS SELECT count(*) FROM mv2;'
+./risedev psql -c 'CREATE MATERIALIZED VIEW mv4 AS SELECT * FROM mv;'
+./risedev psql -c 'CREATE MATERIALIZED VIEW mv5 AS SELECT count(*) FROM mv2;'
+./risedev psql -c 'CREATE MATERIALIZED VIEW mv6 AS SELECT mv4.* FROM mv4 join mv2 using(id);'
+./risedev psql -c 'CREATE MATERIALIZED VIEW mv7 AS SELECT max(id) FROM mv;'
+./risedev psql -c 'CREATE MATERIALIZED VIEW mv8 AS SELECT mv.* FROM mv join mv6 using(id);'
+./risedev psql -c 'CREATE SCHEMA s1;'
+./risedev psql -c 'CREATE TABLE s1.t1 (v1 int);'
+./risedev psql -c 'CREATE MATERIALIZED VIEW s1.mv1 AS SELECT s1.t1.* FROM s1.t1 join mv on s1.t1.v1 = mv.id;'
+./risedev psql -c 'INSERT INTO dimension select 0 from generate_series(1, 20);'
+```
+
+3. Run the dashboard:
+```bash
+cd dashboard
+npm i
+npm run dev
+```
+
+4. Navigate to http://localhost:3000/relation_graph/ to view the relation graph
+
+5. Verify the following features:
+   - The graph is rendered with proper layout
+   - Clicking on a relation shows the sub-DAG (upstream and downstream nodes)
+   - The ""Show All Nodes"" button appears when in sub-DAG view
+   - Nodes can be dragged and repositioned
+   - MiniMap and Controls are available for navigation
+
+Fixes #20543
+
+Link to Devin run: https://app.devin.ai/sessions/21bce8106d5c46309b9f8946365fce01
+",Devin,158243242,devin-ai-integration[bot],closed,2025-04-27T08:09:17Z,2025-05-05T14:16:56Z,,453068084,https://api.github.com/repos/risingwavelabs/risingwave,https://github.com/risingwavelabs/risingwave/pull/21585,2,0.3014656593400225,False
+3275923459,8572,Add tx_index and block_number to dex.trades,"## Thank you for contributing to Spellbook 🪄
+Please open the PR in **draft** and mark as ready when you want to request a review.
+
+### Description:
+
+This PR adds the `tx_index` column to the `dex.trades` table.
+
+While `block_number` was already present, `tx_index` was missing from the final output, despite being available in base tables. This addition is crucial for accurately distinguishing transactions on chains with sub-second blocks and improves the efficiency of related spells like `dex.sandwiches` and `dex.atomic_arbitrages`.
+
+---
+quick links for more information:
+- [README.md](https://github.com/duneanalytics/spellbook/blob/main/README.md)
+- [spellbook docs](https://github.com/duneanalytics/spellbook/tree/main/docs)
+- [CONTRIBUTING.md](https://github.com/duneanalytics/spellbook/blob/main/CONTRIBUTING.md)
+
+---
+[Slack Thread](https://duneanalytics.slack.com/archives/C08J8B5EF34/p1753813549113989?thread_ts=1753813549.113989&cid=C08J8B5EF34)
+
+<a href=""https://cursor.com/background-agent?bcId=bc-70312cb5-415a-4aff-85bc-fd6f733a8c51"">
+  <picture>
+    <source media=""(prefers-color-scheme: dark)"" srcset=""https://cursor.com/open-in-cursor-dark.svg"">
+    <source media=""(prefers-color-scheme: light)"" srcset=""https://cursor.com/open-in-cursor-light.svg"">
+    <img alt=""Open in Cursor"" src=""https://cursor.com/open-in-cursor.svg"">
+  </picture>
+</a>
+<a href=""https://cursor.com/agents?id=bc-70312cb5-415a-4aff-85bc-fd6f733a8c51"">
+  <picture>
+    <source media=""(prefers-color-scheme: dark)"" srcset=""https://cursor.com/open-in-web-dark.svg"">
+    <source media=""(prefers-color-scheme: light)"" srcset=""https://cursor.com/open-in-web-light.svg"">
+    <img alt=""Open in Web"" src=""https://cursor.com/open-in-web.svg"">
+  </picture>
+</a>
+
+<sub>[Learn more](https://docs.cursor.com/background-agent/web-and-mobile) about Cursor Agents</sub>",Cursor,83790096,0xRobin,open,2025-07-30T07:03:53Z,,,237392204,https://api.github.com/repos/duneanalytics/spellbook,https://github.com/duneanalytics/spellbook/pull/8572,2,0.25497965742182777,False
+2899419096,6824,Fix UI flickering in TradingView component,"Fix UI flickering in TradingView component by optimizing the useTradingViewProps hook, consolidating setTimeout delays, and improving loading state management.
+
+Link to Devin run: https://app.devin.ai/sessions/2361253340b7436bb3760349dbbce64f
+
+Requested by: 用户",Devin,158243242,devin-ai-integration[bot],closed,2025-03-06T05:49:04Z,2025-03-06T06:08:23Z,,430749584,https://api.github.com/repos/OneKeyHQ/app-monorepo,https://github.com/OneKeyHQ/app-monorepo/pull/6824,2,0.24054622487216024,False
+2914247752,1048,fix: enhance API Keys component with loading indicators and performance optimizations,"This PR enhances the API Keys component with:
+
+- Loading indicators during data fetching
+- Timeout mechanism for database queries (10s)
+- Cache size limits to prevent memory growth (max 1000 entries)
+- Improved error handling with detailed messages and toast notifications
+
+Link to Devin run: https://app.devin.ai/sessions/86f5e7c993b1479f9c1d611255978ab6
+
+Requested by: Cap-go",Devin,158243242,devin-ai-integration[bot],closed,2025-03-12T14:51:55Z,2025-03-13T22:20:49Z,,442321089,https://api.github.com/repos/Cap-go/capgo,https://github.com/Cap-go/capgo/pull/1048,2,0.2378392046583777,False
+2990501610,345,fix: 优化数据库事务处理以减少死锁和超时,"# 修复数据库死锁和超时问题
+
+## 问题描述
+当系统 src/api 并发到了个级别时，系统会持续的报数据库死锁和超时。初步判断是study/run 接口由于时间过长导致请求时间过长，当其他接口有请求导致数据库整体锁死。这时只有通过重新启动才能解决。
+
+## 解决方案
+1. 优化事务处理：将长时间运行的事务拆分为多个较小的事务，使用`db.session.begin_nested()`和`db.session.commit()`确保数据库操作及时提交
+2. 改进Redis锁处理：减少锁超时时间，增加错误处理，确保锁在所有情况下都能正确释放
+3. 分离长时间运行的操作：在`run_script`中，将长时间运行的LLM操作与数据库事务分离，在初始数据库操作完成后提前释放Redis锁
+
+## 主要修改
+1. `run_with_redis`函数：
+   - 减少锁超时时间（最大30秒）
+   - 设置阻塞超时为3秒
+   - 增加全面的错误处理
+   - 确保在所有情况下都能正确释放锁
+
+2. `reset_user_study_info_by_lesson`函数：
+   - 使用嵌套事务处理各个数据库操作
+   - 在每个操作后立即提交事务
+   - 改进错误处理
+
+3. `get_script`函数：
+   - 使用嵌套事务处理各个数据库查询
+   - 在每个查询后立即提交事务
+   - 增加详细的错误日志记录
+
+4. `run_script_inner`函数：
+   - 使用嵌套事务处理各个数据库操作
+   - 在每个操作后立即提交事务
+   - 改进错误处理
+
+## 测试方法
+添加了三个测试脚本来验证优化效果：
+1. `test_concurrency.py`：模拟多个并发用户访问study/run和reset-study-progress接口
+2. `monitor_db.py`：监控数据库锁和超时情况
+3. `transaction_test.py`：简化测试，专注于事务处理模式的优化效果
+
+### 生产环境测试建议
+1. 部署更改到测试/预发布环境
+2. 使用`monitor_db.py`脚本监控数据库锁和超时情况
+3. 使用负载测试工具（如JMeter或Locust）模拟高并发访问
+4. 观察系统在高并发下的表现，特别是是否还会出现死锁和超时
+
+## 预期效果
+1. 减少或消除数据库死锁和超时
+2. 提高系统在高并发下的稳定性
+3. 保持接口功能的一致性
+4. 改善用户体验，减少系统重启次数
+
+Link to Devin run: https://app.devin.ai/sessions/09c6a885cd5d45c4b98c7af00ba13b1c
+Requested by: geyunfei@gmail.com
+",Devin,158243242,devin-ai-integration[bot],closed,2025-04-12T14:27:15Z,2025-04-15T03:56:31Z,,832552991,https://api.github.com/repos/ai-shifu/ai-shifu,https://github.com/ai-shifu/ai-shifu/pull/345,2,0.2324808396077543,False
+3161160444,177,Fix issue %23157 on GitHub,"In `packages/web/src/server/services/safe.service.ts`, a `DECIMAL_CACHE` was introduced to memoize token decimals.
+
+*   USDC-on-Base decimals are hard-coded to 6 within the `DECIMAL_CACHE`. This eliminates an unnecessary RPC call that previously caused intermittent timeouts and a $0.00 balance display.
+*   For other tokens, decimals are cached after the first successful on-chain lookup, reducing subsequent RPC calls.
+*   The `getSafeBalance` function was refactored to first fetch the token balance, then retrieve decimals from the cache or by querying the chain.
+*   A fallback to 18 decimals was added if the on-chain decimals query fails. This prevents errors and ensures a value is always displayed in the UI.
+
+These changes ensure the dashboard's ""Personal · USD"" card consistently shows the correct USDC balance.",Cursor,11430621,benjaminshafii,closed,2025-06-19T19:18:19Z,2025-06-19T19:18:32Z,2025-06-19T19:18:32Z,883825890,https://api.github.com/repos/different-ai/zero-finance,https://github.com/different-ai/zero-finance/pull/177,2,0.2318060620537517,False
+3213528854,125,Improve item indexing on dashboard,"## Summary
+- simplify how visible items are counted
+- precompute ad configs before rendering
+- adjust dashboard to use precomputed ad configs
+
+## Testing
+- `./gradlew test` *(fails: SDK location not found)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_686d5d38ea98832d84323f4074df5f5a",OpenAI_Codex,61864357,MihaiCristianCondrea,closed,2025-07-08T19:11:57Z,2025-07-08T19:12:12Z,2025-07-08T19:12:12Z,600355571,https://api.github.com/repos/MihaiCristianCondrea/Smart-Cleaner-for-Android,https://github.com/MihaiCristianCondrea/Smart-Cleaner-for-Android/pull/125,2,0.22777063523833588,False
+2918513256,1060,fix: enhance API Keys component with loading indicators and performance optimizations,"# API Keys Component Enhancements
+
+This PR enhances the API Keys component with performance optimizations and improved user experience:
+
+## Improvements
+
+### 1. Loading Indicators
+- Added Spinner component during initial data loading
+- Added loading states for individual key operations (add, regenerate, delete, rename)
+- Disabled buttons during loading states to prevent multiple submissions
+
+### 2. Timeout Mechanism
+- Implemented 10-second timeout for all database queries
+- Added AbortController for cancellable requests
+- Implemented retry logic with exponential backoff for transient errors
+
+### 3. Cache Size Limits
+- Created LRUCache class with 1000 entry maximum
+- Implemented Least Recently Used (LRU) eviction policy
+- Replaced simple Map implementation with size-limited cache
+
+### 4. Error Handling
+- Created centralized error handling utility
+- Added detailed, user-friendly error messages
+- Implemented toast notifications with recovery suggestions
+- Added context-specific error logging
+
+## Implementation Details
+
+- Created utility files for better code organization:
+  - `supabaseUtils.ts`: Query timeout and retry mechanisms
+  - `cacheUtils.ts`: LRU cache implementation
+  - `errorUtils.ts`: Centralized error handling
+
+## Testing
+
+- Verified loading indicators display correctly during operations
+- Confirmed timeout mechanism works for long-running queries
+- Validated cache size limits prevent memory growth
+- Tested error handling with various error scenarios
+
+Link to Devin run: https://app.devin.ai/sessions/d5ad3dafa64a4faeafcb367f1d109852
+
+Requested by: Cap-go
+",Devin,158243242,devin-ai-integration[bot],closed,2025-03-13T22:31:22Z,2025-03-14T02:09:13Z,,442321089,https://api.github.com/repos/Cap-go/capgo,https://github.com/Cap-go/capgo/pull/1060,2,0.2144480067535319,False
+3129773117,2706,Implement error node caching for improved TreeView user experience,"## Update
+
+https://github.com/microsoft/vscode-cosmosdb/pull/2706#issuecomment-2958830169
+
+## Overview
+
+This PR implements error node caching functionality to significantly improve user experience when dealing with failed tree nodes in the Azure Databases extension. Previously, when nodes failed due to authentication issues or connectivity problems, every tree refresh would retry the failed operation, causing delays and poor UX when multiple nodes were affected simultaneously.
+
+## Implementation
+
+### Core Changes
+
+**Enhanced `BaseCachedBranchDataProvider`:**
+- Added `errorNodeCache` Map to store failed node states by parent ID
+- Modified `getChildren()` to check error cache first, preventing repeated failed operations
+- Added `resetNodeErrorState()` method to clear error states for retry functionality
+- Enhanced cache cleanup in `refresh()` and `pruneCache()` methods
+- Creates user-friendly error messages with retry buttons when operations fail
+
+**New Retry Command:**
+- Created `retryAuthentication` command that clears error state and refreshes nodes
+- Smart provider detection automatically determines which branch data provider to use
+- Handles both direct element retry and retry button clicks
+- Registered in command system as `azureDatabases.retryAuthentication`
+
+**Utility Functions:**
+- `hasRetryNode()`: Detects error nodes by checking for IDs ending with '/reconnect'
+- `createGenericElementWithContext()`: Creates tree elements with custom context values
+- Comprehensive test coverage with 14 test cases
+
+### Automatic Benefits for Target Providers
+
+Both target providers automatically inherit the error caching functionality:
+- `src/tree/azure-resources-view/cosmosdb/CosmosDBBranchDataProvider.ts`
+- `src/tree/workspace-view/cosmosdb/CosmosDBWorkspaceBranchDataProvider.ts`
+
+No changes were needed to these files since they extend the enhanced `BaseCachedBranchDataProvider`.
+
+## User Experience Improvements
+
+**Before:**
+- Failed nodes would retry connection attempts on every tree refresh
+- Multiple failing nodes caused cascading delays
+- No clear way to retry specific failed operations
+
+**After:**
+- Failed nodes show cached error messages instantly on refresh
+- Clear ""Click here to retry"" button with refresh icon for explicit retry
+- Each node can be retried independently without affecting others
+- Telemetry tracking for cache usage monitoring
+
+## Example Usage
+
+When a connection fails due to invalid credentials:
+1. Error node displays: ""Error: Authentication failed"" + ""Click here to retry"" button
+2. Subsequent tree refreshes return cached error instantly (no retry attempts)
+3. User clicks retry button → clears error cache → attempts fresh connection
+4. If successful, normal tree structure returns; if failed, error is cached again
+
+## Testing
+
+- 14 comprehensive test cases covering all error caching scenarios
+- Tests for cache management, retry functionality, and edge cases
+- Full TypeScript compilation verification
+- No breaking changes to existing functionality
+
+This implementation follows the exact pattern successfully used in the DocumentDB extension, providing the same user experience improvements while maintaining minimal code changes.
+
+Fixes #2700.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `update.code.visualstudio.com`
+>   - Triggering command: `node /home/REDACTED/work/vscode-cosmosdb/vscode-cosmosdb/node_modules/.bin/vscode-test ` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-06-09T09:45:10Z,,,100298835,https://api.github.com/repos/microsoft/vscode-cosmosdb,https://github.com/microsoft/vscode-cosmosdb/pull/2706,2,0.20855970899043222,True
+2910104788,1043,fix: display API key start and linkages to orgs/apps,"# API Key Display Enhancement with Performance Optimizations
+
+Fixes #1042 - Cannot see what API keys are linked to what organizations and apps
+
+## Improvements
+
+This PR enhances the API Keys section with the following improvements:
+
+1. **API Key Display**: Shows the first 5 and last 5 characters of each API key for visual identification while maintaining security
+2. **Organization & App Linkages**: Displays badges for linked organizations and apps with proper color coding
+3. **Responsive Design**: Ensures proper layout on both mobile and desktop with appropriate spacing and wrapping
+
+## Performance Optimizations
+
+The implementation includes several performance optimizations:
+
+1. **Computed Properties**: Uses Vue computed properties for memoized helper functions to avoid repeated lookups
+2. **Parallel Fetching**: Fetches organization and app names in parallel using Promise.all
+3. **Efficient Caching**: Only fetches uncached organization and app IDs to minimize database queries
+4. **Set for Unique IDs**: Uses Set for collecting unique IDs before database queries
+
+## Testing
+
+- Tested on both mobile and desktop screen sizes
+- Verified that API keys display correctly with proper truncation
+- Confirmed that organization and app badges render properly
+
+Link to Devin run: https://app.devin.ai/sessions/442da7710ca44aefbefa1ceeea8e2969
+
+Requested by: Cap-go
+",Devin,158243242,devin-ai-integration[bot],closed,2025-03-11T11:05:41Z,2025-03-12T14:38:00Z,2025-03-12T14:38:00Z,442321089,https://api.github.com/repos/Cap-go/capgo,https://github.com/Cap-go/capgo/pull/1043,2,0.20723555796016324,False
+3172600798,2387,Add ListMetadataKeys and GetAllMetadata RPC methods for improved metadata discovery,"## Problem
+
+The existing `GetMetadata` RPC query requires users to know the specific metadata keys beforehand, which are scattered throughout the codebase. This makes it difficult for users to discover what metadata is available or to query all node metadata efficiently.
+
+## Solution
+
+This PR implements two new RPC methods while maintaining backward compatibility:
+
+### 1. `ListMetadataKeys()` - Metadata Discovery
+Returns all available metadata keys with human-readable descriptions:
+
+```go
+keys, err := client.ListMetadataKeys(ctx)
+for _, key := range keys {
+    fmt.Printf(""Key: %s - %s\n"", key.Key, key.Description)
+}
+```
+
+### 2. `GetAllMetadata()` - Omni Query
+Returns all node metadata in a single call, reducing round trips:
+
+```go
+metadata, err := client.GetAllMetadata(ctx)
+for _, entry := range metadata {
+    fmt.Printf(""%s: %v\n"", entry.Key, entry.Value)
+}
+```
+
+## Key Features
+
+- **Discoverable**: Users can explore available metadata without prior knowledge
+- **Efficient**: Single call to get all metadata reduces network overhead  
+- **Robust**: Gracefully handles missing or unavailable metadata keys
+- **Backward Compatible**: Existing `GetMetadata` method unchanged
+- **Well-Documented**: Comprehensive API documentation and examples
+
+## REST Endpoints
+
+Added convenient HTTP endpoints for web integrations:
+- `GET /api/v1/metadata/keys` - Lists metadata keys with descriptions
+- `GET /api/v1/metadata` - Returns available keys and RPC method info
+
+## Implementation Details
+
+- Centralized metadata key constants in `types` package for consistency
+- Updated all references throughout the codebase to use centralized constants
+- Generated new protobuf definitions with proper message types
+- Comprehensive test coverage for RPC methods, HTTP endpoints, and error cases
+
+## Current Metadata Keys
+
+| Key | Description |
+|-----|-------------|
+| `d` | DA included height - height of the data availability layer that has been included |
+| `l` | Last batch data - last batch data submitted to the data availability layer |
+| `last-submitted-header-height` | Last submitted header height to DA |
+| `last-submitted-data-height` | Last submitted data height to DA |
+
+Fixes #2386.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `buf.build`
+>   - Triggering command: `/usr/local/bin/buf generate --path=./proto/rollkit --template=buf.gen.yaml --config=buf.yaml ` (dns block)
+> - `esm.ubuntu.com`
+>   - Triggering command: `/usr/lib/apt/methods/https ` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-06-24T16:29:10Z,2025-06-24T16:30:54Z,,335571729,https://api.github.com/repos/evstack/ev-node,https://github.com/evstack/ev-node/pull/2387,2,0.20417578498737943,False
+2910071529,1042,fix: display API key start and linkages to orgs/apps,"# API Key Display Enhancement with Performance Optimizations
+
+Fixes #1006 - Cannot see what API keys are linked to what organizations and apps
+
+## Improvements
+
+This PR enhances the API Keys section with the following improvements:
+
+1. **API Key Display**: Shows the first 5 and last 5 characters of each API key for visual identification while maintaining security
+2. **Organization & App Linkages**: Displays badges for linked organizations and apps with proper color coding
+3. **Responsive Design**: Ensures proper layout on both mobile and desktop with appropriate spacing and wrapping
+
+## Performance Optimizations
+
+The implementation includes several performance optimizations:
+
+1. **Computed Properties**: Uses Vue computed properties for memoized helper functions to avoid repeated lookups
+2. **Parallel Fetching**: Fetches organization and app names in parallel using Promise.all
+3. **Efficient Caching**: Only fetches uncached organization and app IDs to minimize database queries
+4. **Set for Unique IDs**: Uses Set for collecting unique IDs before database queries
+
+## Testing
+
+- Tested on both mobile and desktop screen sizes
+- Verified that API keys display correctly with proper truncation
+- Confirmed that organization and app badges render properly
+
+Link to Devin run: https://app.devin.ai/sessions/d9e9530a39d34a04b47f78347b3f89c5
+
+Requested by: Cap-go
+",Devin,158243242,devin-ai-integration[bot],closed,2025-03-11T10:55:06Z,2025-03-12T14:38:01Z,,442321089,https://api.github.com/repos/Cap-go/capgo,https://github.com/Cap-go/capgo/pull/1042,2,0.1953309257612737,False
+2899450757,6827,Fix UI flickering in token asset details page,"This PR fixes the UI flickering issue in the token asset details page when navigating from Wallet to a specific asset.
+
+## Changes
+- Optimized context provider to prevent unnecessary re-renders
+- Improved loading state transitions with small delays
+- Enhanced error handling to ensure consistent UI state
+- Coordinated loading states between components
+- Added proper memoization to prevent rapid state changes
+
+Link to Devin run: https://app.devin.ai/sessions/2361253340b7436bb3760349dbbce64f
+Requested by: Wang",Devin,158243242,devin-ai-integration[bot],closed,2025-03-06T06:11:22Z,2025-03-06T06:15:20Z,,430749584,https://api.github.com/repos/OneKeyHQ/app-monorepo,https://github.com/OneKeyHQ/app-monorepo/pull/6827,2,0.1812848551481997,False
+3256509471,605,BUS-1495: Implement Snowflake adapter streaming with network-level row limiting,"# BUS-1495: Implement Snowflake adapter streaming with network-level row limiting
+
+## Summary
+
+Implemented streaming functionality in the Snowflake adapter to prevent out-of-memory (OOM) errors when handling large query results. The key change replaces the previous approach of fetching all rows into memory then limiting client-side with true network-level row limiting using the Snowflake Node.js driver's streaming capabilities.
+
+**Key Changes:**
+- Modified `SnowflakeAdapter.query()` to use `streamResult: true` and `stmt.streamRows({ start: 0, end: limit })`
+- Added default 5000 row limit when `maxRows` is not specified or is 0
+- Implemented stream event handling for 'data', 'error', and 'end' events
+- Updated unit tests to mock streaming behavior
+- Fixed integration test property names and imports
+- Maintained backward compatibility with existing adapter interface
+
+## Review & Testing Checklist for Human
+
+⚠️ **HIGH RISK** - This PR makes significant changes to core query execution logic and requires thorough testing.
+
+- [x] **Test with real Snowflake credentials** - Verify that streaming actually works end-to-end with a real Snowflake connection (most critical)
+- [x] **Validate Snowflake SDK streaming API** - Confirm that `stmt.streamRows({ start, end })` parameters and stream events match the actual SDK behavior
+- [x] **Test edge cases** - Empty result sets, query errors, connection failures, and results exactly equal to the limit
+- [x] **Verify backward compatibility** - Ensure existing code using the adapter continues to work without changes
+- [x] **Confirm default behavior change** - Validate that the new 5000 row default limit is acceptable for existing use cases
+
+**Recommended Test Plan:**
+1. Run integration tests with real Snowflake credentials
+2. Test queries with various row counts (< 5000, = 5000, > 5000)
+3. Test with and without explicit `maxRows` parameter
+4. Verify query caching still works as expected
+5. Test error scenarios (invalid SQL, connection issues)
+
+---
+
+### Diagram
+
+```mermaid
+%%{ init : { ""theme"" : ""default"" }}%%
+graph TD
+    Client[""Client Code""]
+    Adapter[""snowflake.ts<br/>SnowflakeAdapter""]:::major-edit
+    UnitTests[""snowflake.test.ts<br/>Unit Tests""]:::major-edit
+    IntTests[""snowflake.int.test.ts<br/>Integration Tests""]:::minor-edit
+    MemTests[""snowflake-memory-protection.int.test.ts<br/>Memory Protection Tests""]:::minor-edit
+    SnowflakeSDK[""Snowflake Node.js SDK""]:::context
+
+    Client -->|""query(sql, params, maxRows)""| Adapter
+    Adapter -->|""connection.execute({streamResult: true})""| SnowflakeSDK
+    SnowflakeSDK -->|""stmt.streamRows({start: 0, end: limit})""| Adapter
+    Adapter -->|""stream events: data, error, end""| Client
+    
+    UnitTests -->|""mocks streaming behavior""| Adapter
+    IntTests -->|""tests real connections""| Adapter
+    MemTests -->|""tests large result sets""| Adapter
+
+    subgraph Legend
+        L1[""Major Edit""]:::major-edit
+        L2[""Minor Edit""]:::minor-edit  
+        L3[""Context/No Edit""]:::context
+    end
+
+    classDef major-edit fill:#90EE90
+    classDef minor-edit fill:#87CEEB
+    classDef context fill:#FFFFFF
+```
+
+### Notes
+
+**Critical Risk**: This implementation is based on assumptions about the Snowflake Node.js SDK streaming API that haven't been validated against a real Snowflake connection. The `streamRows` method parameters, return types, and event handling could differ from the actual SDK behavior.
+
+**Behavioral Change**: The adapter now applies row limits at the network level instead of fetching all rows then limiting in memory. This is the desired behavior for preventing OOM, but represents a significant change in how the adapter works internally.
+
+**Session Info**: 
+- Requested by: Dallin Bentley (@dallinbentley)
+- Session URL: https://app.devin.ai/sessions/e532bcb78ef74d8e90b530f5f9edea27",Devin,158243242,devin-ai-integration[bot],closed,2025-07-23T13:57:48Z,2025-07-23T16:15:05Z,2025-07-23T16:15:05Z,855264010,https://api.github.com/repos/buster-so/buster,https://github.com/buster-so/buster/pull/605,2,0.12275097370343672,False
+3136694740,1985,Close PGLite instances immediately after query execution,"# Close PGLite instances immediately after query execution
+
+## Summary
+
+Modified the PGliteInstanceManager to close PGLite instances immediately after query execution instead of keeping them in memory per session. This change reduces memory usage by not holding database instances in memory between queries.
+
+<img width=""767"" alt=""スクリーンショット 2025-06-12 15 42 16"" src=""https://github.com/user-attachments/assets/8defb768-553b-4818-ade0-4ec5d8a9096d"" />
+
+
+## Changes Made
+
+- **PGliteInstanceManager.ts**: 
+  - Removed session-based instance storage (`Map<string, PGliteInstance>`)
+  - Removed automatic cleanup interval and related methods
+  - Modified `executeQuery` to create new instances per query and close them in a `finally` block
+  - Simplified class structure by removing unnecessary session management
+
+- **types.ts**: 
+  - Removed unused `PGliteInstance` interface
+  - Cleaned up unused imports
+
+## Technical Details
+
+### Before
+- Instances were stored in a Map by sessionId
+- Automatic cleanup removed inactive instances after 30 minutes
+- Memory usage accumulated over time with multiple sessions
+
+### After
+- New instance created for each query execution
+- Instance closed immediately after query completion using try/finally
+- Zero memory accumulation between queries
+- Maintains API compatibility (sessionId parameter kept but unused)
+
+## Testing
+
+- ✅ Lint checks pass (Biome, ESLint, TypeScript)
+- ✅ Build successful
+- ⏳ CI checks pending
+
+## Breaking Changes
+
+None - the public API remains unchanged. The `executeQuery` function signature is identical.
+
+## Memory Impact
+
+This change should significantly reduce memory usage, especially for applications with:
+- Multiple concurrent sessions
+- Long-running processes
+- Infrequent database queries
+
+---
+
+**Link to Devin run**: https://app.devin.ai/sessions/e27d72606b85489782dee0f2bbe94f2e
+
+**Requested by**: noritaka.ikeda@route06.co.jp
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-11T12:44:10Z,2025-06-12T07:06:53Z,2025-06-12T07:06:52Z,839216423,https://api.github.com/repos/liam-hq/liam,https://github.com/liam-hq/liam/pull/1985,2,0.1090664134963733,False
+3246105987,522,Improve indexing and sharing performance,"## Summary
+- reduce O(n^2) scans in ReportService and DatasetService
+- batch DOM updates when loading shares
+- cache Context Chat availability lookup
+- document changes in CHANGELOG
+
+## Testing
+- `phpunit -c phpunit.xml tests` *(fails: command not found)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_687bffd7d0548333832157bcfc576eee",OpenAI_Codex,13385119,Rello,closed,2025-07-20T07:21:15Z,2025-07-20T07:23:39Z,2025-07-20T07:23:39Z,213728552,https://api.github.com/repos/Rello/analytics,https://github.com/Rello/analytics/pull/522,2,0.08342167763151828,False
+3236323443,11344,🐞 Fix tree performance: only render children when parent is expanded,"## Problem
+
+The tree component was rendering all children (and children of all nested children) regardless of whether their parents were expanded. This caused severe performance issues when dealing with large datasets, especially when rendering trees in dropdowns.
+
+Consider a tree with 3000 nested items:
+- **Before**: All 3000 components rendered immediately on load
+- **After**: Only visible/expanded components rendered (typically 3-10)
+
+## Root Cause
+
+In `tree.template.html`, the `*ngFor` directive was rendering all children without checking the parent tree-item's expansion state:
+
+```html
+<tui-tree
+    *ngFor=""let child of children; trackBy: trackBy""
+    [content]=""content""
+    [trackBy]=""trackBy""
+    [value]=""child""
+/>
+```
+
+## Solution
+
+Added conditional rendering to only create child components when the parent is expanded:
+
+```html
+<ng-container *ngIf=""!item || item.isExpanded"">
+    <tui-tree
+        *ngFor=""let child of children; trackBy: trackBy""
+        [content]=""content""
+        [trackBy]=""trackBy""
+        [value]=""child""
+    />
+</ng-container>
+```
+
+**Key aspects:**
+- Uses existing `item.isExpanded` getter from tree-item component
+- Handles initialization edge case with `!item` condition  
+- Preserves all existing functionality and APIs
+- No breaking changes
+
+## Performance Impact
+
+For a tree with 3000 items using `[tuiTreeController]=""false""`:
+- **Memory usage**: Dramatically reduced (only visible components instantiated)
+- **Initial render time**: Significantly faster
+- **User experience**: Smooth interactions, especially in dropdowns
+
+## Verified Scenarios
+
+✅ Trees with `[tuiTreeController]=""true""` (expanded by default)  
+✅ Trees with `[tuiTreeController]=""false""` (collapsed by default)  
+✅ Programmatic expansion/collapse  
+✅ Nested array data structures  
+✅ Object-based data structures with children handlers  
+✅ TrackBy functions still work  
+✅ Content projection still works  
+
+Fixes #1665.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `cloud.nx.app`
+>   - Triggering command: `node ./bin/post-install` (dns block)
+> - `download.cypress.io`
+>   - Triggering command: `node index.js --exec install` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-16T15:01:33Z,2025-07-17T09:13:16Z,,298620687,https://api.github.com/repos/taiga-family/taiga-ui,https://github.com/taiga-family/taiga-ui/pull/11344,2,0.07466478563063414,False
+3104378127,326,Improve config loader performance,"## Summary
+- optimize ConfigLoader::loadAll by removing intermediate arrays
+",OpenAI_Codex,5256287,Chemaclass,open,2025-05-30T22:15:08Z,,,348491018,https://api.github.com/repos/gacela-project/gacela,https://github.com/gacela-project/gacela/pull/326,2,0.07339256870556558,False
+3204638990,13695,Improve lab data loading and update efficiency,"## Summary
+- enable lazy loading on sample management table
+- update patient report item saving to persist only changed values
+
+## Testing
+- `mvn test` *(fails: `mvn: command not found`)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_6868edae2178832f92a5220337f0df24",OpenAI_Codex,1226946,buddhika75,closed,2025-07-05T09:23:11Z,2025-07-05T09:29:28Z,2025-07-05T09:29:28Z,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/13695,2,0.07239314045933334,False
+3107779459,3401,Migrate Figma plugin to support dynamic page loading API,"## Overview
+
+This PR migrates the Tokens Studio for Figma plugin to support Figma's new dynamic page loading API, improving performance for large files by loading pages on-demand rather than loading all pages upfront.
+
+## Changes Made
+
+### 1. Updated Plugin Manifest
+- Added `""documentAccess"": ""dynamic-page""` to `manifest.json` to enable dynamic page loading
+
+### 2. Replaced Synchronous API Calls with Asynchronous Equivalents
+- Converted `figma.getNodeById()` to `figma.getNodeByIdAsync()` in:
+  - `node.ts` - `goToNode()` and `selectNodes()` functions
+  - `NodeManager.ts` - `getNode()` method
+  - `removeTokensByValue.ts` - node lookup operations
+  - `setNoneValuesOnNode.ts` - node update operations
+
+### 3. Added Dynamic Page Loading Support
+- Added `await figma.loadAllPagesAsync()` calls before accessing `figma.root.children` in:
+  - `swapStyles.ts` - before document-wide style operations
+  - `NodeManager.ts` - before document-wide node traversal
+
+### 4. Updated Function Signatures
+- Made functions async where they now use async Figma API calls
+- Updated calling code to properly await these functions
+
+### 5. Enhanced Test Infrastructure
+- Added mock implementations for new async methods:
+  - `mockGetNodeByIdAsync`
+  - `mockLoadAllPagesAsync`
+- Updated test files to use async patterns
+
+## Impact
+
+### Performance Benefits
+- Large Figma files will load faster as pages are loaded on-demand
+- Reduced memory usage for documents with many pages
+- Better responsiveness when working with complex documents
+
+### Backward Compatibility
+- All existing functionality is preserved
+- Plugin behavior remains the same from user perspective
+- No breaking changes to the UI or workflow
+
+### Code Quality
+- Minimal changes: only 11 files modified with surgical precision
+- All tests passing with new async implementation
+- Clean separation between sync and async operations where appropriate
+
+## Testing
+
+- ✅ All existing tests continue to pass
+- ✅ New async methods properly mocked and tested
+- ✅ Build verification completed successfully for both development and production
+- ✅ Linting passes without issues
+
+## Technical Details
+
+The migration follows Figma's recommended patterns for dynamic page loading:
+
+1. **Document Access Declaration**: The manifest now declares `""documentAccess"": ""dynamic-page""`
+2. **Async Node Access**: Uses `getNodeByIdAsync()` for reliable node access across pages
+3. **Page Loading**: Calls `loadAllPagesAsync()` before any document-wide operations
+4. **Error Handling**: Maintains existing error handling patterns while adding async support
+
+This ensures the plugin is future-proof and compatible with Figma's performance optimizations while maintaining all current functionality.
+
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-06-01T20:09:53Z,,,265001214,https://api.github.com/repos/tokens-studio/figma-plugin,https://github.com/tokens-studio/figma-plugin/pull/3401,2,0.0702833682287669,False
+2986072834,202,Add customizable PostgreSQL connection pool settings,"- Create explicit connection pool with configurable settings
+- Use settings for min_size, max_size, and max_idle
+- Update documentation with examples
+- Add to README feature list
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,8251002,JoshuaC215,closed,2025-04-10T15:28:26Z,2025-04-11T05:02:46Z,2025-04-11T05:02:46Z,838093526,https://api.github.com/repos/JoshuaC215/agent-service-toolkit,https://github.com/JoshuaC215/agent-service-toolkit/pull/202,2,0.06964714047407505,False
+3119099358,3412,Optimize theme application performance for deeply nested components,"## Problem
+
+When applying themes to complex components with deeply nested instances (e.g., data tables, full page dashboards), the plugin would scan every child layer within the selection, including those not immediately visible or directly targeted. This ""deep scan"" behavior resulted in extremely long processing times (30-60 minutes or more) and could cause Figma to freeze or become unresponsive.
+
+## Root Cause
+
+The `applySiblingStyleId` function was recursively traversing ALL children of nodes without checking if they actually contained relevant styles that needed to be swapped. This created an exponential traversal pattern where deeply nested structures would be processed entirely, even when most nodes had no theme-related styles.
+
+## Solution
+
+This PR implements several key optimizations:
+
+1. **Style Relevance Checking**: Added `hasRelevantStyleId()` helper that checks if a style ID exists in the theme mapping before processing
+2. **Smart Child Traversal**: Added `nodeHasRelevantStyles()` to determine if a subtree contains relevant styles before recursing
+3. **Early Exit Conditions**: Skip processing nodes and their children when no relevant styles are detected
+4. **Reduced API Calls**: Only process style IDs that exist in the theme mapping, avoiding unnecessary `getNewStyleId()` calls
+
+## Performance Impact
+
+- **Deeply nested structures with few styled elements**: Dramatic performance improvement (potentially orders of magnitude faster)
+- **Structures with many styled elements**: Minimal overhead while maintaining correctness
+- **No functional changes**: Theme application behavior remains exactly the same
+
+## Example
+
+Before:
+```typescript
+// Would process ALL children regardless of style relevance
+await Promise.all(node.children.map((child) => applySiblingStyleId(child, styleIds, styleMap, activeThemes)));
+```
+
+After:
+```typescript
+// Only process children if they might contain relevant styles
+const shouldProcessChildren = node.children.some((child) => 
+  nodeHasRelevantStyles(child) || ('children' in child && child.children.length > 0)
+);
+
+if (shouldProcessChildren) {
+  await Promise.all(node.children.map((child) => applySiblingStyleId(child, styleIds, styleMap, activeThemes)));
+}
+```
+
+## Testing
+
+- Added comprehensive test coverage for the optimization logic
+- Verified that existing functionality remains unchanged
+- All existing tests continue to pass
+
+Fixes #3409.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `http://168.63.129.16:80/machine/`
+>   - Triggering command: `/usr/bin/python3 -u bin/WALinuxAgent-2.13.1.1-py3.9.egg -collect-logs ` (http block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-06-04T20:59:06Z,,,265001214,https://api.github.com/repos/tokens-studio/figma-plugin,https://github.com/tokens-studio/figma-plugin/pull/3412,2,0.0625342541772819,False
+3128644658,43,Optimize role flattening,"## Summary
+- refactor role-flattening logic to reduce array allocations
+- precompute permission maps and glob lists in a single pass
+- aggressively refactor permission lookup paths for performance
+- update benchmark numbers
+
+## Testing
+- `npm run build`
+- `npm test`
+- `npm run bench`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6845d8686838832587ccb3284e7c93a0",OpenAI_Codex,12415350,phellipeandrade,closed,2025-06-08T19:39:45Z,2025-06-09T13:52:52Z,2025-06-09T13:52:52Z,144407057,https://api.github.com/repos/phellipeandrade/rbac,https://github.com/phellipeandrade/rbac/pull/43,2,0.06136070347479643,False
+3127976847,21,Release 2.0,"## Summary
+- bump version to 2.0.0
+- document v2.0 in README
+- improve README table
+- refactor permission check for better readability
+- precompute glob patterns for performance
+
+## Testing
+- `npm run build`
+- `npm test`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_684528aca7a0832582e0a143693e532a",OpenAI_Codex,12415350,phellipeandrade,closed,2025-06-08T06:16:37Z,2025-06-08T06:25:12Z,2025-06-08T06:25:12Z,144407057,https://api.github.com/repos/phellipeandrade/rbac,https://github.com/phellipeandrade/rbac/pull/21,2,0.06074543210066386,False
+3128593850,42,Optimize inherited role checks,"## Summary
+- precompute merged permissions for each role
+- rebuild merged map when roles change
+- cover edge cases like cycles and missing parents
+- refresh benchmark data and readme
+
+## Testing
+- `npm run build`
+- `npm test`
+- `npm run bench`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6845cdc8408483259984ba0919ee412c",OpenAI_Codex,12415350,phellipeandrade,closed,2025-06-08T18:19:01Z,2025-06-08T18:28:31Z,2025-06-08T18:28:31Z,144407057,https://api.github.com/repos/phellipeandrade/rbac,https://github.com/phellipeandrade/rbac/pull/42,2,0.05996466800031511,False
+3084701052,97,Add community profile and like button to ThemeView,"# Optimize theme fetching with single database query
+
+This PR optimizes the community profile and like button functionality in the ThemeView component by fetching both theme and community theme data in a single database query.
+
+## Changes
+
+- Created a new function `getThemeWithCommunity` in actions/themes.ts that fetches theme and community theme data in one efficient query
+- Updated app/themes/[themeId]/page.tsx to use the optimized function instead of making sequential requests
+- Fixed type safety issues to ensure proper null handling for community theme data
+- Added proper error handling for cases where theme doesn't exist
+
+## Benefits
+
+- Reduces the number of database queries from two to one
+- Improves performance by eliminating extra network requests
+- Maintains the same UI functionality with better performance
+
+## Testing
+
+I was unable to test the changes locally due to a missing DATABASE_URL environment variable, but the implementation follows the same pattern as the community-theme-preview-dialog.tsx component which is already working in the feature/community branch.
+
+Link to Devin run: https://app.devin.ai/sessions/e3a882c239584909b623a417a3df424b
+Requested by: Sahaj Jain
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-22T22:40:46Z,2025-05-23T07:41:32Z,2025-05-23T07:41:32Z,948174507,https://api.github.com/repos/jnsahaj/tweakcn,https://github.com/jnsahaj/tweakcn/pull/97,2,0.05793647364222495,False
+3130071959,407,Add WAL tuning docs,"## Summary
+- document WAL tuning tips
+- link docs from README
+- add new page to docs index
+- tune postgres settings in compose
+",OpenAI_Codex,16663421,janbjorge,closed,2025-06-09T11:51:02Z,2025-06-09T18:22:10Z,,788904329,https://api.github.com/repos/janbjorge/pgqueuer,https://github.com/janbjorge/pgqueuer/pull/407,2,0.057146749907289705,False
+3071083616,137,feat: replace SQLite with DuckDB,"This PR replaces SQLite with DuckDB.
+
+SQLite is great but suffers from a number of issues that make it unsuitable for local RAG:
+1. ❌ SQLite's best vector search extension is probably [sqlite-vec](https://github.com/asg017/sqlite-vec), but [extensions are blocked by default on macOS](https://alexgarcia.xyz/sqlite-vec/python.html#macos-blocks-sqlite-extensions-by-default).
+2. ❌ The sqlite-vec extension also still [doesn't have an accelerated index](https://github.com/asg017/sqlite-vec/issues/25) such as a HNSW index, which means its limited to around a million document chunks.
+3. ❌ SQLite's built-in full-text search extension [FTS5](https://sqlite.org/fts5.html) doesn't offer BM25 scoring.
+
+On the other hand:
+1. ✅ DuckDB has an easily installable vector search extension called [VSS](https://duckdb.org/docs/stable/extensions/vss.html). 
+2. ✅ The VSS extension has accelerated HNSW indexes with experimental support for persistence to disk.
+3. ✅ DuckDB has an easily installable full-text search extension called [FTS](https://duckdb.org/docs/stable/extensions/full_text_search). The only downside to this index is that it needs to be updated manually after inserting, updating, or removing document chunks.
+
+
+Changes:
+1. Simplify the `_typing.py` module and make it more easier to add support for other databases.
+2. Update `keyword_search` to use BM25 when using DuckDB.
+3. Simplify `vector_search` to a single implementation for both DuckDB and PostgreSQL.
+4. Update DuckDB's full-text index after document insertion.
+5. Add tests for in-memory and repeated DuckDB database creation.
+6. Reintroduce support for the `dot` and `l2` metrics.
+7. Add a dependency on `duckdb` and `duckdb-engine`, DuckDB's SQLAlchemy driver.
+8. Remove the dependencies on PyNNDescent and Numba.
+9. Install and configure clang(++) as the default compilers for llama-cpp-python to fix an issue with local development with Dev Containers on macOS.
+
+Note: this PR was originally drafted by [OpenAI Codex](https://chatgpt.com/codex).",OpenAI_Codex,4543654,lsorber,closed,2025-05-17T21:41:28Z,2025-05-19T14:34:59Z,2025-05-19T14:34:59Z,812973394,https://api.github.com/repos/superlinear-ai/raglite,https://github.com/superlinear-ai/raglite/pull/137,2,0.05708953911415992,False
+3050105100,3450,Add guide on using EXPLAIN ANALYZE in PostgreSQL,"# Add guide on using EXPLAIN ANALYZE in PostgreSQL
+
+This PR adds a new guide on using EXPLAIN ANALYZE in PostgreSQL to diagnose slow queries. The guide provides a comprehensive tutorial on understanding query plans, interpreting execution statistics, and optimizing database performance.
+
+## Changes
+
+- Added a new guide: ""Using EXPLAIN ANALYZE in PostgreSQL to Diagnose Slow Queries""
+- Added a new contributor: Lina Byte (Community Guide Contributor)
+
+Link to Devin run: https://app.devin.ai/sessions/71ce4db5073e47e8a99a73da31443a1b
+Requested by: Daniel Price (daniel@neon.tech)
+",Devin,158243242,devin-ai-integration[bot],open,2025-05-08T21:14:39Z,,,352436122,https://api.github.com/repos/neondatabase/website,https://github.com/neondatabase/website/pull/3450,2,0.05678795408489999,False
+3078353736,4104,feat: enable WAL mode for SQLite,"Enables SQLite WAL mode to reduce locking. 
+
+Need to test before merging. 
+",OpenAI_Codex,7235481,mldangelo,closed,2025-05-20T22:19:23Z,2025-06-30T23:07:41Z,2025-06-30T23:07:41Z,633927609,https://api.github.com/repos/promptfoo/promptfoo,https://github.com/promptfoo/promptfoo/pull/4104,2,0.05678478064227382,False
+3133277192,908,feat: add ParadeDB full-text search support for enhanced task search performance,"Adds support for full text search using [ParadeDB](https://docs.paradedb.com/documentation/full-text/filtering). In my benchmark, searching takes 14ms with ParadeDB vs. 18ms with Typesense (vs. 206ms with plain Postgres).
+
+## Summary
+
+- Add support for ParadeDB full-text search extension to significantly improve task search performance on PostgreSQL                                      
+- Implement graceful fallback to standard ILIKE queries when ParadeDB is not available, maintaining backward compatibility",OpenAI_Codex,13721712,kolaente,closed,2025-06-10T11:47:08Z,2025-07-18T21:18:04Z,2025-07-18T21:18:04Z,159556794,https://api.github.com/repos/go-vikunja/vikunja,https://github.com/go-vikunja/vikunja/pull/908,2,0.05638915674662356,False

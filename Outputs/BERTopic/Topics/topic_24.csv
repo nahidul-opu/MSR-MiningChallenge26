@@ -1,681 +1,41 @@
-id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
-3087038655,93,Fix message ordering in chat API,"## Summary
-- reorder system state message after user messages to optimize caching
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,Topic,Probability,Representative_document
+3199812992,62558,[Blazor] Remove sourcemap link comments from production bundles for blazor.web.js and blazor.webassembly.js,"This change modifies the Rollup configuration to generate sourcemap files without including sourcemap link comments in production bundles for `blazor.web.js` and `blazor.webassembly.js`.
 
-## Testing
-- `npm run build`
-- `npm run lint` *(fails: Unexpected any, unused vars)*",OpenAI_Codex,2830514,ryokun6,closed,2025-05-23T17:24:42Z,2025-06-12T05:23:14Z,,923332984,https://api.github.com/repos/ryokun6/ryos,https://github.com/ryokun6/ryos/pull/93,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Fix message ordering in chat API"". Summary: ""- reorder system state message after user messages to optimize caching"". That suggests performance optimization: reorder to optimize caching. So it's performance. The body mentions testing commands. So classification: performance.assistantfinalperformance",24,1.0,False
-3058809612,1399,Fix: Cache system info to prevent re-fetching on page navigation,"# Cache System Info to Prevent Re-fetching on Page Navigation
+## Changes Made
 
-## Problem
-Currently, the system information (including version number) is re-fetched every time a page navigation occurs in the LangBot web interface. This is unnecessary and can cause performance issues.
+- Modified `src/Components/Web.JS/rollup.config.mjs` to use `sourcemap: 'hidden'` for production builds of blazor.web.js and blazor.webassembly.js
+- This generates `.map` files but omits the `//# sourceMappingURL=` comments from the bundle
+- Preserves existing behavior for other bundles:
+  - `blazor.server.js` still gets sourcemap link comments (`sourcemap: true`)
+  - `blazor.webview.js` still gets inline sourcemaps (`sourcemap: 'inline'`)
+  - All development builds continue to include sourcemap link comments
 
-## Solution
-- Added localStorage caching for system information
-- System info is now only fetched on initial load or page refresh
-- Added a `refreshSystemInfo()` method for manual refresh when needed
+## Behavior
 
-## Testing
-- Verified that version number in sidebar remains consistent when navigating between pages
-- Verified that version number is updated when the page is refreshed
+**Before:**
+```javascript
+// Production blazor.web.js would end with:
+console.log('Blazor initialized');
+//# sourceMappingURL=blazor.web.js.map
+```
 
-## Link to Devin run
-https://app.devin.ai/sessions/76bdfc13b08e4003a2de93b9d80cc6fb
+**After:**
+```javascript
+// Production blazor.web.js now ends with:
+console.log('Blazor initialized');
+// No sourcemap link comment
+```
 
-Requested by: Junyan Qin (Chin)
-",Devin,158243242,devin-ai-integration[bot],closed,2025-05-13T05:33:38Z,2025-05-13T07:32:44Z,,575321313,https://api.github.com/repos/langbot-app/LangBot,https://github.com/langbot-app/LangBot/pull/1399,"analysisWe need to classify as performance or non-performance. The PR title: ""Fix: Cache system info to prevent re-fetching on page navigation"". The body: caching system info to prevent re-fetching, localStorage caching, only fetch on initial load or refresh. This is about performance improvement: reducing unnecessary network requests, improving speed. So classification: performance.assistantfinalperformance",24,1.0,False
-3102876964,711,Fix AI chat query execution to only run when chat pane is open,"Fixes OPS-1876.
-
-## Problem
-
-The `useAiAssistantChat` hook was invoking `queryFn` regardless of whether the AI chat pane is open, leading to unnecessary API calls and potential side effects when the pane is closed.
-
-## Solution
-
-Modified `useAiAssistantChat` to read `isAiChatOpened` directly from the application state using `useAppStore` and added it as the `enabled` option in the `useQuery` configuration. This ensures the query function is only executed when the AI chat pane is actually open.
-
-## Changes
-
-- **Added import** for `useAppStore` in `ai-assistant-chat-hook.ts`
-- **Added state reading** of `isAiChatOpened` from the store within the hook
-- **Added query guard** using `enabled: isAiChatOpened` in the `useQuery` options
-- **Added comprehensive unit tests** to validate the new guard logic
-
-## Testing
-
-The implementation includes focused unit tests that verify:
-- Query function is not called when AI chat is closed (`isAiChatOpened === false`)
-- Query function is called when AI chat is opened (`isAiChatOpened === true`) 
-- Query function starts executing when chat state changes from closed to opened
+The sourcemap files (`blazor.web.js.map`, `blazor.webassembly.js.map`) are still generated and contain full debugging information. Developers can manually load these sourcemaps in browser dev tools when needed.
 
 ## Benefits
 
-- **Performance improvement**: Eliminates unnecessary API calls when chat is closed
-- **Cleaner architecture**: Centralizes state management through the existing app store
-- **Maintainability**: No breaking changes to existing component interfaces
-- **Reliability**: Prevents potential side effects from unintended query execution
-
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-05-30T10:51:18Z,2025-05-30T14:10:23Z,,945671748,https://api.github.com/repos/openops-cloud/openops,https://github.com/openops-cloud/openops/pull/711,"analysisWe need to classify as performance or non-performance. The PR description: ""Fix AI chat query execution to only run when chat pane is open"". It mentions performance improvement: eliminates unnecessary API calls, reduces overhead. The keywords: performance improvement, unnecessary API calls, etc. So it's performance. So label 'performance'.assistantfinalperformance",24,1.0,False
-3113519735,128,Split IE prompt for caching,"## Summary
-- cache static IE generation prompt using `system`
-- generate dynamic system message for URL/year
-
-## Testing
-- `npm run lint` *(fails: unexpected any/unused vars in unrelated files)*
-
-------
-https://chatgpt.com/codex/tasks/task_e_683ed636d87c832498567962ed9e4c3e",OpenAI_Codex,2830514,ryokun6,closed,2025-06-03T11:10:49Z,2025-06-03T11:11:06Z,2025-06-03T11:11:06Z,923332984,https://api.github.com/repos/ryokun6/ryos,https://github.com/ryokun6/ryos/pull/128,"analysisWe need to classify whether the primary purpose of the PR is to improve performance. The PR title: ""Split IE prompt for caching"". Summary: ""cache static IE generation prompt using `system` - generate dynamic system message for URL/year"". This seems to be about caching prompts, likely to improve performance. The testing mentions lint fails unrelated. The main change is caching static IE generation prompt. That is a performance improvement. So classification: 'performance'.assistantfinalperformance",24,1.0,False
-3073532077,50,Optimize chat system prompts,"## Summary
-- split static instructions and dynamic state in `chat.ts`
-- send both system prompts before user messages for caching
-
-## Testing
-- `npm run lint` *(fails: unexpected any and other warnings)*",OpenAI_Codex,2830514,ryokun6,closed,2025-05-19T11:38:12Z,2025-05-19T11:38:33Z,2025-05-19T11:38:33Z,923332984,https://api.github.com/repos/ryokun6/ryos,https://github.com/ryokun6/ryos/pull/50,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Optimize chat system prompts"". Summary: split static instructions and dynamic state in chat.ts, send both system prompts before user messages for caching. Testing: lint fails. The description indicates optimization of chat system prompts, likely to improve performance by caching prompts. The keywords: ""Optimize"" suggests performance improvement. There's no explicit mention of memory, speed, etc. But ""Optimize"" is a strong indicator. The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. The word ""Optimize"" is not in the list but ""optimization"" is. The summary says ""Optimize chat system prompts"". That is an optimization. So classify as 'performance'.
-
-Thus answer: performance.assistantfinalperformance",24,1.0,False
-3185789444,8605,feat(worker): Implement bulk event sending method,"%23%23%23 What changed%3F Why was the change needed%3F
-
-*   **What:** Implemented a new `/send/bulk` endpoint in the socket worker and refactored the `SocketWorkerService` to utilize it.
-*   **Why:** To allow sending multiple events (e.g., a new message, unread count, unseen count) in a single HTTP request, significantly reducing network overhead and improving performance for common event dispatch flows. Previously, these events were sent via separate HTTP calls.
-
-%23%23%23 Screenshots
-
-<!-- If the changes are visual, include screenshots or screencasts. -->
-
-<details>
-<summary><strong>Expand for optional sections</strong></summary>
-
-%23%23%23 Related enterprise PR
-
-<!-- A link to a dependent pull request  -->
-
-%23%23%23 Special notes for your reviewer
-
-*   The new `/send/bulk` endpoint supports up to 100 messages per request and provides detailed success/failure reporting for individual messages within the bulk operation.
-*   The `SocketWorkerService` now combines the main message, unread count, and unseen count updates into a single bulk request when a `RECEIVED` event with a `messageId` is processed.
-
-</details>",Cursor,8872447,scopsy,closed,2025-06-29T05:51:20Z,2025-06-29T10:56:55Z,,400215964,https://api.github.com/repos/novuhq/novu,https://github.com/novuhq/novu/pull/8605,"analysisWe need to classify as performance or non-performance. The PR implements bulk event sending to reduce network overhead, improving performance. So it's performance.assistantfinalperformance",24,1.0,False
-3144466175,4,Implement local storage persistence,"A new persistence utility, `src/lib/persistence.ts`, was introduced to manage `localStorage` operations for AI configuration and user input. It defines Zod schemas (`AIConfigSchema`, `UserInputSchema`) for robust validation, ensuring data integrity and preventing buggy states. Safe `localStorage` operations handle potential errors like incognito mode or storage quotas.
-
-`src/lib/model-store.ts` was refactored to use this utility, consolidating `selectedModel` and `enabledTools` persistence under a single `ai-config` key. Updates are now only persisted when values genuinely change, optimizing performance.
-
-`src/lib/chat-store.ts` was updated to persist `input` to a separate `user-input` key. Input persistence is debounced by 300ms to prevent excessive writes during typing, and a `beforeunload` listener ensures the latest input is saved. Chat resets now clear the persisted input.
-
-In `src/components/chat.tsx`, `useMemo` was applied to model selection to prevent unnecessary re-renders. `src/components/multimodal-input.tsx` and `src/hooks/use-chat-integration.ts` were updated to retrieve `enabledTools` from `useModelStore`, reflecting the consolidated AI configuration.",Cursor,56125930,f1shy-dev,closed,2025-06-13T18:49:45Z,2025-06-13T18:49:52Z,2025-06-13T18:49:52Z,998301272,https://api.github.com/repos/intern3-chat/intern3-chat,https://github.com/intern3-chat/intern3-chat/pull/4,"analysisWe need to classify whether the primary purpose of the pull request is to improve performance. The PR description: Implement local storage persistence, new persistence utility, refactor model-store to use this utility, consolidating persistence under a single key, updates only persisted when values genuinely change, optimizing performance. chat-store updated to persist input with debounce 300ms to prevent excessive writes, beforeunload listener ensures latest input saved. Chat resets clear persisted input. In components, useMemo applied to model selection to prevent unnecessary re-renders. So performance improvements: debouncing writes, only persisting when values change, useMemo to prevent re-renders. So yes, performance. The classification: 'performance'.assistantfinalperformance",24,1.0,False
-3152003781,2037,Optimize Chat API/Job schema transfer by removing HTTP payload overhead,"# Optimize Chat API/Job schema transfer by removing HTTP payload overhead
-
-## Summary
-
-This PR optimizes the Chat API/Job system by removing unnecessary `schemaData` transfer through HTTP payloads and leveraging the existing repository pattern for schema retrieval within the Job context.
-
-## Problem
-
-The current implementation had significant inefficiencies:
-
-1. **Large HTTP payloads**: `schemaData` was being passed through HTTP request bodies in both the API route and Job trigger, resulting in large JSON transfers
-2. **Redundant data transfer**: Schema data was being sent via HTTP when the Job already had access to retrieve it directly from the database
-3. **Unnecessary coupling**: Frontend components needed to pass schema data they didn't actually use
-
-## Solution
-
-### Changes Made
-
-1. **API Route optimization** (`frontend/apps/app/app/api/chat/route.ts`)
-   - Removed `schemaData` from `chatRequestSchema` validation
-   - Eliminated `schemaSchema` import as it's no longer needed
-
-2. **Job payload optimization** (`frontend/internal-packages/jobs/src/trigger/chatJobs.ts`)
-   - Updated `ChatJobPayload` type to exclude `schemaData`
-   - Implemented schema fetching using `repositories.schema.getSchema(designSessionId)`
-   - Added proper error handling for schema retrieval failures
-   - Used sophisticated type inference to maintain type safety
-
-3. **Frontend cleanup** 
-   - **Chat Component** (`frontend/apps/app/components/Chat/Chat.tsx`): Removed `schemaData` from `sendChatMessage` calls
-   - **Message Service** (`frontend/apps/app/components/Chat/services/aiMessageService.ts`): 
-     - Removed `schemaData` from `SendChatMessageParams` interface
-     - Updated `callChatAPI` function signature
-     - Removed `Schema` import as it's no longer needed
-
-## Benefits
-
-- **Reduced network overhead**: Eliminates large schema JSON from HTTP request bodies
-- **Improved performance**: Faster API calls due to smaller payloads
-- **Better architecture**: Proper separation of concerns - data fetching happens where it's needed
-- **Maintained functionality**: All existing Chat features work exactly the same
-
-## Technical Details
-
-- Leverages existing `@liam-hq/agent` repository pattern
-- Uses `SupabaseSchemaRepository.getSchema(designSessionId)` for schema retrieval
-- Maintains type safety through sophisticated TypeScript type inference
-- Passes all linting checks (biome, ESLint, TypeScript)
-
-## Testing
-
-- ✅ All linting checks pass (`pnpm lint`)
-- ✅ TypeScript compilation successful
-- ✅ No breaking changes to existing interfaces
-- ✅ Repository pattern integration verified
-
-Link to Devin run: https://app.devin.ai/sessions/2ab1690f94024a83bc558366ab65fac8
-
-Requested by: hirotaka.miyagi@route06.co.jp
-",Devin,158243242,devin-ai-integration[bot],closed,2025-06-17T04:17:12Z,2025-06-17T07:08:49Z,2025-06-17T07:08:49Z,839216423,https://api.github.com/repos/liam-hq/liam,https://github.com/liam-hq/liam/pull/2037,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Optimize Chat API/Job schema transfer by removing HTTP payload overhead"". The body describes removing unnecessary schemaData transfer, reducing network overhead, improving performance. Keywords: optimize, performance, reduce network overhead, faster API calls. So it's performance. So output 'performance'.assistantfinalperformance",24,1.0,False
-3275952470,2777,fix: update schemaDesignTool to directly update workflow state,"## Issue
-
-- resolve: Root cause issue where `schemaDesignTool` only updates the database but doesn't update workflow state, causing `invokeSchemaDesignToolNode` to make redundant database fetches for state synchronization
-
-## Why is this change needed?
-
-The original architecture had a separation between tool execution and state updates:
-1. `schemaDesignTool` would update the database via `repositories.schema.createVersion()`
-2. `invokeSchemaDesignToolNode` would then make a separate database fetch to sync the workflow state
-3. This created potential race conditions and unnecessary database calls
-
-This change eliminates the redundant database fetch by having the tool directly return the updated schema data, which the workflow node can use to update state immediately.
-
-## Changes Made
-
-### 1. Modified `schemaDesignTool.ts`
-- Changed return value from plain string to JSON containing:
-  - `message`: Success message
-  - `schemaData`: The new schema from `result.newSchema`
-  - `latestVersionNumber`: Incremented version number
-
-### 2. Updated `invokeSchemaDesignToolNode.ts`
-- Added `extractSchemaDataFromToolResult()` function to parse tool JSON response
-- Replaced database fetch logic with direct use of tool response data
-- Added proper error handling using neverthrow and valibot validation
-- Removed unused helper functions `wasSchemaDesignToolSuccessful` and `fetchUpdatedSchemaWithResult`
-
-### 3. Updated tests
-- Modified `schemaDesignTool.test.ts` to handle new JSON response format
-- Added proper typing for parsed response
-
-## Architecture Diagram
-
-```mermaid
-%%{ init : { ""theme"" : ""default"" }}%%
-graph TD
-    A[schemaDesignTool] --> B[repositories.schema.createVersion]
-    B --> C[Database Updated]
-    A --> D[Return JSON with schema data]
-    D --> E[invokeSchemaDesignToolNode]
-    E --> F[Parse JSON response]
-    F --> G[Update workflow state directly]
-    
-    style D fill:#e1f5fe
-    style F fill:#e1f5fe
-    style G fill:#e1f5fe
-```
-
-## Critical Review Points
-
-⚠️ **High Priority Items to Verify:**
-
-1. **Data Consistency**: Verify that `result.newSchema` from `createVersion()` exactly matches what would be fetched from the database
-2. **Version Number Handling**: Confirm that `latestVersionNumber + 1` calculation aligns with database version management
-3. **Error Handling**: Review the neverthrow error handling chain in `extractSchemaDataFromToolResult()`
-4. **Type Safety**: Validate that the valibot schema properly covers all expected data structures
-5. **Integration Testing**: The workflow node integration wasn't directly tested - consider testing the full flow
-
-## Potential Risks
-
-- **Backward Compatibility**: Tool return format changed from string to JSON (should be isolated to this workflow)
-- **State Synchronization**: Removing the database fetch could cause issues if tool and DB state diverge
-- **Testing Coverage**: Limited integration testing of the full workflow node behavior
-
-## Testing
-
-- ✅ All existing `schemaDesignTool` tests pass with new JSON format
-- ✅ Lint and type checking pass
-- ⚠️ Integration testing of full workflow node not performed
-
----
-
-**Link to Devin run**: https://app.devin.ai/sessions/d8e21da1edbc49c3b2119275ebf5417c  
-**Requested by**: noritaka.ikeda@route06.co.jp",Devin,158243242,devin-ai-integration[bot],open,2025-07-30T07:15:24Z,,,839216423,https://api.github.com/repos/liam-hq/liam,https://github.com/liam-hq/liam/pull/2777,"analysisWe need to classify whether the primary purpose of the pull request is to improve performance. The PR is about updating schemaDesignTool to directly update workflow state, eliminating redundant database fetches, reducing race conditions, and unnecessary calls. This is a performance improvement: reducing database calls, improving efficiency. The description mentions eliminating redundant database fetch, reducing unnecessary calls, which is a performance improvement. So classification: 'performance'.assistantfinalperformance",24,1.0,False
-3074294403,320,Integrate chatAudioIO module,"# Integrate chatAudioIO module
-
-This PR integrates the chatAudioIO module from Moddable SDK 5.6.0 by refactoring the microphone implementation to use embedded:io/audio/in instead of pins/audioin. This improves real-time audio capabilities for stack-chan.
-
-## Changes:
-- Updated manifest_microphone.json to include io/audioin manifest
-- Refactored microphone.ts to use embedded:io/audio/in
-- Updated main.ts to check for embedded:io/audio/in availability
-- Updated manifest.json to include chatAudioIO module
-
-Link to Devin run: https://app.devin.ai/sessions/de064430de0d4c179e502e1d2686155f
-Requested by: Shinya Ishikawa
-",Devin,158243242,devin-ai-integration[bot],closed,2025-05-19T15:42:40Z,2025-05-28T14:33:26Z,,374381865,https://api.github.com/repos/stack-chan/stack-chan,https://github.com/stack-chan/stack-chan/pull/320,"analysisWe need to classify as performance or non-performance. The PR title: ""Integrate chatAudioIO module"". Body: ""This PR integrates the chatAudioIO module from Moddable SDK 5.6.0 by refactoring the microphone implementation to use embedded:io/audio/in instead of pins/audioin. This improves real-time audio capabilities for stack-chan."" It mentions improving real-time audio capabilities. That is performance improvement? Real-time audio capabilities: likely performance improvement. The keywords: ""improves real-time audio capabilities"" - performance. So classify as 'performance'.assistantfinalperformance",24,1.0,False
-3067975590,1848,Implement conversation by ID and active conversation tracking,"# Implement conversation by ID and active conversation tracking
-
-This PR implements:
-- Getting conversation by ID
-- Storing the active conversation ID
-- Only fetching conversation messages when conversation is active
-
-## Changes
-- Added a new `getConversationById` endpoint to the chat router
-- Added `activeConversationId` property to `ConversationManager`
-- Updated `selectConversation` method to set the active conversation ID
-- Modified `getConversationFromStorage` to only fetch messages for the active conversation
-- Updated related methods to properly set and clear the active conversation ID
-
-These changes optimize message fetching by only retrieving messages for the active conversation, improving performance.
-
-Link to Devin run: https://app.devin.ai/sessions/d6a0d25fe2bc4964b23867f2ad72145a
-Requested by: kiet@onlook.dev
-",Devin,158243242,devin-ai-integration[bot],closed,2025-05-16T05:27:32Z,2025-05-16T23:48:50Z,,820087727,https://api.github.com/repos/onlook-dev/onlook,https://github.com/onlook-dev/onlook/pull/1848,"analysisWe need to classify as performance or non-performance. The PR description says ""These changes optimize message fetching by only retrieving messages for the active conversation, improving performance."" That indicates performance improvement. So label 'performance'.assistantfinalperformance",24,0.057507900038728264,False
-3155127737,2055,feat: optimize duplicate checking in useRealtimeMessages with O(1) Set/Map lookups,"# Optimize Duplicate Checking in useRealtimeMessages with O(1) Set/Map Lookups
-
-## Summary
-
-This PR implements efficient duplicate checking in the `useRealtimeMessages` hook by replacing O(n) `array.some()` operations with O(1) Set/Map lookups, addressing the TODO comment on line 179.
-
-## Changes Made
-
-- **Added `MessageCache` interface** with `messageIds` Set and `userContentMap` Map for O(1) lookups
-- **Replaced O(n) duplicate checking** with efficient Set/Map-based approach
-- **Split `isDuplicateMessage` function** to reduce cognitive complexity (was 19, now under 15)
-- **Added proper TypeScript type guards** for optional `timestamp` property handling
-- **Maintained existing functionality** for both message ID and content-based duplicate detection
-- **Removed completed TODO comment** about implementing efficient duplicate checking
-
-## Technical Details
-
-### Before (O(n) complexity):
-```typescript
-const duplicateById = messages.some((msg) => msg.id === newEntry.id)
-const contentDuplicate = messages.some((msg) => { /* complex logic */ })
-```
-
-### After (O(1) complexity):
-```typescript
-const messageCache = createMessageCache(messages) // Creates Set/Map
-if (messageCache.messageIds.has(newEntry.id)) return true
-const existingMessages = messageCache.userContentMap.get(newEntry.content)
-```
-
-## Performance Impact
-
-- **Message ID checking**: O(n) → O(1)
-- **Content duplicate checking**: O(n) → O(1) for lookup + O(k) for timestamp comparison (where k is number of messages with same content)
-- **Overall improvement**: Significant performance boost for chat sessions with many messages
-
-## Testing
-
-- ✅ Code passes all linting checks (`pnpm lint`)
-- ✅ TypeScript compilation successful
-- ✅ Maintains existing duplicate detection logic
-- ✅ Proper type safety with optional timestamp handling
-
-## Files Changed
-
-- `frontend/apps/app/components/Chat/hooks/useRealtimeMessages.ts`
-
-## Link to Devin run
-https://app.devin.ai/sessions/3ccf96c6c9cf4ea094f9e56427b32318
-
-## Requested by
-hirotaka.miyagi@route06.co.jp
-",Devin,158243242,devin-ai-integration[bot],closed,2025-06-18T01:02:16Z,2025-06-18T03:09:37Z,,839216423,https://api.github.com/repos/liam-hq/liam,https://github.com/liam-hq/liam/pull/2055,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""feat: optimize duplicate checking in useRealtimeMessages with O(1) Set/Map lookups"". The body describes replacing O(n) array.some() with O(1) Set/Map lookups, improving performance. So it's a performance improvement. So classification: 'performance'.assistantfinalperformance",24,0.055613455435573514,False
-3208672912,718,Add realtime events for agent typing and reply broadcasting,"
-# Address PR feedback: use channel helper, implement throttle, move typing trigger
-
-## Summary
-
-This PR addresses three specific GitHub comments from binary-koan on the realtime events implementation:
-
-1. **Channel Helper Function**: Added `conversationRealtimeChannelId` helper function to `lib/realtime/channels.ts` and updated all 4 locations using the `conversation-${slug}` pattern to use this centralized helper.
-
-2. **Throttle vs Debounce**: Changed typing event logic from debounce (8s delay before sending) to throttle (send immediately, then block subsequent sends for 8s). Implemented using timestamp tracking instead of setTimeout for better performance.
-
-3. **TipTap Editor Integration**: Moved typing event trigger from `updateDraftedEmail` to TipTap editor's `onUpdate` callback, ensuring typing events trigger on actual editor changes rather than any draft updates.
-
-## Review & Testing Checklist for Human
-
-⚠️ **High Risk - Requires Thorough Testing** (5 items)
-
-- [ ] **End-to-end realtime functionality**: Test that typing events are broadcast immediately on first keypress in dashboard and typing indicators appear in widget, then verify 8-second throttle blocking works correctly
-- [ ] **TipTap editor integration**: Verify typing events trigger on actual editor key presses and not on programmatic content changes or other draft updates
-- [ ] **Event scoping**: Test with multiple conversations open to ensure events are properly scoped to conversation slugs and don't leak between different conversations
-- [ ] **Throttle edge cases**: Test rapid typing, network interruptions, and tab switching to ensure throttle logic handles edge cases correctly
-- [ ] **No regressions**: Verify existing reply event broadcasting and 10-second timeout functionality still works correctly
-
-**Recommended Test Plan:**
-1. Open dashboard conversation view and corresponding widget side-by-side
-2. Type in dashboard - verify typing indicator appears immediately in widget
-3. Continue typing rapidly - verify no additional typing events sent for 8 seconds
-4. Test with multiple conversations to ensure proper event isolation
-5. Verify reply events and existing functionality still work
-
----
-
-### Diagram
-
-```mermaid
-%%{ init : { ""theme"" : ""default"" }}%%
-graph TD
-    Dashboard[""app/(dashboard)/mailboxes/[mailbox_slug]/[category]/conversation/messageActions.tsx<br/>Dashboard Conversation""]:::major-edit
-    Widget[""components/widget/Conversation.tsx<br/>Chat Widget""]:::minor-edit
-    Channels[""lib/realtime/channels.ts<br/>Channel Helper""]:::major-edit
-    TipTap[""components/tiptap/editor.tsx<br/>TipTap Editor""]:::context
-    Supabase[""Supabase Realtime<br/>Channel System""]:::context
-
-    Dashboard -->|""uses""| Channels
-    Widget -->|""uses""| Channels
-    Dashboard -->|""onUpdate callback""| TipTap
-    Dashboard -->|""throttled broadcast""| Supabase
-    Supabase -->|""listen events""| Widget
-
-    subgraph Legend
-        L1[Major Edit]:::major-edit
-        L2[Minor Edit]:::minor-edit
-        L3[Context/No Edit]:::context
-    end
-
-    classDef major-edit fill:#90EE90
-    classDef minor-edit fill:#87CEEB
-    classDef context fill:#FFFFFF
-```
-
-### Notes
-
-- **Environment Issues**: Local development environment had persistent Docker PostgreSQL setup timeout issues, preventing end-to-end testing of the realtime functionality. This significantly increases the risk of bugs.
-- **Merge Conflicts**: Had to resolve complex merge conflicts during rebase, which required careful preservation of both autofix changes and new implementations.
-- **Throttle Implementation**: Uses `Date.now()` timestamp comparison instead of setTimeout for more reliable throttle behavior across browser tabs and network conditions.
-- **Channel Naming**: The helper function centralizes the `conversation-${slug}` pattern used across 4 different locations in the codebase.
-
-**Link to Devin run**: https://app.devin.ai/sessions/29c331cda1144d649eb058a1416a13ad  
-**Requested by**: reason.koan@gmail.com
-",Devin,158243242,devin-ai-integration[bot],closed,2025-07-07T11:40:25Z,2025-07-09T23:59:42Z,2025-07-09T23:59:42Z,941289933,https://api.github.com/repos/antiwork/helper,https://github.com/antiwork/helper/pull/718,"analysisWe need to classify whether the primary purpose of the pull request is to improve performance. The PR is about adding realtime events for agent typing and reply broadcasting. It addresses channel helper, throttle vs debounce, and editor integration. The changes include switching from debounce to throttle, using timestamp tracking instead of setTimeout for better performance. That is a performance improvement: throttle vs debounce, timestamp tracking. Also mention ""better performance"". The PR is about realtime events, but the main change is throttle logic to reduce network traffic, which is a performance improvement. The classification: 'performance'.
-
-Check if any other aspects: The PR is about adding realtime events, but the main change is throttle vs debounce. That is a performance improvement. So classification: performance.assistantfinalperformance",24,0.051536679715818455,True
-2821981350,1184,refactor: prevent chat messages from re-rendering on stream updates,"This PR splits out the streaming message and memoizes individual messages to reduce unnecessary re-renders.
-
-Changes:
-- Created separate StreamingMessage component to handle streaming state
-- Memoized AssistantMessage with React.memo
-- Added observer to UserMessage for MobX state changes
-- Removed streamingMessage from useEffect dependencies
-- Added proper TypeScript types to components
-
-Link to Devin run: https://app.devin.ai/sessions/d1e1527a71b34c3eb8b4ed7acd60660d",Devin,158243242,devin-ai-integration[bot],closed,2025-01-30T22:52:48Z,2025-01-31T00:10:40Z,,820087727,https://api.github.com/repos/onlook-dev/onlook,https://github.com/onlook-dev/onlook/pull/1184,"analysisWe need to classify as performance or non-performance. The PR title: ""refactor: prevent chat messages from re-rendering on stream updates"". Body: splits out streaming message and memoizes individual messages to reduce unnecessary re-renders. This is about performance: reducing re-renders, memoization. So classification: performance.assistantfinalperformance",24,0.05085338924998129,False
-3260887009,1164,Fix startup errors and implement real-time Effect streaming,"## Summary
-Fixes the ""Session not found"" error on app startup and implements real-time Effect-based streaming to replace 50ms polling.
-
-## Key Changes
-
-### 1. Fix ""Session not found"" Error
-- **Problem**: App showed ""Session not found"" dialog on every startup
-- **Root cause**: Chat panes were persisted but sessions are ephemeral 
-- **Solution**: Filter out chat panes on rehydration from localStorage
-- **Result**: Clean app startup with no error dialogs
-
-### 2. Implement Effect-Based Streaming  
-- **Problem**: Messages appeared all at once instead of streaming in real-time
-- **Root cause**: PR #1160 with Effect streaming was never merged
-- **Solution**: Extracted working streaming implementation and integrated it
-- **Key techniques**:
-  - Uses `Effect.forkDaemon` to prevent fiber interruption
-  - Direct `Effect.runPromise` with `Effect.provide` instead of ManagedRuntime
-  - Simplified session management without complex Fiber tracking
-  - Queue holds payload directly instead of TauriEvent wrapper
-- **Result**: Messages now stream in real-time as they're received from Claude
-
-### 3. Additional Fixes
-- **React setState warnings**: Wrapped state updates in `setTimeout` to avoid render-time mutations
-- **Text input during initialization**: Removed `isInitializing` check to allow typing while session starts
-- **Responsive pane height**: Made `DEFAULT_CHAT_HEIGHT` responsive to viewport size
-- **Clean logging**: Removed debug console.log statements for production use
-- **Rust backend**: Updated to emit Tauri events for real-time streaming
-
-## Technical Details
-
-### Backend Changes
-- Added `app_handle` to `ClaudeManager` and `ClaudeSession`
-- Emit `claude:{sessionId}:message` events for each message
-- Modified `create_session` to accept and store app handle
-
-### Frontend Changes
-- Added Effect streaming services: `TauriEventService`, `ClaudeStreamingService`
-- Created `useClaudeStreaming` hook for React integration
-- Added `SessionStreamManager` component to handle streaming per session
-- Removed 50ms polling mechanism entirely
-
-### Effect Streaming Architecture
-```typescript
-// Service layer with proper error handling
-const ServiceLayer = Layer.provideMerge(ClaudeStreamingServiceLive, TauriEventLayer);
-
-// Stream processing with daemon fork
-yield* pipe(
-  service.getMessageStream(session),
-  Stream.tap(message => updateUI(message)),
-  Stream.runDrain,
-  Effect.forkDaemon // Key: prevents fiber interruption
-);
-```
-
-## Test Plan
-- [x] App starts without ""Session not found"" error
-- [x] Messages stream in real-time (not all at once)
-- [x] Can type in chat input while session initializes  
-- [x] Pane height adapts to viewport size
-- [x] No React setState warnings in console
-- [x] Clean console output (no debug logs)
-- [x] Chat sessions persist messages across app usage
-- [x] Multiple concurrent sessions work correctly
-
-## Before/After
-**Before**: 50ms polling, messages appear all at once, ""Session not found"" errors
-**After**: Real-time streaming, messages appear as they're typed, clean startup
-
-Fixes #1163
-
-🤖 Generated with [Claude Code](https://claude.ai/code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,14167547,AtlantisPleb,closed,2025-07-24T18:50:34Z,2025-07-24T20:00:28Z,2025-07-24T20:00:28Z,715683924,https://api.github.com/repos/OpenAgentsInc/openagents,https://github.com/OpenAgentsInc/openagents/pull/1164,"analysisWe need to classify as performance or non-performance. The PR is about fixing startup errors and implementing real-time effect streaming, replacing 50ms polling. The key change is removing polling and using real-time streaming. This is a performance improvement: removing polling reduces latency, improves responsiveness. Also mentions ""real-time streaming"" and ""messages now stream in real-time"". That is performance. So classify as 'performance'.assistantfinalperformance",24,0.04595675950899916,True
-3164503419,40,Fix Claude animation flickering with vt10x-inspired terminal state deduplication,"## 🎯 Problem: Claude's Thinking Animation Causes Terminal Flickering
-
-When using Claude in the terminal, rapid escape sequences during the ""thinking"" animation cause visual chaos:
-- Cursor jumps left-right-left-right 🔄
-- Bottom lines flicker aggressively ⚡
-- Text appears and disappears creating a strobe effect 📺
-- Makes Claude unusable in terminal environments 😵
-
-The root cause: Claude sends `\x1b[2K\x1b[1A` (clear line + cursor up) sequences **every 20ms**, overwhelming the terminal with 193 redundant updates!
-
-## 🧠 Solution: Learn from the Masters - vt10x Terminal Emulation
-
-Instead of fighting Claude's animation, we studied how professional terminal emulators handle rapid updates. The **vt10x library** revealed the secret sauce:
-
-### 🔬 **The Science Behind Smooth Terminals**
-```go
-// Before: Naive approach - send every update
-ptyOutput → terminalBuffer → websocket (193 updates! 🔥)
-
-// After: vt10x-inspired state deduplication  
-ptyOutput → dirtyTracking → changeFlags → sequenceID → debounce → websocket (53 updates ✨)
-```
-
-## 🚀 **Performance Revolution**
-
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| WebSocket updates | 193 | 53 | **72% reduction** |
-| Animation smoothness | Flickering mess | Buttery smooth | **Visual perfection** |
-| CPU overhead | High churn | Optimized | **Efficient processing** |
-| Terminal compatibility | Broken | Perfect | **Zero regressions** |
-
-## 🛠 **Technical Wizardry**
-
-### **1. Dirty Line Tracking (vt10x-style)**
-```go
-dirty []bool  // Track exactly which lines changed
-anydirty bool // Quick dirty check without scanning
-```
-
-### **2. Change Flag System**
-```go
-const (
-    ChangedScreen uint32 = 1 << iota  // Content changed
-    ChangedCursor                     // Cursor moved  
-    ChangedTitle                      // Title updated
-    ChangedSize                       // Terminal resized
-)
-```
-
-### **3. Sequence-Based Deduplication** 
-```go
-sequenceID uint64  // Monotonic counter
-// If sequenceID matches → identical state → skip update!
-```
-
-### **4. Smart Debouncing (Node.js-inspired)**
-```go
-// Simple 50ms timer - let rapid updates settle
-time.AfterFunc(50*time.Millisecond, sendFinalState)
-```
-
-## 🎮 **The Node.js Secret Weapon**
-
-We discovered the working Node.js version uses **XTerm.js** which has built-in sophisticated state management. Our Go implementation now matches this approach:
-
-```typescript
-// Node.js: XTerm.js handles complexity internally
-ptyData → xterm.headless → 50ms debounce → websocket
-
-// Go: We replicated the internal magic  
-ptyData → vt10x-style-buffer → 50ms debounce → websocket
-```
-
-## 🔧 **What Changed**
-
-### **Core Files Transformed:**
-- **`terminal/buffer.go`**: Added vt10x dirty tracking + change flags
-- **`termsocket/manager.go`**: Simplified to Node.js-style debouncing  
-- **`api/raw_websocket.go`**: NEW goterm-style direct PTY streaming
-- **`session/manager.go`**: Direct PTY callbacks bypass file I/O
-
-### **Performance Optimizations:**
-- **Incremental updates**: Only send changed lines, not entire screen
-- **State caching**: Reuse identical snapshots via sequence comparison
-- **Memory efficiency**: Reuse buffers instead of allocating new ones
-- **Event-driven I/O**: 1ms epoll/kqueue timeouts for instant response
-
-## 🧪 **Battle-Tested Results**
-
-```bash
-# Before: Flickering nightmare
-$ claude
-╭─────────────────╮  ← Flickers every 20ms
-│ >               │  ← Cursor jumps around  
-╰─────────────────╯  ← Text strobes on/off
-
-# After: Smooth as silk  
-$ claude
-╭─────────────────╮  ← Stable animation
-│ > thinking...   │  ← Smooth cursor
-╰─────────────────╯  ← No flicker artifacts
-```
-
-## 🎯 **Test Plan**
-
-- [x] **Build success**: All Go packages compile cleanly
-- [x] **WebSocket monitoring**: Confirmed 72% update reduction  
-- [x] **State deduplication**: Sequence IDs prevent duplicates
-- [x] **Terminal compatibility**: All escape sequences work perfectly
-- [ ] **Side-by-side comparison**: Go vs Node.js visual parity
-- [ ] **Application testing**: nano, vim, htop, claude all smooth
-
-## 🏆 **The Bottom Line**
-
-This isn't just a bug fix - it's a **terminal performance revolution**! By applying lessons from professional terminal emulators like vt10x, we've transformed a flickering mess into a buttery-smooth experience that rivals the best terminal applications.
-
-**Claude's thinking animation now works beautifully in the terminal! 🎉**
-
----
-*🤖 Engineered with precision by [Claude Code](https://claude.ai/code)*
-
-*Co-Authored-By: Claude <noreply@anthropic.com>*",Claude_Code,2891702,hjanuschka,closed,2025-06-20T22:47:18Z,2025-06-21T11:51:22Z,,1002552148,https://api.github.com/repos/amantus-ai/vibetunnel,https://github.com/amantus-ai/vibetunnel/pull/40,"analysisWe need to classify as 'performance' or 'non-performance'. The PR description is about improving performance: reducing websocket updates, reducing flickering, optimizing terminal updates, etc. It contains performance keywords: ""performance revolution"", ""72% reduction"", ""CPU overhead"", ""efficient processing"", ""memory efficiency"", ""event-driven I/O"". So it's performance.assistantfinalperformance",24,0.045818024858385556,True
-3179460425,344,Introduce UID support for Messages to enable efficient frontend tracking,"This PR introduces unique identifiers (UIDs) for all message types to enable efficient message tracking and filtering, particularly beneficial for frontend applications that need to sync message state without unnecessary data transfer.
-
-## Overview
-
-All messages now generate deterministic SHA256-based UIDs from their content, enabling:
-- **Efficient sync**: Frontend can request only messages newer than a known UID
-- **Deduplication**: Identical messages are easily identified by matching UIDs  
-- **State management**: Track which messages have been processed/displayed
-- **Bandwidth optimization**: Avoid re-transmitting known messages
-
-## Changes Made
-
-### Core Message Interface
-- Added `getUid(): string` method to `MessageInterface`
-- All message types (`SystemMessage`, `AssistantMessage`, `UserMessage`, `ToolCallMessage`) now implement UID generation
-- UIDs are deterministic - same content always produces the same UID
-
-### MessageBag Enhancements
-Added new methods to `MessageBag` and `MessageBagInterface`:
-- `findByUid(string $uid): ?MessageInterface` - Find message by UID
-- `hasMessageWithUid(string $uid): bool` - Check if UID exists
-- `getUids(): array` - Get all UIDs in order
-- `messagesAfterUid(string $uid): array` - Get messages after a specific UID
-- `messagesNewerThan(string $uid): self` - Get MessageBag with newer messages
-
-### UID Generation Strategy
-- Uses SHA256 hashing for deterministic, content-based UIDs
-- Includes message role and content in hash computation
-- Complex content (tool calls, multiple content objects) is serialized consistently
-- 64-character hex string format
-
-## Usage Example
-
-```php
-use PhpLlm\LlmChain\Platform\Message\Message;
-use PhpLlm\LlmChain\Platform\Message\MessageBag;
-
-// Messages generate consistent UIDs
-$message1 = Message::forSystem('Welcome');
-$message2 = Message::forSystem('Welcome'); // Same UID as message1
-$userMsg = Message::ofUser('Hello');
-
-$bag = new MessageBag($message1, $userMsg);
-
-// Get only new messages since last sync
-$lastKnownUid = $message1->getUid();
-$newMessages = $bag->messagesNewerThan($lastKnownUid);
-
-// Frontend can now request only messages it hasn't seen
-$uids = $bag->getUids();
-$latestMessage = $bag->findByUid(end($uids));
-```
-
-## Frontend Integration Benefits
-
-This enables the exact use case described in the issue - frontends can now:
-1. Track the last known message UID
-2. Request only messages newer than that UID
-3. Avoid downloading the entire conversation history on each update
-4. Efficiently manage real-time message updates
-
-## Backward Compatibility
-
-This change is fully backward compatible. Existing code continues to work unchanged, and the new UID functionality is opt-in.
-
-## Testing
-
-- Comprehensive test suite covering all message types and UID scenarios
-- Verified deterministic behavior across identical content
-- Tested MessageBag filtering functionality
-- Validated practical frontend-backend sync patterns
-
-Fixes #77.
+- Reduces production bundle size by eliminating sourcemap URL comments
+- Maintains debugging capability through manually loadable sourcemap files
+- Aligns with security best practices by not exposing sourcemap URLs in production
+- Consistent with the related .NET runtime issue approach
+
+Fixes #62295.
 
 > [!WARNING]
 >
@@ -684,10 +44,10 @@ Fixes #77.
 >
 > #### I tried to connect to the following addresses, but was blocked by firewall rules:
 >
-> - `https://api.github.com/repos/CodeWithKyrian/transformers-libsloader/zipball/7052adad23e969701a961437b77422f820df05ba`
->   - Triggering command: `/usr/bin/php8.3 -n -c /tmp/E7SlNf /usr/bin/composer install --ignore-platform-req=ext-mongodb ` (http block)
-> - `https://api.github.com/repos/OskarStark/enum-helper/zipball/adccc8c099db61cb26497a1e1987fc95ebda02a9`
->   - Triggering command: `/usr/bin/php8.3 -n -c /tmp/9SZRkl /usr/bin/composer install --ignore-platform-req=ext-mongodb --no-dev ` (http block)
+> - `googlechromelabs.github.io`
+>   - Triggering command: `node install.mjs` (dns block)
+> - `https://storage.googleapis.com/chrome-for-testing-public/134.0.6998.35/linux64/chrome-headless-shell-linux64.zip`
+>   - Triggering command: `node install.mjs` (http block)
 >
 > If you need me to access, download, or install something from one of these locations, you can either:
 >
@@ -701,4 +61,1017 @@ Fixes #77.
 <!-- START COPILOT CODING AGENT TIPS -->
 ---
 
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-26T15:10:34Z,2025-06-30T21:01:31Z,,777432944,https://api.github.com/repos/php-llm/llm-chain,https://github.com/php-llm/llm-chain/pull/344,"analysisWe need to classify whether the primary purpose of the PR is to improve performance. The PR introduces UID support for messages to enable efficient frontend tracking, sync, deduplication, bandwidth optimization. The focus is on efficient sync, bandwidth optimization, avoiding re-transmitting known messages. That is performance improvement: reducing bandwidth, efficient sync. The keywords: ""efficient"", ""bandwidth optimization"", ""deduplication"", ""sync"". The classification: 'performance'. The PR is about performance improvement. So output 'performance'.assistantfinalperformance",24,0.04560764078012076,False
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-03T15:33:45Z,2025-07-09T16:05:38Z,2025-07-09T16:05:38Z,17620347,https://api.github.com/repos/dotnet/aspnetcore,https://github.com/dotnet/aspnetcore/pull/62558,24,1.0,False
+3167979829,1633,Optimize VSCode extension bundle size by adding .js extensions to core imports,"This PR optimizes the VSCode extension bundle by converting all core module imports to use explicit `.js` extensions, enabling better tree-shaking and more efficient bundling.
+
+## Changes Made
+
+Updated **105 import statements** across **24 TypeScript files** in `packages/vscode/src/` to use explicit `.js` extensions:
+
+```typescript
+// Before:
+import { deleteUndefinedValues } from ""../../core/src/cleaners""
+import { TOOL_NAME, CHANGE, TOOL_ID } from ""../../core/src/constants"" 
+import { logInfo, groupBy, logVerbose } from ""../../core/src/util""
+
+// After:
+import { deleteUndefinedValues } from ""../../core/src/cleaners.js""
+import { TOOL_NAME, CHANGE, TOOL_ID } from ""../../core/src/constants.js""
+import { logInfo, groupBy, logVerbose } from ""../../core/src/util.js""
+```
+
+## Benefits
+
+1. **Reduced Bundle Size**: Explicit extensions enable better tree-shaking and dead code elimination
+2. **Faster Build Performance**: Module resolution is more predictable and efficient
+3. **Improved Bundling**: ESBuild can optimize imports more effectively with explicit extensions
+4. **Better Development Experience**: Clearer module resolution during development
+
+## Files Updated
+
+Most frequently imported modules that were updated:
+- `constants.js` (18 imports across files)
+- `util.js` (10 imports)
+- `cleaners.js` (7 imports)
+- `error.js` (6 imports)
+- `server/messages.js` (5 imports)
+- Plus 20+ other core modules
+
+All changes are backward compatible and maintain existing functionality while optimizing the extension's bundle efficiency.
+
+Fixes #1628.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `cdn.sheetjs.com`
+>   - Triggering command: `node /usr/local/bin/yarn install ` (dns block)
+>   - Triggering command: `npm install                     ` (dns block)
+>   - Triggering command: `npm install                                   ` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-23T12:15:01Z,2025-06-23T12:36:01Z,,679784368,https://api.github.com/repos/microsoft/genaiscript,https://github.com/microsoft/genaiscript/pull/1633,24,1.0,False
+3114992077,244,feat(editor): implement code splitting and tree shaking optimizations,"# Editor Code Splitting and Tree Shaking Optimizations
+
+This PR implements comprehensive code splitting and tree shaking optimizations for the `packages/editor` package to improve bundle size and loading performance.
+
+## Changes Made
+
+### Code Splitting Implementation
+- **Lazy Loading for ToolbarPlugin**: Split large toolbar components into separate chunks
+  - `FormatButtonGroup`, `HistoryButtonGroup`, `BlockFormatDropdown` now load on-demand
+  - Created `LazyComponents.tsx` for centralized toolbar component lazy loading
+- **Plugin Lazy Loading**: Implemented lazy loading for editor plugins
+  - `MarkdownPlugin`, `ShortcutsPlugin` with centralized `LazyPlugins.tsx`
+  - Export functionality lazy loaded in `LazyExportFiles.tsx`
+- **Suspense Integration**: All lazy components wrapped with appropriate loading fallbacks
+
+### Tree Shaking Optimizations
+- Added `""sideEffects"": false` to `package.json` for better tree shaking
+- Enhanced Vite configuration with granular manual chunks:
+  - `vendor-react`: React and React DOM (11.84 kB)
+  - `lexical`: Lexical editor packages (263.73 kB)
+  - `utils`: Utility libraries (24.84 kB)
+  - `ui`: Lucide React icons (9.47 kB)
+  - `toolbar-components`: Toolbar sub-components (8.19 kB)
+  - Individual plugin chunks for optimal loading
+
+### Build Configuration
+- Created `tsconfig.build.json` for proper TypeScript compilation
+- Removed unused `@lexical/code` dependency from manual chunks
+- Optimized external dependencies configuration
+- Updated build script to use Vite directly
+
+## Bundle Analysis Results
+
+The code splitting successfully created multiple optimized chunks:
+
+```
+dist/assets/MarkdownTransformers-C6xoCyMc.js       0.11 kB │ gzip:  0.11 kB
+dist/assets/MarkdownShortcutPlugin-BOQmR3JH.js     0.21 kB │ gzip:  0.17 kB
+dist/assets/NetlifyBadge-BE_iR48X.js               0.40 kB │ gzip:  0.30 kB
+dist/assets/ShortcutsPlugin-DKuKwRn5.js            1.75 kB │ gzip:  0.73 kB
+dist/assets/ExportFilesDropdownMenu-BZ5xBM_F.js    3.02 kB │ gzip:  1.44 kB
+dist/assets/toolbar-components-e1peZuVQ.js         8.19 kB │ gzip:  2.55 kB
+dist/assets/ui-CK1V8Drw.js                         9.47 kB │ gzip:  2.30 kB
+dist/assets/vendor-react-Cye7vbh-.js              11.84 kB │ gzip:  4.21 kB
+dist/assets/utils-BvPSPxno.js                     24.84 kB │ gzip:  7.91 kB
+dist/assets/index-ByAE9yeQ.js                    186.57 kB │ gzip: 59.62 kB
+dist/assets/lexical-B7GF3u3o.js                  263.73 kB │ gzip: 84.16 kB
+```
+
+## Performance Benefits
+- **Improved Initial Load**: Core editor loads faster with non-essential components deferred
+- **Better Caching**: Vendor libraries and utilities cached separately from application code
+- **Reduced Bundle Size**: Tree shaking eliminates unused code paths
+- **Progressive Loading**: Features load on-demand as users interact with the editor
+
+## Code Quality
+- ✅ All existing coding style and patterns preserved
+- ✅ TypeScript types maintained throughout
+- ✅ Lint checks pass (only pre-existing warnings remain)
+- ✅ Build process successful with optimized output
+- ✅ Suspense fallbacks provide smooth loading experience
+
+## Testing
+- Build process verified with `pnpm build`
+- Lint checks completed with `pnpm lint`
+- Bundle analysis confirms proper code splitting
+- All lazy loading components wrapped with appropriate Suspense boundaries
+
+---
+
+**Link to Devin run**: https://app.devin.ai/sessions/eca0c6fc8ab94289b7bd92363bd22d11
+
+**Requested by**: Yadong (Adam) Zhang (zhyd007@gmail.com)
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-03T18:22:54Z,2025-06-12T15:23:07Z,,440017777,https://api.github.com/repos/softmaple/softmaple,https://github.com/softmaple/softmaple/pull/244,24,1.0,True
+3088949809,77,Migrate from NextJS to RedwoodJS,"This PR migrates the application from NextJS to RedwoodJS with the goal of reducing bundle size as discussed in #46.
+
+## Changes Overview
+
+- Added RedwoodJS core dependencies to the project
+- Created RedwoodJS project structure with `api` and `web` directories
+- Migrated existing components and layouts to work with RedwoodJS
+- Converted API routes to GraphQL services with equivalent functionality
+- Set up Prisma schema to match our existing data models
+- Updated scripts in package.json to support both existing and new workflows
+- Enhanced documentation with RedwoodJS-specific information
+
+## Migration Architecture
+
+The implementation follows RedwoodJS best practices while maintaining compatibility with existing code:
+
+- Created a GraphQL schema that matches our current API endpoints
+- Implemented services that utilize our existing database access patterns
+- Set up routes that mirror our current application structure
+- Maintained the same styling and component structure
+
+## Benefits
+
+- Smaller bundle size through RedwoodJS's optimized build process
+- Improved code organization with clear separation between API and web
+- Better developer experience with RedwoodJS tooling
+- GraphQL API improves frontend data fetching efficiency
+- Automatic code splitting for improved client-side performance
+
+## Testing Notes
+
+To test locally:
+1. Run `pnpm dev:redwood` to start the full RedwoodJS stack
+2. Visit http://localhost:8910 to view the application
+
+Fixes #46.
+
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-05-25T00:59:54Z,2025-05-25T01:15:01Z,,969089225,https://api.github.com/repos/unibeck/solstatus,https://github.com/unibeck/solstatus/pull/77,24,1.0,False
+3075349977,55,Decrease OpenNext Bundle Size to Below 3MB,"This PR reduces the OpenNext bundle size to well below the 3MB limit. The compressed bundle size is now 2.14MB, which is a significant reduction from the original bundle.
+
+## Changes Made
+
+### Optimized OpenAPI Implementation
+- Replaced heavy OpenAPI implementation with a lightweight custom solution
+- Completely removed `@scalar/nextjs-openapi` package dependency
+- Created a simple endpoint that returns JSON or redirects to GitHub
+
+### Build Optimizations
+- Added webpack optimizations in `next.config.ts` to minimize server-side code
+- Configured `optimizePackageImports` for icon libraries and date-fns
+- Added optimization script that runs post-build to further reduce file size:
+  - Removes source maps and debug code
+  - Strips unnecessary whitespace and comments
+  - Minifies common code patterns
+
+### Build Process Enhancements
+- Updated build scripts to include optimization step
+- Added gzip compression checks to ensure the size stays below 3MB
+- Modified deployment commands to always include optimization
+
+## Results
+
+| Metric | Before | After | Change |
+|--------|--------|-------|--------|
+| Raw Size | 24MB | 10.11MB | -58% |
+| Compressed Size | ~6MB | 2.14MB | -64% |
+
+The bundle now easily fits within Cloudflare's worker size requirements.
+
+Fixes #54.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `cdn.fwupd.org`
+>   - Triggering command: `/usr/bin/fwupdmgr refresh ` (dns block)
+> - `fonts.googleapis.com`
+>   - Triggering command: `/usr/local/bin/node /home/REDACTED/work/solstatus/solstatus/node_modules/.pnpm/next@15.3.2_babel-plugin-react-compiler@19.1.0-rc.1_react-dom@19.1.0_react@19.1.0__react@19.1.0/node_modules/next/dist/compiled/jest-worker/processChild.js ` (dns block)
+> - `telemetry.nextjs.org`
+>   - Triggering command: `node /home/REDACTED/work/solstatus/solstatus/node_modules/.bin/../next/dist/bin/next build ` (dns block)
+>   - Triggering command: `/home/REDACTED/work/_temp/ghcca-node/node/bin/node /home/REDACTED/work/_temp/copilot-developer-action-main/dist/index.js ` (dns block)
+>   - Triggering command: `node /home/REDACTED/work/solstatus/solstatus/node_modules/.bin/../.pnpm/next@15.3.2_babel-plugin-react-compiler@19.1.0-rc.1_react-dom@19.1.0_react@19.1.0__react@19.1.0/node_modules/next/dist/bin/next build ` (dns block)
+> - `workers.cloudflare.com`
+>   - Triggering command: `node /home/REDACTED/work/solstatus/solstatus/node_modules/.bin/../next/dist/bin/next build ` (dns block)
+>   - Triggering command: `/usr/local/bin/node /home/REDACTED/work/solstatus/solstatus/node_modules/.pnpm/next@15.3.2_babel-plugin-react-compiler@19.1.0-rc.1_react-dom@19.1.0_react@19.1.0__react@19.1.0/node_modules/next/dist/compiled/jest-worker/processChild.js ` (dns block)
+>   - Triggering command: `node /home/REDACTED/work/solstatus/solstatus/node_modules/.bin/../.pnpm/next@15.3.2_babel-plugin-react-compiler@19.1.0-rc.1_react-dom@19.1.0_react@19.1.0__react@19.1.0/node_modules/next/dist/bin/next build ` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-05-20T01:19:02Z,2025-05-20T13:41:44Z,,969089225,https://api.github.com/repos/unibeck/solstatus,https://github.com/unibeck/solstatus/pull/55,24,1.0,False
+3128413591,20265,Introduce ahead of time bundling for HTML imports with `bun build`,"### What does this PR do?
+
+This + #20198 will fix #17653
+
+The HTML becomes a manifest object like this:
+```json
+{
+  ""index"": ""./index.html"",
+  ""files"": [
+    {
+      ""input"": ""index.html"",
+      ""path"": ""./index-f2me3qnf.js"",
+      ""loader"": ""js"",
+      ""isEntry"": true,
+      ""headers"": {
+        ""etag"": ""eet6gn75"",
+        ""content-type"": ""text/javascript;charset=utf-8""
+      }
+    },
+    {
+      ""input"": ""index.html"",
+      ""path"": ""./index.html"",
+      ""loader"": ""html"",
+      ""isEntry"": true,
+      ""headers"": {
+        ""etag"": ""r9njjakd"",
+        ""content-type"": ""text/html;charset=utf-8""
+      }
+    },
+    {
+      ""input"": ""index.html"",
+      ""path"": ""./index-gysa5fmk.css"",
+      ""loader"": ""css"",
+      ""isEntry"": true,
+      ""headers"": {
+        ""etag"": ""50zb7x61"",
+        ""content-type"": ""text/css;charset=utf-8""
+      }
+    }
+  ]
+}
+```
+
+### How did you verify your code works?
+
+There are tests.",Cursor,709451,Jarred-Sumner,closed,2025-06-08T14:48:30Z,2025-06-11T04:26:01Z,2025-06-11T04:26:01Z,357728969,https://api.github.com/repos/oven-sh/bun,https://github.com/oven-sh/bun/pull/20265,24,1.0,False
+3110602702,218,Optimize Editor Bundle Size with Dynamic Imports and Chunk Splitting,"# Optimize Editor Bundle Size with Dynamic Imports and Chunk Splitting
+
+## Problem
+The `packages/editor` bundle was not optimized for lazy loading of editor plugins, resulting in a large initial bundle size that included all editor features even when they weren't immediately needed.
+
+## Solution
+Implemented dynamic imports and enhanced chunk splitting to reduce initial bundle size while maintaining all existing functionality.
+
+### Key Optimizations
+
+#### 1. Dynamic Imports with React.lazy()
+- Converted ToolbarPlugin, ShortcutsPlugin, and MarkdownPlugin to lazy-loaded components
+- Added appropriate Suspense wrappers with loading fallbacks
+- Plugins are now loaded on-demand rather than bundled in the main chunk
+
+#### 2. Enhanced Vite Chunk Splitting
+- Added `editor-toolbar` chunk for toolbar-related components
+- Added `editor-plugins` chunk for other editor plugins and transformers
+- Improved separation of concerns in bundle architecture
+
+## Results
+
+### Bundle Size Improvements
+**Before:**
+- Main bundle: `index--c2hLphG.js` - 306.24 kB
+- Lexical chunk: `lexical-BUtOlolZ.js` - 264.20 kB
+
+**After:**
+- Main bundle: `index-SPxahrIZ.js` - 182.37 kB (**40% reduction**)
+- Lexical chunk: `lexical-CgftDftg.js` - 264.19 kB (unchanged)
+- Editor toolbar: `editor-toolbar-BEHgd-9i.js` - 123.05 kB (new chunk)
+- Editor plugins: `editor-plugins-Ci9LYc9w.js` - 1.74 kB (new chunk)
+
+### Performance Impact
+- **40% reduction** in main bundle size (306.24 kB → 182.37 kB)
+- Toolbar and advanced plugins load on-demand
+- Faster initial page load for basic editor usage
+- Better code splitting and caching strategies
+
+## Changes Made
+
+### `packages/editor/src/components/core/Editor.tsx`
+- Added React.lazy() imports for ToolbarPlugin, ShortcutsPlugin, and MarkdownPlugin
+- Wrapped lazy components with Suspense and appropriate fallbacks
+- Maintained all existing functionality and props
+
+### `packages/editor/vite.config.ts`
+- Added `editor-toolbar` chunk for toolbar components
+- Added `editor-plugins` chunk for plugin components
+- Enhanced manual chunk splitting configuration
+
+## Testing
+- ✅ Build process completes successfully
+- ✅ TypeScript compilation passes
+- ✅ All editor functionality preserved
+- ✅ Dynamic imports working correctly
+- ✅ Chunk splitting configuration applied
+
+## Impact
+- Improved initial load performance for editor package consumers
+- Better separation of editor features into logical chunks
+- Maintained backward compatibility with existing usage patterns
+- Optimized bundle architecture for future scalability
+
+## Link to Devin run
+https://app.devin.ai/sessions/3a33dc1589be45e69203da487719000c
+
+**Requested by:** Yadong (Adam) Zhang (zhyd007@gmail.com)
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-02T15:12:06Z,2025-06-02T15:15:26Z,,440017777,https://api.github.com/repos/softmaple/softmaple,https://github.com/softmaple/softmaple/pull/218,24,1.0,False
+3245424562,571,feat: optimize web app bundle size (BUS-1459),"# feat: optimize web app bundle size (BUS-1459)
+
+## Summary
+
+This PR implements several bundle size optimizations for the web app to address the ~740KB bundle size issue:
+
+1. **Fixed Next.js configuration** - Added missing import and enabled bundle analyzer
+2. **Optimized barrel file exports** - Replaced `export *` patterns with explicit named exports in key UI components to improve tree-shaking
+3. **Implemented dynamic Chart.js loading** - Created `BusterChartJSDynamic` component with lazy loading to reduce initial bundle size
+4. **Streamlined icon library exports** - Limited exported icons to only commonly used ones (16 icons vs 3562+ total exports)
+
+Bundle analyzer reports were successfully generated showing the optimization impact, though builds failed due to missing @buster/server-shared environment dependencies.
+
+## Review & Testing Checklist for Human
+
+**⚠️ CRITICAL ITEMS TO VERIFY:**
+
+- [ ] **Icon functionality test** - Verify all icons throughout the app still render correctly (highest risk change - only 16 icons now exported vs 3562+ before)
+- [ ] **Chart component functionality** - Test that all chart components load and function properly with the new dynamic loading
+- [ ] **Bundle size measurement** - Run bundle analyzer before/after to verify actual size reduction achieved
+- [ ] **Build success** - Ensure the build completes successfully in proper environment with all dependencies
+- [ ] **Functionality regression test** - Test key user flows to ensure barrel file optimizations didn't break imports
+
+**Recommended test plan:** Navigate through dashboard with charts, verify icons display correctly in sidebars/buttons/dropdowns, and run `ANALYZE=true npm run analyze` to measure bundle impact.
+
+---
+
+### Diagram
+
+```mermaid
+%%{ init : { ""theme"" : ""default"" }}%%
+graph TD
+    A[""next.config.mjs""]:::major-edit
+    B[""ui/icons/index.ts""]:::major-edit  
+    C[""ui/charts/BusterChartJSDynamic.tsx""]:::major-edit
+    D[""ui/charts/BusterChartComponent.tsx""]:::minor-edit
+    E[""NucleoIconOutlined/index.ts<br/>(3562 exports)""]:::context
+    F[""ui/buttons/index.ts""]:::minor-edit
+    G[""ui/modal/index.ts""]:::minor-edit
+    H[""BusterChartJS/index.ts""]:::minor-edit
+    
+    A -->|""enables""| I[""Bundle Analyzer""]:::context
+    B -->|""imports from""| E
+    C -->|""dynamic import""| J[""BusterChartJS components""]:::context
+    D -->|""uses""| C
+    B -.->|""tree-shaking""| K[""Smaller bundle""]:::context
+    C -.->|""code splitting""| K
+    
+    subgraph Legend
+        L1[""Major Edit""]:::major-edit
+        L2[""Minor Edit""]:::minor-edit  
+        L3[""Context/No Edit""]:::context
+    end
+
+classDef major-edit fill:#90EE90
+classDef minor-edit fill:#87CEEB  
+classDef context fill:#FFFFFF
+```
+
+### Notes
+
+- **Environment issue**: Build failures due to missing `@buster/server-shared` dependencies prevented full end-to-end testing
+- **Bundle analyzer success**: Reports were generated successfully both before and after optimizations
+- **Icon library risk**: The most significant change is limiting icon exports from 3562+ to 16 commonly used ones - this needs careful verification
+- **Dynamic loading**: Chart.js components now use Next.js dynamic imports with loading states
+
+**Screenshots:**
+- Baseline bundle analysis: ![Baseline](file:///home/ubuntu/screenshots/file_home_ubuntu_161253.png)
+- Optimized bundle analysis: ![Optimized](file:///home/ubuntu/screenshots/file_home_ubuntu_161751.png)
+
+**Session info:**
+- Link to Devin run: https://app.devin.ai/sessions/1739ea31124a416d8b502f0e44dcd6e5
+- Requested by: @nate-kelley-buster",Devin,158243242,devin-ai-integration[bot],closed,2025-07-19T16:20:13Z,2025-07-22T19:47:42Z,2025-07-22T19:47:42Z,855264010,https://api.github.com/repos/buster-so/buster,https://github.com/buster-so/buster/pull/571,24,1.0,False
+3110558023,216,feat: optimize Liveblocks bundle size with dynamic imports and chunk splitting,"# Optimize Liveblocks Bundle Size with Dynamic Imports and Chunk Splitting
+
+## Problem
+The conditional rendering in `apps/web/modules/docs/document-editor.tsx` was causing excessive bundle size due to loading heavy Liveblocks collaboration dependencies even when they weren't immediately needed.
+
+**Root Cause Analysis:**
+- When `docSlug && isPublic` is true, the code loads the entire Liveblocks collaboration stack
+- This includes 5 heavy packages: `@liveblocks/client`, `@liveblocks/react`, `@liveblocks/react-lexical`, `@liveblocks/react-ui`, and `@liveblocks/node`
+- The Room component and CollabDocEditor pull in providers, UI components, CSS files, and real-time collaboration features
+- When `isPublic` is false, only the lightweight CoreEditor is used
+
+## Solution
+Implemented two key optimizations:
+
+### 1. Dynamic Imports with React.lazy()
+- Added `React.lazy()` for the Room component to defer loading collaboration features
+- Wrapped with `Suspense` for better UX during loading
+- Only loads Liveblocks dependencies when actually needed (public documents)
+
+### 2. Bundle Splitting Configuration
+- Updated `next.config.mjs` with webpack configuration to split Liveblocks packages into separate chunks
+- Ensures collaboration dependencies are bundled separately from main application code
+- Reduces initial bundle size for users who don't need collaboration features
+
+## Changes Made
+
+### `apps/web/modules/docs/document-editor.tsx`
+- Added `Suspense` and `lazy` imports from React
+- Converted Room import to dynamic import using `React.lazy()`
+- Added loading fallback UI for collaboration features
+
+### `apps/web/next.config.mjs`
+- Added webpack configuration with `splitChunks.cacheGroups`
+- Created dedicated ""liveblocks"" chunk for all `@liveblocks/*` packages
+- Set appropriate priority and chunk strategy
+
+## Impact
+- **Reduced main bundle size** for non-collaborative document editing
+- **Improved initial page load** for users who don't need real-time collaboration
+- **Better code splitting** separates collaboration features from core functionality
+- **Maintained functionality** - both public and private document editing work as expected
+
+## Testing
+- ✅ Build process completes successfully with optimizations
+- ✅ Dynamic imports compile correctly
+- ✅ Bundle splitting configuration applied without errors
+- ✅ Lint-staged hooks passed with code formatting
+
+## Link to Devin run
+https://app.devin.ai/sessions/3a33dc1589be45e69203da487719000c
+
+**Requested by:** Yadong (Adam) Zhang (zhyd007@gmail.com)
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-02T15:00:11Z,2025-06-02T15:15:24Z,,440017777,https://api.github.com/repos/softmaple/softmaple,https://github.com/softmaple/softmaple/pull/216,24,1.0,False
+3197782823,2661,fix(warn): Optimize console warnings to prevent excessive output in development,"<!--
+  How to write a good PR title:
+  - Follow [the Conventional Commits specification](https://www.conventionalcommits.org/en/v1.0.0/).
+  - Give as much context as necessary and as little as possible
+  - Prefix it with [WIP] while it’s a work in progress
+-->
+
+## Self Checklist
+
+- [x] I wrote a PR title in **English** and added an appropriate **label** to the PR.
+- [x] I wrote the commit message in **English** and to follow [**the Conventional Commits specification**](https://www.conventionalcommits.org/en/v1.0.0/).
+- [x] I [added the **changeset**](https://github.com/changesets/changesets/blob/main/docs/adding-a-changeset.md) about the changes that needed to be released. (or didn't have to)
+- [ ] I wrote or updated **documentation** related to the changes. (or didn't have to)
+- [x] I wrote or updated **tests** related to the changes. (or didn't have to)
+- [ ] I tested the changes in various browsers. (or didn't have to)
+  - Windows: Chrome, Edge, (Optional) Firefox
+  - macOS: Chrome, Edge, Safari, (Optional) Firefox
+
+## Related Issue
+
+<!-- Please link to issue if one exists -->
+
+- Fixes #2644
+
+## Summary
+
+Optimizes the `warn` utility function to prevent excessive console warnings in development mode, specifically addressing performance issues when many components trigger the same warning (e.g., legacy icon deprecation).
+
+## Details
+
+This PR introduces a `scope` parameter to the `warn` function. When a `scope` is provided, the warning message for that specific scope will only be logged to the console once per development session.
+
+This change was made to:
+- Prevent UI blocking and developer tool freezing caused by hundreds or thousands of identical console warnings, especially when using components with deprecated features (like legacy icons) in large lists.
+- Improve the developer experience by reducing console noise while still providing necessary warnings.
+
+**Key Changes:**
+- **`packages/bezier-react/src/utils/assert.ts`**:
+    - `warn` function overloaded to accept an optional `scope` string.
+    - Uses an internal `Set` (`devWarningScopes`) to track and ensure each scoped warning is logged only once.
+- **Component Updates**:
+    - Applied the new `scope` parameter to existing legacy icon deprecation warnings in `Button`, `Banner`, and `SectionLabel` components.
+- **Test Coverage**:
+    - Added new tests for the `warn` function to verify that warnings are logged only once per scope and that different scopes are handled independently.
+
+### Breaking change? (Yes/No)
+
+No. This is an internal utility improvement that only affects development-mode console output.
+
+## References
+
+- Inspired by `react-window`'s warning mechanism:
+    - https://github.com/bvaughn/react-window/blob/72db696dd8ebb7f0f287c78d037ff68ba9534183/src/createListComponent.js#L674-L682
+    - https://github.com/bvaughn/react-window/blob/72db696dd8ebb7f0f287c78d037ff68ba9534183/src/__tests__/FixedSizeList.js#L868-L885
+
+<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
+## Summary by CodeRabbit
+
+## Summary by CodeRabbit
+
+* **신규 기능**
+  * 경고 메시지에 scope(범위) 파라미터가 추가되어, 동일 범위 내에서는 경고가 한 번만 표시됩니다.
+
+* **버그 수정**
+  * Button, Banner, SectionLabel 컴포넌트의 레거시 아이콘 사용 시 과도한 경고로 인한 UI 지연 현상이 개선되었습니다.
+
+* **테스트**
+  * scope별 경고 동작을 검증하는 테스트가 추가되었습니다.
+<!-- end of auto-generated comment: release notes by coderabbit.ai -->",Cursor,58209009,sungik-choi,closed,2025-07-03T02:46:00Z,2025-07-03T04:41:25Z,2025-07-03T04:41:25Z,262985799,https://api.github.com/repos/channel-io/bezier-react,https://github.com/channel-io/bezier-react/pull/2661,24,1.0,False
+3115293385,245,feat(editor): exclude storybook files and implement code splitting without lazy loading,"# Code Splitting Without Lazy Loading + Storybook Exclusion
+
+This PR implements code splitting using only Vite manual chunks configuration while excluding Storybook files from the build process, as requested.
+
+## Changes Made
+
+### 🚫 **Storybook Exclusion**
+- Added `exclude` array to `tsconfig.app.json` to exclude Storybook files from TypeScript compilation:
+  - `src/stories/**/*`
+  - `**/*.stories.*` 
+  - `**/*.test.*`
+
+### ⚡ **Code Splitting Without Lazy Loading**
+- **Removed all lazy loading** from `layout.tsx`:
+  - Replaced `React.lazy()` NetlifyBadge with direct import
+  - Removed `Suspense` wrapper
+- **Enhanced Vite manual chunks configuration** for optimal code splitting:
+  - `vendor-react`: React and React DOM (11.95 kB)
+  - `lexical`: All Lexical editor packages (264.19 kB) 
+  - `utils`: Utility libraries like clsx, tailwind-merge (25.60 kB)
+  - `ui`: UI components like lucide-react (10.24 kB)
+  - `toolbar-components`: Toolbar plugin components (95.18 kB)
+  - `export-features`: Export functionality (25.06 kB)
+  - `editor-plugins`: Editor plugins (2.21 kB)
+
+### 🌳 **Tree Shaking Optimization**
+- Added `""sideEffects"": false` to `package.json` for better tree shaking
+
+## Build Results
+
+✅ **Successful build with optimized chunks:**
+```
+dist/assets/editor-plugins-n0RmVbyB.js        2.21 kB │ gzip:  1.04 kB
+dist/assets/ui-DL9XMVVD.js                   10.24 kB │ gzip:  2.41 kB
+dist/assets/vendor-react-Csw2ODfV.js         11.95 kB │ gzip:  4.25 kB
+dist/assets/export-features-CdC021Vx.js      25.06 kB │ gzip:  8.03 kB
+dist/assets/utils-Dx8rIIiD.js                25.60 kB │ gzip:  8.23 kB
+dist/assets/toolbar-components-DuWjEUyX.js   95.18 kB │ gzip: 31.86 kB
+dist/assets/lexical-yUpeGyG8.js             264.19 kB │ gzip: 84.26 kB
+```
+
+## Key Benefits
+
+- ✅ **No lazy loading complexity** - All components load synchronously
+- ✅ **Storybook files excluded** - Cleaner builds without development files
+- ✅ **Optimal code splitting** - Manual chunks provide predictable bundle splitting
+- ✅ **Tree shaking enabled** - Unused code eliminated from bundles
+- ✅ **Build performance** - Fast compilation without lazy loading overhead
+
+## Testing
+
+- ✅ `pnpm build` - Successful build with proper chunk generation
+- ✅ `pnpm lint` - Passes with only minor warnings (unrelated to changes)
+- ✅ All functionality preserved without lazy loading
+
+---
+
+**Link to Devin run:** https://app.devin.ai/sessions/eca0c6fc8ab94289b7bd92363bd22d11  
+**Requested by:** Yadong (Adam) Zhang (zhyd007@gmail.com)
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-03T20:06:22Z,2025-06-12T15:23:07Z,,440017777,https://api.github.com/repos/softmaple/softmaple,https://github.com/softmaple/softmaple/pull/245,24,1.0,False
+3145702280,2826,Move BarChart to ui-graphs package with SCSS modules and bigint support,"This PR migrates the `BarChart` components from `packages/app/src/library/BarChart` to the `ui-graphs` package, following the established patterns and conventions of the ui-graphs package.
+
+## Key Changes
+
+### 🏗️ Component Migration
+- **Moved** all BarChart components from `app/library` to `ui-graphs/src/BarChart/`
+- **Converted** styled-components in `Wrappers.ts` to native SCSS modules (`index.module.scss`)
+- **Updated** component structure to follow ui-graphs conventions
+
+### 🔧 Type System Improvements
+- **Replaced** `BigNumber` with `bigint` for better performance and type safety
+- **Updated** `BondedChart` to accept `bigint` values directly instead of converting from `BigNumber`
+- **Enhanced** prop interfaces to support both individual components and composite usage
+
+### 🎯 Dependency Management
+- **Removed** dependencies on app-specific hooks (`useTranslation`, `useHelp`)
+- **Refactored** components to accept labels and help callbacks as props
+- **Maintained** backward compatibility for existing usage patterns
+
+### 📦 Package Structure
+- **Added** proper exports in `ui-graphs/src/index.tsx`
+- **Updated** all imports across the app to use `ui-graphs` exports
+- **Removed** legacy `BarChart` directory from app package
+
+## Files Updated
+
+### New Components in `ui-graphs`
+- `BarChart/index.module.scss` - SCSS module replacing styled-components
+- `BarChart/BarSegment.tsx` - Individual bar segment component
+- `BarChart/LegendItem.tsx` - Legend item with optional help support
+- `BarChart/BondedChart.tsx` - Main chart component with bigint support
+- `BarChart/Wrappers.tsx` - Container components using SCSS classes
+- `BarChart/types.ts` - Updated type definitions
+- `BarChart/defaults.ts` - Configuration constants
+
+### Updated App Components
+- `pages/Pools/ManageBond.tsx` - Updated to use new BarChart API
+- `pages/Nominate/Active/ManageBond.tsx` - Updated to use new BarChart API  
+- `pages/Overview/AccountBalance/BalanceChart.tsx` - Updated imports for individual components
+
+## Before/After Usage
+
+### Before (BigNumber + styled-components)
+```tsx
+import { BondedChart } from 'library/BarChart/BondedChart'
+
+<BondedChart
+  active={new BigNumber(planckToUnit(active, units))}
+  free={new BigNumber(planckToUnit(free, units))}
+  // ... other BigNumber conversions
+/>
+```
+
+### After (bigint + SCSS modules)
+```tsx
+import { BondedChart } from 'ui-graphs'
+
+<BondedChart
+  active={active}          // Direct bigint usage
+  free={free}             // No conversion needed
+  labels={{
+    bonded: t('bonded'),
+    free: t('free'),
+    // ... localized labels
+  }}
+  unit={unit}
+  units={units}
+  onHelpClick={openHelp}
+/>
+```
+
+## Benefits
+- ✅ **Better separation of concerns** - UI components now in dedicated ui-graphs package
+- ✅ **Improved performance** - Direct bigint usage eliminates BigNumber conversions
+- ✅ **Consistent styling** - SCSS modules align with other ui-graphs components
+- ✅ **Type safety** - Enhanced TypeScript support with proper bigint types
+- ✅ **Maintainability** - Centralized graph components reduce duplication
+
+## Testing
+- ✅ TypeScript compilation passes for both packages
+- ✅ ESLint and Prettier formatting passes
+- ✅ All existing functionality preserved
+- ✅ Components render correctly with new bigint API
+
+Fixes #2825.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-06-14T07:45:53Z,2025-06-14T11:32:29Z,,456470362,https://api.github.com/repos/polkadot-cloud/polkadot-staking-dashboard,https://github.com/polkadot-cloud/polkadot-staking-dashboard/pull/2826,24,0.24592963541339372,False
+3129029549,2799,Draw down `Wrapper` components and migrate from `styled-components` to SCSS modules,"Successfully migrated 19 components from styled-components to SCSS modules in `packages/app/src/library`, establishing clear patterns for the remaining migration work.
+
+## Changes Made
+
+### Components Migrated (19 total)
+- **StyledSlider** - Simple wrapper conversion
+- **SideMenu/Heading** - Transient props (`$minimised`) → CSS classes
+- **SetupSteps/Header** - Complex wrapper with nested sections
+- **EstimatedTxFee** - Simple wrapper conversion
+- **MainFooter** - Complex component with CSS variables
+- **Stat** - Transient props (`$isAddress`) → CSS classes
+- **NotificationPrompts** - Simple wrapper conversion
+- **SelectItems** - Complex responsive layout with breakpoints
+- **Tooltip** - Simple wrapper conversion
+- **ErrorBoundary** - Multiple conditional classes
+- **Form/Warning** - Simple wrapper conversion
+- **AccountInput** - Complex conditional classes and state
+- **Nominations** - Simple wrapper conversion
+- **Account** - Conditional classes
+- **StatusLabel** - CSS variables as inline styles
+- **ActionItem** - Semantic HTML tags (h3)
+- **QrReader** - Animations and keyframes
+- **PayeeInput** - Complex transient props and state
+
+### Key Infrastructure Added
+- **`_variables.scss`** - Shared SCSS variables for breakpoints, colors, and common values
+- **Consistent patterns** - Established migration patterns for future work
+
+## Migration Patterns Established
+
+### 1. Transient Props → CSS Classes
+```tsx
+// Before (styled-components)
+<Wrapper $isAddress={type === 'address'} />
+
+// After (CSS modules)
+const allClasses = classNames(classes.wrapper, {
+  [classes.isAddress]: type === 'address',
+})
+<div className={allClasses} />
+```
+
+### 2. CSS Variables in SCSS
+```scss
+// _variables.scss
+$network-bar-font-size: 0.9rem;
+$two-threshold: 800px;
+$positive-color: #3eb955;
+
+// Component SCSS
+.wrapper {
+  font-size: $network-bar-font-size;
+  
+  @media (min-width: $two-threshold) {
+    // responsive styles
+  }
+}
+```
+
+### 3. Complex Responsive Layouts
+```scss
+.selectItemsWrapper {
+  &.twoCol {
+    @media (min-width: $two-threshold-min) {
+      > div:nth-child(2n) {
+        padding-right: 0;
+      }
+    }
+  }
+}
+```
+
+### 4. Animations and Keyframes
+```scss
+@keyframes fadeInScale {
+  from {
+    opacity: 0.75;
+    transform: scale(0.75);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.wrapper {
+  animation: fadeInScale 0.2s cubic-bezier(0, 1, 0, 1) forwards;
+}
+```
+
+## Benefits Achieved
+
+1. **Reduced Bundle Size** - Eliminated styled-components overhead for 19 components
+2. **Better Performance** - CSS modules provide better tree-shaking and optimization  
+3. **Improved Maintainability** - Clearer separation between styles and logic
+4. **Better Developer Experience** - CSS autocomplete, better debugging tools
+5. **Standards Compliance** - Moving towards standard CSS approaches
+6. **Type Safety** - CSS modules provide better type safety for class names
+
+## Remaining Work
+
+26 wrapper files remain to be migrated using the established patterns:
+- `Tx/Wrapper.ts`
+- `Card/Wrappers.ts` 
+- `Modal/Wrappers.ts`
+- `Form/Wrappers.ts`
+- And 22 others...
+
+The patterns established in this PR provide a clear roadmap for completing the migration.
+
+Fixes #2798.
+
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-09T03:32:28Z,2025-06-14T07:41:26Z,,456470362,https://api.github.com/repos/polkadot-cloud/polkadot-staking-dashboard,https://github.com/polkadot-cloud/polkadot-staking-dashboard/pull/2799,24,0.12393939126004169,True
+3234973989,12990,Replace emotion with CSS modules across Express.js and Next.js applications,"This PR completely replaces emotion styling with CSS modules throughout the Simorgh codebase, affecting both the Express.js app (`src/`) and Next.js app (`ws-nextjs-app/`).
+
+## Changes Made
+
+### 🔧 Build System Updates
+- Added CSS modules support to webpack configuration with proper loaders
+- Removed emotion babel preset (`@emotion/babel-preset-css-prop`)
+- Updated Jest configuration to handle CSS modules with `identity-obj-proxy`
+- Removed emotion serializer from Jest snapshots
+
+### 🎨 Component Conversion
+- **200+ components** converted from emotion to CSS modules
+- **70+ CSS module files** created with `.module.css` extension
+- Replaced `css` props with `className` attributes
+- Converted emotion `styled` components to regular elements with CSS classes
+
+### 🧹 Code Cleanup
+- Removed `/** @jsx jsx */` pragmas from all components
+- Removed `@emotion/react` and `@emotion/styled` imports
+- Fixed duplicate `className` attributes in 29 files
+- Updated import paths from `./index.styles` to `./index.module.css`
+
+### 🏗️ Styling Architecture
+- **Before**: Runtime emotion styling with theme-based CSS-in-JS
+- **After**: Build-time CSS modules with local scoping and CSS custom properties
+
+Example transformation:
+```tsx
+// Before (emotion)
+/** @jsx jsx */
+import { jsx } from '@emotion/react';
+import styled from '@emotion/styled';
+
+const Button = styled.button`
+  color: ${props => props.theme.palette.WHITE};
+  padding: 1rem;
+`;
+
+// After (CSS modules)
+import styles from './Button.module.css';
+
+const Button = ({ children }) => (
+  <button className={styles.button}>
+    {children}
+  </button>
+);
+```
+
+### 📊 Impact
+- **Express.js app**: ✅ Builds successfully with CSS modules
+- **Performance**: Improved by removing emotion runtime overhead
+- **Bundle size**: Reduced by eliminating emotion dependencies at runtime
+- **Developer experience**: Cleaner component code with standard CSS
+
+### 🔬 Testing
+- Build system tested for both Express.js and Next.js applications
+- CSS modules properly resolved and scoped
+- Components render correctly with new className approach
+
+### 📝 Notes
+- Server-side rendering files still use emotion for SSR cache (minimal usage)
+- CSS module placeholders created for all converted styles (manual styling needed)
+- Test snapshots will need updates to reflect new CSS class names
+
+Fixes #12989.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `download.cypress.io`
+>   - Triggering command: `/usr/local/bin/node index.js --exec install` (dns block)
+> - `googlechromelabs.github.io`
+>   - Triggering command: `/usr/local/bin/node install.mjs` (dns block)
+> - `https://storage.googleapis.com/chrome-for-testing-public/137.0.7151.119/linux64/chrome-headless-shell-linux64.zip`
+>   - Triggering command: `/usr/local/bin/node install.mjs` (http block)
+> - `https://storage.googleapis.com/chrome-for-testing-public/137.0.7151.119/linux64/chrome-linux64.zip`
+>   - Triggering command: `/usr/local/bin/node install.mjs` (http block)
+> - `ofcncog2cu-dsn.algolia.net`
+>   - Triggering command: `/usr/local/bin/node /home/REDACTED/work/simorgh/simorgh/.yarn/releases/yarn-4.1.1.cjs add --dev css-loader style-loader mini-css-extract-plugin` (dns block)
+>   - Triggering command: `/usr/local/bin/node /home/REDACTED/work/simorgh/simorgh/.yarn/releases/yarn-4.1.1.cjs add --dev identity-obj-proxy` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-07-16T08:22:00Z,,,133968906,https://api.github.com/repos/bbc/simorgh,https://github.com/bbc/simorgh/pull/12990,24,0.12298952222927076,True
+3137892942,6197,Cleanup styled-components in *.stories.tsx files and convert to CSS modules,"This PR removes all `styled-components` imports from story files and converts them to use CSS modules, following the established pattern in the codebase as outlined in [ADR-016](../contributor-docs/adrs/adr-016-css.md).
+
+## Changes Made
+
+### Files Updated
+- **8 story files** migrated from styled-components to CSS modules
+- **7 new CSS module files** created following established patterns
+
+### Specific Conversions
+
+**ActionList/ActionMenu Stories:**
+- Replaced `ErsatzOverlay` styled div with CSS module class
+- Replaced `StyledDiv` components that used `sx` prop with `Box` component + CSS classes
+
+**LabelGroup Stories:**
+- Replaced `ResizableContainer` styled div with CSS module class
+
+**Hook Stories (useFocusZone, useFocusTrap, useAnchoredPosition, ThemeProvider):**
+- Replaced `MarginButton` styled Button components with CSS module classes
+- Converted `createGlobalStyle` usage to inline `<style>` components for demo purposes
+- Replaced complex styled components (`Float`, `Anchor`, `Nav`, `Main`) with CSS module classes
+
+### CSS Module Pattern
+All new CSS modules follow the established conventions:
+- Use `@layer primer.stories.<story-name>` for proper CSS layering
+- Utilize CSS custom properties for theming (e.g., `var(--bgColor-default)`)
+- Maintain original styling behavior while eliminating runtime style generation
+
+### Benefits
+- **Performance improvement**: No runtime CSS-in-JS generation for story components
+- **Consistency**: Aligns with the migration strategy outlined in ADR-016
+- **Maintainability**: Explicit CSS dependencies and standard CSS authoring
+
+## Verification
+- ✅ All linting passes
+- ✅ Build completes successfully  
+- ✅ Storybook starts without errors
+- ✅ No `styled-components` imports remain in any `*.stories.tsx` files
+
+Fixes #6196.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-06-11T19:28:59Z,2025-06-17T14:15:24Z,2025-06-17T14:15:24Z,121814210,https://api.github.com/repos/primer/react,https://github.com/primer/react/pull/6197,24,0.11883910169067773,False
+2766896431,982,Replace motion library with Tailwind transitions in EditPanel,"Replaces motion library implementation with Tailwind transitions for elements in the EditPanel to improve performance.
+
+## Changes
+- Removed motion library dependency from EditPanel components
+- Replaced motion.div elements with regular div elements
+- Added Tailwind transition classes for animations
+- Improved performance by removing runtime animation library dependency
+
+## Components Updated
+- NestedInputs.tsx
+- TagDetails.tsx
+- DisplayInput.tsx
+- BorderInput.tsx
+
+## Testing
+- Verified all components compile without errors
+- Ran lint and build checks successfully
+- Confirmed transitions work correctly with Tailwind classes
+
+Link to Devin run: https://app.devin.ai/sessions/e2fe8d543a2441e39a1e82af89642bc7",Devin,158243242,devin-ai-integration[bot],closed,2025-01-03T02:44:37Z,2025-01-06T22:07:34Z,,820087727,https://api.github.com/repos/onlook-dev/onlook,https://github.com/onlook-dev/onlook/pull/982,24,0.06409654495748109,False
+2782133644,1016,refactor: remove framer-motion animations from ShareProject and ChatInput components,"# Remove Framer Motion animations from ShareProject and ChatInput components
+
+## Changes
+- Removed AnimatePresence and motion components from ShareProject/index.tsx
+- Removed AnimatePresence and motion components from ChatInput.tsx
+- Replaced animated components with static div elements
+- Preserved core functionality without animations
+
+## Impact
+- Improved performance by removing MobX-triggered animations
+- Reduced unnecessary re-renders from observable state changes
+- Simplified component structure and reduced bundle size
+- Maintained core functionality while removing animation overhead
+
+## Testing
+- Build succeeds without errors
+- Core functionality remains intact
+- UI transitions now happen instantly instead of animated
+
+Link to Devin run: https://app.devin.ai/sessions/a8b3d35e051246a3a80a097ddc020f10
+",Devin,158243242,devin-ai-integration[bot],closed,2025-01-11T20:26:17Z,2025-01-11T20:46:23Z,,820087727,https://api.github.com/repos/onlook-dev/onlook,https://github.com/onlook-dev/onlook/pull/1016,24,0.05850213566522506,False
+3100224074,431,chore: simplify project selector,"## Summary
+- remove intermediate ProjectSelectOption state
+- use projects directly to populate list
+
+<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
+
+## Summary by CodeRabbit
+
+- **Refactor**
+  - Streamlined the project selector for improved performance and responsiveness by simplifying how projects are displayed and selected. No visible changes to the user interface.
+
+<!-- end of auto-generated comment: release notes by coderabbit.ai -->",OpenAI_Codex,199983080,aipolabs-credentials,closed,2025-05-29T12:40:47Z,2025-05-29T17:45:23Z,2025-05-29T17:45:22Z,859956307,https://api.github.com/repos/aipotheosis-labs/aci,https://github.com/aipotheosis-labs/aci/pull/431,24,0.055328626029305175,False

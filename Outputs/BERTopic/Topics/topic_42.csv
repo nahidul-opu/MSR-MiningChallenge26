@@ -1,0 +1,140 @@
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,Topic,Probability,Representative_document
+3146870376,146,Improve putAll efficiency,"## Summary
+- detect large bulk inserts in CompactMap.putAll
+- copy existing entries directly to a backing map
+- add regression tests ensuring putAll switches representation when exceeding the threshold
+
+## Testing
+- `mvn -q test` *(fails: `mvn: command not found`)*
+
+------
+https://chatgpt.com/codex/tasks/task_b_684dfe1a0a5c832a92f0720ed80566f3",OpenAI_Codex,5373774,jdereg,closed,2025-06-14T23:09:08Z,2025-06-14T23:09:30Z,2025-06-14T23:09:30Z,12670630,https://api.github.com/repos/jdereg/java-util,https://github.com/jdereg/java-util/pull/146,42,1.0,False
+3179347779,3563,Add liveness analysis to VM compiler,"## Summary
+- add liveness analysis pass for VM functions
+- track register usage and eliminate dead writes
+- shrink function register counts after optimization
+
+## Testing
+- `go test ./runtime/vm -run .`
+- `go test ./...` *(fails: requires apt packages)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_685d57b8fe548320b65e48c63d74406f",OpenAI_Codex,1218621,tamnd,closed,2025-06-26T14:34:34Z,2025-06-27T03:38:27Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3563,42,1.0,False
+3091688841,127,Improve CompactMap array operations with binary search,"## Summary
+- implement `pairBinarySearch` for even-indexed lookups
+- use binary search in `putInCompactArray`, `get`, `containsKey`, and `removeFromCompactArray`
+- add tests for sorted and reverse case-insensitive ordering
+
+## Testing
+- `mvn -q -DskipTests=false test` *(fails: `mvn` not found)*",OpenAI_Codex,5373774,jdereg,closed,2025-05-26T16:52:20Z,2025-05-26T16:52:42Z,2025-05-26T16:52:42Z,12670630,https://api.github.com/repos/jdereg/java-util,https://github.com/jdereg/java-util/pull/127,42,1.0,False
+3124191731,8572,HDDS-13114. Make MaxSubCompactions configureable for manual compaction,"## What changes were proposed in this pull request?
+
+https://github.com/apache/ozone/pull/8141#discussion_r2093792426
+
+ 
+In https://github.com/apache/ozone/pull/8141 `RDBStore#compactTable` was introduced. 
+
+We should set `options.setMaxCompactionBytes()` when we open the snapshot rocksdb this could be useful so that we ensure one sub compaction doesn't take up a lot of memory. Also look into making ManagedCompactRangeOptions.setMaxSubCompactions() configurable so that we don't use a lot of CPU for this operation. It is ok if the compactions take time.
+
+This can be achieved by adding `ManagedRangeCompactionOption` into `AbstractRDBStore`, `RDBStore`, `RDBStoreBuilder`. Also the corresponding rocksdb config keys.
+
+## What is the link to the Apache JIRA
+
+https://issues.apache.org/jira/browse/HDDS-13114
+
+## How was this patch tested?
+
+CI:
+https://github.com/peterxcli/ozone/actions/runs/15484301525",OpenAI_Codex,54034701,peterxcli,open,2025-06-06T09:22:21Z,,,212382406,https://api.github.com/repos/apache/ozone,https://github.com/apache/ozone/pull/8572,42,1.0,True
+3188892969,4253,Improve row map assembly,"## Summary
+- optimize `buildRowMap` to avoid copying when key/value pairs are already contiguous
+
+## Testing
+- `go test -tags slow ./tests/vm -run TestVM_TPCH/q14 -count=1`
+- `go test -tags slow ./tests/vm -run TestVM_TPCH/q14 -update -count=1`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6862a8172e8c83208c921c2bc121339d",OpenAI_Codex,1218621,tamnd,closed,2025-06-30T15:19:51Z,2025-07-03T10:40:35Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4253,42,1.0,False
+3183820232,3871,Implement register coalescing,"## Summary
+- reduce virtual register usage by eliminating redundant `Move` ops
+- update Optimize loop to invoke new pass
+- refresh IR golden files
+
+## Testing
+- `go test ./...`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_685ebb7fa8d88320a14da8cc0e5a151a",OpenAI_Codex,1218621,tamnd,closed,2025-06-27T19:00:49Z,2025-06-29T16:25:46Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3871,42,1.0,False
+3183832117,3872,Add register coalescing,"## Summary
+- implement register coalescing pass
+- integrate it in Optimize
+- test register coalescing
+- rename pass to `coalesceRegisters`
+
+## Testing
+- `go vet ./...`
+- `go test ./...`
+
+Codex couldn't run certain commands due to environment limitations. Consider configuring a setup script or internet access in your Codex environment to install dependencies.
+
+------
+https://chatgpt.com/codex/tasks/task_e_685ebb524f7c83208f136ac3fa2cce32",OpenAI_Codex,1218621,tamnd,closed,2025-06-27T19:06:13Z,2025-06-29T16:25:53Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3872,42,1.0,False
+3186441704,4016,Enable VM register compaction when MakeMap absent,"## Summary
+- add helper to detect MakeMap usage
+- enable CompactRegisters optimisation when safe
+
+## Testing
+- `go build ./runtime/vm/...`
+- `go vet ./...`
+- `go test ./...`
+
+
+------
+https://chatgpt.com/codex/tasks/task_e_6861747e93448320b472f1b0f1f77eff",OpenAI_Codex,1218621,tamnd,open,2025-06-29T18:30:11Z,,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4016,42,1.0,False
+3169934401,2756,Implement register reuse for VM,"## Summary
+- implement simple liveness analysis to allocate physical registers
+- update compiler to run register allocation after building a function
+- regenerate golden files for VM tests
+
+## Testing
+- `go test ./tests/vm -run .`
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6859ab6272348320881a692011032d46",OpenAI_Codex,1218621,tamnd,closed,2025-06-24T01:36:43Z,2025-06-24T04:07:52Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2756,42,1.0,False
+3186065104,3951,Fix VM map argument optimization,"## Summary
+- ensure map creation uses contiguous registers by copying to temporaries
+- update TPCH q1 IR golden file
+
+## Testing
+- `go test ./tests/vm -run TestVM_TPCH/q1.mochi -tags slow -count=1 -v`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68611bdd928c8320bfae7863c61c4a54",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T11:14:37Z,2025-07-01T03:06:12Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3951,42,1.0,False
+3181030935,3584,Implement liveness analysis optimization,"## Summary
+- add a liveness analysis pass with dead code elimination
+- invoke optimization on every compiled function
+- extend optimizer with constant folding and branch pruning
+- regenerate IR golden files for vm tests
+
+## Testing
+- `go test ./...`
+- `go test -tags slow ./tests/vm -run TestVM_IR -update`
+- `go run tools/update_tpch/main.go` *(fails: signal interrupt)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_685df2482eb48320bb2f16322cd2778f",OpenAI_Codex,1218621,tamnd,closed,2025-06-27T01:44:26Z,2025-06-27T05:15:39Z,2025-06-27T05:15:39Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3584,42,1.0,True
+3170043914,1118,Implement KV batch PutMany,"## Summary
+- add PutMany RPC to kv.proto and regenerate protobuf code
+- extend KVService server and NATS store with PutMany handling
+- update sync poller to batch KV writes using PutMany
+- revise KV interfaces and mocks for PutMany support
+- refresh Armis integration tests and sweep result utilities for new APIs
+
+## Testing
+- `go test ./...` *(fails: TestArmisIntegration_Fetch_WithUpdaterAndCorrelation, TestDefaultKVWriter_WriteSweepConfig, TestSweepResultsQuery_Pagination in pkg/sync/integrations/armis)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_685a0deb86cc83209ded43866c89c806",OpenAI_Codex,1821930,mfreeman451,closed,2025-06-24T02:49:48Z,2025-06-24T02:52:14Z,2025-06-24T02:52:14Z,916252207,https://api.github.com/repos/carverauto/serviceradar,https://github.com/carverauto/serviceradar/pull/1118,42,1.0,True

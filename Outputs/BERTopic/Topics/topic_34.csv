@@ -1,205 +1,302 @@
-id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
-3158935716,5425,Add ESLint rule for slow CSS properties that may impact GPU rendering,"This PR adds a new ESLint rule `@remotion/slow-css-property` that warns developers when they use CSS properties that may slow down rendering on machines without a GPU.
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,Topic,Probability,Representative_document
+3188858394,834,feat: implement async notification and telemetry system (Phase 1-3),"## Summary
 
-## What it does
+This PR implements the first three phases of the async notification and telemetry system as outlined in #833. It introduces a non-blocking event bus architecture that decouples error reporting from notification/telemetry processing, preventing any blocking operations during error handling.
 
-The rule detects usage of the following CSS properties in React style objects:
-- `boxShadow` - Box shadow effects
-- `textShadow` - Text shadow effects  
-- `filter` - CSS filter effects (blur, brightness, etc.)
+## Related Issues
 
-When any of these properties are used, the rule displays a warning:
+- Implements phases 1-3 of #833 (Async notification/telemetry system)
+- Addresses performance concerns from #825 (Error handling optimization)
+- Includes error deduplication from #827 (Reduce telemetry noise)
+
+## Changes
+
+### Phase 1: Core Event Bus Infrastructure ✅
+- Created `internal/events` package with non-blocking event bus
+- Implemented worker pool pattern with configurable workers (default: 4)
+- Added `TryPublish()` method that never blocks (drops events if buffer full)
+- Comprehensive unit tests with 100% coverage
+- Structured logging with `internal/logging` package
+- Atomic operations for thread-safe metrics
+
+### Phase 2: Error Deduplication System ✅
+- Hash-based deduplication with configurable TTL (default: 5 minutes)
+- LRU eviction for memory-bounded cache (max 10,000 entries)
+- Periodic cleanup goroutine for expired entries
+- Comprehensive deduplication metrics (hit rate, suppression count)
+- Reduces telemetry volume by suppressing duplicate errors
+
+### Phase 3: Error Package Integration ✅
+- Enhanced `EnhancedError` to implement `ErrorEvent` interface
+- Created `EventPublisher` interface to avoid circular dependencies
+- Adapter pattern connects errors and events packages
+- Maintains backward compatibility - falls back to sync processing if event bus not initialized
+- Verified no circular dependencies through compilation tests
+
+## Architecture
+
 ```
-This GPU effect may slow down the render on machines which don't have a GPU.
-See: https://remotion.dev/docs/gpu
-```
-
-## Examples
-
-❌ **Invalid** (triggers warning):
-```javascript
-const style = {
-  boxShadow: ""0 0 5px red"",
-  textShadow: ""1px 1px 1px black"",
-  filter: ""blur(5px)""
-};
-```
-
-✅ **Valid** (no warning):
-```javascript
-const style = {
-  color: ""red"",
-  backgroundColor: ""blue"",
-  margin: 10,
-  // String keys don't trigger the rule
-  ""box-shadow"": ""0 0 5px red""
-};
-```
-
-## Implementation Details
-
-- Added new rule file: `src/rules/slow-css-property.ts`
-- Added comprehensive tests: `src/tests/slow-css-property.test.ts`
-- Updated main index to export the rule and include it in recommended config as a ""warn"" level rule
-- Follows existing code patterns and ESLint plugin conventions
-- All existing tests continue to pass
-
-The rule is automatically included when using `@remotion/eslint-plugin` with the recommended configuration.
-
-Fixes #5424.
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-19T04:57:31Z,2025-06-19T08:10:04Z,2025-06-19T08:10:04Z,274495425,https://api.github.com/repos/remotion-dev/remotion,https://github.com/remotion-dev/remotion/pull/5425,analysisWe need to classify whether the primary purpose of the PR is to improve performance. The PR adds an ESLint rule to warn about slow CSS properties that may impact GPU rendering. This is about performance: it warns about properties that may slow rendering. So it's performance-related. The classification: 'performance'.assistantfinalperformance,34,1.0,False
-3245889248,496,Implement MeshData API and Job System optimization for UMA mesh combiners,"This PR implements high-performance mesh combiners that leverage Unity's newer MeshData API and Job System to significantly improve the performance of UMA's mesh combining operations.
-
-## Performance Improvements
-
-The new optimized combiners provide substantial performance gains:
-- **Large meshes** (5000+ vertices): **60-200% faster**
-- **Medium meshes** (1000-5000 vertices): **30-60% faster**
-- **Reduced memory allocations** and GC pressure through NativeArray usage
-- **Parallel processing** across multiple CPU cores with Burst compilation
-
-## Implementation
-
-### New Components
-
-1. **`UMAMeshDataCombiner`** (Recommended)
-   - Uses Unity's MeshData API for direct buffer access
-   - Job-based parallel vertex processing with `IJobParallelFor`
-   - Supports Unity 2020.1+ with automatic fallback
-   - Comprehensive vertex attribute support (positions, normals, tangents, UVs, colors)
-
-2. **`UMAJobifiedMeshCombiner`**
-   - Basic job-based processing structure
-   - Compatible with Unity 2019.3+
-   - Foundation for incremental optimization
-
-3. **`UMAOptimizedMeshCombinerExample`**
-   - Performance testing and comparison component
-   - Runtime switching between combiner types
-   - Built-in benchmarking tools
-
-### Technical Approach
-
-Uses a **hybrid architecture** that maximizes performance while maintaining full compatibility:
-
-```csharp
-// Optimized operations (new)
-- Parallel vertex position copying with expandAlongNormal support
-- Parallel normal/tangent/UV/color processing
-- Direct MeshData buffer access
-- Burst-compiled native code execution
-
-// Complex operations (existing)
-- Bone weight processing and remapping
-- Blend shape handling
-- Triangle index processing
-- Material and submesh management
+errors package → EventBus → Deduplication → notification workers (future)
+                                         ↘ → telemetry workers (future)
 ```
 
-### Key Features
+### Key Design Principles
 
-- **Zero breaking changes**: Drop-in replacements for existing combiners
-- **Full UMA compatibility**: Supports all features (blend shapes, bone weights, materials, etc.)
-- **Graceful fallback**: Automatically handles unsupported platforms/versions
-- **Memory efficient**: Proper NativeArray disposal and minimal allocations
-- **Error handling**: Comprehensive try-catch blocks with detailed logging
+1. **Zero-cost when disabled**: No overhead when telemetry/notifications are off
+2. **Non-blocking guarantees**: `TryPublish()` never blocks, uses select with default
+3. **No circular dependencies**: Uses interfaces to decouple packages
+4. **Backward compatible**: Falls back to legacy sync processing
+5. **Production ready**: Proper error handling, metrics, and tests
 
-## Usage
+## Performance Characteristics
 
-### Quick Integration
-```csharp
-// Replace existing combiner with optimized version
-var oldCombiner = GetComponent<UMAMeshCombiner>();
-if (oldCombiner != null) DestroyImmediate(oldCombiner);
+- Error creation overhead: < 100ns when telemetry disabled (maintains #825 optimizations)
+- Event publishing: Non-blocking with overflow protection
+- Deduplication: O(1) hash lookup with < 100ns overhead
+- Memory usage: Bounded by configuration (10k events max)
+- Zero goroutine leaks verified
 
-gameObject.AddComponent<UMAMeshDataCombiner>();
+## Testing
+
+- Comprehensive unit tests for all components
+- Integration tests verify no circular dependencies
+- Fixed deadlock issues in error hooks
+- Proper test isolation and cleanup
+- All tests pass without timeouts or race conditions
+
+## Configuration
+
+The system supports configuration through the new event bus config:
+
+```go
+type Config struct {
+    BufferSize    int                    // Event buffer size (default: 10,000)
+    Workers       int                    // Worker goroutines (default: 4)
+    Enabled       bool                   // Enable event bus (default: true)
+    Deduplication *DeduplicationConfig   // Deduplication settings
+}
+
+type DeduplicationConfig struct {
+    Enabled         bool          // Enable deduplication (default: true)
+    TTL             time.Duration // Duplicate window (default: 5m)
+    MaxEntries      int          // Max cache size (default: 10,000)
+    CleanupInterval time.Duration // Cleanup frequency (default: 1m)
+}
+```
+
+## Next Steps
+
+This PR lays the foundation for async processing. Future phases will:
+- Phase 4: Migrate notification system to use event bus workers
+- Phase 5: Migrate telemetry system with batching and circuit breakers
+- Phase 6: Remove legacy sync processing code
+- Phase 7: Add monitoring and production tuning
+
+## Breaking Changes
+
+None. The system maintains full backward compatibility.
+
+## Checklist
+
+- [x] Tests pass
+- [x] Linter passes (`golangci-lint run`)
+- [x] No circular dependencies
+- [x] Backward compatible
+- [x] Performance requirements met
+- [x] Documentation updated
+
+## How to Test
+
+1. Run tests: `go test ./internal/events/... ./internal/errors/...`
+2. Verify no circular dependencies compile
+3. Check deduplication with repeated errors
+4. Confirm non-blocking behavior under load
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+
+<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
+## Summary by CodeRabbit
+
+* **New Features**
+  * Introduced an asynchronous event bus system for non-blocking error event processing with deduplication and metrics.
+  * Added error deduplication to suppress duplicate error events within a configurable time window.
+  * Provided integration between error reporting and the event bus for improved decoupling and extensibility.
+  * Added new error accessors for retrieving underlying error and message details.
+
+* **Bug Fixes**
+  * Improved thread safety and encapsulation in error context handling.
+
+* **Tests**
+  * Added comprehensive unit and integration tests for event bus, deduplication, and error-event integration.
+
+* **Refactor**
+  * Updated error category handling to use string values for improved consistency.
+  * Improved synchronization and state management in error hook and telemetry logic.
+
+* **Documentation**
+  * Expanded best practices and lessons learned on defensive coding, testing, atomic usage, performance, and error handling.
+<!-- end of auto-generated comment: release notes by coderabbit.ai -->",Claude_Code,7030001,tphakala,closed,2025-06-30T15:10:13Z,2025-06-30T15:35:07Z,2025-06-30T15:35:07Z,707764474,https://api.github.com/repos/tphakala/birdnet-go,https://github.com/tphakala/birdnet-go/pull/834,34,1.0,True
+3193198936,841,feat(telemetry): implement performance testing framework (Phase 8),"## Summary
+
+This PR implements Phase 8 of the telemetry system migration (#833), focusing on comprehensive performance testing and validation. The primary goal was to ensure the telemetry system has minimal performance impact when disabled (<100ns) while providing robust testing capabilities.
+
+## Key Achievements
+
+### 🎯 Performance Goals Met
+- **2.4 nanoseconds** per operation when telemetry is disabled (target: <100ns)
+- **Zero memory allocations** on the disabled path
+- Atomic flag checking optimized to 1.3ns
+
+### 🧪 Testing Infrastructure
+- **MockTransport**: Thread-safe Sentry transport implementation for testing
+- **Test Helpers**: Unified testing interface for both `testing.T` and `testing.B`
+- **Integration Tests**: Complete end-to-end telemetry flow validation
+- **Performance Benchmarks**: Comprehensive benchmark suite
+
+## What's Changed
+
+### MockTransport Implementation
+- Implements full `sentry.Transport` interface
+- Thread-safe event capture and retrieval
+- Helper methods for test assertions
+- Support for async event verification
+
+### Test Coverage
+- ✅ Telemetry system unit tests
+- ✅ Integration tests with error package
+- ✅ End-to-end flow tests
+- ✅ Privacy compliance verification
+- ✅ Concurrent operation tests
+- ✅ Performance benchmarks
+
+### Performance Optimizations
+- Atomic flag for fast telemetry state checking
+- Optimized capture functions with early returns
+- Zero-allocation path when disabled
+
+## Performance Results
+
+```
+BenchmarkOptimizedTelemetryDisabled/FastCaptureError-4     496724498    2.423 ns/op    0 B/op    0 allocs/op
+BenchmarkOptimizedTelemetryDisabled/FastCaptureMessage-4   491951907    2.448 ns/op    0 B/op    0 allocs/op
+BenchmarkOptimizedTelemetryDisabled/AtomicCheck-4          897079670    1.346 ns/op    0 B/op    0 allocs/op
+```
+
+## Testing Guidelines
+
+### Using MockTransport
+```go
+config, cleanup := telemetry.InitForTesting(t)
+defer cleanup()
+
+// Your test code here
+telemetry.CaptureError(err, ""component"")
+
+// Verify
+telemetry.AssertEventCount(t, config.MockTransport, 1, 100*time.Millisecond)
 ```
 
 ### Performance Testing
-```csharp
-// Use the provided example component
-var example = gameObject.AddComponent<UMAOptimizedMeshCombinerExample>();
-example.PerformanceTest(); // Compare all combiner types
+```go
+// Use optimized functions in production code
+if telemetry.IsTelemetryEnabled() {
+    telemetry.CaptureError(err, component)
+}
 ```
 
-## Compatibility
+## Files Changed
+- `internal/telemetry/mock_transport.go` - MockTransport implementation
+- `internal/telemetry/test_helpers.go` - Testing utilities
+- `internal/telemetry/integration_test.go` - Integration tests
+- `internal/telemetry/e2e_test.go` - End-to-end tests
+- `internal/telemetry/benchmark_test.go` - Performance benchmarks
+- `internal/telemetry/optimized_capture.go` - Performance optimizations
+- `internal/telemetry/optimized_benchmark_test.go` - Optimized benchmarks
 
-- **Unity Versions**: 2020.1+ (MeshData API), 2019.3+ (Jobs only)
-- **Platforms**: All platforms supporting Unity's Job System and Burst compilation
-- **UMA Features**: 100% compatible with existing functionality
+## Related Issues
+- Implements Phase 8 of #833
+- Continues work from PR #839 (Phase 7)
 
-## Documentation
+## Checklist
+- [x] Tests pass
+- [x] Linter passes
+- [x] Performance targets met
+- [x] Documentation updated
+- [x] No breaking changes
 
-Includes comprehensive documentation:
-- Performance analysis and benchmarking guide
-- Usage instructions and examples
-- Troubleshooting and platform-specific notes
-- Technical implementation details
-- Future enhancement roadmap
+## Next Steps
+Phase 9 will focus on documentation and examples to help developers integrate with the new telemetry system.
 
-This implementation provides immediate performance benefits while establishing a foundation for future optimizations, ensuring UMA remains performant as character complexity continues to grow.
+🤖 Generated with [Claude Code](https://claude.ai/code)
 
-Fixes #495.
+Co-Authored-By: Claude <noreply@anthropic.com>
 
-<!-- START COPILOT CODING AGENT TIPS -->
----
+<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
+## Summary by CodeRabbit
 
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,open,2025-07-20T03:07:04Z,,,85005919,https://api.github.com/repos/umasteeringgroup/UMA,https://github.com/umasteeringgroup/UMA/pull/496,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Implement MeshData API and Job System optimization for UMA mesh combiners"". Body describes performance improvements, speed, memory, etc. So it's performance. So output 'performance'.assistantfinalperformance",34,1.0,False
-3238704789,1074,Implement terrain patches to reduce GPU load for large terrains,"This PR implements a terrain patch system that splits large terrains into smaller, manageable chunks to significantly reduce GPU performance issues when rendering large terrains.
+* **New Features**
+  * Introduced a mock transport for capturing and inspecting telemetry events in tests.
+  * Added optimized functions for fast telemetry state checks and event capturing.
+  * Provided utilities for initializing and asserting telemetry events in test environments.
+  * Added a recommended asynchronous telemetry worker with rate limiting and circuit breaker for reliable error reporting.
+  * Integrated telemetry state cache updates on settings changes to ensure accurate telemetry enablement status.
+
+* **Tests**
+  * Added comprehensive unit, integration, end-to-end, and benchmark tests for telemetry, including privacy scrubbing, concurrency, and performance scenarios.
+  * Included helpers for verifying event content, count, levels, and tags during testing.
+  * Validated asynchronous and synchronous telemetry error reporting behaviors and non-blocking guarantees.
+<!-- end of auto-generated comment: release notes by coderabbit.ai -->",Claude_Code,7030001,tphakala,closed,2025-07-01T17:00:54Z,2025-07-01T18:11:08Z,2025-07-01T18:11:08Z,707764474,https://api.github.com/repos/tphakala/birdnet-go,https://github.com/tphakala/birdnet-go/pull/841,34,1.0,True
+3210834321,13204,chore(shed): update trace-finding in lotus-shed miner fees & fees-inspect with a better top-down filter,"This PR implements a better top-down filtering approach for trace-finding in the `lotus-shed miner fees` and `lotus-shed miner fees-inspect` commands, as requested in the issue.
 
 ## Problem
-Currently, rendering large terrains generates massive vertex/index arrays that overwhelm the GPU, causing performance bottlenecks. The entire terrain was rendered as a single geometry object regardless of size.
+
+Previously, both commands used a bottom-up filtering approach that would trace any execution involving the target miner address. This resulted in noisy output with many irrelevant traces that didn't follow the actual cron execution flow.
 
 ## Solution
-The patch system divides terrains into configurable sub-sections (patches) that are rendered individually:
 
-### Core Changes
-- **New `TerrainPatch` type** - Represents a subdivision of terrain with its own bounds and resolution
-- **Extended terrain descriptors** - Added `PatchSize` property to `TerrainGeometryDescriptor` and `TerrainDescriptor`
-- **Patch-based geometry generation** - New `tryCreatePhysicallyBasedTerrainPatchGeometry` function creates geometry for individual patches
-- **Updated rendering pipeline** - Modified terrain categorization, shadow rendering, and main rendering to handle patch arrays
+The new implementation adds hierarchical trace filtering that follows the expected cron execution flow:
 
-### TerrainFacet Integration
-- Added `PatchSize` property to `TerrainFacet` with default value of 64×64 height map samples
-- Seamless integration with existing terrain creation workflow
-- Backward compatibility maintained
+- **Depth 0**: SystemActorAddr (f00) → CronActorAddr (f03) method 2 (EpochTick)
+- **Depth 1**: CronActorAddr (f03) → StoragePowerActorAddr (f04) method 5 (OnEpochTickEnd)  
+- **Depth 2+**: StoragePowerActorAddr (f04) → miner actors method 12 (OnDeferredCronEvent), plus any miner-related calls
 
-### Material System Support
-The patch system fully supports the existing terrain material pipeline:
-- Normal map extraction for patch regions
-- Tint image processing per patch
-- Blend weight computation
-- Proper vertex format matching
+This matches the actual protocol flow described in the issue:
 
-### Performance Benefits
-- **Reduced GPU load** - Smaller geometry chunks instead of massive single meshes
-- **Future optimization ready** - Enables per-patch frustum culling and LOD
-- **Configurable granularity** - Adjustable patch sizes for different use cases
-- **Fallback support** - Automatically uses single patch for small terrains
-
-### Example Usage
-```fsharp
-// Default patch size (64x64 samples)
-terrain ""MyTerrain"" [
-    TerrainMaterial <| BlendMaterial { /* material config */ }
-    HeightMap <| RawHeightMap { Resolution = v2i 1025 1025; /* config */ }
-]
-
-// Custom patch size for very large terrains
-terrain ""LargeTerrain"" [
-    TerrainMaterial <| BlendMaterial { /* material config */ }
-    HeightMap <| RawHeightMap { Resolution = v2i 2049 2049; /* config */ }
-    PatchSize <| v2i 128 128  // Larger patches for huge terrains
-]
+```
+f00->f03[2]:0                         # System calls Cron EpochTick
+    f03->f04[5]:0                     # Cron calls Power OnEpochTickEnd
+        f04->f02[3]:0                 # Power calls Reward ThisEpochReward
+        f04->f01083949[12]:0          # Power calls Miner OnDeferredCronEvent
+            f01083949->f099[0]:...    # Miner pays fees to burn address
+            f01083949->f04[4]:0       # Miner reports back to Power
+        f04->f02[4]:0                 # Power calls Reward again
+    f03->f05[9]:0                     # Cron calls Market actor
 ```
 
-This addresses the performance concern mentioned in the issue about enabling proximity debug drawing for height maps without killing performance.
+## Changes Made
 
-Fixes #747.
+1. **Updated `printExec` function** in the `fees` command with depth-based filtering logic
+2. **Updated `traceBurns` function** in the `fees-inspect` command with the same filtering approach
+3. **Preserved existing behavior** for deeper trace levels (depth >= 2) where miner interactions occur
+4. **Added comprehensive filtering** for shallow depths (0 and 1) to focus on the cron execution path
+
+## Benefits
+
+- **Cleaner output**: Filters out unrelated execution traces that don't follow the cron flow
+- **Faster processing**: Skips irrelevant trace branches early in the recursion
+- **Better debugging**: Highlights the actual execution path that leads to fee payments
+- **Protocol consistency**: Matches the designed cron execution flow
+
+## Testing
+
+- Validated actor addresses match expected values (f00=System, f03=Cron, f04=Power)
+- Verified method numbers correspond to expected calls (2=EpochTick, 5=OnEpochTickEnd, 12=OnDeferredCronEvent)
+- Tested filtering logic with various valid/invalid trace scenarios
+- Confirmed code compiles and follows existing style patterns
+
+Fixes #13203.
 
 > [!WARNING]
 >
@@ -208,8 +305,8 @@ Fixes #747.
 >
 > #### I tried to connect to the following addresses, but was blocked by firewall rules:
 >
-> - `esm.ubuntu.com`
->   - Triggering command: `/usr/lib/apt/methods/https` (dns block)
+> - `https://api.github.com/repos/filecoin-project/filecoin-ffi/releases/tags/v1.33.1-dev`
+>   - Triggering command: `curl --retry 3 --location REDACTED` (http block)
 >
 > If you need me to access, download, or install something from one of these locations, you can either:
 >
@@ -223,366 +320,435 @@ Fixes #747.
 <!-- START COPILOT CODING AGENT TIPS -->
 ---
 
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-17T08:46:08Z,2025-07-24T16:31:01Z,,11965691,https://api.github.com/repos/bryanedds/Nu,https://github.com/bryanedds/Nu/pull/1074,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Implement terrain patches to reduce GPU load for large terrains"". Body describes reducing GPU load, performance benefits, etc. It's clearly performance. So label 'performance'.assistantfinalperformance",34,1.0,True
-3238286297,1073,Implement terrain patches for improved GPU performance,"This PR implements terrain patches to address GPU performance issues when rendering large terrains. The solution automatically subdivides large terrains into smaller, cullable chunks without breaking existing APIs.
-
-## Problem
-Currently, rendering large terrains consumes excessive GPU resources because the entire terrain is rendered as a single mesh. This prevents efficient frustum culling and makes proximity debug drawing for height maps impractical due to performance concerns.
-
-## Solution
-The implementation adds an automatic terrain patching system that:
-
-- **Automatically subdivides large terrains** (>64x64 vertices) into 64x64 vertex patches
-- **Maintains full backwards compatibility** - existing terrain code works unchanged
-- **Enables per-patch frustum culling** for better GPU utilization
-- **Uses configurable patch size** via `Constants.Render.TerrainPatchSize`
-
-## Key Changes
-
-### Core Infrastructure
-- Added `TerrainPatchSize` constant (64 vertices) in `Constants.fs`
-- Added `TerrainPatch` type to represent terrain subdivisions
-- Extended `TerrainGeometryDescriptor` and `TerrainDescriptor` with optional patch information
-
-### Smart Patch System
-- `TerrainPatch.calculateTerrainPatches` function handles subdivision logic
-- Edge patches correctly handle non-even divisions (e.g., 200x200 terrain creates 4x4 patches with 8-vertex edge patches)
-- Small terrains (<64x64) continue using single-mesh rendering
-
-### Rendering Pipeline Updates
-- Modified `categorizeTerrain` to detect when patches should be used
-- Updated terrain geometry creation to handle both single-mesh and patch-based rendering
-- Each patch is treated as independent geometry with its own bounds for culling
-
-## Testing
-Created validation scripts that confirm:
-- 200x200 terrain correctly generates 16 patches (4x4 grid)
-- Edge patches handle remainder vertices properly (8x64, 64x8, 8x8 for edges/corners)
-- Small terrains (32x32) use single patch as expected
-- All patch bounds calculations are accurate
-
-## Performance Benefits
-- **Reduced GPU load**: Only visible terrain patches are rendered
-- **Better memory utilization**: Patches enable more efficient GPU processing
-- **Enables proximity debug drawing**: Height map debugging can now be used without performance concerns
-- **Automatic optimization**: No code changes needed - patches activate automatically for large terrains
-
-## Example
-```fsharp
-// Before: 512x512 terrain renders as single 262,144 vertex mesh
-// After: Same terrain automatically splits into 64 patches of 64x64 vertices each
-//        Only visible patches are rendered based on frustum culling
-```
-
-This change directly addresses the core issue while maintaining complete API compatibility. Developers can now enable proximity debug drawing for height maps without performance penalties.
-
-Fixes #747.
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-17T06:19:52Z,2025-07-17T08:45:05Z,,11965691,https://api.github.com/repos/bryanedds/Nu,https://github.com/bryanedds/Nu/pull/1073,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Implement terrain patches for improved GPU performance"". Body describes GPU performance improvements, culling, etc. It's clearly performance. So output 'performance'.assistantfinalperformance",34,1.0,True
-3224573615,279,Add Raspberry Pi 4 hardware acceleration support and debugging utilities,"This PR addresses video playback performance issues on Raspberry Pi 4 by implementing comprehensive hardware acceleration support and debugging tools.
-
-## Problem
-Users reported poor video performance on Raspberry Pi 4:
-- 1080p 30fps videos lagging without widgets
-- 720p 30fps videos lagging with animated widgets overlay
-- High CPU usage indicating software decoding instead of hardware acceleration
-- Lack of clear guidance for enabling hardware acceleration
-
-## Solution
-
-### 📚 Enhanced Documentation
-Added comprehensive Raspberry Pi 4 setup guide with:
-- Step-by-step instructions for removing bundled FFmpeg libraries
-- System FFmpeg installation with V4L2 hardware acceleration
-- Performance optimization tips (elinux, GPU memory, desktop environment)
-- Troubleshooting section for common issues
-
-### 🔍 Runtime Detection & Warnings
-Implemented automatic Pi4 detection that:
-- Warns when bundled `libffmpeg.so.*` files block hardware acceleration
-- Checks for V4L2 video devices availability
-- Provides specific file paths for library removal
-- Logs hardware-optimized decoder selection
-
-### 🛠️ Debug Utilities
-Added new utility methods for troubleshooting:
-
-```dart
-import 'package:fvp/fvp.dart' as fvp;
-
-// Check system hardware support
-final systemInfo = await fvp.FVPUtils.checkSystemHardwareSupport();
-print('Hardware acceleration blocked: ${systemInfo['hardwareAccelerationBlocked']}');
-
-// Get current decoder configuration  
-final decoderInfo = fvp.FVPUtils.getDecoderInfo();
-print('Pi4 detected: ${decoderInfo['isRaspberryPi']}');
-
-// Check per-player acceleration status
-final hwInfo = controller.getHardwareAccelerationInfo();
-print('Video codec: ${hwInfo['mediaInfo']['videoCodec']}');
-```
-
-### 🎯 Enhanced Example App
-Added ""Debug Info"" tab demonstrating:
-- Real-time hardware acceleration status
-- System information display with color-coded warnings
-- Interactive troubleshooting interface
-
-## Key Features
-- **Automatic Pi4 Detection**: Uses `/dev/vchiq` presence for reliable identification
-- **Bundled FFmpeg Detection**: Scans common library directories and warns users
-- **V4L2 Device Verification**: Checks for hardware decoder availability
-- **Comprehensive Logging**: Enhanced debug information for decoder selection
-- **Zero Breaking Changes**: All new functionality is additive and optional
-
-## Technical Implementation
-- **Runtime Warnings**: `_checkRaspberryPiSetup()` provides actionable guidance
-- **Debug Utilities**: `FVPUtils` class with static methods for system analysis
-- **Controller Extensions**: `getHardwareAccelerationInfo()` for per-player status
-- **Error Handling**: Safe file system operations with graceful fallbacks
-
-## Usage Example
-The new tools help users quickly identify and resolve acceleration issues:
-
-```dart
-// Enable debug logging and check system
-fvp.registerWith(options: {
-  'video.decoders': ['V4L2M2M', 'FFmpeg:hwcontext=drm', 'FFmpeg'],
-  'global': {'log': 'debug'}
-});
-
-// Runtime will now warn: 
-// ""Raspberry Pi detected: Bundled FFmpeg libraries found in /path/to/lib""
-// ""For hardware acceleration, remove bundled FFmpeg: rm /path/to/libffmpeg.so.6""
-```
-
-This transforms Pi4 hardware acceleration from a trial-and-error process into a guided procedure with built-in validation and comprehensive troubleshooting capabilities.
-
-Fixes #276.
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-12T00:40:28Z,2025-07-12T03:17:43Z,,540673185,https://api.github.com/repos/wang-bin/fvp,https://github.com/wang-bin/fvp/pull/279,"analysisWe need to classify as 'performance' or 'non-performance'. The PR is about adding Raspberry Pi 4 hardware acceleration support and debugging utilities to improve video playback performance. It explicitly mentions performance issues, lag, CPU usage, hardware acceleration, etc. So it's performance.assistantfinalperformance",34,1.0,False
-3230709333,1071,Optimize billboard rendering for 3D particles with specialized batched render path,"This PR implements an optimized billboard rendering system specifically designed for 3D particle systems, addressing the need for efficient batched billboard rendering with blend and flip support.
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-08T02:50:11Z,2025-07-08T06:51:15Z,2025-07-08T06:51:15Z,193681111,https://api.github.com/repos/filecoin-project/lotus,https://github.com/filecoin-project/lotus/pull/13204,34,1.0,False
+3177258847,40,Expand tracing instrumentation to gen_witness and PCS prove methods,"This PR expands the existing tracing infrastructure to provide detailed timing breakdown for `gen_witness` and PCS prove methods, enabling better performance analysis and debugging.
 
 ## Changes Made
 
-### 1. New Render Message Type
-Added `RenderStaticBillboards` type that supports batched rendering of multiple billboards with shared material properties but individual:
-- Color and emission values per billboard
-- Blend modes (Transparent, Additive, Overwrite) 
-- Flip options (FlipNone, FlipH, FlipV, FlipHV)
-- Transform matrices
+### gen_witness Method Instrumentation
+- **Circuit synthesis timing**: Added `circuit_synthesize` span to measure time spent in circuit constraint generation
+- **R1CS creation timing**: Added `r1cs_instance_and_witness` span with nested timing for:
+  - `create_r1cs_witness`: Time to create witness commitment
+  - `create_r1cs_instance`: Time to create R1CS instance
+- **Derandomization timing**: Added `derandomize_witness_instance` span for witness/instance derandomization
 
-### 2. Fast Path API
-Implemented `World.renderStaticBillboardFast` method that provides a high-performance rendering path by:
-- Bypassing normal message allocation overhead
-- Batching billboards with the same material
-- Supporting individual per-billboard properties
+### PCS Prove Method Instrumentation
 
-```fsharp
-World.renderStaticBillboardFast(
-    &modelMatrix, castShadow, presence, insetOpt, orientUp, planar,
-    &materialProperties, &material, &color, &emission, 
-    blend, flip, shadowOffset, depthTest, renderType, renderPass, world)
+#### IPA (Inner Product Argument) Implementation
+- **Setup phase**: Added `ipa_setup` span for initial transcript and commitment key preparation
+- **Recursion phase**: Added `ipa_recursion` span with round count for the main IPA folding loop
+- **Preparation phase**: Added `ipa_prove_prepare` and `ipa_prove_argument` spans in the PC interface
+
+#### Hyrax Implementation  
+- **Setup phase**: Added `hyrax_prove_setup` span for polynomial factorization and evaluation point preparation
+- **Binding phase**: Added `hyrax_prove_bind` span for computing vector-matrix products
+- **Commitment phase**: Added `hyrax_prove_commit` span for MSM operations
+- **IPA phase**: Added `hyrax_prove_ipa` span for the inner product argument
+
+## Example Output
+
+The instrumentation provides clear nested timing breakdown:
+
+```
+circuit_synthesize elapsed_ms=602
+create_r1cs_witness elapsed_ms=85
+create_r1cs_instance elapsed_ms=0  
+r1cs_instance_and_witness elapsed_ms=85
+derandomize_witness_instance elapsed_ms=0
+...
+hyrax_prove_setup elapsed_ms=44
+hyrax_prove_bind elapsed_ms=97
+hyrax_prove_commit elapsed_ms=107
+ipa_setup elapsed_ms=3
+ipa_recursion elapsed_ms=2044 rounds=9
+hyrax_prove_ipa elapsed_ms=2048
+pcs_prove elapsed_ms=2297
 ```
 
-### 3. Blend Mode Support
-Added infrastructure for blend modes in 3D billboard rendering:
-- **Transparent**: Standard alpha blending for particles
-- **Additive**: Bright glowing effects for sparks/fire
-- **Overwrite**: Solid billboard rendering
+## Design Principles
 
-### 4. Flip Support
-Full texture flipping support for billboard variety:
-- Individual flip control per billboard
-- Supports horizontal, vertical, and combined flipping
-
-## Performance Benefits
-
-1. **Batched Rendering**: Multiple billboards sharing materials are rendered efficiently
-2. **Fast Path**: Eliminates message allocation overhead for high-frequency particle updates
-3. **Particle Optimized**: Designed specifically for particle system use cases with hundreds/thousands of billboards
-
-## Example Usage
-
-```fsharp
-// Fire particle with additive blending and emission
-let modelMatrix = Matrix4x4.CreateTranslation(particlePosition)
-let color = Color(1.0f, 0.5f, 0.0f, alpha) // Orange with fade
-let emission = Color(1.0f, 0.3f, 0.0f, 1.0f) // Glowing orange
-
-World.renderStaticBillboardFast(
-    &modelMatrix, false, Presence.Present, ValueNone, true, false,
-    &materialProps, &material, &color, &emission, 
-    Additive, FlipNone, 0.0f, LessThanOrEqualTest,
-    ForwardRenderType(0.0f, 0.0f), NormalPass, world)
-```
-
-This implementation provides the foundation for high-performance 3D particle systems while maintaining compatibility with existing billboard rendering infrastructure.
-
-Fixes #700.
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-15T04:23:51Z,2025-07-15T04:53:59Z,,11965691,https://api.github.com/repos/bryanedds/Nu,https://github.com/bryanedds/Nu/pull/1071,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Optimize billboard rendering for 3D particles with specialized batched render path"". Body describes optimized billboard rendering, batched rendering, fast path, eliminating message allocation overhead, performance benefits. Contains keywords: optimize, performance, batched, fast path, high-performance, efficient. So it's performance.assistantfinalperformance",34,1.0,False
-3232691904,259,Add Intel/AMD GPU hardware acceleration support for video conversion,"## Summary
-
-This PR adds support for Intel and AMD GPU hardware acceleration to the video conversion module, extending the existing NVIDIA GPU support. The implementation provides hardware-accelerated video encoding for Intel GPUs (via VAAPI) and AMD GPUs (via AMF), with automatic fallback to CPU encoding when needed.
-
-## Changes Made
-
-### Core Implementation
-- **Intel GPU (VAAPI) Support**: Added complete VAAPI implementation with device initialization and hardware upload filters
-- **AMD GPU (AMF) Support**: Added AMF encoder support with simplified setup
-- **Hardware Priority System**: Implemented priority-based selection: NVIDIA > Intel > AMD > CPU fallback
-- **Codec Mappings**: Added H.264 and H.265 support for both Intel and AMD GPUs
-
-### Configuration
-- Added `INTEL_GPU_AVAILABLE` environment variable for Intel GPU detection
-- Added `AMD_GPU_AVAILABLE` environment variable for AMD GPU detection
-- Extended settings configuration to include new GPU availability flags
-- Maintained full backward compatibility with existing NVIDIA settings
-
-### Command Generation Examples
-
-**Intel GPU (VAAPI)**:
-```bash
-ffmpeg -init_hw_device vaapi=intel:/dev/dri/renderD128 \
-       -filter_hw_device intel \
-       -i input.mkv \
-       -vf format=nv12,hwupload \
-       -c:v h264_vaapi \
-       -qp 22 \
-       output.mkv
-```
-
-**AMD GPU (AMF)**:
-```bash
-ffmpeg -i input.mkv \
-       -c:v h264_amf \
-       -qp 22 \
-       output.mkv
-```
-
-**NVIDIA GPU (CUDA)** (unchanged):
-```bash
-ffmpeg -hwaccel cuda \
-       -hwaccel_output_format cuda \
-       -i input.mkv \
-       -c:v h264_nvenc \
-       -preset fast \
-       -cq 22 \
-       output.mkv
-```
-
-## Key Features
-
-- **Automatic Hardware Detection**: System automatically selects the best available GPU acceleration
-- **Graceful Fallback**: Unsupported codecs automatically fall back to CPU encoding
-- **Minimal Changes**: Surgical implementation that extends existing patterns without breaking changes
-- **Comprehensive Testing**: Added validation scripts and test infrastructure
-- **Documentation**: Updated comments to reflect implemented VAAPI support
-
-## Technical Details
-
-### Hardware Acceleration Priority
-1. **NVIDIA GPU (CUDA)** - if available and enabled
-2. **Intel GPU (VAAPI)** - if available and enabled  
-3. **AMD GPU (AMF)** - if available and enabled
-4. **CPU Fallback** - software encoding
-
-### Supported Codecs
-- **Intel VAAPI**: H.264 (`h264_vaapi`), H.265 (`hevc_vaapi`)
-- **AMD AMF**: H.264 (`h264_amf`), H.265 (`hevc_amf`)
-- **Fallback**: VP8, VP9, AV1 automatically use CPU encoding
+- **Minimal overhead**: Only instruments operations that consume significant time (>1ms typically)
+- **Clear nesting**: Uses the existing `start_span!` macro to ensure proper span hierarchy
+- **Readable code**: Instrumentation doesn't obscure the original logic
+- **Consistent naming**: Uses descriptive span names that clearly indicate the operation being timed
 
 ## Testing
 
 - All existing tests continue to pass
-- Created comprehensive validation scripts
-- Verified codec mappings and command structures
-- Validated hardware acceleration priority logic
-- Confirmed fallback mechanisms work correctly
+- Code passes `cargo fmt` and `cargo clippy` checks
+- Verified instrumentation works correctly with sha256 example
+- No performance regressions introduced
 
-## Backward Compatibility
-
-✅ **Fully backward compatible**
-- All existing NVIDIA GPU functionality unchanged
-- No breaking changes to existing APIs
-- New GPU types are additional options, not replacements
-- Existing environment variables and settings preserved
-
-## Usage
-
-No code changes required for existing functionality. The system automatically uses the best available acceleration method based on:
-
-- Available GPU hardware
-- `TRAILER_HARDWARE_ACCELERATION` setting (global toggle)
-- Individual GPU availability flags
-- Codec support for the selected GPU type
-
-To enable the new GPU types, simply set the appropriate environment variables:
-```bash
-INTEL_GPU_AVAILABLE=true   # Enable Intel GPU acceleration
-AMD_GPU_AVAILABLE=true     # Enable AMD GPU acceleration
-```
-
-Resolves the issue mentioned in the problem statement about implementing Intel/AMD GPU hardware acceleration options that were previously commented out as ""not implementing.""
+Fixes #39.
 
 <!-- START COPILOT CODING AGENT TIPS -->
 ---
 
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,open,2025-07-15T15:16:53Z,,,768813127,https://api.github.com/repos/nandyalu/trailarr,https://github.com/nandyalu/trailarr/pull/259,analysisWe need to classify whether the primary purpose is performance improvement. The PR adds Intel/AMD GPU hardware acceleration support for video conversion. This is about performance: hardware acceleration speeds up video encoding. So it's performance. The classification: 'performance'.assistantfinalperformance,34,1.0,True
-3112822851,27,Add viewer and adaptive resolution,"## Summary
-- add a simple WebRTC `viewer.html`
-- document remote viewer and adaptive mode in README
-- implement adaptive resolution toggle in `j360.ts`
-- expose `toggleAdaptive` in type declarations
-- support `--adaptive` option in CLI
-- update CLI and encoder tests
-- provide test stubs for TypeScript and ffmpeg
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-06-25T23:49:08Z,2025-06-26T20:35:31Z,2025-06-26T20:35:31Z,668062221,https://api.github.com/repos/microsoft/Spartan2,https://github.com/microsoft/Spartan2/pull/40,34,1.0,False
+3113190475,2073,docs: update trusted hash guide,"- [x] Analyzed repository structure and understood the issue
+- [x] Confirmed build system works correctly
+- [x] Identified that quick-start.md already uses the new command format
+- [x] Update celestia-node-trusted-hash.md to use the new single-call command instead of two separate curl calls
+- [x] Test that the markdown lints correctly after changes
+- [x] Verify build still works after changes
+
+The issue requests updating the trusted hash guide to use a more efficient single API call command instead of making two separate curl requests. This reduces network calls and improves user experience.
+
+Current state: The file `/how-to-guides/celestia-node-trusted-hash.md` still uses the old two-call approach on lines 50-51, while `/how-to-guides/quick-start.md` already uses the new efficient single-call format.
+
+Fixes #2033.
+
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-03T09:30:34Z,2025-06-04T01:15:59Z,2025-06-04T01:15:59Z,470727349,https://api.github.com/repos/celestiaorg/docs,https://github.com/celestiaorg/docs/pull/2073,34,1.0,False
+3186447377,2086,feat!: simplify tracing by removing S3 push/pull and using atomic file writes,"This PR backports the tracer refactor from PR #1437 onto the main branch, significantly simplifying the tracing system by removing complex S3 push/pull functionality and replacing it with a reliable atomic file writing mechanism.
+
+## Summary of Changes
+
+### Files Removed (934 lines deleted):
+- `libs/trace/buffered_file.go` (101 lines) - Complex buffered file implementation with read/write coordination
+- `libs/trace/fileserver.go` (331 lines) - S3 push/pull HTTP server functionality
+- `libs/trace/local_tracer_test.go` (183 lines) - Old complex tests with S3 dependencies
+
+### Files Added/Modified:
+- **New**: `libs/trace/cached_file.go` (115 lines) - Simple channel-based atomic file writer
+- **New**: `libs/trace/cached_file_test.go` (81 lines) - Focused tests for cached file functionality  
+- **New**: `libs/trace/README.md` - Documentation for simplified trace usage
+- **Modified**: `libs/trace/local_tracer.go` - Simplified from ~250 to ~120 lines, removed S3/HTTP functionality
+- **Modified**: `config/config.go` - Added deprecation warnings for `TracePushConfig`/`TracePullAddress`
+- **Modified**: `config/toml.go` - Added deprecation warnings in config comments
+- **Modified**: `libs/trace/decoder.go` - Changed `ReadString` to `ReadBytes` for better performance
+- **Modified**: Various files - Added `//nolint:staticcheck` comments for deprecated config usage
+
+## Key Improvements
+
+✅ **Simplified Architecture**: Removed complex buffered file + S3 system, replaced with simple cached file writes  
+✅ **Atomic Writes**: New system ensures only complete JSON events are written, preventing data corruption  
+✅ **Better Performance**: Channel-based caching with configurable batch sizes and parallel writes  
+✅ **Cleaner Code**: 490+ lines removed, much simpler to understand and maintain  
+✅ **Reliable Data**: Eliminates incomplete JSON writes that made trace files unreadable  
+✅ **Backward Compatible**: Existing config works, deprecated fields marked properly  
+
+## Breaking Changes
+
+- **Removed S3 automatic push/pull functionality** - Users should now collect trace files manually using `scp`, `aws s3 cp`, or similar tools
+- **Removed HTTP pull server** - No more `/get_table` endpoint for remote trace collection
+- **Removed environment variable S3 config** - `TRACE_PUSH_*` environment variables no longer supported
+
+## Migration Guide
+
+The tracer now focuses solely on reliable local file writing. To collect trace data:
+
+**Before (automatic S3 push):**
+```toml
+trace_push_config = ""s3_config.json""
+```
+
+**After (manual collection):**
+```bash
+# Copy files after experiment completes
+scp -r user@host:/path/to/.celestia-app/data/traces /local/path
+# or
+aws s3 cp /path/to/.celestia-app/data/traces s3://bucket/prefix --recursive
+```
+
+## Validation
+
+- All existing tests pass
+- New comprehensive test suite for cached file functionality
+- Integration test validates end-to-end trace writing
+- Build and config validation successful
+
+This change makes the tracer much more reliable and maintainable by removing the complexity of automatic S3 uploads and HTTP servers that were prone to data corruption issues.
+
+Fixes #2085.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,open,2025-06-29T18:36:58Z,,,221931137,https://api.github.com/repos/celestiaorg/celestia-core,https://github.com/celestiaorg/celestia-core/pull/2086,34,1.0,True
+3110867755,4915,docs: Add IAVL v1 migration guide for consensus node operators,"This PR adds comprehensive documentation for consensus node operators on how to migrate from IAVL v0 to IAVL v1 to achieve optimal performance benefits with celestia-app v4.
+
+## Background
+
+With celestia-app v4, the state machine uses IAVL v1.x which provides roughly 10x performance improvement over v0.x through data locality optimizations. However, the entire database needs to be migrated to the v1 key layout. While this happens lazily by default, it can cause increased I/O load and make state access a performance bottleneck during the migration period.
+
+## What's Added
+
+The new migration guide (`docs/maintainers/iavl-v1-migration.md`) provides:
+
+### Migration Options
+- **Lazy Migration** (default): Automatic migration during normal operation
+- **State Sync Migration** (recommended): Full migration via state sync for immediate optimal performance
+
+### Comprehensive Instructions
+- Step-by-step procedures for both migration approaches
+- Specific commands and configuration examples
+- Prerequisites and preparation steps
+- Backup and recovery procedures
+
+### Performance Optimization
+- IAVL configuration options in `app.toml` with tuning recommendations
+- Performance monitoring guidance to measure improvements
+- Key performance indicators to track
+
+### Operational Support
+- Troubleshooting common migration issues
+- Best practices for safe migration
+- Recovery procedures if rollback is needed
+- Links to additional resources and support channels
+
+## Key Benefits
+
+This documentation addresses the concern that lazy migration might cause increased I/O load and prevent maximizing throughput. By providing clear guidance on the state sync migration approach, consensus node operators can immediately access the full IAVL v1 performance benefits without experiencing a degradation period.
+
+The guide is specifically written for consensus node operators and includes validator-specific considerations like proper backup procedures, downtime planning, and configuration optimization.
+
+Fixes #4839.
+
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-02T16:34:00Z,2025-06-06T15:26:26Z,2025-06-06T15:26:25Z,327696712,https://api.github.com/repos/celestiaorg/celestia-app,https://github.com/celestiaorg/celestia-app/pull/4915,34,1.0,False
+2918518626,1061,fix: improve deploy history performance and code quality,"Closes #1050
+
+This PR implements performance improvements for the deploy history screen in the channel page:
+
+## Improvements
+- Enhanced database indexes with composite indexes for common query patterns
+- Optimized the record_deployment_history trigger to avoid unnecessary updates
+- Implemented server-side search in HistoryTable component
+- Added debounce for search input to prevent excessive API calls
+- Optimized data fetching by selecting only necessary fields
+- Improved error handling in update_metadata endpoint
+- Fixed URL validation in update_metadata.ts
+- Added loading state for search in HistoryTable
 
 ## Testing
-- `npm test`
+- Tested locally with Supabase and frontend server
+- Verified that the deploy history screen loads faster with optimized queries
+- Confirmed that search functionality works correctly with server-side filtering
+- Tested pagination and sorting functionality
+- Verified mobile responsiveness
 
-------
-https://chatgpt.com/codex/tasks/task_e_683e862c544c8328adca501270226361",OpenAI_Codex,843228,imgntn,closed,2025-06-03T07:38:24Z,2025-06-03T07:39:25Z,2025-06-03T07:39:25Z,76519330,https://api.github.com/repos/imgntn/j360,https://github.com/imgntn/j360/pull/27,"analysisWe need to classify whether the primary purpose is performance improvement. The PR adds viewer and adaptive resolution, implements adaptive resolution toggle, support CLI option, update tests. The focus is on adaptive resolution, which is about performance? Adaptive resolution toggling can improve performance by reducing resolution to improve speed. But is the primary purpose performance? The PR adds viewer and adaptive resolution, but the main change is adding adaptive resolution toggle. That is a performance improvement feature. The description: ""implement adaptive resolution toggle in j360.ts"" and ""support --adaptive option in CLI"". Adaptive resolution is about performance. So likely performance. The guidelines: performance-related PR may contain keywords like performance, speed, etc. The title: ""Add viewer and adaptive resolution"". The body: ""implement adaptive resolution toggle"". That is a performance improvement. So classify as 'performance'.assistantfinalperformance",34,1.0,False
-3119420084,33,Add GPU shader plugins and adaptive capture improvements,"## Summary
-- support GPU-powered plugins via `createWebGLProcessor`
-- expose adaptive resolution range flags in the CLI
-- show capture metrics in VR HUD and remote pages
-- add sample invert shader plugin
-- update docs and tests for new CLI options
+**Note**: There's a linting issue with an unused variable in the catch block that needs to be fixed.
+
+Link to Devin run: https://app.devin.ai/sessions/560c246e629a4ce5b6d51b93e60aa043
+Requested by: Cap-go",Devin,158243242,devin-ai-integration[bot],closed,2025-03-13T22:35:28Z,2025-03-14T03:04:47Z,,442321089,https://api.github.com/repos/Cap-go/capgo,https://github.com/Cap-go/capgo/pull/1061,34,1.0,False
+2914387943,1050,fix: improve deploy history performance and code quality,"# Deploy History Screen Implementation
+
+Closes #1014
+
+This PR implements the deploy history screen in the channel page as requested in issue #1014, with significant performance optimizations and code quality improvements.
+
+## Features
+- Added a new 'History' tab to the channel page
+- Created a deploy_history table to track deployment history
+- Added link and comment fields to app_versions table
+- Implemented a HistoryTable component to display deployment history
+- Added rollback functionality to previous versions
+- Created API endpoint for updating bundle metadata (link and comment)
+
+## Performance Optimizations
+- Added database indexes for deploy_history table to improve query performance
+  
+- Optimized the record_deployment_history trigger to only update records with is_current=TRUE
+- Implemented server-side search functionality in HistoryTable.vue
+- Combined API calls to reduce network overhead using Promise.all
+- Reduced data transfer by selecting only necessary fields
+
+## Code Quality Improvements
+- Enhanced update_metadata.ts with URL validation and proper error handling
+- Added consistency between app_versions and deploy_history tables
+- Moved DeployHistory interface to shared types directory
+- Added proper i18n for all UI text
+- Removed unused imports and code
+- Improved error handling for all API calls
 
 ## Testing
-- `npm test`
+- Tested locally with Supabase and frontend server
+- Verified that all lint checks pass
+- Confirmed that the deploy history screen loads faster with optimized queries
 
-------
-https://chatgpt.com/codex/tasks/task_e_68402244f90083288d96066790094c14",OpenAI_Codex,843228,imgntn,closed,2025-06-04T23:57:32Z,2025-06-04T23:58:23Z,2025-06-04T23:58:23Z,76519330,https://api.github.com/repos/imgntn/j360,https://github.com/imgntn/j360/pull/33,"analysisWe need to classify whether the primary purpose is performance. The PR adds GPU shader plugins and adaptive capture improvements. It mentions GPU-powered plugins, adaptive resolution range flags, capture metrics. This seems performance-related: GPU shaders can improve performance, adaptive capture improvements likely performance. So classify as 'performance'.assistantfinalperformance",34,1.0,False
-3120480438,40,Add GPU little planet support,"## Summary
-- add shader and `toLittlePlanetGpu()` in `CubemapToEquirectangular`
-- call the new method from `downloadLittlePlanet()` when GPU is available
-- document GPU little planet feature in README and docs
-- include definition in TypeScript declarations
-- add regression test for little planet output size
-- wire new test in npm script
+## Screenshots
+![Deploy History Screen](https://github.com/user-attachments/assets/cc67cb47-1a0e-46d8-987c-ac4023f09981)
+
+Link to Devin run: https://app.devin.ai/sessions/0101f24694ce440f92f17b2e884d4492
+Requested by: Cap-go",Devin,158243242,devin-ai-integration[bot],closed,2025-03-12T15:39:53Z,2025-03-13T22:27:01Z,,442321089,https://api.github.com/repos/Cap-go/capgo,https://github.com/Cap-go/capgo/pull/1050,34,1.0,False
+2914424485,1051,fix: improve deploy history performance and code quality,"# Fix: Improve Deploy History Performance and Code Quality
+
+Closes #1014
+
+This PR implements performance improvements for the deploy history screen in the channel page:
+
+## Improvements
+- Added database indexes for deploy_history table to improve query performance
+- Optimized the record_deployment_history trigger to only update necessary records
+- Enhanced update_metadata endpoint with URL validation and deploy_history updates
+- Implemented server-side search in HistoryTable component
+- Combined API calls to reduce network overhead
+- Added proper i18n for UI text
+- Moved DeployHistory interface to shared types
+- Fixed database migration issues with proper column types and function permissions
+- Removed unused imports and code
 
 ## Testing
-- `npm test`
+- Tested locally with linting checks
+- Verified that the deploy history screen loads faster with optimized queries
+- Confirmed that search functionality works correctly with server-side filtering
+- Fixed CI test failures related to database migrations
 
-------
-https://chatgpt.com/codex/tasks/task_e_68415cf2cb908328a9d6d334d1a4dff3",OpenAI_Codex,843228,imgntn,closed,2025-06-05T09:23:11Z,2025-06-05T09:26:25Z,2025-06-05T09:26:25Z,76519330,https://api.github.com/repos/imgntn/j360,https://github.com/imgntn/j360/pull/40,"analysisWe need to classify as performance or non-performance. The PR adds GPU support for little planet, adding shader, GPU method, etc. This is about performance? GPU acceleration likely improves performance. But the primary purpose is to add GPU support, not necessarily performance improvement. However, GPU acceleration is a performance optimization. The description: ""Add GPU little planet support"" - adding GPU shader to accelerate conversion. That is a performance improvement. The keywords: GPU, shader, performance. The classification: performance. So output ""performance"".assistantfinalperformance",34,1.0,False
-3241713269,1236,Implement texture atlas,"## Summary
-- add `TextureAtlas` class to manage shared texture space
-- track atlas membership inside `Texture`
-- insert textures into atlas when GL IDs are generated
-- draw from atlas in DrawPool and DrawPoolManager
-- include new source file in build system
-",OpenAI_Codex,2267386,mehah,closed,2025-07-18T03:26:47Z,2025-07-18T03:31:53Z,,273278110,https://api.github.com/repos/mehah/otclient,https://github.com/mehah/otclient/pull/1236,"analysisWe need to classify whether the primary purpose is performance. The PR adds a texture atlas to manage shared texture space, track atlas membership, insert textures into atlas when GL IDs are generated, draw from atlas in DrawPool and DrawPoolManager, include new source file. This is about performance: texture atlases reduce draw calls, improve rendering performance. So classification: 'performance'.assistantfinalperformance",34,1.0,False
+Link to Devin run: https://app.devin.ai/sessions/e7cd2982c76f49b597994abb3fb0385d
+Requested by: Cap-go
+",Devin,158243242,devin-ai-integration[bot],closed,2025-03-12T15:52:39Z,2025-03-13T22:32:04Z,,442321089,https://api.github.com/repos/Cap-go/capgo,https://github.com/Cap-go/capgo/pull/1051,34,1.0,False
+2914433643,1052,fix: improve deploy history performance and code quality,"Closes #1050
+
+This PR implements performance improvements for the deploy history screen in the channel page:
+
+## Improvements
+- Enhanced database indexes with composite indexes for common query patterns
+- Optimized the record_deployment_history trigger to avoid unnecessary updates
+- Implemented server-side search in HistoryTable component
+- Added debounce for search input to prevent excessive API calls
+- Optimized data fetching by selecting only necessary fields
+- Improved error handling in update_metadata endpoint
+- Fixed URL validation in update_metadata.ts
+- Added loading state for search in HistoryTable
+
+## Testing
+- Tested locally with Supabase and frontend server
+- Verified that the deploy history screen loads faster with optimized queries
+- Confirmed that search functionality works correctly with server-side filtering
+- Tested pagination and sorting functionality
+- Verified mobile responsiveness
+
+Link to Devin run: https://app.devin.ai/sessions/301eff9c3c0940d4a621aca5a3e57a1b
+Requested by: Cap-go",Devin,158243242,devin-ai-integration[bot],closed,2025-03-12T15:55:50Z,2025-03-13T22:25:25Z,,442321089,https://api.github.com/repos/Cap-go/capgo,https://github.com/Cap-go/capgo/pull/1052,34,1.0,False
+2914453633,1054,fix: performance improvements for deploy history screen,"# Performance Improvements for Deploy History Screen
+
+This PR addresses the performance and security issues in the deploy history screen implementation from Issue #1014 and PR #1050.
+
+## Database Optimizations
+
+- Added composite indexes for common query patterns to improve performance:
+  ```sql
+  CREATE INDEX IF NOT EXISTS deploy_history_channel_app_idx ON ""public"".""deploy_history"" (channel_id, app_id);
+  CREATE INDEX IF NOT EXISTS deploy_history_app_deployed_at_idx ON ""public"".""deploy_history"" (app_id, deployed_at);
+  ```
+
+- Optimized the `record_deployment_history` trigger function to only update records that are currently marked as current:
+  ```sql
+  UPDATE deploy_history
+  SET is_current = FALSE
+  WHERE channel_id = NEW.id
+  AND is_current = TRUE;
+  ```
+
+## Security Fixes
+
+- Fixed URL validation in `update_metadata.ts` to use a safer implementation:
+  ```typescript
+  function isValidUrl(url: string): boolean {
+    try {
+      void new URL(url)
+      return true
+    }
+    catch {
+      return false
+    }
+  }
+  ```
+
+## Test Improvements
+
+- Added missing `reset_app_data` database function that was causing test failures
+- Updated test utilities to include metadata fields in the `createAppVersions` function
+
+## Frontend Optimizations
+
+- Implemented optimized query to select only needed fields:
+  ```typescript
+  .select(`
+    id, 
+    deployed_at,
+    link,
+    comment,
+    is_current,
+    version_id,
+    version:version_id (
+      id,
+      name
+    )
+  `, { count: 'exact' })
+  ```
+
+## Testing
+
+The changes have been tested locally with:
+- Linting checks using `bun run lint-backend`
+- Database migrations applied with `supabase db reset`
+
+Link to Devin run: https://app.devin.ai/sessions/9941d6700a2841b98725e6b1b9dc420e
+Requested by: Cap-go
+",Devin,158243242,devin-ai-integration[bot],closed,2025-03-12T16:02:40Z,2025-03-13T22:33:14Z,,442321089,https://api.github.com/repos/Cap-go/capgo,https://github.com/Cap-go/capgo/pull/1054,34,1.0,False
+2965102818,1108,perf: Performance analysis for default channel migration,"# Performance Analysis for Default Channel Migration in PR #1107
+
+## Overview
+This PR provides a detailed performance analysis and recommendations for PR #1107 ""Move default channel to app table"" which implements moving default channel configurations from individual channel records to the application level.
+
+## Performance Concerns Identified
+
+1. **Migration Script Performance**:
+   - Row-by-row processing instead of set-based operations
+   - Scalability issues for large databases
+   - No batch processing
+
+2. **Channel API Performance**:
+   - Computed public property adds complexity
+   - Subqueries in SQL could be inefficient
+   - Multiple sequential database operations
+
+3. **UI Operations**:
+   - Multiple database operations when changing default channels
+   - No batching of operations
+   - Sequential operations instead of parallel
+
+## Recommendations
+
+The performance-analysis.md file contains detailed recommendations including:
+- Optimized migration script using set-based operations
+- Improved Channel API queries using JOINs instead of subqueries
+- Batched UI operations
+- Additional indexes for better query performance
+
+These recommendations will significantly improve the performance and scalability of the default channel migration, especially for large databases with many apps and users.
+
+Link to Devin run: https://app.devin.ai/sessions/bdc151dc81bb495990fd5404cec9b6da
+Requested by: unknown
+",Devin,158243242,devin-ai-integration[bot],closed,2025-04-02T03:50:33Z,2025-04-10T14:43:00Z,,442321089,https://api.github.com/repos/Cap-go/capgo,https://github.com/Cap-go/capgo/pull/1108,34,1.0,False
+2965108973,1109,feat: Optimize default channel migration for performance,"# Performance Optimizations for Default Channel Migration
+
+## Summary
+This PR implements performance optimizations for the default channel migration in PR #1107. The optimizations focus on improving database operations and query efficiency.
+
+## Performance Improvements
+
+### 1. Migration Script Optimization
+- Replaced row-by-row processing with efficient set-based operations
+- Added indexes to improve query performance for default channel lookups
+- Eliminated unnecessary loops for better scalability with large datasets
+
+### 2. Channel API Optimization
+- Improved computation of 'public' property with more efficient checks
+- Used array filtering for faster default channel identification
+- Optimized type handling for better performance
+
+### 3. UI Operations Optimization
+- Consolidated multiple database operations into single operations
+- Reduced database round-trips when updating default channels
+- Improved error handling for better reliability
+
+## Testing
+These optimizations maintain the same functionality while significantly improving performance, especially for large databases with many apps and users.
+
+Link to Devin run: https://app.devin.ai/sessions/80306a71b65b49358504dfa8ecaf48fa
+Requested by: unknown",Devin,158243242,devin-ai-integration[bot],closed,2025-04-02T03:56:17Z,2025-04-10T14:43:00Z,,442321089,https://api.github.com/repos/Cap-go/capgo,https://github.com/Cap-go/capgo/pull/1109,34,1.0,False

@@ -1,1082 +1,513 @@
-id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
-3142181649,19,Replace CLI subprocess approach with Claude Code SDK,"## Description
-
-Replace the current CLI subprocess execution approach with the Claude Code SDK for better performance, type safety, and error handling. This is a clean replacement that maintains the same interface while providing significant performance improvements.
-
-## Type of Change
-
-Please add the appropriate label(s) to this PR and check the relevant box(es):
-
-- [ ] 🐛 `bug` - Bug fix (non-breaking change which fixes an issue)
-- [x] ✨ `feature` - New feature (non-breaking change which adds functionality)
-- [ ] 💥 `breaking` - Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] 📚 `documentation` - Documentation update
-- [x] ⚡ `performance` - Performance improvement
-- [ ] 🔨 `refactor` - Code refactoring
-- [ ] 🧪 `test` - Adding or updating tests
-- [ ] 🔧 `chore` - Maintenance, dependencies, tooling
-
-## Changes Made
-
-- **Complete replacement**: CLI subprocess execution → Claude Code SDK
-- **Same interface**: `executeClaudeCommand` function maintains identical signature
-- **Identical output**: Same JSON message structure (`system`, `assistant`, `result` types)
-- **Simplified implementation**: No feature flags, fallbacks, or complex configuration
-- **Working directory**: Maintains project root execution behavior
-- **Dependencies**: Added `npm:@anthropic-ai/claude-code` to deno.lock
-
-## Testing
-
-- [x] Tests pass locally (`make test`)
-- [x] Code is formatted (`make format`)
-- [x] Code is linted (`make lint`)
-- [x] Type checking passes (`make typecheck`)
-- [x] All quality checks pass (`make check`)
-- [x] Manual testing performed - Verified SDK produces identical JSON output format
-
-## Checklist
-
-- [x] My code follows the project's style guidelines
-- [x] I have performed a self-review of my own code
-- [x] I have commented my code, particularly in hard-to-understand areas
-- [ ] I have made corresponding changes to the documentation
-- [ ] I have added/updated tests for my changes
-- [x] All tests pass
-
-## Screenshots (if applicable)
-
-N/A - Backend implementation change with no UI modifications.
-
-## Additional Notes
-
-This addresses issue #18 with a clean, simple replacement approach:
-
-**Performance Benefits:**
-- Eliminates process spawning overhead for each request
-- Direct memory access instead of IPC communication
-- Native JavaScript error handling
-
-**Compatibility:**
-- Zero breaking changes to API
-- Identical JSON output format maintained
-- Same function interface for minimal integration impact
-
-**Simplicity:**
-- No feature flags or configuration complexity
-- Clean, focused implementation
-- Easier to maintain and understand
-
-Closes #18
-
-🤖 Generated with [Claude Code](https://claude.ai/code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,80381,sugyan,closed,2025-06-13T04:05:15Z,2025-06-13T14:14:33Z,2025-06-13T14:14:33Z,999285986,https://api.github.com/repos/sugyan/claude-code-webui,https://github.com/sugyan/claude-code-webui/pull/19,"analysisWe need to classify as 'performance' or 'non-performance'. The PR description explicitly says performance improvement, includes performance label, mentions performance benefits. So classification: performance.assistantfinalperformance",19,1.0,True
-3200679276,4304,Implement lazy loading for RegistryInstance to improve latency in operations where the registry does not need to be read,"👨 
-
-Before:
-
-```
-julia> @time Pkg.instantiate()
-  0.390297 seconds (1.95 M allocations: 148.381 MiB, 16.29% gc time, 31.03% compilation time: 68% of which was recompilation)
-```
-
-After:
-```
-julia> @time Pkg.instantiate()
-  0.161872 seconds (456.14 k allocations: 27.898 MiB, 9.75% gc time, 86.52% compilation time: 60% of which was recompilation)
-```
-
-
------
-
-🤖 
-
-- Change RegistryInstance to mutable struct with lazily loaded fields
-- Defer expensive operations (decompression, Registry.toml parsing) until needed
-- Add ensure_registry_loaded\!() to trigger loading on first access
-- Use getproperty() to automatically load when accessing name, uuid, repo, description, or pkgs
-- Fix #4301 by reducing initial registry creation overhead
-
-🤖 Generated with [Claude Code](https://claude.ai/code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>
-",Claude_Code,1282691,KristofferC,closed,2025-07-03T21:18:03Z,2025-07-04T08:34:04Z,2025-07-04T08:34:04Z,82341193,https://api.github.com/repos/JuliaLang/Pkg.jl,https://github.com/JuliaLang/Pkg.jl/pull/4304,"analysisWe need to classify as performance or non-performance. The PR title: ""Implement lazy loading for RegistryInstance to improve latency in operations where the registry does not need to be read"". Body describes performance improvements: lazy loading, reduce allocations, speed up instantiate. So it's performance. So output 'performance'.assistantfinalperformance",19,1.0,False
-3090065215,19,Add Claude CLI support with Strategy Pattern architecture (v0.6.0),"## 🚀 Major Enhancement: Claude CLI Support & Strategy Pattern Architecture
-
-This PR introduces comprehensive Claude CLI support with a robust Strategy Pattern architecture, bringing the MCP installer to v0.6.0 with significant performance and extensibility improvements.
-
-## ✨ New Features
-
-### Claude CLI Integration
-- **Automatic Detection**: Detects if `claude` CLI is available at startup
-- **Immediate Availability**: Servers installed via CLI are available instantly (no restart required)
-- **Graceful Fallback**: Falls back to Claude Desktop config if CLI unavailable
-- **Enhanced UX**: Clear feedback on installation method and availability status
-
-### Strategy Pattern Architecture
-- **Extensible Design**: Clean interface ready for multiple installation environments
-- **Performance Optimized**: Early strategy detection (1 call vs 4 calls per operation)
-- **Future-Ready**: Prepared for Docker, Kubernetes, VS Code Extensions, and more
-- **Maintainable**: Eliminated conditional branching duplication throughout codebase
-
-## 🏗️ Technical Improvements
-
-### Architecture Changes
-- Added `InstallationStrategy` interface with concrete implementations:
-  - `ClaudeCliStrategy` - For `claude` CLI installations
-  - `ClaudeDesktopStrategy` - For traditional config file approach
-- Global strategy initialization at server startup
-- Unified installation interface across all environments
-
-### Performance Enhancements
-- **Before**: 4 `hasClaudeCLI()` calls per installation operation
-- **After**: 1 `hasClaudeCLI()` call per server startup
-- Eliminated redundant environment detection
-- Streamlined installation flow
-
-### Code Quality
-- Removed legacy `installToClaudeCLI`/`installToClaudeDesktop` functions
-- Simplified conditional logic throughout the codebase
-- Better separation of concerns
-- Enhanced error handling and user feedback
-
-## 📦 Installation & Usage
-
-### For Claude CLI (New - Recommended):
-```bash
-claude mcp add mcp-installer npx --args @o2alexanderfedin/mcp-installer
-```
-
-### For Claude Desktop (Existing):
-```json
-{
-  ""mcpServers"": {
-    ""mcp-installer"": {
-      ""command"": ""npx"",
-      ""args"": [""@o2alexanderfedin/mcp-installer""]
-    }
-  }
-}
-```
-
-## 🔄 Backward Compatibility
-
-✅ **No Breaking Changes**: All existing Claude Desktop installations continue to work exactly as before
-✅ **Enhanced Experience**: Existing users get improved performance and better error messages
-✅ **Seamless Migration**: No action required for current users
-
-## 🧪 Testing
-
-- ✅ TypeScript compilation passes
-- ✅ Build system works correctly  
-- ✅ Module loads without runtime errors
-- ✅ Backward compatibility verified
-- ✅ Strategy pattern functionality confirmed
-
-## 📋 Commits Included
-
-1. **Add Claude CLI support with automatic detection and fallback** (`8e50814`)
-   - Core Claude CLI integration
-   - Automatic detection logic
-   - Enhanced README documentation
-
-2. **Remove unused function to fix TypeScript compilation** (`dd6e4a9`)
-   - Clean up legacy code
-   - Fix compilation issues
-
-3. **Refactor installation logic using Strategy Pattern** (`a778373`)
-   - Complete Strategy Pattern implementation
-   - Performance optimizations
-   - Code simplification
-
-4. **Bump version to 0.6.0** (`ce7ed5c`)
-   - Version update for release
-
-## 🎯 Future Roadmap
-
-This architecture enables easy addition of new installation environments:
-- Docker containers (`docker run` commands)
-- Kubernetes deployments (`kubectl apply`)
-- VS Code Extensions (`.vscode/settings.json`)
-- JetBrains IDEs (plugin configuration)
-- Cloud deployments (AWS Lambda, Google Cloud Functions)
-
----
-
-🤖 Generated with [Claude Code](https://claude.ai/code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,77516945,o2alexanderfedin,open,2025-05-26T05:38:39Z,,,894640711,https://api.github.com/repos/anaisbetts/mcp-installer,https://github.com/anaisbetts/mcp-installer/pull/19,"analysisWe need to classify as 'performance' or 'non-performance'. The PR description includes performance improvements: ""Performance Optimized: Early strategy detection (1 call vs 4 calls per operation)"", ""Performance Enhancements"". Also mentions ""significant performance and extensibility improvements"". So it's performance. The classification: 'performance'.assistantfinalperformance",19,1.0,True
-3226043406,4902,feat: lazy load CLI command actions for improved startup performance,"## Summary
-
-This PR implements lazy loading for CLI command actions as outlined in TODO.md, resulting in a **15.7% overall improvement** in CLI startup performance.
-
-### Key Changes:
-- Separated command registration (lightweight) from action execution (heavyweight)
-- Applied dynamic imports for all command actions
-- Optimized checkNodeVersion to remove heavy imports
-- Kept main.ts completely unchanged as required
-
-## Performance Results
-
-### Overall Performance
-- **Main branch average:** 971.84ms
-- **Feature branch average:** 819.00ms
-- **Improvement:** 152.84ms (15.7% faster)
-
-### Top 5 Most Improved Commands
-
-| Command | Main (ms) | Feature (ms) | Improvement (ms) | % Faster |
-|---------|-----------|--------------|------------------|----------|
-| validate | 988.45 | 820.17 | 168.28 | 17.0% |
-| init | 998.59 | 831.59 | 167.00 | 16.7% |
-| export | 991.45 | 826.09 | 165.36 | 16.7% |
-| show | 990.22 | 826.54 | 163.68 | 16.5% |
-| share | 985.84 | 823.22 | 162.62 | 16.5% |
-
-### All Commands Performance Comparison
-
-| Command | Main (ms) | Feature (ms) | Improvement (ms) |
-|---------|-----------|--------------|------------------|
-| help | 950.48 | 803.65 | 146.83 |
-| eval | 965.16 | 812.03 | 153.13 |
-| eval help | 962.44 | 809.09 | 153.35 |
-| init | 998.59 | 831.59 | 167.00 |
-| view | 961.37 | 807.18 | 154.19 |
-| list | 965.70 | 809.64 | 156.06 |
-| show | 990.22 | 826.54 | 163.68 |
-| auth login | 965.89 | 806.39 | 159.50 |
-| auth logout | 965.12 | 808.45 | 156.67 |
-| auth whoami | 960.51 | 808.14 | 152.37 |
-| cache clear | 973.60 | 822.12 | 151.48 |
-| config show | 967.38 | 812.36 | 155.02 |
-| delete | 963.28 | 810.41 | 152.87 |
-| export | 991.45 | 826.09 | 165.36 |
-| import | 959.79 | 809.01 | 150.78 |
-| share | 985.84 | 823.22 | 162.62 |
-| validate | 988.45 | 820.17 | 168.28 |
-| debug | 969.55 | 819.36 | 150.19 |
-| model-scan | 975.96 | 823.60 | 152.36 |
-| generate dataset | 989.25 | 833.66 | 155.59 |
-| generate assertions | 980.55 | 827.68 | 152.87 |
-
-## Commands Refactored
-
-- ✅ eval
-- ✅ init  
-- ✅ view
-- ✅ generate (dataset, assertions)
-- ✅ share
-- ✅ show
-- ✅ list
-- ✅ cache
-- ✅ config
-- ✅ auth
-- ✅ delete
-- ✅ export
-- ✅ import
-- ✅ validate
-- ✅ debug
-- ✅ modelScan
-
-## Testing
-
-All CI checks pass:
-- ✅ Build
-- ✅ Lint
-- ✅ Format
-- ✅ Tests
-- ✅ Circular dependencies check
-- ✅ Python tests
-- ✅ Integration tests
-
-## Breaking Changes
-
-None - all changes are internal optimizations that maintain the same external API.
-
-🤖 Generated with [Claude Code](https://claude.ai/code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,7235481,mldangelo,open,2025-07-13T02:47:49Z,,,633927609,https://api.github.com/repos/promptfoo/promptfoo,https://github.com/promptfoo/promptfoo/pull/4902,"analysisWe need to classify as 'performance' or 'non-performance'. The PR clearly is about lazy loading CLI command actions for improved startup performance, with performance results. So it's performance.assistantfinalperformance",19,1.0,False
-3193183157,7710,Optimize datatype CLI performance by skipping accessor loop for 0-ary constructors,"This PR fixes a significant performance regression in the CLI when declaring datatypes with many 0-ary constructors (constructors with no arguments).
-
-## Problem
-
-The issue was identified through profiling data showing that `cmd_context::dt_eh::operator()` was spending excessive time in:
-- `datatype::util::get_constructor_recognizer` (67.03% of time, 8743 calls)  
-- `datatype::util::get_constructor_accessors` (36.53% of time, 5600 calls)
-
-For datatypes with many 0-ary constructors like:
-```smt2
-(declare-datatype Element (
-  (a1) (a2) (a3) ... (a50000)
-))
-```
-
-The CLI was taking 4+ seconds for 50,000 constructors and 14+ seconds for 100,000 constructors, while the API could handle 100,000 constructors in just 300ms.
-
-## Root Cause
-
-The performance bottleneck was in `cmd_context::dt_eh::operator()` where the code was calling `get_constructor_accessors()` and iterating through the results for **every** constructor, including 0-ary constructors that have no accessors by definition.
-
-## Solution
-
-Added a simple check `if (c->get_arity() > 0)` before calling `get_constructor_accessors()` and iterating through accessors:
-
-```cpp
-if (c->get_arity() > 0) {
-    for (func_decl * a : *m_dt_util.get_constructor_accessors(c)) {
-        TRACE(new_dt_eh, tout << ""new accessor: "" << a->get_name() << ""\n"";);
-        m_owner.insert(a);
-    }
-}
-```
-
-This avoids the expensive accessor lookup and empty loop iteration for 0-ary constructors while preserving full functionality for constructors that do have accessors.
-
-## Performance Results
-
-- **1,000 constructors**: ~9ms  
-- **10,000 constructors**: ~137ms
-- **50,000 constructors**: ~3s (significant improvement from the original 4s)
-
-## Validation
-
-- All existing datatype tests pass
-- Mixed datatypes with both 0-ary and non-0-ary constructors work correctly
-- API performance remains unaffected
-- No functional regressions detected
-
-Fixes #7709.
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-01T16:55:38Z,2025-07-01T21:23:50Z,,32944298,https://api.github.com/repos/Z3Prover/z3,https://github.com/Z3Prover/z3/pull/7710,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Optimize datatype CLI performance by skipping accessor loop for 0-ary constructors"". The body describes performance regression, profiling, solution to improve performance. So it's a performance PR. So output 'performance'.assistantfinalperformance",19,1.0,False
-3186777284,742,Refactor CLI parsing to separate syntax parsing from option validation,"## Problem
-
-The current `parse_cli` functionality performs both CLI syntax parsing and option existence validation, which requires loading the full FFmpeg options dictionary. This increases package size because the complete options list gets bundled into release files.
-
-## Solution
-
-This PR refactors the CLI parsing to separate these concerns:
-
-### New Functions
-- **`parse_cli(cli: str)`** - Parses CLI arguments by syntax only, without loading the options dictionary
-- **`parse_with_validation(cli: str, validate_options: bool)`** - Allows explicit control over validation behavior
-
-### Modified Functions
-- **`parse_global()`, `parse_input()`, `parse_output()`** - Made `ffmpeg_options` parameter optional
-- **`parse_filter_complex()`** - Updated to handle optional filter validation
-- **`parse_options()`** - Already only handled syntax parsing (no changes needed)
-
-### Backward Compatibility
-The original `parse()` function remains unchanged and continues to validate options by default.
-
-## Usage Examples
-
-### Before (loads full options dictionary)
-```python
-from ffmpeg.compile.compile_cli import parse
-stream = parse(""ffmpeg -i input.mp4 -c:v libx264 output.mp4"")
-```
-
-### After (syntax-only parsing, no dictionary loading)
-```python
-from ffmpeg.compile.compile_cli import parse_cli
-stream = parse_cli(""ffmpeg -i input.mp4 -c:v libx264 output.mp4"")
-```
-
-### Explicit validation control
-```python
-from ffmpeg.compile.compile_cli import parse_with_validation
-
-# No validation (smaller package size)
-stream = parse_with_validation(cli, validate_options=False)
-
-# With validation (backward compatible)
-stream = parse_with_validation(cli, validate_options=True)
-```
-
-## Benefits
-
-1. **Reduced Package Size** - `parse_cli()` avoids loading the full options dictionary
-2. **Improved Performance** - Faster parsing without validation overhead
-3. **Flexible Validation** - Can enable/disable validation as needed
-4. **Backward Compatibility** - Existing code continues to work unchanged
-
-## Testing
-
-- ✅ Comprehensive unit tests verify dictionary loading behavior
-- ✅ Compatibility tests ensure both parsing methods work correctly
-- ✅ Complex CLI commands with filters tested successfully
-- ✅ Mocking confirms `parse_cli()` doesn't load options dictionary
-- ✅ All existing functionality preserved
-
-Fixes #741
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-30T00:55:04Z,2025-07-01T06:56:27Z,,722865845,https://api.github.com/repos/livingbio/typed-ffmpeg,https://github.com/livingbio/typed-ffmpeg/pull/742,"analysisWe need to classify the pull request as performance or non-performance. The PR refactors CLI parsing to separate syntax parsing from option validation, reducing package size and improving performance. The description explicitly mentions improved performance, reduced package size, faster parsing. So it's a performance-related PR. So classification: 'performance'.assistantfinalperformance",19,1.0,False
-3193870086,7712,Fix O(n²) performance issue in CLI datatype declaration processing,"This PR fixes the non-linear performance issue in Z3's CLI when processing `declare-datatype` commands with many constructors. The problem was identified through profiling (see image) where `datatype::util::get_constructor_recognizer` consumed 67% and `datatype::util::get_constructor_accessors` consumed 36% of execution time.
-
-## Problem
-
-The original implementation had O(n²) complexity due to linear searches:
-
-```cpp
-// In cmd_context::dt_eh::operator()
-for (func_decl * c : *m_dt_util.get_datatype_constructors(dt)) {
-    func_decl * r = m_dt_util.get_constructor_recognizer(c);  // O(n) search
-    for (func_decl * a : *m_dt_util.get_constructor_accessors(c)) {  // O(n) search
-        // ...
-    }
-}
-```
-
-Each call to `get_constructor_recognizer()` and `get_constructor_accessors()` performed a linear search through all constructors to find the matching one by name. For n constructors, this created n × n = O(n²) behavior.
-
-**Performance impact:**
-- 50,000 constructors: 4 seconds  
-- 100,000 constructors: 14 seconds
-- API equivalent: 100,000 constructors in 300ms
-
-## Solution
-
-Implemented batch initialization as suggested in the existing code comment:
-
-> ""Option 2: initialize all calls to plugin() registration in a single pass.""
-
-### Changes Made:
-
-1. **Added `batch_initialize_constructor_functions()`** - Pre-processes all constructors in a single O(n) pass and populates the cache maps
-2. **Modified `cmd_context::dt_eh::operator()`** - Calls batch initialization before the main loop
-3. **Zero breaking changes** - All existing APIs remain unchanged
-
-### Implementation:
-
-```cpp
-void util::batch_initialize_constructor_functions(sort * datatype) {
-    // Process all constructors in single O(n) pass
-    for (func_decl * con : *get_datatype_constructors(datatype)) {
-        // Pre-populate recognizer cache
-        if (!plugin().m_constructor2recognizer.contains(con)) {
-            // Find and cache recognizer
-        }
-        // Pre-populate accessor cache  
-        if (!plugin().m_constructor2accessors.contains(con)) {
-            // Find and cache accessors
-        }
-    }
-}
-```
-
-## Expected Performance
-
-Theoretical analysis shows dramatic improvements:
-- **100 constructors**: 6x speedup
-- **1,000 constructors**: 108x speedup  
-- **5,000 constructors**: 523x speedup
-- **100,000 constructors**: ~1000x speedup (14s → ~10ms)
-
-This brings CLI performance in line with API performance for large datatypes.
-
-## Testing
-
-The fix has been validated with:
-- Generated test files with 50-5000 constructors
-- Theoretical performance analysis confirming O(n) complexity
-- Zero regression risk (no existing code modified)
-
-Fixes #7709.
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-01T21:28:07Z,2025-07-02T16:54:36Z,2025-07-02T16:54:36Z,32944298,https://api.github.com/repos/Z3Prover/z3,https://github.com/Z3Prover/z3/pull/7712,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Fix O(n²) performance issue in CLI datatype declaration processing"". The body describes performance issue, O(n²) complexity, solution to improve performance. So it's performance. So output 'performance'.assistantfinalperformance",19,1.0,False
-3232717651,7737,Fix quantifier weight default to prevent performance regression,"This PR fixes a critical performance regression in Z3 4.15.x where quantifier-heavy SMT files experience memory and time blowup compared to Z3 4.8.17.
-
-## Problem
-The issue was caused by the ""Weight 0"" performance bug documented in `src/params/qi_params.h`. When quantifiers have default weight 0:
-
-1. Cost calculation: `(+ weight generation)` becomes just `generation`
-2. New enode generation = cost = old generation  
-3. All enodes maintain the same generation value
-4. Z3 cannot detect matching loops in quantifier instantiation
-5. Results in infinite instantiation leading to memory/time blowup
-
-## Root Cause
-The default weight parameter in quantifier constructor methods (`mk_quantifier`, `mk_forall`, `mk_exists`) was set to 0, triggering this well-documented performance bug.
-
-## Solution
-Changed default weight from 0 to 1 in `src/ast/ast.h` for:
-- `mk_quantifier()` 
-- `mk_forall()`
-- `mk_exists()`
-
-This ensures proper cost differentiation: `(+ 1 generation)` enables matching loop detection.
-
-## Verification
-- ✅ **Consistent with existing code**: SMT2 parser already uses weight=1 default
-- ✅ **Backward compatible**: Explicit weight=0 calls remain unchanged
-- ✅ **Test case added**: `examples/test_quantifier_weight_fix.smt2` demonstrates the fix
-- ✅ **Minimal change**: Only affects default parameters, no logic changes
-
-## Expected Impact
-- **Before**: Files like those in the issue would hang with excessive memory usage
-- **After**: Same files should solve normally with reasonable instantiation counts
-- **No regression**: Existing functionality preserved since explicit weights unchanged
-
-The fix directly addresses the performance regression described in the issue by restoring proper quantifier instantiation loop detection.
-
-Fixes #7735.
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-15T15:24:09Z,2025-07-26T22:11:16Z,,32944298,https://api.github.com/repos/Z3Prover/z3,https://github.com/Z3Prover/z3/pull/7737,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Fix quantifier weight default to prevent performance regression"". The body describes a performance regression, memory/time blowup, fix default weight to 1 to avoid infinite instantiation. This is clearly a performance-related PR. So classification: 'performance'.assistantfinalperformance",19,1.0,False
-3148090723,2146,Optimize pytest startup via lazy runtime imports,"## Summary
-- prevent expensive imports on Python startup
-- only load `JacMachine` when executing Jac modules
-
-## Testing
-- `pre-commit run --files jac/jaclang/runtimelib/meta_importer.py` *(fails: unable to access github.com)*
-- `pytest -k meta_importer -q` *(fails: ModuleNotFoundError: dotenv)*
-
-------
-https://chatgpt.com/codex/tasks/task_e_684f3e054b808322b47ea46902c5ea7c",OpenAI_Codex,8206008,marsninja,open,2025-06-15T21:45:50Z,,,422711680,https://api.github.com/repos/jaseci-labs/jaseci,https://github.com/jaseci-labs/jaseci/pull/2146,"analysisWe need to classify the pull request as performance or non-performance. The title: ""Optimize pytest startup via lazy runtime imports"". Summary: prevent expensive imports on Python startup, only load JacMachine when executing Jac modules. This is about performance: reducing startup time, lazy imports. So classification: performance.assistantfinalperformance",19,1.0,False
-3210327689,489,Refactor asset conversion/management: Move to CLI tool and enable direct WAD loading,"This PR implements a comprehensive refactoring of OpenKeeper's asset conversion and management system to address the requirements outlined in #486.
-
-## 🎯 Key Changes
-
-### 1. Standalone Asset Converter CLI
-- **New `AssetConverterCLI.java`**: Replaces GUI-based conversion integrated into game startup
-- **Command-line interface** with options for custom DK II folder, force overwrite, and skipping models
-- **Gradle integration**: Added `assetConverterCLI` task for easy execution
-- **Cross-platform friendly**: Enables Android builds without requiring runtime conversion
-
-```bash
-# Convert all assets
-./gradlew assetConverterCLI
-
-# Skip model conversion and load directly from WAD
-./gradlew assetConverterCLI -PcliArgs=""--skip-models""
-```
-
-### 2. Direct WAD File Loading
-- **New `WadAssetLocator.java`**: Loads assets directly from original DK II files
-- **Priority system**: Extracted assets take precedence over WAD files for modding
-- **Support for multiple formats**:
-  - KMF models from `Meshes.WAD`
-  - Textures from `EngineTextures.dat`
-  - Sounds from `Sounds.WAD`
-
-### 3. Removed .j3o Model Generation
-- **Modified `ConvertModels.java`**: Extracts raw KMF files instead of converting to .j3o
-- **Runtime loading**: Models converted from KMF to JME objects at runtime using existing `KmfModelLoader`
-- **Better editability**: Raw KMF files can be viewed/modified by external tools
-- **Reduced storage**: Eliminates duplicate data in both KMF and .j3o formats
-
-### 4. Game Startup Optimization
-- **Modified `Main.java`**: Removed asset conversion dependency from startup
-- **Faster launches**: Game starts immediately without conversion delays
-- **Dual asset loading**: Registers both `FileLocator` (extracted) and `WadAssetLocator` (original)
-
-## 🚀 Benefits
-
-### For Users
-- **Instant startup**: No more waiting for asset conversion when launching the game
-- **Smaller disk usage**: Can skip model conversion entirely
-- **Better modding support**: Easy to replace individual assets while keeping others original
-
-### For Developers
-- **Cross-platform builds**: Especially important for Android deployment (#218)
-- **Cleaner architecture**: Asset conversion separated from game logic
-- **Easier testing**: Can test game without full asset conversion
-
-## 📋 Asset Loading Priority
-
-1. **Extracted/converted assets** (highest priority) - Located in assets folder
-2. **Original WAD files** (fallback) - Loaded directly from DK II installation  
-3. **Built-in defaults** (lowest priority) - Embedded in JAR
-
-## 🔄 Migration
-
-**Existing users**: No action required. The game automatically uses the new priority system.
-
-**Fresh installs**: 
-1. Set DK II folder in game settings
-2. Optionally run `./gradlew assetConverterCLI` for faster loading
-
-## 📚 Documentation
-
-Added comprehensive `ASSET_CONVERSION_REFACTOR.md` with:
-- Usage examples and command-line options
-- Migration guide for existing users
-- Technical implementation details
-- Troubleshooting information
-
-## ✅ Testing
-
-- CLI argument parsing validated with automated tests
-- Backward compatibility maintained for existing converted assets
-- Asset loading priority system verified
-
-This refactoring achieves all the goals outlined in the issue: moves conversion out of startup, enables direct WAD loading, removes .j3o generation, and maintains excellent modding support.
-
-Fixes #486.
-
-> [!WARNING]
->
-> <details>
-> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
->
-> #### I tried to connect to the following addresses, but was blocked by firewall rules:
->
-> - `jitpack.io`
->   - Triggering command: `/usr/lib/jvm/temurin-17-jdk-amd64/bin/java --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED --add-opens=java.base/java.nio.charset=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED --add-opens=java.xml/javax.xml.namespace=ALL-UNNAMED -XX:MaxMetaspaceSize=384m -XX:&#43;HeapDumpOnOutOfMemoryError -Xms256m -Xmx512m -Dfile.encoding=UTF-8 -Duser.country -Duser.language=en -Duser.variant -cp /home/REDACTED/.gradle/wrapper/dists/gradle-8.14-bin/38aieal9i53h9rfe7vjup95b9/gradle-8.14/lib/gradle-daemon-main-8.14.jar -javaagent:/home/REDACTED/.gradle/wrapper/dists/gradle-8.14-bin/38aieal9i53h9rfe7vjup95b9/gradle-8.14/lib/agents/gradle-instrumentation-agent-8.14.jar org.gradle.launcher.daemon.bootstrap.GradleDaemon 8.14` (dns block)
->
-> If you need me to access, download, or install something from one of these locations, you can either:
->
-> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
-> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
->
-> </details>
-
-
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-07-07T21:46:36Z,,,22580980,https://api.github.com/repos/tonihele/OpenKeeper,https://github.com/tonihele/OpenKeeper/pull/489,"analysisWe need to classify as performance or non-performance. The PR is about refactoring asset conversion, moving to CLI, enabling direct WAD loading, removing.j3o generation, faster startup, smaller disk usage. It mentions ""Game Startup Optimization"" and ""Faster launches"". This is performance improvement. So classify as 'performance'.assistantfinalperformance",19,1.0,True
-3070977591,4628,chore: refactor CLI fs operations,"## Summary
-- replace sync fs reads/writes in CLI commands with async equivalents
-- use `fs.promises` with proper error handling
-- fix parseEnv helper to be async and await it in deploy/upgrade actions
-
-## Testing
-- `bun run test` *(fails: turbo: command not found)*
-- `bun run scripts/pre-commit-lint.js`",OpenAI_Codex,82053242,wtfsayo,closed,2025-05-17T18:16:48Z,2025-05-17T18:19:36Z,,826170402,https://api.github.com/repos/elizaOS/eliza,https://github.com/elizaOS/eliza/pull/4628,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""chore: refactor CLI fs operations"". Summary: replace sync fs reads/writes with async equivalents, use fs.promises, fix parseEnv helper to be async. This is about async vs sync, which can improve performance by not blocking event loop. It's a performance improvement. So classify as 'performance'.assistantfinalperformance",19,0.31775512275175727,False
-3070969331,4626,chore: Refactor CLI fs operations,"## Summary
-- replace sync fs reads/writes in CLI commands with async equivalents
-- use `fs.promises` with proper error handling
-
-## Testing
-- `bun run test` *(fails: turbo: command not found)*
-- `bun run scripts/pre-commit-lint.js` *(fails: prettier not found)*",OpenAI_Codex,82053242,wtfsayo,closed,2025-05-17T18:02:08Z,2025-05-17T18:18:47Z,,826170402,https://api.github.com/repos/elizaOS/eliza,https://github.com/elizaOS/eliza/pull/4626,"analysisWe need to classify as performance or non-performance. The PR title: ""chore: Refactor CLI fs operations"". Body: replace sync fs reads/writes with async equivalents. That is about performance? Using async instead of sync can improve performance by not blocking event loop. But is that considered performance? The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs.
-
-This PR mentions replacing sync fs reads/writes with async equivalents. That is about performance, but does it contain any of the keywords? It doesn't contain any of those keywords. But the guidelines say performance-related PRs may contain keywords, but not necessarily must contain them. The classification is based on primary purpose. The primary purpose is to improve performance by using async fs operations. So we should classify as 'performance'.
-
-Thus answer: performance.assistantfinalperformance",19,0.31176280384974747,False
-3151002300,6671,Use async file system APIs instead of sync APIs in install.ts,"Replaces synchronous file system API calls with asynchronous equivalents in `vscode/npm-package/install.ts` to improve performance and follow Node.js best practices.
-
-## Changes Made
-
-- **Added helper functions:**
-  - `checkFileExists()` - Uses `fs.promises.access()` to check file/directory existence asynchronously
-  - `isDirectoryEmpty()` - Uses `fs.promises.readdir()` to check if directory is empty asynchronously
-
-- **Replaced sync calls with async equivalents:**
-  - `fs.existsSync(installPath)` → `await checkFileExists(installPath)`
-  - `fs.readdirSync(installPath).length === 0` → `await isDirectoryEmpty(installPath)`
-  - `fs.existsSync(kiotaBinaryZip)` → `await checkFileExists(kiotaBinaryZip)`
-
-## Behavior Preserved
-
-The changes maintain exact same functional behavior:
-- Non-existent directories still trigger installation
-- Empty directories still trigger installation
-- Directories with files still skip installation
-
-All error handling and edge cases are properly managed with the new async approach.
-
-Fixes #6165.
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-06-16T19:04:49Z,2025-06-17T20:07:53Z,2025-06-17T20:07:52Z,323665366,https://api.github.com/repos/microsoft/kiota,https://github.com/microsoft/kiota/pull/6671,"analysisWe need to classify as performance or non-performance. The PR title: ""Use async file system APIs instead of sync APIs in install.ts"". The body says replacing sync calls with async equivalents to improve performance and follow Node.js best practices. This is a performance improvement. So classification: performance.assistantfinalperformance",19,0.29819247730503,False
-3245346788,195,feat: simplify Node.js runtime with Hono v1.17.0 absolute path support,"## Summary
-- Update @hono/node-server from v1.15.0 to v1.17.0 for absolute path support  
-- Simplify Node.js runtime implementation by removing complex relative path calculations
-- Improve code maintainability and eliminate working directory dependencies
-
-## Type of Change
-
-Please add the appropriate label(s) to this PR and check the relevant box(es):
-
-- [ ] 🐛 `bug` - Bug fix (non-breaking change which fixes an issue)
-- [x] ✨ `feature` - New feature (non-breaking change which adds functionality)
-- [ ] 💥 `breaking` - Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] 📚 `documentation` - Documentation update
-- [x] ⚡ `performance` - Performance improvement
-- [ ] 🔨 `refactor` - Code refactoring
-- [ ] 🧪 `test` - Adding or updating tests
-- [ ] 🔧 `chore` - Maintenance, dependencies, tooling
-
-## Changes Made
-
-- **Dependency Update**: Upgraded `@hono/node-server` to v1.17.0 which adds absolute path support
-- **Code Simplification**: Replaced 10 lines of complex relative path calculation with 1 line of absolute path
-- **Import Cleanup**: Removed unused `relative` import from `node:path`
-- **Improved Robustness**: Static file serving no longer depends on working directory
-
-## Before/After Comparison
-
-### Before (10 lines of complex logic)
-```typescript
-const staticAbsPath = join(__dirname, ""../static"");
-let staticRelPath = relative(process.cwd(), staticAbsPath);
-if (staticRelPath === """") {
-  staticRelPath = ""."";
-}
-```
-
-### After (1 line, simple and clear)
-```typescript
-const staticPath = join(__dirname, ""../static"");
-```
-
-## Testing
-
-- [x] Tests pass locally (`make test`)
-- [x] Code is formatted (`make format`)
-- [x] Code is linted (`make lint`)
-- [x] Type checking passes (`make typecheck`)
-- [x] All quality checks pass (`make check`)
-- [x] Manual testing performed: Verified static file serving works with absolute paths
-
-## Checklist
-
-- [x] My code follows the project's style guidelines
-- [x] I have performed a self-review of my own code
-- [x] I have commented my code, particularly in hard-to-understand areas
-- [x] I have made corresponding changes to the documentation
-- [x] I have added/updated tests for my changes
-- [x] All tests pass
-
-🤖 Generated with [Claude Code](https://claude.ai/code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,80381,sugyan,closed,2025-07-19T14:33:10Z,2025-07-19T14:41:39Z,2025-07-19T14:41:39Z,999285986,https://api.github.com/repos/sugyan/claude-code-webui,https://github.com/sugyan/claude-code-webui/pull/195,"analysisWe need to classify as 'performance' or 'non-performance'. The PR includes a performance label. The description: ""simplify Node.js runtime with Hono v1.17.0 absolute path support"". It mentions performance improvement? It says ""Simplify Node.js runtime implementation by removing complex relative path calculations"" and ""Improved Robustness"". The label includes performance. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The PR includes performance improvement? It might be more about code simplification and maintainability, but also performance? The label says performance. The content: ""Simplify Node.js runtime implementation by removing complex relative path calculations"" - that might reduce overhead? But it's more about maintainability. However, the label is performance. The instruction: ""Performance-related pull requests may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs."" The PR includes ""performance improvement"" label. But does it mention performance? It says ""Simplify Node.js runtime implementation by removing complex relative path calculations"" - that might reduce runtime overhead. But it's not explicitly about performance. However, the label is performance. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The PR is labeled performance. So likely it's performance. So classification: 'performance'.assistantfinalperformance",19,0.22398942642728675,False
-3226357274,4052,[WIP] @clash-verge-rev/clash-verge-rev/pull/4051 协助修复,"## PR #4051 Fix Summary - COMPLETED ✅
-
-### Problem Statement
-Assisted with fixing PR #4051 which migrates from `mihomo_api` to `kode-bridge` IPC communication system.
-
-### Issues Fixed
-- [x] **Rate struct definition**: Fixed commented-out fields with proper `u64` types
-- [x] **Kode-bridge compilation**: Applied patch to fix missing trait import and type mismatch
-- [x] **Build dependencies**: Installed system libs and built frontend
-- [x] **Full build verification**: All targets compile successfully
-
-### Build Status
-✅ **All targets compile successfully**  
-✅ **All tests pass** (9/9 tests passing)  
-✅ **Release build successful**  
-✅ **Clippy warnings are minor style issues only**
-
-### Technical Achievement
-Successfully migrated from REST API to IPC communication using:
-- Unix domain sockets on Linux/macOS
-- Named pipes on Windows
-- Better performance and security
-
-### Files Delivered
-- `PR_4051_SUMMARY.md` - Complete technical summary
-- `FIXES.md` - Detailed fix documentation  
-- `kode-bridge.patch` - Patch file for dependency fix
-- Fixed source code with proper IPC implementation
-
-**The PR is now ready for code review and merging** 🚀
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-13T10:15:40Z,2025-07-13T11:04:47Z,,721767116,https://api.github.com/repos/clash-verge-rev/clash-verge-rev,https://github.com/clash-verge-rev/clash-verge-rev/pull/4052,"analysisWe need to classify as performance or non-performance. The PR is about migrating from REST API to IPC communication, mentions better performance and security. The description: ""Better performance and security"". The keywords: performance, better performance. So it's performance-related. So label 'performance'.assistantfinalperformance",19,0.21049453800463255,False
-3141541564,882,Direct FFI Integration for idb_companion,"## Summary
-
-This PR introduces a Direct FFI (Foreign Function Interface) integration as a lightweight alternative to the gRPC-based architecture. This enables direct function calls from Rust to Objective-C with microsecond latency.
-
-## Key Benefits
-
-- **Performance**: 500x faster than gRPC (microseconds vs milliseconds)
-- **Size**: 40x smaller binary (~500KB vs ~20MB)
-- **Simplicity**: No async runtime, no protobuf serialization
-- **Zero dependencies**: Just the Foundation framework
-
-## What's Included
-
-### Core Implementation
-- `idb_direct.h` - C interface definition
-- `idb_direct_simple.m` - Stub implementation for testing
-- `idb_direct.m` - Full implementation (with framework API updates needed)
-- Rust FFI bindings with safe wrappers
-
-### Documentation
-- [Direct FFI Advantages](rust-client-simple/DIRECT_FFI_ADVANTAGES.md)
-- [Implementation Plan](rust-client-simple/DIRECT_FFI_IMPLEMENTATION_PLAN.md)
-- [Embedded Companion Plan](rust-client-simple/EMBEDDED_COMPANION_PLAN.md)
-
-### CI/CD
-- New GitHub workflow for FFI builds
-- Automated artifact packaging
-
-## Testing
-
-```bash
-cd rust-client-simple
-cargo build --features ffi --bin idb-tap-ffi
-./target/debug/idb-tap-ffi
-```
-
-## Current Status
-
-- ✅ FFI interface defined and working
-- ✅ Rust bindings complete
-- ✅ Stub implementation for testing
-- 🚧 Real implementation needs framework API compatibility fixes
-
-## Next Steps
-
-1. Resolve framework API compatibility issues
-2. Complete real touch event implementation
-3. Add screenshot support
-4. Performance benchmarking vs gRPC
-
-🤖 Generated with [Claude Code](https://claude.ai/code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,40346430,arkavo-com,closed,2025-06-12T20:58:00Z,2025-06-12T20:59:11Z,,41870517,https://api.github.com/repos/facebook/idb,https://github.com/facebook/idb/pull/882,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Direct FFI Integration for idb_companion"". Body mentions performance: ""microsecond latency"", ""500x faster than gRPC"", ""Performance: 500x faster"". So it's definitely performance. So output 'performance'.assistantfinalperformance",19,0.17986607356227877,False
-3190247421,216,Reduce Vercel deployment time by 2x,"<!-- One very short sentence on the WHAT and WHY of the PR. E.g. ""Remove pathHash attribute because it is confirmed unused."" or ""Add DNS round robin to improve load distribution."" -->
-Reduce Vercel deploy time by offloading TypeScript checks and optimizing build steps.
-
-<!-- OPTIONAL: If the WHY of the PR is not obvious, perhaps because it fixed a gnarly bug, explain it in a short paragraph here. E.g. ""Commit a73bb98 introduced a bug where the class list was filtered to only work for MDC files, hence we partially revert it here."" -->
-The previous Vercel build process spent nearly 4 minutes on TypeScript checking. This PR configures Vercel to skip type checking during deployment, instead running it in a dedicated GitHub Actions workflow. Additional optimizations include improved Webpack configuration, faster dependency installation, and refined Vercel build commands, aiming for a 2x reduction in deploy time.",Cursor,11430621,benjaminshafii,closed,2025-07-01T00:21:53Z,2025-07-01T20:54:18Z,,883825890,https://api.github.com/repos/different-ai/zero-finance,https://github.com/different-ai/zero-finance/pull/216,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Reduce Vercel deployment time by 2x"". Body: mentions reducing deployment time, skipping type checking, optimizing build steps. This is clearly performance improvement. So label 'performance'.assistantfinalperformance",19,0.17338469252836933,False
-3124595999,388,Add Python stub file generation with documentation parsing,"### Summary
-
-This PR adds comprehensive Python stub file (.pyi) generation for the LVGL MicroPython bindings, providing full IDE support with autocompletion, type hints, and rich documentation.
-
-**Key Features:**
-- 🚀 **Fast Parallel Processing**: 6 seconds vs. minutes (uses all CPU cores)
-- 📝 **Rich Documentation**: Automatic extraction from 1400+ LVGL functions  
-- 🎯 **IDE Integration**: Full autocompletion and type hints (.pyi files)
-- ⚡ **Separate Build**: Doesn't slow down main MicroPython builds
-- 🔧 **Smart Formatting**: Bullet points, text wrapping, proper Python conventions
-- 🔗 **Source Navigation**: File:line references to original C implementation
-
-The implementation includes:
-1. **Stub Generation**: Creates `.pyi` files with proper Python type hints
-2. **Documentation Parsing**: Extracts Doxygen comments from C headers using parallel processing
-3. **Smart Parameter Handling**: Converts `obj` to `self` for class methods
-4. **Performance Optimization**: Processes 209 header files in ~6 seconds using all CPU cores
-5. **Source References**: Adds file:line references for navigation to C implementation
-
-### Testing
-
-Tested on Unix port with full stub generation:
-- Processes 209 LVGL header files using parallel processing
-- Extracts documentation from 1423 functions
-- Generates type hints for 41 widget classes and 64 enums
-- Produces comprehensive `.pyi` files for IDE consumption
-
-The generated stubs provide full autocompletion and documentation in modern Python IDEs like VS Code, PyCharm, etc.
-
-### Trade-offs and Alternatives
-
-**Trade-offs:**
-- Adds ~6 seconds to generate full documentation (but as separate optional target)
-- Increases repository size slightly with documentation files
-
-**Alternatives considered:**
-- External documentation parsing libraries (rejected to minimize dependencies)
-- Manual stub file maintenance (rejected due to maintenance burden)
-- No documentation extraction (rejected as it provides significant developer value)
-
-The implementation uses custom regex-based Doxygen parsing to avoid external dependencies while providing exactly the functionality needed for LVGL's documentation format.
-
-🤖 Generated with [Claude Code](https://claude.ai/code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,3318786,andrewleech,open,2025-06-06T12:10:03Z,,,167166039,https://api.github.com/repos/lvgl/lv_binding_micropython,https://github.com/lvgl/lv_binding_micropython/pull/388,"analysisWe need to classify as performance or non-performance. The PR description includes ""Fast Parallel Processing: 6 seconds vs. minutes (uses all CPU cores)"" and ""Performance Optimization: Processes 209 header files in ~6 seconds using all CPU cores"". This is clearly a performance improvement. So label 'performance'.assistantfinalperformance",19,0.17128290322534537,False
-3034997303,13284,Optimize CLI dependencies,"# Dependency Optimization for CLI Package
-
-This PR optimizes the dependency footprint of the Vercel CLI package, achieving the following:
-
-- Reduced compressed node_modules size from ~125MB to ≤50MB (actual: 620KB)
-- Reduced total package count by ≥40% (from ~194 to ≤115)
-- Eliminated direct usage of deprecated packages
-- Reduced libraries with multiple versions from 17 to ≤3
-
-## Approach
-
-1. Replaced heavy libraries with lighter alternatives
-   - `chalk` → `picocolors` (80% smaller, same functionality)
-   - `node-fetch` → native `fetch` (available in Node.js 18+)
-
-2. Inlined small utility packages (<200 LOC, MIT/ISC)
-   - `ms`
-   - `bytes`
-   - `strip-ansi`
-   - `title`
-
-3. Consolidated duplicate version libraries
-   - Updated `semver` from 5.7.2 to 7.5.4
-
-4. Removed deprecated packages
-   - Replaced `codecov` with `c8`
-   - Replaced `glob` with `fast-glob`
-   - Removed `@types/jest-expect-message`
-
-## Testing
-
-- Build successful with `pnpm build`
-- Tests pass with `pnpm test`
-- Import paths fixed for inlined packages
-
-Link to Devin run: https://app.devin.ai/sessions/b5f8c7fe322e4e388b6ce1a3d82ee200
-
-Requested by: lee@vercel.com
-",Devin,158243242,devin-ai-integration[bot],closed,2025-05-02T01:23:55Z,2025-05-10T14:30:15Z,,67753070,https://api.github.com/repos/vercel/vercel,https://github.com/vercel/vercel/pull/13284,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize CLI dependencies"". Body: describes reducing node_modules size, reducing package count, eliminating deprecated packages, reducing libraries with multiple versions. It's about dependency optimization, reducing size, but is that performance? The instructions: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs.
-
-This PR is about optimizing dependencies, reducing size, but does it improve performance? It reduces size, which may improve performance (load time, memory). But the keywords: ""Optimize CLI dependencies"" - optimization. The body mentions ""dependency footprint"", ""compressed node_modules size"", ""total package count"", ""libraries with multiple versions"". It's about reducing size, which can improve performance. But is it explicitly about performance? The instructions say performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, etc. The word ""optimization"" is present. So likely performance. But is it ""performance"" or ""non-performance""? The classification is binary. The PR is about optimizing dependencies, which is a performance improvement. So classify as 'performance'.
-
-Thus answer: performance.assistantfinalperformance",19,0.16566407994000848,False
-3206861578,301,"Release v4.8.0: Bundle Size Optimization, Enhanced Coverage & Documentation","# 🚀 Release v4.8.0: Major Bundle Size Optimization & Quality Improvements
-
-## 📦 Bundle Size Reduction
-- **Removed es-toolkit dependency** - Eliminates external dependency bloat
-- **Implemented custom helper functions** - Replaced with lightweight, purpose-built utilities
-- **Significant bundle size reduction** - Improved loading performance for all consumers
-- **Zero breaking changes** - Public API remains fully compatible
-
-## 🧪 Test Coverage Excellence  
-- **Achieved 95%+ code coverage** (94.96% statement coverage)
-- **100% function coverage** across all modules
-- **100% coverage** for `helpers.ts` and `jsonCompare.ts`
-- **Added 17 comprehensive test cases** (82 total tests)
-- **Enhanced edge case testing** - Function types, Date objects, JSONPath parsing
-- **Error handling validation** - Invalid operations and boundary conditions
-
-## 📚 Documentation & Examples
-- **Overhauled README with Star Wars theme** - Engaging, thematically consistent examples
-- **Improved technical accuracy** - Fixed variable naming and data consistency
-- **Enhanced API documentation** - Clearer usage examples and options
-- **Added comprehensive release notes** - Detailed v4.8.0 changelog
-- **Better SEO optimization** - Improved discoverability keywords
-
-## 🔧 CI/CD & Workflow Improvements
-- **Updated GitHub Actions** - Latest action versions (checkout@v4, setup-node@v4)
-- **Enhanced security** - Proper permissions, npm provenance enabled
-- **Improved performance** - Added concurrency control, npm caching, timeouts
-- **Better visibility** - Job summaries, artifact upload, coverage reporting
-- **Fixed deprecations** - Resolved ::set-output warnings, updated CodeQL
-
-## 🎯 Quality Assurance
-- **All tests passing** ✅ (82/82 tests)
-- **No breaking changes** ✅ - Backward compatibility maintained
-- **Performance validated** ✅ - Equal or better performance vs. previous version
-- **Bundle analysis** ✅ - Confirmed size reduction without functionality loss
-- **Security enhanced** ✅ - Updated workflows, removed vulnerabilities
-
-## 📋 Validation Checklist
-- [x] Bundle size significantly reduced
-- [x] All existing functionality preserved
-- [x] Comprehensive test coverage (95%+)
-- [x] Documentation improved and accurate
-- [x] CI/CD pipelines modernized
-- [x] No breaking changes introduced
-- [x] Performance benchmarks maintained
-- [x] Security best practices implemented
-
-## 🔄 Migration Guide
-**No migration required** - This is a drop-in replacement with zero breaking changes. Simply update to v4.8.0 and enjoy the smaller bundle size!
-
----
-
-**Closes:** #299  
-**Impact:** Major performance improvement with enhanced maintainability  
-**Risk:** Low - Extensive testing and validation completed",OpenAI_Codex,965766,ltwlf,closed,2025-07-06T18:19:33Z,2025-07-06T19:45:05Z,2025-07-06T19:45:05Z,224980941,https://api.github.com/repos/ltwlf/json-diff-ts,https://github.com/ltwlf/json-diff-ts/pull/301,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""Release v4.8.0: Bundle Size Optimization, Enhanced Coverage & Documentation"". Body includes bundle size reduction, performance improvements, etc. It's definitely performance-related. So label 'performance'.assistantfinalperformance",19,0.1452391846415959,False
-3206743230,300,"Replace es-toolkit/compat with es-toolkit for difference, intersection, and keyBy","This PR optimizes the bundle size and performance by replacing imports from `es-toolkit/compat` with the standard `es-toolkit` module for the `difference`, `intersection`, and `keyBy` functions in `jsonDiff.ts`.
-
-## Changes Made
-
-1. **Updated import statement**: Changed from `es-toolkit/compat` to `es-toolkit` for better performance and smaller bundle size
-2. **Enhanced keyBy compatibility**: Modified `convertArrayToObj` function to handle string keys by converting them to property accessor functions, maintaining backward compatibility
-
-## Why This Change is Safe
-
-The analysis of the current usage patterns shows:
-- `intersection(oldObjKeys, newObjKeys)` - called with exactly two arrays from `Object.keys()`
-- `difference(newObjKeys, oldObjKeys)` and `difference(oldObjKeys, newObjKeys)` - called with exactly two arrays from `Object.keys()`
-- `keyBy(arr, uniqKey)` - used in standard manner with array and key parameter
-
-None of the Lodash compatibility features from `es-toolkit/compat` were being utilized, making this migration straightforward and beneficial.
-
-## Testing
-
-- All existing tests pass (61/61) ✅
-- Build completes successfully ✅
-- Linting passes ✅
-- Manual verification of diff functionality with embedded object keys ✅
-
-## Benefits
-
-- **Smaller bundle size**: Removes compatibility layer overhead
-- **Better performance**: Direct usage of optimized es-toolkit functions
-- **No breaking changes**: Full backward compatibility maintained
-
-Fixes #299.
-
-<!-- START COPILOT CODING AGENT TIPS -->
----
-
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-06T16:16:57Z,2025-07-06T16:32:40Z,2025-07-06T16:32:40Z,224980941,https://api.github.com/repos/ltwlf/json-diff-ts,https://github.com/ltwlf/json-diff-ts/pull/300,"analysisWe need to classify as performance or non-performance. The PR title: ""Replace es-toolkit/compat with es-toolkit for difference, intersection, and keyBy"". Body says ""This PR optimizes the bundle size and performance by replacing imports from es-toolkit/compat with the standard es-toolkit module for the difference, intersection, and keyBy functions in jsonDiff.ts."" It mentions performance improvements, bundle size, etc. So it's performance. So label 'performance'.assistantfinalperformance",19,0.13766949181913832,False
-3156177738,2073,Replace custom JSON patch implementation with fast-json-patch library,"# Replace custom JSON patch implementation with fast-json-patch library
-
-## Summary
-This PR replaces the custom `applyPatchOperations` implementation in the `db-structure` package with the `fast-json-patch` library's `applyPatch` function while maintaining full backward compatibility.
-
-## Changes
-- **File modified**: `frontend/packages/db-structure/src/operation/applyPatchOperations.ts`
-- **Approach**: Hybrid implementation that uses `fast-json-patch` for standard operations and custom logic for paths with special characters (`~`) to preserve original behavior
-- **Dependencies**: Leverages existing `fast-json-patch` v3.1.1 dependency (already installed)
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,Topic,Probability,Representative_document
+3122455352,1179,Cache hub_client.beta.threads.messages.list in environment.py,"The `hub_client.beta.threads.messages.list` API call was taking a long time to run and being called repeatedly during agent execution, causing performance issues.
+
+This PR implements a message cache in the `Environment` class that:
+
+- **Caches messages on first call**: The first `_list_messages()` call fetches from the API and populates the cache
+- **Serves subsequent calls from cache**: Following calls return cached data instantly without API requests
+- **Updates cache on new messages**: `add_reply()` and `_add_message()` automatically append new messages to the cache
+- **Invalidates cache at run end**: Cache is cleared when agent runs complete to ensure fresh data for next execution
 
 ## Implementation Details
-The new implementation:
-1. **Uses `fast-json-patch` for most operations** - Leverages the library's performance and correctness
-2. **Custom handling for special characters** - Operations with `~` in paths use custom logic to match original behavior (no JSON Pointer unescaping)
-3. **Graceful error handling** - Falls back to custom nested path creation when the library throws errors for missing paths
-4. **Maintains exact API** - Same function signature and behavior as the original implementation
+
+```python
+# Cache structure added to Environment.__init__()
+self._messages_cache: Optional[List[Message]] = None
+self._messages_cache_initialized = False
+
+# Cache-aware message listing
+def _list_messages(limit, order, thread_id):
+    if cache_available_for_thread:
+        return cached_messages  # Instant return
+    
+    # Fetch from API and populate cache
+    messages = hub_client.beta.threads.messages.list(...)
+    self._messages_cache = messages.data
+    return messages.data
+
+# Cache updates on new messages  
+def add_reply(message):
+    new_message = hub_client.beta.threads.messages.create(...)
+    if cache_initialized:
+        self._messages_cache.append(new_message)  # Keep cache in sync
+    return new_message
+```
+
+## Performance Impact
+
+- **First API call per run**: Normal performance (cache miss)
+- **Subsequent calls in same run**: Instant response (cache hit)
+- **Memory usage**: Minimal - only stores messages for current thread
+- **Thread safety**: Cache only applies to main thread, other threads bypass cache
+
+## Cache Lifecycle
+
+1. **Initialization**: Cache starts empty and uninitialized
+2. **Population**: First `_list_messages()` call loads cache from API
+3. **Updates**: New messages automatically added to cache via `add_reply()`
+4. **Invalidation**: Cache cleared in `run()` method's finally block
+
+The implementation respects thread boundaries and maintains data consistency while providing significant performance improvements for repeated message list operations during agent execution.
+
+Fixes #1178.
+
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-05T19:50:24Z,2025-06-06T14:55:39Z,2025-06-06T14:55:39Z,797493401,https://api.github.com/repos/nearai/nearai,https://github.com/nearai/nearai/pull/1179,19,1.0,False
+3104322035,64,[WIP] CachedVariable for ChildSelectors,"Thanks for assigning this issue to me. I'm starting to work on it and will keep this PR's description up to date as I form a plan and make progress.
+
+Original issue description:
+
+> 	• Add CachedVariable (name pending) property that caches the result of an expression for use in the ChildSelectors.
+> 		○ A common pattern in ChildSelectors is a switch statement, where you calculate some value and visit different children depending on the result. The issue today is this calculation must be done for each child selector. This feature would allow you to calculate the result once and use it directly multiple times. 
+> 		○ Allows you to evaluate an expression and save the result (non-persisted?).
+> 		○ ChildSelectors then have access to that variable to simplify their ShouldSelect statements.
+> 		○ Consider allowing the variable to be a dynamic object. So could be bool, string, object, etc.. This allows users to set as many properties as they wish.
+> 		○ Consider what using a dynamic object would look like. If we have to wrap it every time with (Session.CachedVariable as string), then the usability goes down. In this case, it may be better to just set it as a string. Users could still use it as a bool or object by converting the string if they desire.
+> 		○ Consider if this should be localized to just the current TreeNode's ChildSelector, or if you can access parent's CachedVariables as well.
+> 		○ Consider if this should be tied to ChildSelector at all. Perhaps just adding a way to persist data in the ForgeStateDictionary from the tree would be cool.
+> 			§ Perhaps they both could happen though. This would be a helper property to make the feature intention clear. If we decide to add more functionality later for setting ForgeState, we can still do that.
+> 		○ Considerations:
+> 			§ Persisted vs non-persisted
+> 			§ Useable from ChildSelector only or everywhere?
+> 			§ Save as String vs Object
+> 			§ Cache result vs expression itself. Specify if you want to cache the expression result, or reevaluate.
+> 			§ Consider defining at the tree level.
+> 			§ Add flag to dictate behavior of CachedVariable. Whether or not to reevaluate each time. Could be unclear what the behavior is by default, make sure to set up the right expectations.
+> 		○ Issue with tree structure
+> 			§ How to enforce that people are calling it at the right time? For example, the expression could GetOutput of a TreeNode that hasn't executed yet.
+> 		○ Issue with node structure
+> 			§ If we decide to persist, not having good discoverability on parent nodes persisted data.
+> 		○ Example Old way:
+> 	                ""ChildSelector"": [
+> 	                    {
+> 	                        ""ShouldSelect"": ""C#|(await Session.GetLastActionResponseAsync()).Status == \""Failure\"""",
+> 	                        ""Child"": ""SoC_HS_RebootOnly_Failure""
+> 	                    },
+> 	                    {
+> 	                        ""ShouldSelect"": ""C#|(await Session.GetLastActionResponseAsync()).Status == \""Timeout\"""",
+> 	                        ""Child"": ""SoC_HS_RebootOnly_Timeout""
+> 	                    },
+> 	                    {
+> 	                        ""ShouldSelect"": ""C#|(await Session.GetLastActionResponseAsync()).Status == \""Success\"""",
+> 	                        ""Child"": ""SoC_HS_RebootOnly_Success""
+> 	                    }
+> 		○ Example New way:
+> 	                ""ChildSelectorVariable"": ""C#|(await Session.GetLastActionResponseAsync()).Status"",
+> 	                ""ChildSelector"": [
+> 	                    {
+> 	                        ""ShouldSelect"": ""C#|Session.CachedVariable == \""Failure\"""",
+> 	                        ""Child"": ""SoC_HS_RebootOnly_Failure""
+> 	                    },
+> 	                    {
+> 	                        ""ShouldSelect"": ""C#|Session.CachedVariable == \""Timeout\"""",
+> 	                        ""Child"": ""SoC_HS_RebootOnly_Timeout""
+> 	                    },
+> 	                    {
+> 	                        ""ShouldSelect"": ""C#|Session.CachedVariable == \""Success\"""",
+> 	                        ""Child"": ""SoC_HS_RebootOnly_Success""
+>                     }
+
+
+Fixes #29.
+
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-05-30T21:32:31Z,,,162360309,https://api.github.com/repos/microsoft/Forge,https://github.com/microsoft/Forge/pull/64,19,1.0,True
+3082306112,448,Add Redis caching for LLM calls,"## Summary
+- Add `llm_cache_redis_url` config option and propagate to model builders
+- Setup LangChain RedisCache when creating LLM models
+- Implement manual caching in instructor methods
+- Test new configuration and caching behaviour",OpenAI_Codex,198574046,robbie-portia,closed,2025-05-22T07:10:12Z,2025-05-23T16:59:59Z,2025-05-23T16:59:59Z,902291246,https://api.github.com/repos/portiaAI/portia-sdk-python,https://github.com/portiaAI/portia-sdk-python/pull/448,19,1.0,False
+3197380367,104,Implement context caching system,"## Summary
+- add `MemoryCache`, `RedisCache`, and `ContextCache`
+- extend `EnrichContext` with a `cache` property
+- patch `FastMCP.get_context` in `EnrichMCP`
+- provide new caching example and mention caching in README
+- test cache backend and update example suite
+- finish documentation on caching
+- warn and fall back to request scope when user cache used without token
 
 ## Testing
-- ✅ **All existing tests pass**: 15/15 tests in `applyPatchOperations.test.ts`
-- ✅ **Full package test suite passes**: 219/219 tests in db-structure package
-- ✅ **Lint checks pass**: Biome, TypeScript, and ESLint all pass
-- ✅ **No breaking changes**: Existing usage in `supabase.ts` and other files remains unchanged
+- `pre-commit run --files docs/api/cache.md examples/caching/README.md examples/caching/app.py src/enrichmcp/cache/__init__.py tests/test_cache.py`
+- `pytest -q`
 
-## Benefits
-- **Performance**: Leverages optimized library implementation for most operations
-- **Maintainability**: Reduces custom code while preserving required behavior
-- **Reliability**: Uses well-tested library with proper JSON Pointer handling
-- **Backward compatibility**: All existing functionality preserved
 
-## Link to Devin run
-https://app.devin.ai/sessions/9a624d80120e420abad0dec521e3832d
+------
+https://chatgpt.com/codex/tasks/task_e_686589273e44832a9572b181db583a6a",OpenAI_Codex,64661186,simba-git,closed,2025-07-02T22:49:46Z,2025-07-02T23:07:17Z,,958026130,https://api.github.com/repos/featureform/enrichmcp,https://github.com/featureform/enrichmcp/pull/104,19,1.0,False
+2978149205,2533,Add Context Caching Support,"Fixes #2532
 
-## Requested by
-hirotaka.miyagi@route06.co.jp
-",Devin,158243242,devin-ai-integration[bot],closed,2025-06-18T09:38:18Z,2025-06-19T08:27:21Z,,839216423,https://api.github.com/repos/liam-hq/liam,https://github.com/liam-hq/liam/pull/2073,"analysisWe need to classify as performance or non-performance. The PR replaces custom JSON patch implementation with fast-json-patch library, claiming performance benefits. The description includes ""Performance: Leverages optimized library implementation for most operations"". So it's a performance improvement. So label 'performance'.assistantfinalperformance",19,0.13049448174813383,False
-3216135866,837,fix!: Update publishObject to use json patches,"```
-## Proposed changes
+This PR adds support for context caching in CrewAI, leveraging LiteLLM's cache_control parameter. This feature improves performance and reduces costs by caching parts of prompts that remain unchanged across multiple API calls.
 
-feat: Implement JSON Patch with string optimizations for publishObject
+## Features
+- Added `cache_enabled` and `cache_ttl` parameters to LLM class
+- Modified the LLM.call method to include cache_control in API calls when enabled
+- Added tests to verify caching functionality
+- Updated documentation to explain how to use context caching
 
-This pull request significantly reduces network traffic and improves performance for `publishObject` by sending only incremental changes as JSON patches, which is especially beneficial for streaming scenarios like LLM output.
+Different LLM providers handle caching differently:
+- OpenAI and Deepseek models have prompt caching enabled automatically
+- Anthropic and Gemini require explicit caching instructions
+- Gemini also supports TTL configuration
+
+## Testing
+- Added unit tests for cache_control parameter
+- Ran the full test suite to ensure compatibility
+
+Link to Devin run: https://app.devin.ai/sessions/c0bef5c2769a4078a2087a245034e5b4
+Request by @joao@crewai.com",Devin,158243242,devin-ai-integration[bot],closed,2025-04-07T22:39:49Z,2025-04-16T15:59:50Z,,710601088,https://api.github.com/repos/crewAIInc/crewAI,https://github.com/crewAIInc/crewAI/pull/2533,19,1.0,False
+2959068895,646,feat: implement HTTP caching with mitmproxy's native format,"This PR implements HTTP caching for connectors using mitmproxy. It supports four cache modes, separate read/write directories, and configurable serialization formats including mitmproxy's native format for better interoperability.
+
+Link to Devin run: https://app.devin.ai/sessions/9bbcc89c5dc047cabfe064370d8ca798
+Requested by: Aaron (""AJ"") Steers (aj@airbyte.io)",Devin,158243242,devin-ai-integration[bot],closed,2025-03-30T19:59:25Z,2025-04-24T15:23:57Z,,752526884,https://api.github.com/repos/airbytehq/PyAirbyte,https://github.com/airbytehq/PyAirbyte/pull/646,19,1.0,False
+3239327534,135,implement context caching,"## Summary
+- implement cached content resource and data handling
+- expose cachedContent methods on client & client fake
+- add model enum patch
+- provide tests and fixtures for cached content
+
+## Testing
+- `composer lint`
+- `vendor/bin/phpstan analyse --ansi`
+- `vendor/bin/pest --colors=always`
+
+<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
+## Summary by CodeRabbit
+
+* **New Features**
+  * Introduced comprehensive cached content management: create, retrieve, list, update, and delete cached contents via the client interface.
+  * Added detailed metadata and list responses for cached content, improving data handling and visibility.
+  * Enhanced HTTP support by adding the PATCH method for partial updates.
+* **Tests**
+  * Delivered extensive unit tests covering all cached content operations and response behaviors for robustness and accuracy.
+<!-- end of auto-generated comment: release notes by coderabbit.ai --",OpenAI_Codex,3524595,michabbb,open,2025-07-17T12:04:24Z,,,755889931,https://api.github.com/repos/google-gemini-php/client,https://github.com/google-gemini-php/client/pull/135,19,1.0,False
+3196526840,1645,Investigate caching options for from_provider(),"> feat: add native caching support to from_provider
+
+## Describe your changes
+
+This PR introduces a native caching mechanism, allowing users to easily integrate various caching strategies with `from_provider`.
 
 Key changes include:
-*   **JSON Patch Implementation**: `publishObject` now uses RFC 6902 compliant JSON patches to send differences between object states.
-*   **String Optimizations**: Introduced custom `string-append` and `string-diff` operations for highly efficient updates to string values (e.g., appending tokens in streaming text).
-*   **Message Format Update**: The `WorkflowObjectMessage` format has been updated to include a `patches` array and `isInitial` flag, replacing the previous `data` field.
-*   **State Management**: Added internal state tracking for published objects and exposed utility functions (`clearObjectState`, `clearAllObjectStates`, `applyObjectPatches`) for consumers to reconstruct object states.
-*   **Dependencies**: Added `fast-json-patch` and `diff` libraries.
-*   **Tests**: Comprehensive tests have been added and updated to cover the new functionality and optimizations.
+- **New `instructor.cache` module**: Provides `BaseCache` interface and concrete implementations (`AutoCache` (in-process LRU), `DiskCache`, `RedisCache`).
+- **Schema-aware cache keys**: `make_cache_key` ensures that any changes to the Pydantic response model's fields or descriptions automatically bust the cache.
+- **Integrated into `patch`**: Caching logic is injected into `instructor/patch.py` for both synchronous and asynchronous calls, occurring *before* the retry mechanism.
+- **`from_provider` API**: The `from_provider` function now accepts `cache` and `cache_ttl` keyword arguments, which are propagated to the underlying client.
+- **Documentation**: The `docs/blog/posts/caching.md` has been updated to highlight the new built-in caching capabilities.
+- **Tests**: Unit tests for cache key invalidation and an integration test demonstrating cache functionality with a mocked provider have been added.
 
-**Breaking Change**: This is a breaking change as the `WorkflowObjectMessage` format has changed. Consumers of workflow messages must be updated to handle the new JSON patch format.
-```",Cursor,4382100,jmoseley,closed,2025-07-09T14:23:09Z,2025-07-09T19:40:08Z,2025-07-09T19:40:08Z,899766976,https://api.github.com/repos/gensx-inc/gensx,https://github.com/gensx-inc/gensx/pull/837,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""fix!: Update publishObject to use json patches"". Body: describes JSON Patch implementation, string optimizations, reduces network traffic, improves performance. Keywords: ""improves performance"", ""reduces network traffic"", ""string optimizations"", ""efficient updates"". So it's performance. So output: performance.assistantfinalperformance",19,0.1304430432056386,False
+This allows users to simply pass a cache instance to `from_provider` to enable caching, e.g., `from_provider(..., cache=AutoCache())`.
+
+## Issue ticket number and link
+
+## Checklist before requesting a review
+
+- [x] I have performed a self-review of my code
+- [x] If it is a core feature, I have added thorough tests.
+- [x] If it is a core feature, I have added documentation.
+<!-- ELLIPSIS_HIDDEN -->
+
+
+----
+
+> [!IMPORTANT]
+> Introduces native caching support for `from_provider` with new cache implementations, API changes, and updated documentation and tests.
+> 
+>   - **Caching Mechanism**:
+>     - Adds `instructor.cache` module with `BaseCache`, `AutoCache`, `DiskCache`, and `RedisCache`.
+>     - `make_cache_key` generates schema-aware cache keys to auto-bust cache on model changes.
+>     - Integrates caching into `instructor/patch.py` for sync/async calls before retry logic.
+>   - **API Changes**:
+>     - `from_provider` now accepts `cache` and `cache_ttl` arguments.
+>   - **Documentation**:
+>     - Updates `docs/blog/posts/caching.md` to include new caching features.
+>   - **Testing**:
+>     - Adds unit tests for cache key invalidation and integration tests with mocked providers.
+> 
+> <sup>This description was created by </sup>[<img alt=""Ellipsis"" src=""https://img.shields.io/badge/Ellipsis-blue?color=175173"">](https://www.ellipsis.dev?ref=567-labs%2Finstructor&utm_source=github&utm_medium=referral)<sup> for e60c46a29adf342cda3f50010a49f054b8a2003d. You can [customize](https://app.ellipsis.dev/567-labs/settings/summaries) this summary. It will automatically update as commits are pushed.</sup>
+
+
+<!-- ELLIPSIS_HIDDEN -->",Cursor,4852235,jxnl,closed,2025-07-02T16:43:11Z,2025-07-07T18:50:34Z,,653589102,https://api.github.com/repos/567-labs/instructor,https://github.com/567-labs/instructor/pull/1645,19,1.0,False
+3182184191,3077,Fix performance issue: cache agent knowledge to avoid reloading on every kickoff,"
+# Fix: Cache agent knowledge to prevent unnecessary reloading on repeated kickoffs
+
+## Summary
+
+This PR implements a caching mechanism in the `Agent.set_knowledge()` method to resolve a significant performance issue where agent knowledge was being reloaded on every crew kickoff operation. The issue was occurring in `crew.py` line 645 where knowledge sources were being processed (chunked, embedded, stored) unnecessarily on each kickoff, causing substantial performance overhead.
+
+**Key Changes:**
+- Added knowledge state tracking with private attributes `_knowledge_loaded`, `_last_embedder`, `_last_knowledge_sources`
+- Modified `set_knowledge()` to skip reloading when knowledge hasn't changed
+- Added `reset_knowledge_cache()` method for explicit cache clearing when needed
+- Added comprehensive test coverage for caching behavior and edge cases
+
+The caching mechanism intelligently detects when knowledge needs to be reloaded (when sources or embedder changes) while preventing redundant processing when the same agent is used across multiple kickoffs.
+
+## Review & Testing Checklist for Human
+
+- [ ] **Verify cache invalidation logic** - Test that knowledge is properly reloaded when knowledge sources or embedder configurations change, and NOT reloaded when they stay the same
+- [ ] **End-to-end performance testing** - Create a crew with knowledge sources and run multiple kickoffs to verify the performance improvement actually occurs
+- [ ] **Test edge cases** - Verify behavior with different knowledge source types, embedder configurations, and the `reset_knowledge_cache()` method
+- [ ] **Backward compatibility** - Ensure existing workflows still work correctly with the new caching behavior
+
+**Recommended Test Plan:**
+1. Create an agent with knowledge sources (e.g., StringKnowledgeSource)
+2. Run crew.kickoff() multiple times and measure/verify that knowledge loading only happens once
+3. Change knowledge sources mid-way and verify knowledge gets reloaded
+4. Test with different embedder configurations to ensure cache invalidation works
+
+---
+
+### Diagram
+
+```mermaid
+graph TD
+    crew[src/crewai/crew.py]
+    agent[src/crewai/agent.py]:::major-edit
+    knowledge[src/crewai/knowledge/knowledge.py]:::context
+    agent_tests[tests/agent_test.py]:::major-edit
+    
+    crew -->|calls set_knowledge| agent
+    agent -->|creates/caches| knowledge
+    agent_tests -->|tests caching behavior| agent
+    
+    subgraph ""Agent Caching Logic""
+        cache_check[Check _knowledge_loaded flag]
+        compare_state[Compare _last_embedder & _last_knowledge_sources]
+        skip_load[Skip knowledge loading]
+        load_knowledge[Load knowledge & update cache]
+        
+        cache_check --> compare_state
+        compare_state -->|same| skip_load
+        compare_state -->|different| load_knowledge
+    end
+    
+    subgraph Legend
+        L1[Major Edit]:::major-edit
+        L2[Minor Edit]:::minor-edit  
+        L3[Context/No Edit]:::context
+    end
+
+classDef major-edit fill:#90EE90
+classDef minor-edit fill:#87CEEB
+classDef context fill:#FFFFFF
+```
+
+### Notes
+
+
+- **Performance Impact**: This fix addresses issue #3076 where repeated kickoffs caused significant performance degradation due to unnecessary knowledge reprocessing
+- **Cache Strategy**: Uses simple state comparison (embedder config + knowledge sources) to determine when cache is valid
+- **Memory Considerations**: Cache stores references to knowledge sources and embedder configs - monitor for potential memory usage in long-running applications
+- **Thread Safety**: Current implementation is not thread-safe - consider this if agents are used in multi-threaded environments
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-27T09:53:02Z,2025-07-05T16:03:29Z,,710601088,https://api.github.com/repos/crewAIInc/crewAI,https://github.com/crewAIInc/crewAI/pull/3077,19,1.0,True
+3069006084,106,feat: add caching layer for frequent identical requests,"# Caching Layer for Identical Requests
+
+This PR adds a caching layer to reduce redundant processing of identical LLM requests:
+
+- Added caching configuration fields to the project table
+- Created API endpoints to toggle and configure caching
+- Implemented Redis-based caching for identical chat requests
+- Made caching configurable on a per-project basis
+- Applied schema changes using pnpm push
+
+Caching can be configured:
+- Enable/disable via API
+- Set cache duration (10 seconds to 1 year)
+
+Link to Devin run: https://app.devin.ai/sessions/670ba155336747678916872d5b707685
+Requested by: Luca Steeb
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-16T13:23:31Z,2025-05-16T17:47:11Z,2025-05-16T17:47:11Z,965250949,https://api.github.com/repos/theopenco/llmgateway,https://github.com/theopenco/llmgateway/pull/106,19,1.0,False
+3069147854,1561,Add caching for RunPod PDF markdown results in GCS,"# PDF RunPod Result Caching
+
+This PR adds caching for RunPod markdown results from PDF conversion in Google Cloud Storage (GCS).
+
+## Changes:
+- Created a new module for PDF caching functions that hash PDF content and use the hash as a cache key
+- Modified the PDF engine to check for cached results before calling RunPod
+- Added tests for the caching functionality
+
+## Testing:
+- Added unit tests for the caching functionality
+- Manually tested with PDF documents to verify cache hits/misses
+
+Link to Devin run: https://app.devin.ai/sessions/4c34ee13ee9448f69efffa88f7952a2c
+Requested by: thomas@sideguide.dev
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-16T14:20:52Z,2025-05-16T15:04:38Z,2025-05-16T15:04:38Z,787076358,https://api.github.com/repos/mendableai/firecrawl,https://github.com/mendableai/firecrawl/pull/1561,19,1.0,False
+3239609997,35,Implement unbound dns caching,Implement unbound dns caching,Cursor,100861363,Bandit-HaxUnit,open,2025-07-17T13:30:47Z,,,465787727,https://api.github.com/repos/Bandit-HaxUnit/haxunit,https://github.com/Bandit-HaxUnit/haxunit/pull/35,19,0.327987508506991,False
+3125029980,1181,Implement asynchronous API calls for file and message creation in environment.py,"This PR addresses the performance issue where API calls to create messages and files were taking too long by implementing asynchronous execution with concurrent processing.
+
+## Problem
+When agents make multiple tool calls or create multiple files, the synchronous API calls were executed sequentially, causing significant delays:
+- 5 tool calls × 200ms each = 1000ms total execution time
+- Multiple file uploads processed one at a time
+- Poor user experience due to high latency
+
+## Solution
+Added comprehensive async support while maintaining full backward compatibility:
+
+### Concurrent Execution
+- Tool call responses now created concurrently using `asyncio`
+
+### Configuration & Fallback
+- New `ASYNC_API_CALLS` environment variable (default: `true`)
+
+## Backward Compatibility
+- ✅ All original synchronous methods preserved unchanged
+- ✅ No breaking changes to existing API
+- ✅ Opt-in async execution via environment variable
+
+## Usage
+```bash
+# Enable async API calls (default)
+export ASYNC_API_CALLS=true
+
+# Disable if needed
+export ASYNC_API_CALLS=false
+```
+
+Fixes #1180.
+
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-06-06T14:54:51Z,2025-06-07T21:04:30Z,2025-06-07T21:04:30Z,797493401,https://api.github.com/repos/nearai/nearai,https://github.com/nearai/nearai/pull/1181,19,0.32670934926826284,False
+3105225147,68,Fix provider initialization reuse,"## Summary
+- cache provider instances for reuse
+- use cached provider instances when handling chat completion and image generation requests
+
+## Testing
+- `pytest -q` *(fails: ModuleNotFoundError: No module named 'cloudscraper')*
+
+------
+https://chatgpt.com/codex/tasks/task_b_683acdb9079c8327a553efccf9e535b3",OpenAI_Codex,158988478,OEvortex,closed,2025-05-31T09:40:29Z,2025-05-31T09:41:55Z,2025-05-31T09:41:55Z,763886910,https://api.github.com/repos/OEvortex/Webscout,https://github.com/OEvortex/Webscout/pull/68,19,0.12994346801678683,False
+3165644329,144,Investigate ai prompt caching issue,"Anthropic's prompt caching mechanism requires the `cacheControl` tag to be applied to a message block. Previously, the large `STATIC_SYSTEM_PROMPT` was passed via the `system` parameter in `api/chat.ts`, which does not support this tag. The only message carrying the tag was the smaller dynamic system message, which typically fell below the 1024-token minimum required for caching.
+
+To address this in `api/chat.ts`:
+*   The `staticSystemPrompt` was converted into an explicit system message object, `staticSystemMessage`.
+*   `providerOptions: { anthropic: { cacheControl: { type: ""ephemeral"" }}}` was added to `staticSystemMessage`.
+*   The `system: staticSystemPrompt` parameter was removed from the `streamText` call.
+*   The `enrichedMessages` array was reordered to `[staticSystemMessage, dynamicSystemMessage, ...messages]`.
+
+These changes ensure the substantial static prompt is now correctly tagged and included as a cacheable message, allowing Claude Sonnet to utilize its prompt cache and reflect `cacheCreationInputTokens`/`cacheReadInputTokens` in usage metadata.",Cursor,2830514,ryokun6,closed,2025-06-22T04:14:33Z,2025-06-22T04:14:40Z,2025-06-22T04:14:40Z,923332984,https://api.github.com/repos/ryokun6/ryos,https://github.com/ryokun6/ryos/pull/144,19,0.12916758771800083,False
+3210823906,3119,feat: add native DeepSeek API support,"
+# Add Native DeepSeek API Support
+
+## Summary
+
+This PR implements native DeepSeek API support in CrewAI, addressing issue #3118. The implementation enables users to use DeepSeek models directly through their official API endpoints instead of requiring OpenRouter as a proxy.
+
+**Key Changes:**
+- Added DeepSeek provider configuration to CLI constants with API key prompt
+- Added 5 DeepSeek models to CLI model selection (`deepseek-chat`, `deepseek-coder`, `deepseek-r1`, `deepseek-v3`, `deepseek-reasoner`)
+- Added context window sizes (128k) for all DeepSeek models
+- Created comprehensive integration tests (11 test cases)
+
+**Benefits:**
+- Lower latency (direct API calls vs OpenRouter proxy)
+- Potentially lower costs
+- Better reliability with official API endpoints
+- Seamless CLI integration with `crewai create crew`
+
+## Review & Testing Checklist for Human
+
+⚠️ **Critical** - This PR passes CI but requires real-world validation:
+
+- [ ] **End-to-end testing with real DeepSeek API key** - Test the full workflow from CLI setup to model usage
+- [ ] **Verify context window sizes are accurate** - All models are set to 128k but this may not be correct for all models
+- [ ] **Test CLI workflow** - Run `crewai create crew` and verify DeepSeek appears in provider/model selection
+- [ ] **Error handling validation** - Test with invalid API keys and verify error messages are helpful
+- [ ] **Model availability check** - Confirm all 5 listed models are actually available via DeepSeek API
+
+**Recommended test plan:**
+1. Set up DeepSeek API key in environment 
+2. Run `crewai create crew` and select DeepSeek provider
+3. Create a simple crew that uses DeepSeek models
+4. Execute the crew and verify it works end-to-end
+5. Test with different DeepSeek models to ensure they all work
+
+---
+
+### Diagram
+
+```mermaid
+%%{ init : { ""theme"" : ""default"" }}%%
+graph TB
+    CLI[""src/crewai/cli/constants.py<br/>CLI Configuration""]:::major-edit
+    LLM[""src/crewai/llm.py<br/>LLM Core""]:::major-edit
+    Tests[""tests/test_deepseek_integration.py<br/>Integration Tests""]:::major-edit
+    
+    BaseLLM[""src/crewai/llms/base_llm.py<br/>Base LLM Class""]:::context
+    LiteLLM[""LiteLLM Library<br/>External Dependency""]:::context
+    
+    CLI -->|""Configures DeepSeek provider""| LLM
+    LLM -->|""Extends functionality""| BaseLLM
+    LLM -->|""Uses for API calls""| LiteLLM
+    Tests -->|""Tests integration""| CLI
+    Tests -->|""Tests integration""| LLM
+    
+    
+    subgraph Legend
+        L1[Major Edit]:::major-edit
+        L2[Minor Edit]:::minor-edit  
+        L3[Context/No Edit]:::context
+    end
+    
+    classDef major-edit fill:#90EE90
+    classDef minor-edit fill:#87CEEB
+    classDef context fill:#FFFFFF
+```
+
+### Notes
+
+- **Session Info**: Requested by João (joao@crewai.com) via Slack
+- **Devin Session**: https://app.devin.ai/sessions/a3cbabc547ae41d5b8d080fa0ce1e1f4
+- **Testing Limitation**: Implementation was tested with unit tests only - no real DeepSeek API calls were made during development
+- **LiteLLM Dependency**: This integration relies on LiteLLM's DeepSeek support (verified to work but not extensively tested)
+- **Context Window Assumption**: All models set to 128k context window - this should be verified against DeepSeek's official documentation
+- **AI Code Review**: An AI-generated code review comment was added with suggestions for improvements (versioning, error handling, documentation)
+",Devin,158243242,devin-ai-integration[bot],closed,2025-07-08T02:43:14Z,2025-07-17T16:23:51Z,,710601088,https://api.github.com/repos/crewAIInc/crewAI,https://github.com/crewAIInc/crewAI/pull/3119,19,0.11987957394006948,True
+3052357500,185,Use gemini-flash-lite model for app name and commit message generation,"# Use gemini-flash-lite model for app name and commit message generation
+
+Implements the request to use the faster `gemini-flash-lite` model for app name and commit message generation to improve performance.
+
+## Changes
+
+- Modified the `process` method in `TrpcAgentSession` class to use the `gemini-flash-lite` model specifically for app name and commit message generation
+- Created a dedicated LLM client with the flash lite model for these operations
+- The implementation is minimally invasive, only modifying the necessary code
+
+## Testing
+
+Due to environment setup issues, I was unable to run the tests locally. However, the changes are minimal and focused only on switching the model used for name and commit generation.
+
+The implementation follows the pattern established in PR #168 which added the app_name field to the API response.
+
+Link to Devin run: https://app.devin.ai/sessions/57d1256b0afa497ca9bd506c9c230c7e
+
+Requested by: evgenii@neon.tech
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-09T14:30:54Z,2025-05-09T16:55:20Z,2025-05-09T16:55:20Z,913914262,https://api.github.com/repos/appdotbuild/agent,https://github.com/appdotbuild/agent/pull/185,19,0.1131286051585881,False
+2895289652,2281,Fix issue 2279: Prevent multiple OtelBatchSpanProcessor threads,"This PR fixes issue #2279 by implementing a singleton pattern for the Telemetry class to ensure that the OtelBatchSpanProcessor is initialized only once per import lifecycle, not per function call.
+
+## Problem
+Each time a function is called within a FastAPI endpoint that dynamically creates agents, a new OtelBatchSpanProcessor thread is spawned. Over multiple requests, this leads to excessive thread creation, potentially causing performance issues and memory leaks.
+
+## Solution
+Implemented a singleton pattern for the Telemetry class to ensure only one instance is created, which means the OtelBatchSpanProcessor is initialized only once.
+
+## Testing
+Added tests to verify that the Telemetry class is a singleton and that only one instance is created, even when accessed from multiple threads.
+
+Link to Devin run: https://app.devin.ai/sessions/ca321c65b8ae4eb5961c4adc533635c0
+Requested by: research-boy",Devin,158243242,devin-ai-integration[bot],closed,2025-03-04T19:58:40Z,2025-03-13T15:26:56Z,,710601088,https://api.github.com/repos/crewAIInc/crewAI,https://github.com/crewAIInc/crewAI/pull/2281,19,0.10960481009642652,False
+3108570703,70,Improve TTI provider reliability,"## Summary
+- verify proxies when fetching from ProxyFox
+- retry requests with new proxies on failure
+
+## Testing
+- `ruff check webscout/Provider/TTI/utils.py webscout/Provider/OPENAI/autoproxy.py`
+- `pytest -q` *(fails: ModuleNotFoundError: No module named 'cloudscraper')*
+
+------
+https://chatgpt.com/codex/tasks/task_b_683d2b735bb083278874be4819ce945d",OpenAI_Codex,158988478,OEvortex,closed,2025-06-02T05:06:21Z,2025-06-02T05:08:38Z,2025-06-02T05:08:38Z,763886910,https://api.github.com/repos/OEvortex/Webscout,https://github.com/OEvortex/Webscout/pull/70,19,0.10111992688099664,False
+3240738542,38,Optimize recursive dns bruteforce method,"Refactor `_recursive_dnsx_bruteforce` method to enhance reliability, performance, and resource management.
+
+The previous implementation suffered from race conditions due to shared file I/O, inefficient memory usage from duplicate data, and lacked robust error handling and progress tracking. This refactor addresses these issues by introducing thread-safe operations, proper deduplication, adaptive threading, and comprehensive resource management.",Cursor,100861363,Bandit-HaxUnit,open,2025-07-17T19:52:50Z,,,465787727,https://api.github.com/repos/Bandit-HaxUnit/haxunit,https://github.com/Bandit-HaxUnit/haxunit/pull/38,19,0.09545939998164799,False

@@ -1,148 +1,372 @@
-id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
-3261933492,12958,Fix swift rosetta benchmark runtime,"## Summary
-- improve `_now` handling in the Swift transpiler
-- seed PRNG when running benchmarks to keep rosetta programs fast
-- regenerate Swift code for `100-prisoners`
-- update benchmark data and docs
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,Topic,Probability,Representative_document
+3134916409,251153,Fix notebook sticky scroll flashing by using single reusable delayer,"The notebook sticky scroll was experiencing continuous flashing when scrolling headers close to the sticky scroll area. This was caused by improper debouncing in the scroll event handler.
+
+## Root Cause
+
+Each scroll event created a new `Delayer(100)` instance, but multiple delayers could be active simultaneously when scroll events occurred rapidly (faster than 100ms apart). This caused:
+
+1. Multiple delayed updates to be pending at once
+2. Rapid successive content updates
+3. Visual flashing as the sticky scroll content updated repeatedly
+4. Potential memory inefficiency from creating/disposing many delayer instances
+
+## Solution
+
+Replace the per-event delayer creation with a single reusable delayer instance:
+
+**Before:**
+```typescript
+this._disposables.add(this.notebookEditor.onDidScroll(() => {
+    const d = new Delayer(100);  // ❌ New delayer each time
+    d.trigger(() => {
+        d.dispose();
+        // ... update logic
+    });
+}));
+```
+
+**After:**
+```typescript
+private readonly scrollDelayer = this._register(new Delayer(100));
+
+this._disposables.add(this.notebookEditor.onDidScroll(() => {
+    this.scrollDelayer.trigger(() => {  // ✅ Reuse same delayer
+        // ... update logic
+    });
+}));
+```
+
+## Benefits
+
+- **Eliminates flashing**: Only one delayed update can be pending at a time
+- **Improves performance**: No overhead from creating/disposing multiple delayers
+- **Better memory usage**: Single reusable instance vs multiple short-lived instances
+- **Maintains functionality**: All existing behavior preserved
+- **Minimal change**: Only 6 lines added, 4 removed
 
 ## Testing
-- `ROSETTA_INDEX=4 MOCHI_BENCHMARK=1 go test ./transpiler/x/swift -run TestSwiftTranspiler_Rosetta_Golden -tags=slow -count=1 -v`
 
-------
-https://chatgpt.com/codex/tasks/task_e_68830247f8488320a30927cad865dc2b",OpenAI_Codex,1218621,tamnd,open,2025-07-25T04:20:51Z,,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12958,"analysisWe need to classify as performance or non-performance. The PR title: ""Fix swift rosetta benchmark runtime"". Summary: improve _now handling, seed PRNG when running benchmarks to keep rosetta programs fast, regenerate Swift code for 100-prisoners, update benchmark data and docs. This is about benchmarks, runtime, performance. Keywords: ""benchmark"", ""fast"", ""runtime"", ""seed PRNG"", ""improve _now handling"". It's performance improvement. So classify as 'performance'.assistantfinalperformance",28,1.0,False
-3198202667,4811,Update SLT generator and refresh select1 outputs,"## Summary
-- speed up SLT generator execution timeout
-- regenerate select1 cases 1-1000
-- remove old `.error` files for cases that now pass
+Validated with a mock implementation that simulates rapid scroll events - the fix successfully debounces multiple events into a single update call.
 
-## Testing
-- `go run ./cmd/mochi-slt gen --cases case1-case1000 --files select1.test --out tests/dataset/slt/out --run`
+Fixes #211114.",Copilot,198982749,Copilot,open,2025-06-10T21:45:31Z,,,41881900,https://api.github.com/repos/microsoft/vscode,https://github.com/microsoft/vscode/pull/251153,28,1.0,True
+3173304702,252342,Fix sticky scroll performance issue by using correct array for min content width calculation,"Sticky scrolling was causing noticeable performance issues and stuttering during scroll operations due to inefficient DOM queries in the `StickyScrollWidget._renderRootNode` method.
 
+## Problem
 
-------
-https://chatgpt.com/codex/tasks/task_e_6866211786248320be1e23404d7a316d",OpenAI_Codex,1218621,tamnd,closed,2025-07-03T06:29:32Z,2025-07-03T06:30:32Z,2025-07-03T06:30:32Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4811,"analysisWe need to classify as performance or non-performance. The PR title: ""Update SLT generator and refresh select1 outputs"". Summary: ""- speed up SLT generator execution timeout"". That indicates performance improvement. Also ""speed up SLT generator execution timeout"" is a performance keyword. So classification: performance.assistantfinalperformance",28,1.0,False
-3262865664,13059,Optimize VM append,"## Summary
-- improve `OpAppend` to use Go's built-in slice growth
-- regenerate Rosetta artifacts for program 4 after optimization
+The `_renderRootNode` method was calculating `_minContentWidthInPx` using the old `this._renderedStickyLines` array instead of the newly built `renderedStickyLines` array. This caused:
 
-## Testing
-- `MOCHI_ROSETTA_INDEX=4 MOCHI_BENCHMARK=1 go test ./runtime/vm -tags slow -run Rosetta_Golden -update -count=1`
-- `MOCHI_ROSETTA_INDEX=4 go test ./runtime/vm -tags slow -run Rosetta_Golden -update -count=1`
+1. **Performance degradation**: Reading `scrollWidth` from potentially stale/removed DOM elements triggered unnecessary layout recalculations
+2. **Incorrect calculations**: Using outdated scroll width values from elements that were being removed from the DOM
+3. **Browser frame drops**: The additional layout work caused visible stuttering during scroll operations
 
+## Solution
 
-------
-https://chatgpt.com/codex/tasks/task_e_68835a9aebb883208f28f70ced15e7aa",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T11:10:16Z,2025-07-25T11:10:36Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/13059,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize VM append"". Summary: improve OpAppend to use Go's built-in slice growth. That is performance optimization. So label 'performance'.assistantfinalperformance",28,1.0,False
-3206779215,5817,Update hs vm roundtrip tool,"## Summary
-- limit vm roundtrip checks with a LIMIT env var so they can run quicker
-- regenerate `compile/x/hs/ERRORS.md` via the updated tool
+Changed line 248 in `stickyScrollWidget.ts` to use the correct array and added proper empty array handling:
 
-## Testing
-- `go test ./compile/x/hs -run TestHSCompiler_GoldenOutput -tags slow -update`
-- `go test ./compile/x/hs -run TestHSCompiler_GoldenSubset -tags slow -update` *(fails: couldn't match type `AnyValue` with `[Char]`)*
+```typescript
+// Before (buggy):
+this._minContentWidthInPx = Math.max(...this._renderedStickyLines.map(l => l.scrollWidth)) + layoutInfo.verticalScrollbarWidth;
 
-------
-https://chatgpt.com/codex/tasks/task_e_686aa8215ed08320b2b6a20ee13c3bb5",OpenAI_Codex,1218621,tamnd,closed,2025-07-06T16:59:24Z,2025-07-06T16:59:35Z,2025-07-06T16:59:35Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/5817,"analysisWe need to classify as performance or non-performance. The PR title: ""Update hs vm roundtrip tool"". Summary: limit vm roundtrip checks with a LIMIT env var so they can run quicker. That is about performance: making tests run quicker. Also regenerate errors. So it's performance. So output ""performance"".assistantfinalperformance",28,1.0,False
-3261727113,12867,Enable Swift benchmarking,"## Summary
-- support benchmark mode in Swift transpiler and tests
-- record memory usage via `/proc/self/status`
-- update Rosetta checklist with table format and benchmark data
-- regenerate Swift code and outputs for program `100-doors-2` with benchmarking
+// After (fixed):
+this._minContentWidthInPx = renderedStickyLines.length > 0 
+    ? Math.max(...renderedStickyLines.map(l => l.scrollWidth)) + layoutInfo.verticalScrollbarWidth 
+    : 0;
+```
 
-## Testing
-- `go test ./transpiler/x/swift -run TestSwiftTranspiler_Rosetta_Golden -tags slow -count=1`
-- `ROSETTA_INDEX=1 MOCHI_BENCHMARK=1 go test ./transpiler/x/swift -run TestSwiftTranspiler_Rosetta_Golden -tags slow -count=1`
+## Impact
 
-------
-https://chatgpt.com/codex/tasks/task_e_6882de6f57608320a602f807f40eb9c2",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T02:00:18Z,2025-07-25T02:00:39Z,2025-07-25T02:00:39Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12867,"analysisWe need to classify as performance or non-performance. The PR title: ""Enable Swift benchmarking"". Body: mentions support benchmark mode, record memory usage, update checklist with benchmark data, regenerate Swift code and outputs for program with benchmarking. This is about benchmarking, memory usage, performance. So it's performance.assistantfinalperformance",28,1.0,True
-3259957129,12696,"Fix TS append, pass arithmetic-numbers","## Summary
-- optimize TypeScript transpiler `append` to mutate the array
-- emit helper `_append` when needed
-- update Rosetta TS progress
-- add generated code and output for `arithmetic-numbers`
+- **Performance**: Eliminates forced layout recalculations by using fresh scroll width values that were already computed during rendering
+- **Accuracy**: Ensures minimum content width calculation reflects the actual current DOM state
+- **User Experience**: Reduces scroll stuttering and frame drops when sticky scroll is enabled
+- **Minimal Risk**: Only 3 lines changed, preserving all existing functionality
 
-## Testing
-- `MOCHI_ROSETTA_INDEX=72 go test ./transpiler/x/ts -run Rosetta -count=1 -tags=slow -timeout=120s -failfast`
-- `MOCHI_ROSETTA_INDEX=73 go test ./transpiler/x/ts -run Rosetta -count=1 -tags=slow -timeout=120s -failfast`
-- `MOCHI_ROSETTA_INDEX=77 go test ./transpiler/x/ts -run Rosetta -count=1 -tags=slow -timeout=120s -failfast`
+The fix ensures that during sticky scroll updates, we use the scroll width values from the current rendering cycle instead of potentially accessing removed DOM elements.
+
+Fixes #191973.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `electronjs.org`
+>   - Triggering command: `node-gyp                                                                           ` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
 
 
-------
-https://chatgpt.com/codex/tasks/task_e_68822e6ba6d48320bac581180210bb9b",OpenAI_Codex,1218621,tamnd,closed,2025-07-24T13:42:58Z,2025-07-24T13:43:23Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/12696,"analysisWe need to classify the pull request as performance or non-performance. The title: ""Fix TS append, pass arithmetic-numbers"". Summary: ""- optimize TypeScript transpiler `append` to mutate the array - emit helper `_append` when needed - update Rosetta TS progress - add generated code and output for `arithmetic-numbers`"". The summary explicitly says ""optimize TypeScript transpiler `append` to mutate the array"". That is a performance optimization. Also ""emit helper `_append` when needed"" might be performance. So it's performance. So label 'performance'.assistantfinalperformance",28,1.0,False
-3197592817,4722,Regenerate select1 case6,"## Summary
-- regenerate select1 case6 using tools/slt
-- case6 still times out during execution
 
-## Testing
-- `go test ./...`
+<!-- START COPILOT CODING AGENT TIPS -->
+---
 
-------
-https://chatgpt.com/codex/tasks/task_e_6865d1e36a68832087877e57c0847376",OpenAI_Codex,1218621,tamnd,closed,2025-07-03T00:58:38Z,2025-07-03T03:17:28Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4722,"analysisWe need to classify whether the primary purpose of the pull request is to improve performance. The PR title: ""Regenerate select1 case6"". Summary: ""regenerate select1 case6 using tools/slt; case6 still times out during execution"". The issue: case6 times out. So the PR is addressing a timeout, likely performance issue. The body: ""go test./..."" indicates tests. The PR is about regenerating select1 case6, which still times out. So it's about performance? The title ""Regenerate select1 case6"" doesn't explicitly mention performance. But the summary says ""case6 still times out during execution"". That indicates a performance issue. The PR likely addresses a timeout, which is a performance problem. So classification: performance.assistantfinalperformance",28,1.0,False
-3263823691,13194,Update VM rosetta benchmarks,"## Summary
-- refresh VM rosetta benchmarks for first 10 tasks
-- skip interactive puzzle game (index 5)
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-06-24T21:09:26Z,,,41881900,https://api.github.com/repos/microsoft/vscode,https://github.com/microsoft/vscode/pull/252342,28,1.0,True
+3136041106,14760,Fix scroll wheel responsiveness in Windows App SDK by using system scroll settings,"## Problem
 
-## Testing
-- `MOCHI_BENCHMARK=1 MOCHI_ROSETTA_INDEX=11 go test ./runtime/vm -tags=slow -run TestVM_Rosetta_Golden -update`
+Scroll wheel behavior in React Native Windows using the new architecture (Windows App SDK) was significantly less responsive compared to the WinUI 3 Gallery app and other native Windows applications. Users reported that scrolling felt sluggish and required much more effort, with fewer lines scrolled per wheel notch than expected.
 
+## Root Cause
 
-------
-https://chatgpt.com/codex/tasks/task_e_68839b17641c8320aff1ff20f10e2c5d",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T16:55:15Z,2025-07-25T16:55:40Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/13194,"analysisWe need to classify as performance or non-performance. The PR title: ""Update VM rosetta benchmarks"". The body: refresh VM rosetta benchmarks for first 10 tasks, skip interactive puzzle game. It's about updating benchmarks. That is performance related? Benchmarks are about measuring performance. The PR is updating benchmark data. That is performance. So classify as 'performance'.assistantfinalperformance",28,1.0,False
-3262707090,13030,Update rosetta bench for 100‑prisoners,"## Summary
-- fix skipping of main() during compilation
-- avoid negative memory usage in rosetta benchmarks
-- regenerate benchmark for program 4 (100-prisoners)
-- update Rosetta progress checklist
+The `OnPointerWheelChanged` method in `ScrollViewComponentView.cpp` was using the raw mouse wheel delta (typically 120 per notch) multiplied only by `pointScaleFactor`, completely ignoring Windows system settings for wheel scroll behavior that users configure in their system preferences.
 
-## Testing
-- `MOCHI_ROSETTA_INDEX=4 MOCHI_BENCHMARK=1 go test ./runtime/vm -tags=slow -run TestVM_Rosetta_Golden -count=1 -v`
+## Solution
 
-------
-https://chatgpt.com/codex/tasks/task_e_6883521928e88320aa6bf001c4bdf718",OpenAI_Codex,1218621,tamnd,closed,2025-07-25T10:10:12Z,2025-07-25T10:10:24Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/13030,"analysisWe need to classify as performance or non-performance. The PR title: ""Update rosetta bench for 100‑prisoners"". Body: mentions fix skipping of main() during compilation, avoid negative memory usage in rosetta benchmarks, regenerate benchmark for program 4 (100-prisoners), update Rosetta progress checklist. The changes mention memory usage, benchmarks, performance. Keywords: memory, benchmark, negative memory usage. That suggests performance improvement. So classify as 'performance'.assistantfinalperformance",28,1.0,False
-3262757781,13039,Fix VM main execution and update Rosetta outputs,"## Summary
-- ensure rosetta tests use deterministic `now()` by seeding the VM
-- speed up the `Append` instruction by preallocating slices
-- refresh IR outputs for the `100-prisoners` task
-- update benchmark and checklist entries
+This PR implements system-aware scroll wheel calculation that respects Windows user preferences:
 
-## Testing
-- `MOCHI_ROSETTA_INDEX=4 MOCHI_BENCHMARK=1 go test ./runtime/vm -tags slow -run TestVM_Rosetta_Golden -v`
+1. **Added `GetSystemWheelScrollLines()` helper function** that retrieves the user's configured ""lines per wheel notch"" setting using `SystemParametersInfo(SPI_GETWHEELSCROLLLINES, ...)`
 
+2. **Updated scroll calculation** to use proper line-based scrolling:
+   ```cpp
+   // Before: Raw delta approach
+   scrollDown(-delta * m_layoutMetrics.pointScaleFactor, true)
+   
+   // After: System-aware line-based approach  
+   const float notches = delta / 120.0f;
+   const float linesToScroll = notches * systemLinesPerNotch * c_scrollerLineDelta * m_layoutMetrics.pointScaleFactor;
+   scrollDown(-linesToScroll, true)
+   ```
 
-------
-https://chatgpt.com/codex/tasks/task_e_688358317d688320ae15f6e91e6fa043",OpenAI_Codex,1218621,tamnd,open,2025-07-25T10:29:54Z,,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/13039,"analysisWe need to classify as performance or non-performance. The PR title: ""Fix VM main execution and update Rosetta outputs"". Body: includes ""speed up the Append instruction by preallocating slices"". That is a performance improvement. Also ""ensure rosetta tests use deterministic now() by seeding the VM"" is more about determinism. But the performance part is explicit. So classification: performance.assistantfinalperformance",28,1.0,True
-3262887238,13066,Update rosetta artifacts for 100-prisoners,"## Summary
-- speed up `now()` builtin by avoiding system calls and using `math/rand`
-- emit call to user `main` when compiling top level program
-- regenerate IR, output and bench data for `100-prisoners`
-- refresh Rosetta progress checklist
+3. **Math comparison**:
+   - **Before**: 120 pixels per notch (regardless of user preferences)
+   - **After**: ~48 pixels per notch with default 3-line setting, ~80 pixels with 5-line setting
+   - Properly scales with DPI and respects user's accessibility needs
+
+## Benefits
+
+- ✅ **Responsive scrolling**: Matches native Windows application behavior
+- ✅ **User preference aware**: Respects system scroll wheel settings
+- ✅ **Accessibility friendly**: Works with custom line counts for users with mobility needs
+- ✅ **DPI aware**: Maintains proper scaling on high-DPI displays
+- ✅ **Minimal impact**: Only 7 lines of code changed, no breaking changes
 
 ## Testing
-- `MOCHI_ROSETTA_INDEX=4 MOCHI_NOW_SEED=1 go test ./runtime/vm -run TestVM_Rosetta_Golden -tags slow -count=1 -update`
-- `MOCHI_ROSETTA_INDEX=4 MOCHI_BENCHMARK=1 MOCHI_NOW_SEED=1 go test ./runtime/vm -run TestVM_Rosetta_Golden -tags slow -count=1 -update`
 
+Validated the mathematical logic with various scenarios:
+- Standard 3-line setting: 48 pixels per notch
+- High accessibility 5-line setting: 80 pixels per notch  
+- High DPI (1.5x): 72 pixels per notch with 3-line setting
+- Backward scrolling: Proper negative values
 
-------
-https://chatgpt.com/codex/tasks/task_e_6883636054b48320a4b6e5736c3d22b6",OpenAI_Codex,1218621,tamnd,open,2025-07-25T11:19:21Z,,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/13066,"analysisWe need to classify as performance or non-performance. The PR title: ""Update rosetta artifacts for 100-prisoners"". Summary includes ""speed up `now()` builtin by avoiding system calls and using `math/rand`"". That is a performance improvement. So classification: performance.assistantfinalperformance",28,1.0,False
-3262845265,13057,Accelerate now() and update Rosetta artifacts,"## Summary
-- speed up OpNow with xorshift PRNG
-- regenerate program 4 outputs with deterministic seed
-- update benchmark data and checklist
+Fixes #14653.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `googlechromelabs.github.io`
+>   - Triggering command: `/usr/local/bin/node install.mjs ` (dns block)
+> - `https://storage.googleapis.com/chrome-for-testing-public/130.0.6723.116/linux64/chrome-headless-shell-linux64.zip`
+>   - Triggering command: `/usr/local/bin/node install.mjs ` (http block)
+> - `https://storage.googleapis.com/chrome-for-testing-public/130.0.6723.116/linux64/chrome-linux64.zip`
+>   - Triggering command: `/usr/local/bin/node install.mjs ` (http block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+",Copilot,198982749,Copilot,closed,2025-06-11T08:58:57Z,2025-07-14T15:23:48Z,,48009214,https://api.github.com/repos/microsoft/react-native-windows,https://github.com/microsoft/react-native-windows/pull/14760,28,1.0,True
+3099021790,157,Add debounced QR code updates,Resolves #138 ,OpenAI_Codex,35736525,lyqht,closed,2025-05-29T03:03:18Z,2025-05-29T03:05:49Z,2025-05-29T03:05:49Z,630944068,https://api.github.com/repos/lyqht/mini-qr,https://github.com/lyqht/mini-qr/pull/157,28,1.0,False
+3186657928,89,Improve tray icon update frequency,"## Summary
+- refresh the tray icon only every 5 seconds
+",OpenAI_Codex,39589028,eplatonoff,closed,2025-06-29T22:49:27Z,2025-07-04T14:50:39Z,,214868921,https://api.github.com/repos/eplatonoff/pilorama,https://github.com/eplatonoff/pilorama/pull/89,28,1.0,False
+3184703163,499,Implement debounce and smooth updates for share search,"## Summary
+- debounce search requests in share sidebar tab
+- update share search list in-place to prevent flashing
+- log change in CHANGELOG
 
 ## Testing
-- `MOCHI_NOW_SEED=1 MOCHI_ROSETTA_INDEX=4 go test ./runtime/vm -run TestVM_Rosetta_Golden -update -v -tags slow`
-- `MOCHI_NOW_SEED=1 MOCHI_ROSETTA_INDEX=4 MOCHI_BENCHMARK=1 go test ./runtime/vm -run TestVM_Rosetta_Golden -update -v -tags slow`
-
+- `vendor/bin/phpunit --configuration phpunit.xml` *(fails: file not found)*
 
 ------
-https://chatgpt.com/codex/tasks/task_e_68835ebfe1188320b1afcb083715ac75",OpenAI_Codex,1218621,tamnd,open,2025-07-25T11:02:34Z,,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/13057,"analysisWe need to classify as performance or non-performance. The PR title: ""Accelerate now() and update Rosetta artifacts"". Summary: ""speed up OpNow with xorshift PRNG"", ""regenerate program 4 outputs with deterministic seed"", ""update benchmark data and checklist"". This is clearly performance improvement: speed up, benchmark data. So classification: performance.assistantfinalperformance",28,1.0,True
-3177404139,3321,Switch MCP server to VM runtime,"## Summary
-- use `runtime/vm` instead of the interpreter when MCP executes source code
+https://chatgpt.com/codex/tasks/task_e_685f9cf48c8c8333ba3a6f90633f6a72",OpenAI_Codex,13385119,Rello,closed,2025-06-28T07:49:13Z,2025-06-28T07:50:55Z,2025-06-28T07:50:55Z,213728552,https://api.github.com/repos/Rello/analytics,https://github.com/Rello/analytics/pull/499,28,1.0,False
+3119752724,25,Improve input tracking with debouncing,"## Summary
+- debounce uiohook events for smoother ComputerAction logs
+- coalesce mouse move events into `trace_mouse`
+- coalesce keyboard input into `type_keys`
 
 ## Testing
-- `go test ./...`
+- `npm install --ignore-scripts`
+- `npm run build`
+- `npm test` *(fails: no tests found)*
 
 ------
-https://chatgpt.com/codex/tasks/task_e_685c9f81300883208f1983dbc49b04c0",OpenAI_Codex,1218621,tamnd,closed,2025-06-26T01:22:20Z,2025-06-26T01:23:37Z,2025-06-26T01:23:37Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3321,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Switch MCP server to VM runtime"". Summary: use runtime/vm instead of interpreter when MCP executes source code. This likely improves performance by using VM runtime instead of interpreter. So it's performance. No other context. So classification: performance.assistantfinalperformance",28,0.18207756494277105,False
-3205879151,400,Support VM Reuse with Different Compiled Code,"Add `RunCode` method to `vm.VirtualMachine` to enable running multiple compiled code objects on a single VM, improving performance and state management for sequential script execution.
+https://chatgpt.com/codex/tasks/task_b_6840f279e8c08329b1fc8e9addebc0dc",OpenAI_Codex,868976,atupem,closed,2025-06-05T03:55:44Z,2025-06-12T04:01:21Z,,926709003,https://api.github.com/repos/bytebot-ai/bytebot,https://github.com/bytebot-ai/bytebot/pull/25,28,1.0,False
+3240335886,1599,Implement redraw debounce,"## Summary
+- debouce redraw events so repeated requests don't overwhelm the terminal
+- add `RequestRedraw` event and schedule redraws after 100ms
 
-Relates to: https://github.com/risor-io/risor/issues/374",Cursor,1389638,myzie,closed,2025-07-06T01:14:37Z,2025-07-06T13:35:23Z,2025-07-06T13:35:23Z,561389689,https://api.github.com/repos/deepnoodle-ai/risor,https://github.com/deepnoodle-ai/risor/pull/400,"analysisWe need to classify as performance or non-performance. The PR title: ""Support VM Reuse with Different Compiled Code"". Body: ""Add RunCode method to vm.VirtualMachine to enable running multiple compiled code objects on a single VM, improving performance and state management for sequential script execution."" This is clearly about performance improvement. So label 'performance'.assistantfinalperformance",28,0.1429025530876729,False
+## Testing
+- `cargo clippy --tests`
+- `cargo test` *(fails: Sandbox Denied errors in landlock tests)*
+
+------
+https://chatgpt.com/codex/tasks/task_i_68792a65b8b483218ec90a8f68746cd8",OpenAI_Codex,219906144,aibrahim-oai,closed,2025-07-17T17:18:15Z,2025-07-17T19:54:55Z,2025-07-17T19:54:55Z,965415649,https://api.github.com/repos/openai/codex,https://github.com/openai/codex/pull/1599,28,1.0,False
+3093078361,527,Fix per-input refresh debouncing,"## Summary
+- handle refresh rate limiting per input descriptor in `InputsTab`
+
+## Testing
+- `dotnet build Elsa.Studio.sln -c Release` *(fails: Unable to load the service index for source https://api.nuget.org/v3/index.json)*",OpenAI_Codex,938393,sfmskywalker,closed,2025-05-27T08:19:55Z,2025-05-27T08:21:30Z,2025-05-27T08:21:30Z,622646426,https://api.github.com/repos/elsa-workflows/elsa-studio,https://github.com/elsa-workflows/elsa-studio/pull/527,28,1.0,False
+3267083771,955,Prevent duplicate refresh-frame intervals,"## Summary
+- track refresh-frame interval id
+- reuse same interval to avoid starting many refresh timers
+- clear the interval when processing finishes
+- refresh every 5 seconds to reduce server load
+
+## Testing
+- `cargo test --workspace --exclude integration-testing --exclude rag-engine`
+
+------
+https://chatgpt.com/codex/tasks/task_e_688607b4d6208320b85f6eb671944bd8",OpenAI_Codex,173255911,242816,closed,2025-07-27T12:59:42Z,2025-07-28T06:41:50Z,2025-07-28T06:41:50Z,663396489,https://api.github.com/repos/bionic-gpt/bionic-gpt,https://github.com/bionic-gpt/bionic-gpt/pull/955,28,1.0,False
+3027146476,1321,Fix lag in pyplot example by implementing proper debouncing,"# Fix lag in pyplot example by implementing proper debouncing
+
+## Description
+This PR fixes lag in the pyplot example in the documentation by properly implementing debouncing using Reflex's built-in mechanism. The implementation:
+
+- Uses the `.debounce()` method on event handlers to add a 1.2 second debounce delay
+- Removes unnecessary custom debouncing code with asyncio and time tracking
+- Simplifies the event handlers for better readability
+
+## Testing
+- Tested locally with the development server
+- Verified that the debouncing works correctly with the slider and randomize button
+- Tested with different numbers of points to ensure smooth performance
+- Confirmed no errors in the console
+
+Link to Devin run: https://app.devin.ai/sessions/61b87a6c1a0645b2b5da2ba4487d16fd
+Requested by: Alek Petuskey (alek@reflex.dev)
+",Devin,158243242,devin-ai-integration[bot],closed,2025-04-29T06:00:35Z,2025-04-30T03:19:28Z,,577975610,https://api.github.com/repos/reflex-dev/reflex-web,https://github.com/reflex-dev/reflex-web/pull/1321,28,1.0,False
+3027244028,1323,Add debounce to pyplot example Randomize button,"# Add debounce to pyplot example Randomize button
+
+## Description
+This PR adds a debounce to the Randomize button in the pyplot example to reduce lag when processing data. The implementation:
+
+- Uses the `.debounce(1200)` method on the Randomize button's on_click event handler to add a 1.2 second debounce delay
+- Keeps the implementation simple and focused on just the button that needs debouncing
+
+## Testing
+- Tested locally with the development server
+- Verified that the debouncing works correctly with the Randomize button
+- Confirmed no errors in the console
+
+Link to Devin run: https://app.devin.ai/sessions/61b87a6c1a0645b2b5da2ba4487d16fd
+Requested by: Alek Petuskey (alek@reflex.dev)
+",Devin,158243242,devin-ai-integration[bot],closed,2025-04-29T06:44:29Z,2025-04-29T06:45:06Z,,577975610,https://api.github.com/repos/reflex-dev/reflex-web,https://github.com/reflex-dev/reflex-web/pull/1323,28,1.0,False
+2920951577,1064,feat: improve search functionality with pagination and visual feedback,"Closes #1063
+
+This PR improves the search functionality in the dashboard by adding pagination and visual feedback during search operations.
+
+## Changes
+- Implemented pagination in AppTable.vue for better performance with large datasets
+- Added multi-term search support for more flexible filtering
+- Added visual feedback during search operations with a spinner icon
+- Optimized debounce timing for search input from 500ms to 300ms
+- Ensured the search works for both app name and bundleid
+
+## Testing
+- Verified that typing in the search box filters apps by name
+- Verified that typing a bundleid in the search box filters apps by bundleid
+- Tested with multiple search terms to ensure filtering works correctly
+- Tested pagination with large datasets to ensure performance is acceptable
+
+Link to Devin run: https://app.devin.ai/sessions/96be49775cff44bbb1c32785a78c3041
+Requested by: User",Devin,158243242,devin-ai-integration[bot],closed,2025-03-14T18:07:04Z,2025-03-15T05:36:51Z,,442321089,https://api.github.com/repos/Cap-go/capgo,https://github.com/Cap-go/capgo/pull/1064,28,0.1005530548281581,False
+2920955200,1065,feat(dashboard): add improved app filtering with bundle ID support,"# Add search and filtering functionality to the dashboard for apps
+
+## Changes
+- Enhanced search algorithm to support multi-term filtering
+- Added special syntax for bundle ID filtering (`bundle:` or `id:` prefix)
+- Optimized MAU number loading to only fetch data for visible/filtered apps
+- Adjusted debounce timing for better performance with large datasets
+- Updated search placeholder to indicate bundle ID filtering capability
+
+## Performance Improvements
+1. **Search Algorithm Enhancement**
+   - Split search terms by spaces to allow searching for multiple terms
+   - Implemented AND logic for better filtering precision
+   - Added special syntax for bundle ID filtering
+
+2. **MAU Loading Optimization**
+   - Implemented caching to avoid redundant API calls
+   - Only load MAU numbers for filtered/visible apps
+   - Reduced unnecessary data fetching
+
+3. **Debounce Timing Adjustment**
+   - Increased from 500ms to 800ms for smoother experience with large datasets
+
+## Testing
+- Tested locally with the development server
+- Verified search functionality works for both app name and bundle ID filtering
+- Confirmed performance improvements with large datasets
+
+## Related Issue
+Fixes #1056
+
+Link to Devin run: https://app.devin.ai/sessions/82f2233b49da4015a0dc8cb4c717b243
+",Devin,158243242,devin-ai-integration[bot],closed,2025-03-14T18:08:42Z,2025-03-15T05:37:21Z,,442321089,https://api.github.com/repos/Cap-go/capgo,https://github.com/Cap-go/capgo/pull/1065,28,0.08534654194245879,False
+2920983723,1066,perf: optimize MAU loading mechanism for better performance with large datasets,"Closes #1063
+
+This PR optimizes the MAU loading mechanism to improve performance with large datasets.
+
+## Changes
+- Replaced individual API calls with a single bulk API call using getAppMetrics
+- Implemented caching for MAU numbers to avoid redundant API calls
+- Added loading state for MAU numbers to provide visual feedback
+- Optimized watchEffect to avoid unnecessary API calls
+
+## Testing
+- Verified that MAU numbers are displayed correctly after optimization
+- Tested with a large number of apps to ensure performance is acceptable
+- Tested on mobile screen sizes to ensure it works on smaller devices
+- Tested with different search terms to ensure filtering works correctly
+
+Link to Devin run: https://app.devin.ai/sessions/38a38f81d3f9427ebfa20151e4889e7a
+Requested by: User",Devin,158243242,devin-ai-integration[bot],closed,2025-03-14T18:19:38Z,2025-03-15T05:38:03Z,,442321089,https://api.github.com/repos/Cap-go/capgo,https://github.com/Cap-go/capgo/pull/1066,28,0.07567980502409305,False
+3071076936,4054,"feat: Server-side pagination, filtering and search for eval results table","## Summary
+In order to support large evals we're updating the Results View to do server side filtering, pagination and search.
+
+- Introduced a new endpoint `eval/table/:id` since this is a new results format
+- Eval comparisons are done server side too
+- Added indicies to support search and filtering
+- Added filtering dropdown for named scores
+- Created a single hook to fetch eval data
+
+
+
+<!-- ELLIPSIS_HIDDEN -->
+
+----
+
+> [!IMPORTANT]
+> This pull request implements server-side pagination for evaluation results, adds a new API endpoint, and updates the frontend to support dynamic data loading and filtering.
+> 
+>   - **Behavior**:
+>     - Implements server-side pagination for evaluation results in `Eval` model.
+>     - Adds `/api/eval/:id/table` endpoint to fetch paginated data.
+>     - Supports filtering by errors, failures, passes, highlights, and specific metrics.
+>     - Allows search queries across multiple fields.
+>     - Handles SQL injection attempts safely.
+>   - **Frontend**:
+>     - Updates `ResultsTable` to load pages dynamically.
+>     - Introduces `useEvalData` hook for fetching evaluation data.
+>     - Adds metric filtering and search functionality in `ResultsView`.
+>   - **Database**:
+>     - Adds indices to `eval_results` table for improved query performance.
+>     - Updates `evals` table schema to include `vars` column.
+>   - **Tests**:
+>     - Comprehensive tests for pagination, filtering, and search functionalities in `eval.test.ts`.
+>     - Tests for `EvalFactory` to create varied evaluation results for testing.
+> 
+> <sup>This description was created by </sup>[<img alt=""Ellipsis"" src=""https://img.shields.io/badge/Ellipsis-blue?color=175173"">](https://www.ellipsis.dev?ref=promptfoo%2Fpromptfoo&utm_source=github&utm_medium=referral)<sup> for eaf8c2c7eb7e99ff7edbd895c7992da8fa92723b. You can [customize](https://app.ellipsis.dev/promptfoo/settings/summaries) this summary. It will automatically update as commits are pushed.</sup>
+
+<!-- ELLIPSIS_HIDDEN -->",OpenAI_Codex,1080611,sklein12,closed,2025-05-17T21:29:21Z,2025-05-24T21:08:39Z,2025-05-24T21:08:39Z,633927609,https://api.github.com/repos/promptfoo/promptfoo,https://github.com/promptfoo/promptfoo/pull/4054,28,0.07423097696107485,False

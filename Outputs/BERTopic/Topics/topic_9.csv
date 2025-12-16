@@ -1,333 +1,830 @@
-id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
-3185679015,3924,Improve join optimization,"## Summary
-- detect more equality cases in join condition, handling `+0`/`-0`
-- benchmark join with `+0` arithmetic to verify optimization
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,Topic,Probability,Representative_document
+3159415433,83,fix: memory leaks and server stability issues,"## Summary
+This PR addresses critical memory leaks and stability issues in the Zen MCP server that were causing server crashes during heavy usage, requiring frequent reinstallation.
+
+### Fixed Issues
+- **Memory leaks in GeminiModelProvider**: Added bounded token cache with automatic cleanup (max 100 entries, LRU-style cleanup)
+- **Background thread race conditions**: Fixed cleanup worker thread shutdown handling in storage backend
+- **Silent exception swallowing**: Replaced silent exception handling with proper logging in server.py
+
+### Technical Details
+- **Token Cache Management**: Implemented cache size limits, cleanup methods, and performance monitoring
+- **Thread Safety**: Improved background thread lifecycle management with graceful shutdown
+- **Error Visibility**: Enhanced error logging to help diagnose future issues
+
+### Testing
+- ✅ All 583 unit tests pass (100%)
+- ✅ All simulator tests pass
+- ✅ Code quality checks pass (ruff, black, isort)
+- ✅ Memory usage monitoring and cleanup verified
+
+These changes ensure the MCP server can handle long-running sessions and heavy usage without memory leaks or stability issues.
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,2609417,dsaluja,open,2025-06-19T08:15:56Z,,,998428732,https://api.github.com/repos/BeehiveInnovations/zen-mcp-server,https://github.com/BeehiveInnovations/zen-mcp-server/pull/83,9,1.0,False
+3208320625,9278,fix(tabs): resolve memory leak caused by animation transitions,"## Problem
+
+The nz-tabset component was experiencing memory leaks where detached DOM elements accumulated in memory when tabs were repeatedly created and destroyed. As shown in the memory snapshot below, multiple detached `<nz-tabset>` elements were being retained:
+
+![Memory leak showing detached nz-tabset elements](https://github.com/user-attachments/assets/615cdcdc-6db5-49be-88c0-746c7b451d29)
+
+## Root Cause
+
+The issue was in the `tabSwitchMotion` animation definition in `components/core/animation/tabs.ts`. The animation combined `* => leave` and `:leave` transitions with absolute positioning:
+
+```typescript
+// Problematic code
+transition('* => leave, :leave', [
+  style({
+    position: 'absolute',  // This caused detached DOM nodes
+    top: 0,
+    left: 0,
+    width: '100%'
+  }),
+  animate(AnimationDuration.SLOW, style({ opacity: 0 })),
+  style({ display: 'none' })
+])
+```
+
+This caused DOM elements to become absolutely positioned and detached during animations, preventing proper garbage collection.
+
+## Solution
+
+1. **Separated animation transitions** to handle different scenarios appropriately:
+   - `* => leave`: Simple opacity fade for tab switching (no absolute positioning)
+   - `:leave`: Absolute positioning only for actual DOM removal
+
+2. **Added animation completion handler** in `NzTabBodyComponent`:
+   ```typescript
+   @HostListener('@tabSwitchMotion.done', ['$event'])
+   onAnimationDone(event: any): void {
+     if (event.toState === 'leave') {
+       // Ensure proper cleanup after leave animations
+     }
+   }
+   ```
+
+3. **Created comprehensive test suite** (`tabs-memory-leak.spec.ts`) to verify:
+   - No detached DOM elements accumulate after component destruction
+   - Animation transitions complete properly without leaving artifacts
+   - Rapid create/destroy cycles don't cause memory leaks
 
 ## Testing
-- `go test ./... -count=1`
 
-------
-https://chatgpt.com/codex/tasks/task_e_685f6f460e188320906298a7c44ae3ad",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T02:43:12Z,2025-07-01T03:05:49Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3924,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve join optimization"". Summary: detect more equality cases in join condition, handling +0/-0, benchmark join with +0 arithmetic to verify optimization. This is about join optimization, likely performance improvement. Keywords: optimization, benchmark. So classify as 'performance'.assistantfinalperformance",9,1.0,False
-3241710800,9455,Improve PHP join compilation,"## Summary
-- compile left_join_multi/right_join/outer_join queries without `_query`
-- note PHP join improvements in README
+To reproduce the issue before the fix:
+1. Use the provided [StackBlitz reproduction](https://stackblitz.com/edit/wkcrseqt?file=src%2Fapp%2Fapp.component.ts)
+2. Click toggle button repeatedly
+3. Take memory snapshots in browser dev tools
+4. Observe accumulating detached `nz-tabset` elements
 
-## Testing
-- `go test ./compiler/x/php -run TestPHPCompiler_VMValid_Golden -count=1 -tags=slow`
+After this fix:
+- ✅ No detached elements accumulate
+- ✅ Memory usage remains stable
+- ✅ Animation transitions work smoothly
+- ✅ No breaking changes to existing API
 
-------
-https://chatgpt.com/codex/tasks/task_e_6879bc3a2b708320b51e0b494bd2c734",OpenAI_Codex,1218621,tamnd,closed,2025-07-18T03:24:48Z,2025-07-18T03:25:09Z,2025-07-18T03:25:09Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9455,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve PHP join compilation"". Summary: compile left_join_multi/right_join/outer_join queries without `_query`. Note PHP join improvements in README. This seems to be about compilation of PHP join queries, maybe performance improvement? The description: compile left_join_multi/right_join/outer_join queries without `_query`. That might be a performance improvement? It might be about compilation speed or runtime performance. But the title ""Improve PHP join compilation"" could be about performance of compilation. The summary says compile left_join_multi/right_join/outer_join queries without `_query`. That might reduce compile time or memory usage. But is it about performance? The PR might be about improving compilation of PHP join queries, which could be performance improvement. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The PR is about improving PHP join compilation. That likely is a performance improvement. There's no mention of memory, speed, latency, etc. But ""Improve PHP join compilation"" could be about making the compiler faster or more efficient. That is a performance improvement. So classify as 'performance'.
+## Impact
 
-Thus answer: performance.assistantfinalperformance",9,1.0,False
-3186409173,4004,Optimize inner joins,"## Summary
-- improve `compileJoinQuery` to pick smaller side for non-equality inner joins
+- Eliminates memory leaks in applications with frequent tab creation/destruction
+- Maintains all existing animation behavior
+- Improves performance for dynamic tab scenarios
+- Zero breaking changes
 
-## Testing
-- `go test -tags slow ./... -update` *(fails: go run error: exit status 1)*
+Fixes #9095.
 
-------
-https://chatgpt.com/codex/tasks/task_e_686177eacff08320b33533ff0f3ed0c7",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T17:47:36Z,2025-07-01T12:01:39Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4004,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize inner joins"". Summary: ""improve compileJoinQuery to pick smaller side for non-equality inner joins"". This is about performance optimization. So classification: performance.assistantfinalperformance",9,1.0,False
-3241758610,9484,Improve Clojure join compilation,"## Summary
-- optimize Clojure compiler by translating simple left/right/outer joins to direct comprehensions
-- regenerate outer_join machine translation without `_query` helper
-- update machine README checklist
-- note progress in Clojure TASKS
-
-## Testing
-- `go test -tags slow ./compiler/x/clj -run TestClojureCompiler_VMValid_Golden/outer_join -count=1`
-
-------
-https://chatgpt.com/codex/tasks/task_e_6879c147cdfc832088f453a112e75963",OpenAI_Codex,1218621,tamnd,closed,2025-07-18T03:54:44Z,2025-07-18T03:55:13Z,2025-07-18T03:55:13Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9484,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Clojure join compilation"". Summary: optimize Clojure compiler by translating simple left/right/outer joins to direct comprehensions. That is a performance optimization. Keywords: optimize, performance. So classification: performance.assistantfinalperformance",9,1.0,False
-3186037018,3948,Optimize inner join in VM,"## Summary
-- tune inner join code generation
-- regenerate benchmark results
-- update join benchmark documentation
-
-## Testing
-- `go test ./...`
-- `go run cmd/mochi-bench/main.go`
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `registry.npmmirror.com`
+>   - Triggering command: `npm install` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
 
 
-------
-https://chatgpt.com/codex/tasks/task_e_68611419206083209e3be1b1abf8c6b2",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T10:40:41Z,2025-07-01T03:06:08Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3948,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize inner join in VM"". Summary: tune inner join code generation, regenerate benchmark results, update join benchmark documentation. This is clearly performance optimization. So label 'performance'.assistantfinalperformance",9,1.0,False
-3184544966,3893,Improve VM join performance,"## Summary
-- optimize OpAppend to mutate lists in place when safe
-- update query compilation to use in-place append for joins
 
-## Testing
-- `go test ./...`
+<!-- START COPILOT CODING AGENT TIPS -->
+---
 
-------
-https://chatgpt.com/codex/tasks/task_e_685f6a8120fc83208b4b3d7a0559b324",OpenAI_Codex,1218621,tamnd,closed,2025-06-28T04:16:33Z,2025-06-30T15:09:50Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3893,"analysisWe need to classify as 'performance' or 'non-performance'. The title: ""Improve VM join performance"". The body mentions optimizing OpAppend, update query compilation to use in-place append for joins. This is clearly performance improvement. So label 'performance'.assistantfinalperformance",9,1.0,False
-3240935078,280,Resolve db self-join memory bug,"Add comprehensive self-join tests to verify correct behavior and investigate a reported cartesian product bug.
-
-The bug report described self-joins causing memory exhaustion and cartesian products. These new tests, including scenarios with larger datasets and `limit`, demonstrate that the core `db` join logic correctly handles self-joins without producing cartesian products. This suggests the reported issue might stem from the `useLiveQuery` integration or an environment-specific factor, as the underlying join mechanism appears to be working as expected.",Cursor,31130,samwillis,closed,2025-07-17T21:15:07Z,2025-07-18T10:18:19Z,,946895816,https://api.github.com/repos/TanStack/db,https://github.com/TanStack/db/pull/280,"analysisWe need to classify as performance or non-performance. The PR title: ""Resolve db self-join memory bug"". Body: adding tests, investigating memory exhaustion, cartesian product bug. It's about memory bug, memory exhaustion. That is performance-related? Memory usage is a performance aspect. The description says memory exhaustion. That is a performance issue. So classify as 'performance'.assistantfinalperformance",9,1.0,True
-3216916039,6987,Optimize Clojure query helpers,"## Summary
-- add helpers for extracting join key expressions
-- emit join key functions in Clojure query compiler
-- speed up `_group_by` using transients
-- use hash join when key functions are provided in `_query`
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-07-07T09:57:24Z,2025-07-14T01:59:12Z,,99705100,https://api.github.com/repos/NG-ZORRO/ng-zorro-antd,https://github.com/NG-ZORRO/ng-zorro-antd/pull/9278,9,1.0,True
+3246163910,96,Dispose bitmap sources on replacement,"## Summary
+- cleanup image when replacing `ZoomBorder` child images
+- document bitmap disposal requirement
+- add bitmap swapping sample demonstrating disposal logic
 
 ## Testing
-- `go test ./...`
+- `dotnet build PanAndZoom.sln -nologo`
 
 ------
-https://chatgpt.com/codex/tasks/task_e_686ebd073530832087825b793466ef82",OpenAI_Codex,1218621,tamnd,closed,2025-07-09T19:25:09Z,2025-07-09T19:25:21Z,2025-07-09T19:25:21Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/6987,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize Clojure query helpers"". Summary: add helpers for extracting join key expressions, emit join key functions in Clojure query compiler, speed up `_group_by` using transients, use hash join when key functions are provided in `_query`. This is clearly performance improvements: speed up group_by, use hash join, etc. So classification: performance.assistantfinalperformance",9,1.0,False
-3227161026,8628,Add map-based left join in Go compiler,"## Summary
-- implement `eqJoinKeysTyped` helper for join key types
-- generate optimized map-based left join queries in the Go backend
-- regenerate Go machine output for left join programs
-- mark left join task complete
-- regenerate TPCH q1 Go code
+https://chatgpt.com/codex/tasks/task_e_687cabe472cc832185b07f18a1cca44f",OpenAI_Codex,2297442,wieslawsoltes,closed,2025-07-20T08:53:08Z,2025-07-22T10:56:39Z,,51879362,https://api.github.com/repos/wieslawsoltes/PanAndZoom,https://github.com/wieslawsoltes/PanAndZoom/pull/96,9,1.0,False
+3140927195,2167,fix: add memory leak fixes for Maps and MobX reactions,"# Memory Leak Fixes for Maps and MobX Reactions
+
+## Summary
+Fixed multiple memory leaks in the EditorEngine system by adding proper cleanup patterns for Maps, MobX reactions, and event subscribers that were growing without bounds.
+
+## Changes Made
+
+### 1. **SandboxManager Memory Leak Fixes**
+- **MobX Reaction Disposal**: Added proper disposal of the MobX reaction that watches session changes
+- **FileEventBus Cleanup**: Added `clearSubscribers()` call to prevent event listener accumulation
+- **Reaction Disposer Storage**: Store reaction disposer and call it in `clear()` method
+
+### 2. **FileSyncManager Cache Size Limits**
+- **Maximum Cache Size**: Limited file cache to 1000 files to prevent unbounded growth
+- **LRU Eviction**: Implemented least-recently-used eviction when cache size limit is reached
+- **Memory Optimization**: Prevents file content cache from consuming excessive memory
+
+### 3. **TemplateNodeMapper Cache Management**
+- **Cache Size Limit**: Limited template node cache to 5000 entries
+- **Automatic Cleanup**: Remove oldest entries when cache exceeds size limit
+- **Template Node Optimization**: Prevents OID-to-template-node mapping from growing indefinitely
+
+### 4. **LayersManager Nested Map Cleanup**
+- **Nested Map Clearing**: Properly clear `domIdToLayerNode` Maps before removing frame metadata
+- **Memory Leak Prevention**: Ensure all nested Maps are disposed when frames are removed
+- **Comprehensive Cleanup**: Clear all nested structures in the main `clear()` method
+
+## Memory Leak Sources Fixed
+
+1. **MobX Reaction in SandboxManager** - Reaction was never disposed, causing memory retention
+2. **FileEventBus Subscribers** - Event listeners accumulated without cleanup
+3. **FileSyncManager Cache** - File content cache grew without size limits
+4. **TemplateNodeMapper Cache** - OID mappings accumulated indefinitely
+5. **LayersManager Nested Maps** - DOM ID mappings weren't cleared when frames were removed
 
 ## Testing
-- `go test ./compiler/x/go -tags slow -run TPCH -update -count=1`
-- `go test ./compiler/x/go -tags slow -run ValidPrograms/left_join -update -count=1`
+- ✅ Code formatting with `bun run format` passed
+- ⚠️ Linting failed due to missing environment variables (expected in dev environment)
+- 🔄 Manual testing recommended to verify memory usage improvements
 
+## Impact
+- **Reduced Memory Usage**: Prevents Maps from growing without bounds
+- **Better Resource Management**: Proper disposal of MobX reactions and event listeners  
+- **Improved Performance**: Cache size limits prevent excessive memory consumption
+- **Project Switching**: Memory is properly cleaned up when switching between projects
 
-------
-https://chatgpt.com/codex/tasks/task_e_687463f509e8832092aeadb4bfabfc56",OpenAI_Codex,1218621,tamnd,closed,2025-07-14T02:31:21Z,2025-07-14T02:31:42Z,2025-07-14T02:31:42Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/8628,"analysisWe need to classify whether the primary purpose of the pull request is to improve performance. The PR title: ""Add map-based left join in Go compiler"". The body describes implementing eqJoinKeysTyped helper, generating optimized map-based left join queries in Go backend, regenerating Go machine output for left join programs, marking left join task complete, regenerating TPCH q1 Go code. This is about adding map-based left join, which is an optimization for join queries. It likely improves performance of left join queries. The description mentions ""optimized map-based left join queries"". That is a performance improvement. So classification: 'performance'.
+## Verification Steps
+1. Switch between multiple projects to test cleanup
+2. Monitor browser memory usage in DevTools
+3. Verify no console errors related to cleanup
+4. Check that existing functionality still works
 
-Check if any other aspects: It's about adding map-based left join, which is a performance optimization. So yes, performance.assistantfinalperformance",9,1.0,True
-3227169343,8629,Enhance Go backend left join,"## Summary
-- improve Go compiler to special case left join with map lookup
-- regenerate machine output for left_join
-- regenerate tpch/q1 Go output
-- document update in TASKS
+The EditorEngine already has a comprehensive `clear()` method that's properly called during project cleanup in the layout component, so these fixes integrate well with the existing cleanup patterns.
 
-## Testing
-- `go test ./compiler/x/go -run ValidPrograms/left_join -tags slow`
-- `go test ./compiler/x/go -run TestGoCompiler_TPCH/q1 -tags slow -update`
+Link to Devin run: https://app.devin.ai/sessions/6c56d3960b494def8a33c8582d341e03
 
+Requested by: kiet@onlook.dev
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-12T16:31:43Z,2025-06-14T18:16:19Z,,820087727,https://api.github.com/repos/onlook-dev/onlook,https://github.com/onlook-dev/onlook/pull/2167,9,1.0,True
+2784931990,1039,fix: prevent memory leaks across application,"# Memory Leak Prevention
 
-------
-https://chatgpt.com/codex/tasks/task_e_68746832daa88320bfd1e0b391d558cb",OpenAI_Codex,1218621,tamnd,closed,2025-07-14T02:37:50Z,2025-07-14T02:38:21Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/8629,"analysisWe need to classify as performance or non-performance. The PR title: ""Enhance Go backend left join"". Summary: ""improve Go compiler to special case left join with map lookup"". That sounds like a performance optimization: special case left join with map lookup likely improves speed. Also ""regenerate machine output for left_join"" etc. So it's performance. So label 'performance'.assistantfinalperformance",9,1.0,False
-3186037439,3949,Optimize hash join code generation,"## Summary
-- reduce bytecode size for simple inner joins
-- add constant list length detection to skip unused branch
+This PR implements comprehensive memory leak prevention across the Onlook desktop application by adding proper dispose methods to all manager classes and ensuring proper cleanup of resources.
 
-## Testing
-- `go fmt ./...`
-- `go test ./...`
-
-
-------
-https://chatgpt.com/codex/tasks/task_e_686113de63cc8320a8cae6b023442f01",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T10:41:21Z,2025-06-29T10:41:37Z,2025-06-29T10:41:37Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3949,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize hash join code generation"". Summary: reduce bytecode size for simple inner joins, add constant list length detection to skip unused branch. This is about code generation optimization, likely performance improvement. Keywords: optimize, reduce bytecode size, skip unused branch. It's performance. So label 'performance'.assistantfinalperformance",9,1.0,False
-3216964251,7004,Optimize joins in Go backend,"## Summary
-- improve join logic in `compiler/x/go` runtime
+## Changes
+- Added dispose methods to all manager classes
+- Implemented proper cleanup in WebviewMessageBridge
+- Updated EditorEngine to properly dispose all managers
+- Fixed memory leaks in event handlers and observers
+- Ensured proper cleanup of MobX reactions and subscriptions
 
 ## Testing
-- `go test ./compiler/x/go -tags slow` *(fails: cannot use _ as value or type)*
+✅ Changes have been tested:
+- Ran test suite with `bun --filter '*' test` - all tests passing
+- Verified proper cleanup implementation across all key components
+- Checked that all manager classes properly dispose their resources
+- Ensured no TypeScript errors remain
 
-------
-https://chatgpt.com/codex/tasks/task_e_686ec3cf542483208262312e9f190dbb",OpenAI_Codex,1218621,tamnd,closed,2025-07-09T19:48:47Z,2025-07-09T19:48:58Z,2025-07-09T19:48:58Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7004,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize joins in Go backend"". Summary: ""improve join logic in compiler/x/go runtime"". That sounds like performance improvement. Keywords: optimize, improve join logic. So it's performance. So output 'performance'.assistantfinalperformance",9,1.0,False
-3214278956,6520,Improve Go join compilation,"## Summary
-- improve go query compiler: detect simple left joins so helper is skipped
-- regenerate `left_join.go`
-- note new join behaviour in Go machine README
+## Link to Devin run
+https://app.devin.ai/sessions/35457207378d4868b0b7d9045fc4cde9
+",Devin,158243242,devin-ai-integration[bot],closed,2025-01-13T18:31:27Z,2025-01-14T08:28:12Z,2025-01-14T08:28:12Z,820087727,https://api.github.com/repos/onlook-dev/onlook,https://github.com/onlook-dev/onlook/pull/1039,9,1.0,False
+3128356528,1067,fix: memory leak in createPattern,"- Partial fix #1055
 
-## Testing
-- `go test ./compiler/x/go -tags slow`
-- `go test ./compiler/x/go -tags slow -run TestGoCompiler_ValidPrograms/left_join`
+The loadImage seems like still leak, let's fix it in another pr
+",Cursor,3468483,Brooooooklyn,closed,2025-06-08T13:31:29Z,2025-06-08T14:41:54Z,2025-06-08T14:41:54Z,291390714,https://api.github.com/repos/Brooooooklyn/canvas,https://github.com/Brooooooklyn/canvas/pull/1067,9,1.0,False
+3240310398,6475,Fix react root memory leak,"```
+This PR resolves a memory leak in `templates/vue/src/App.vue`. Previously, the React root created within the Vue component's `onMounted` hook was not unmounted when the Vue component was destroyed, leading to persistent DOM nodes and resources.
 
+The fix ensures proper cleanup by:
+- Storing the `Root` instance returned by `createRoot`.
+- Using Vue's `onUnmounted` hook to call `root.unmount()` and nullify the `root` reference.
+- Using the correct `Root` type from `react-dom/client` for improved type safety.
 
-------
-https://chatgpt.com/codex/tasks/task_e_686dc2fa08ac8320bece11662d1b2a58",OpenAI_Codex,1218621,tamnd,closed,2025-07-09T02:26:08Z,2025-07-09T02:26:26Z,2025-07-09T02:26:26Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/6520,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Go join compilation"". Summary: ""improve go query compiler: detect simple left joins so helper is skipped, regenerate left_join.go, note new join behaviour in Go machine README"". This is about compiler optimization: detect simple left joins so helper is skipped. That is a performance improvement: skipping helper likely speeds up compilation or runtime. So classify as 'performance'.assistantfinalperformance",9,1.0,False
-3214280822,6521,Improve Python join code generation,"## Summary
-- improve the Python backend to emit list comprehensions for inner joins
-- regenerate golden machine outputs for inner join programs
-- document new join handling in the Python machine README
+### Change type
 
-## Testing
-- `go test -tags slow ./compiler/x/python -run TestCompilePrograms -count=1`
+- [x] `bugfix`
+- [ ] `improvement`
+- [ ] `feature`
+- [ ] `api`
+- [ ] `other`
 
-------
-https://chatgpt.com/codex/tasks/task_e_686dc30703a883208c194f20cb79ae02",OpenAI_Codex,1218621,tamnd,closed,2025-07-09T02:27:09Z,2025-07-09T02:28:52Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/6521,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Improve Python join code generation"". Summary: improve Python backend to emit list comprehensions for inner joins, regenerate golden machine outputs, document new join handling. This is about code generation for Python backend, using list comprehensions for inner joins. That likely improves performance? List comprehensions are faster than loops? The PR is about generating more efficient code. But is it explicitly about performance? The description: ""improve the Python backend to emit list comprehensions for inner joins"". That is a performance improvement. The summary also mentions ""regenerate golden machine outputs for inner join programs"" and ""document new join handling"". The primary purpose is to improve performance of join code generation. So classification: performance.assistantfinalperformance",9,1.0,True
-3214281732,6522,Improve Elixir compiler join handling,"## Summary
-- generate joins without runtime helper when possible
-- print using `inspect` for better map handling
-- update Elixir machine outputs
+### Test plan
 
-## Testing
-- `go test -tags slow ./compiler/x/ex`
+1. Run the Vue application (`npm run dev` in `templates/vue`).
+2. Observe the `App.vue` component rendering the Tldraw wrapper.
+3. (Optional) Use browser developer tools to inspect memory usage or DOM nodes to confirm proper cleanup upon component unmount.
 
-------
-https://chatgpt.com/codex/tasks/task_e_686dc356b9d88320b85caae44d3a9d14",OpenAI_Codex,1218621,tamnd,closed,2025-07-09T02:27:47Z,2025-07-09T02:29:05Z,2025-07-09T02:29:05Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/6522,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Elixir compiler join handling"". Summary: generate joins without runtime helper when possible, print using inspect for better map handling, update Elixir machine outputs. This seems about compiler optimization, generating joins without runtime helper. That is a performance improvement? It might be about code generation, but not necessarily performance. The summary: ""generate joins without runtime helper when possible"" could reduce runtime overhead, thus performance. But is it about performance? The title ""Improve Elixir compiler join handling"" could be about correctness or code generation. The summary mentions ""print using inspect for better map handling"" which is about debugging output. ""update Elixir machine outputs"" maybe about output formatting. The key is ""generate joins without runtime helper when possible"" - that could reduce runtime overhead, thus performance. But the rest is about printing and outputs. The question: ""primary purpose of the pull request is to improve performance."" The PR seems to be about improving compiler join handling, which might be performance. But the summary also includes printing improvements. The primary purpose might be to improve performance by generating joins without runtime helper. That seems like a performance improvement. So classify as 'performance'.
+- [ ] Unit tests
+- [ ] End to end tests
 
-Check keywords: ""performance"" not present. But ""runtime helper"" might reduce runtime overhead. ""generate joins without runtime helper when possible"" is a performance improvement. So classification: performance.assistantfinalperformance",9,1.0,False
-3216930805,6993,Add hash join optimization for Go backend,"## Summary
-- extend Go runtime `_query` helper with optional hash join support
-- detect simple equality joins and emit `leftKey`/`rightKey` functions
-- new `eqJoinKeys` helper to recognise equality join predicates
+### Release notes
 
-## Testing
-- `go test ./compiler/x/go -tags slow -run TestGoCompiler_ValidPrograms -count=1`
-
-------
-https://chatgpt.com/codex/tasks/task_e_686ebcd8ecfc8320a0253441d3a464f9",OpenAI_Codex,1218621,tamnd,closed,2025-07-09T19:32:09Z,2025-07-09T19:32:24Z,2025-07-09T19:32:23Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/6993,"analysisWe need to classify as performance or non-performance. The PR title: ""Add hash join optimization for Go backend"". That is an optimization for query execution, likely performance improvement. The body mentions ""hash join optimization"", ""detect simple equality joins"", ""emit leftKey/rightKey functions"". This is about improving performance of query execution. So classification: performance.assistantfinalperformance",9,0.513956531217495,False
-3216962602,7003,Improve TS query compile,"## Summary
-- add hash-based join helper in TS runtime
-- detect simple equality joins to use hashed join
-- expose joinEqFields helper
+- Fixed a memory leak in the Vue integration where the React root was not unmounted on component destruction.
+```",Cursor,1489520,SomeHats,closed,2025-07-17T17:08:41Z,2025-07-17T17:09:03Z,2025-07-17T17:09:03Z,365739812,https://api.github.com/repos/tldraw/tldraw,https://github.com/tldraw/tldraw/pull/6475,9,1.0,False
+3070542749,1394,Fix datagram socket leak,"## Summary
+- ensure `DatagramSocket` is closed when querying NTP time
 
 ## Testing
-- `go test ./...`
+- `gradle :wallet:compileDebugKotlin -x lint` *(fails: plugin not found)*
 
-------
-https://chatgpt.com/codex/tasks/task_e_686ebcf0eeb88320848cda5d4534bc8c",OpenAI_Codex,1218621,tamnd,closed,2025-07-09T19:48:00Z,2025-07-09T19:48:11Z,2025-07-09T19:48:11Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7003,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Improve TS query compile"". Body: adds hash-based join helper, detect simple equality joins to use hashed join, expose joinEqFields helper. This is about query compile, likely performance improvement. Keywords: ""hash-based join helper"" suggests optimization. So classify as 'performance'.assistantfinalperformance",9,0.4741821479742636,False
-3183195813,3870,Improve TPCH query compilation,"## Summary
-- add `_hash_combine` runtime helper for hashing struct keys
-- track element types for query variables when compiling
-- generate struct keys for grouped queries when the key is a map literal
+<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
 
-## Testing
-- `go test ./... -tags=slow` *(fails: signal interrupt)*
+## Summary by CodeRabbit
 
-------
-https://chatgpt.com/codex/tasks/task_e_685eaef2a7948320bb16d7ecb29e4d9a",OpenAI_Codex,1218621,tamnd,closed,2025-06-27T15:20:18Z,2025-06-27T15:24:55Z,2025-06-27T15:24:55Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3870,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve TPCH query compilation"". Body: mentions adding runtime helper for hashing struct keys, track element types for query variables when compiling, generate struct keys for grouped queries when key is a map literal. This seems about compilation improvements, maybe performance? It might be about query compilation speed or memory usage? The description doesn't mention speed, latency, optimization explicitly. It's about query compilation improvements, maybe to reduce compile time or memory usage. But the classification guidelines: performance-related PRs may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs.
+- **Refactor**
+  - Improved internal resource management to ensure sockets are closed automatically, enhancing reliability and maintainability. No changes to app behavior or visible features.
 
-The body does not contain those keywords. It mentions ""Improve TPCH query compilation"" which could be about performance of query compilation. But no explicit performance keyword. The guidelines say performance-related PRs may contain keywords such as... or any other terms referring to how faster and efficiently software runs. The phrase ""Improve TPCH query compilation"" could be considered performance improvement. But it's ambiguous. The guidelines: ""Performance-related pull requests may contain keywords such as... or any other terms referring to how faster and efficiently software runs."" So if the PR is about improving compilation, that is a performance improvement. But the guidelines also say ""or any other terms referring to how faster and efficiently software runs."" The phrase ""Improve TPCH query compilation"" is indeed about improving compilation, which is a performance aspect. But the guidelines might want explicit mention of performance. However, the phrase ""Improve TPCH query compilation"" is a direct statement of improvement. It might be considered performance. But the guidelines mention ""or any other terms referring to how faster and efficiently software runs."" So ""Improve TPCH query compilation"" is indeed a term referring to performance. So likely classify as performance.
+<!-- end of auto-generated comment: release notes by coderabbit.ai -->",OpenAI_Codex,7733989,Syn-McJ,closed,2025-05-17T08:06:21Z,2025-05-20T16:26:46Z,2025-05-20T16:26:46Z,20371637,https://api.github.com/repos/dashpay/dash-wallet,https://github.com/dashpay/dash-wallet/pull/1394,9,1.0,False
+3096586088,12,Fix memory leak in data processing module,"This pull request addresses a memory leak issue identified in the data processing module. The leak was caused by not properly releasing resources after processing data batches. This fix ensures that all allocated memory is freed, improving the overall performance and stability of the application. Additionally, unit tests have been updated to cover the changes made and ensure that the memory management is functioning as expected.",OpenAI_Codex,2464556,homanp,closed,2025-05-28T08:55:59Z,2025-05-28T08:56:32Z,,983757718,https://api.github.com/repos/superagent-ai/vibekit,https://github.com/superagent-ai/vibekit/pull/12,9,1.0,False
+3096375012,8,Add Github templates,"This pull request addresses a memory leak issue identified in the data processing module. The leak was caused by not properly releasing resources after processing large datasets. The changes include:
 
-But let's consider if it's about correctness or feature addition. The changes: add runtime helper for hashing struct keys, track element types for query variables when compiling, generate struct keys for grouped queries when key is a map literal. This is about query compilation, maybe to reduce compile time or memory usage. It's not about adding new features or bug fixes. It's about improving compilation. That is a performance improvement. So classification: performance.
+- Added proper cleanup code to release memory allocated for temporary data structures.
+- Updated unit tests to cover scenarios that previously led to memory leaks.
+- Conducted performance testing to ensure that the changes do not negatively impact processing speed.
 
-Thus answer: performance.assistantfinalperformance",9,0.46613416462693796,False
-3202763859,5067,Improve Python compiler list operations,"## Summary
-- reduce use of runtime helpers for `union`, `union_all`, `except` and `intersect`
-- infer resulting list element type when possible
+This fix is crucial for improving the stability and performance of the application, especially when handling large volumes of data.",OpenAI_Codex,2464556,homanp,closed,2025-05-28T07:40:15Z,2025-05-28T07:42:01Z,2025-05-28T07:42:01Z,983757718,https://api.github.com/repos/superagent-ai/vibekit,https://github.com/superagent-ai/vibekit/pull/8,9,1.0,False
+3146866702,380,Add destructor for arrow icons,"## Summary by CodeRabbit
 
-## Testing
-- `go test ./... --vet=off -run TestPyCompiler_SubsetPrograms -count=1`
+- **Bug Fixes**
+  - Improved memory management to prevent potential memory leaks when removing character display elements.
+",OpenAI_Codex,27886627,forntoh,closed,2025-06-14T23:03:25Z,2025-06-14T23:18:29Z,2025-06-14T23:18:29Z,267951056,https://api.github.com/repos/forntoh/LcdMenu,https://github.com/forntoh/LcdMenu/pull/380,9,1.0,False
+3146868385,381,Fix memory leak in ItemInputCharset,"## Summary
+- prevent memory leak in `ItemInputCharset::commitCharEdit`",OpenAI_Codex,27886627,forntoh,closed,2025-06-14T23:05:56Z,2025-06-14T23:31:03Z,2025-06-14T23:31:03Z,267951056,https://api.github.com/repos/forntoh/LcdMenu,https://github.com/forntoh/LcdMenu/pull/381,9,1.0,False
+3262668155,6822,Fix memory leak in BackgroundCommandSenderHostedService by using CancellationToken.None,"## Problem
 
-------
-https://chatgpt.com/codex/tasks/task_e_6867d5cdcb3c8320b49589ac64cc4233",OpenAI_Codex,1218621,tamnd,closed,2025-07-04T13:31:50Z,2025-07-04T13:32:03Z,2025-07-04T13:32:03Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/5067,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Python compiler list operations"". Summary: reduce use of runtime helpers for union, union_all, except and intersect; infer resulting list element type when possible. This seems to be about compiler optimization, reducing runtime overhead, improving performance. Keywords: reduce use of runtime helpers, infer type. This is performance improvement. So label 'performance'.assistantfinalperformance",9,0.4054907258713435,False
-3242128024,9492,Improve Python compiler list set ops,"## Summary
-- optimize list set operations by unwrapping optional types before deciding whether helpers are needed
-- update compiler test helper indentation
-- regenerate Python machine outputs
-- document recent compiler changes
+Memory leak occurring when dispatching large numbers of workflows (e.g., 200+ per second) through the `BackgroundCommandSenderHostedService`. Memory profiling revealed accumulation of `CancellationTokenSource` objects that were not being properly released.
 
-## Testing
-- `go test -tags slow ./compiler/x/python -run TestPythonCompiler_VMValid_Golden -count=1` *(fails: golden mismatch for several programs)*
+**Before fix:**
+![Memory leak with CancellationTokenSources](https://github.com/user-attachments/assets/22cae843-d3e1-4485-98f0-1f43f3444829)
+![Path to root showing accumulation](https://github.com/user-attachments/assets/dbc72033-5040-44d0-9a50-1cad91601e9d)
 
-------
-https://chatgpt.com/codex/tasks/task_e_6879c6469d8c83208026d01713bd6f9b",OpenAI_Codex,1218621,tamnd,closed,2025-07-18T06:49:11Z,2025-07-18T06:49:28Z,2025-07-18T06:49:28Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9492,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve Python compiler list set ops"". Summary: ""optimize list set operations by unwrapping optional types before deciding whether helpers are needed"". That is about optimization, performance. Also mentions ""regenerate Python machine outputs"" maybe not performance. But the main change is optimizing list set operations. So it's performance. So label 'performance'.assistantfinalperformance",9,0.39078868206669765,False
-3186007005,3945,Improve join performance with hashed left join,"## Summary
-- add hash-based optimization for left joins
-- regenerate left join IR after optimization
-- update join benchmarks to reflect faster joins
+**After fix:**
+![Resolved memory usage](https://github.com/user-attachments/assets/f6bfc8e8-b6f3-4849-867f-94e5791b922f)
 
-## Testing
-- `go run ./cmd/mochi run tests/vm/valid/inner_join.mochi --ir` *(fails: unknown flag)*
+## Root Cause
 
+The `BackgroundCommandSenderHostedService` was passing the original caller's `CancellationToken` to background command execution:
 
-------
-https://chatgpt.com/codex/tasks/task_e_68610e47c0148320adf72b2fe8c94159",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T10:11:15Z,2025-06-29T10:23:01Z,2025-06-29T10:23:01Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3945,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve join performance with hashed left join"". Summary: add hash-based optimization for left joins, regenerate left join IR after optimization, update join benchmarks to reflect faster joins. This is clearly performance improvement. So label 'performance'.assistantfinalperformance",9,0.2644608294825942,False
-3186315425,3985,Add hashed outer join optimization,"## Summary
-- optimize join handling by adding `compileHashOuterJoin`
-- regenerate IR outputs for dataset JOB and VM tests
+```csharp
+await commandSender.SendAsync(commandContext.Command, CommandStrategy.Default, commandContext.Headers, commandContext.CancellationToken);
+```
 
-## Testing
-- `go test -tags slow ./tests/vm -run TestVM_IR -update`
-- `go run ./tools/update_job/main.go`
-- `go run ./tools/update_tpch/main.go` *(fails: index out of range)*
+This caused `CancellationTokenSource` instances from caller contexts to accumulate in memory, as they remained referenced during background processing.
 
-------
-https://chatgpt.com/codex/tasks/task_e_686163e02c688320885f98c03e2e9e81",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T16:14:00Z,2025-07-01T12:01:57Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3985,"analysisWe need to classify as performance or non-performance. The PR title: ""Add hashed outer join optimization"". Summary: ""optimize join handling by adding compileHashOuterJoin"". That is a performance optimization. So label 'performance'.assistantfinalperformance",9,0.23396824650954662,False
-3186381329,4002,Optimize outer join in VM,"## Summary
-- implement compileHashOuterJoin for hashed full outer join
-- wire outer join optimization into compileJoinQuery
-- document benchmark update for outer joins
-- regenerate `outer_join.ir.out`
+## Solution
 
-## Testing
-- `go build ./...`
+Changed the background command execution to use `CancellationToken.None`:
 
-------
-https://chatgpt.com/codex/tasks/task_e_6861722f141883208bff79fcb7c95f04",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T17:25:32Z,2025-06-29T17:26:25Z,2025-06-29T17:26:25Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4002,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize outer join in VM"". Summary: implement compileHashOuterJoin for hashed full outer join, wire outer join optimization into compileJoinQuery, document benchmark update for outer joins, regenerate outer_join.ir.out. This is about optimizing outer join, likely performance improvement. Keywords: optimize, performance, compileHashOuterJoin, benchmark update. So classification: performance.assistantfinalperformance",9,0.22585460969210946,False
-3186305026,3979,Improve VM join optimizer,"## Summary
-- add hashed right join implementation
-- regenerate IR golden for right join query
+```csharp
+await commandSender.SendAsync(commandContext.Command, CommandStrategy.Default, commandContext.Headers, CancellationToken.None);
+```
 
-## Testing
-- `go test ./tests/vm -tags slow -run '^TestVM_IR/right_join$' -update`
-- `go test ./...`
+## Why This Fix is Correct
 
-------
-https://chatgpt.com/codex/tasks/task_e_6861603fabc083208abf08472e70a251",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T16:01:05Z,2025-06-29T16:01:18Z,2025-06-29T16:01:18Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3979,"analysisWe need to classify whether the primary purpose is performance. The title: ""Improve VM join optimizer"". Summary: add hashed right join implementation, regenerate IR golden for right join query. This seems to be about adding a new join implementation, likely for performance. The description: ""Improve VM join optimizer"" suggests performance improvement. The keywords: ""hash"" join is usually for performance. The test mentions ""slow"" tag. But the primary purpose is to improve performance of join optimizer. So classification: performance.assistantfinalperformance",9,0.2061467861590623,False
-3142771614,2267,Improve SortedSet union,"## Summary
-- optimize `union` in SortedSet
-- avoid re-counting elements by tracking size during tree copy/merge
+1. **Semantically appropriate**: Background commands should execute independently of the original caller's cancellation context
+2. **Zero memory allocation**: `CancellationToken.None` is a singleton, eliminating per-command object creation
+3. **Service lifecycle preserved**: The service's own cancellation token continues to be used for channel operations and proper shutdown
+4. **Performance optimized**: No additional memory pressure under high-load scenarios
 
-## Testing
-- `moon fmt`
-- `moon info`
-- `moon test`
+## Validation
 
-------
-https://chatgpt.com/codex/tasks/task_e_684bd59b9ccc8320b5e9a44429fe1b2b",OpenAI_Codex,747051,bobzhang,open,2025-06-13T08:46:02Z,,,749681472,https://api.github.com/repos/moonbitlang/core,https://github.com/moonbitlang/core/pull/2267,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve SortedSet union"". Summary: ""optimize `union` in SortedSet avoid re-counting elements by tracking size during tree copy/merge"". This is about performance optimization. So classification: performance.assistantfinalperformance",9,0.1384423249836212,False
-3186433660,4011,Improve VM join compilation,"## Summary
-- add constant-empty checks before join compilation
-- generate simple nil-right loops for constant empty right side in left join
-- update golden IR outputs
+- ✅ Memory leak resolved under high-load testing
+- ✅ Service shutdown behavior maintained
+- ✅ No breaking changes to public APIs
+- ✅ Zero new compilation warnings
 
-## Testing
-- `go test ./tests/vm -tags slow -run TestVM_IR -update`
+Fixes #6449.
 
-------
-https://chatgpt.com/codex/tasks/task_e_6861820b3bfc8320989233ffc16bf14b",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T18:19:28Z,2025-07-01T12:01:37Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/4011,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve VM join compilation"". Body: adds constant-empty checks before join compilation, generate simple nil-right loops for constant empty right side in left join, update golden IR outputs. This seems to be about improving compilation of join operations in VM. Is that performance? It might be about improving compilation speed or runtime performance? The description: ""add constant-empty checks before join compilation"" and ""generate simple nil-right loops for constant empty right side in left join"". This likely improves runtime performance of join operations by generating simpler loops when right side is empty. That is a performance improvement. The PR is about improving VM join compilation, which likely reduces runtime overhead. So classify as 'performance'.
-
-Check keywords: ""performance"" not present but ""join compilation"" might be compile-time optimization. But the description indicates runtime improvement. So classification: performance.assistantfinalperformance",9,0.13164627816088822,False
-3185988908,3943,Optimize VM join loops,"## Summary
-- optimize join loops in `runtime/vm` with `OpLessInt` and cached null constants
-- update join benchmarks
-- regenerate IR golden files for VM tests
-- fold VM constant expressions without importing the interpreter
-
-## Testing
-- `go test ./tests/vm -tags slow -run TestVM_IR -update`
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `f.feedz.io`
+>   - Triggering command: `dotnet build` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to the custom allowlist in this repository's [Copilot coding agent settings](https://github.com/elsa-workflows/elsa-core/settings/copilot/coding_agent) (admins only)
+>
+> </details>
 
 
-------
-https://chatgpt.com/codex/tasks/task_e_6860fd4253048320b7a9b041def55989",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T09:57:37Z,2025-06-29T09:58:13Z,2025-06-29T09:58:13Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3943,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize VM join loops"". Summary: optimize join loops in runtime/vm with OpLessInt and cached null constants, update join benchmarks, regenerate IR golden files, fold VM constant expressions. This is about performance optimization. Keywords: optimize, benchmarks, performance. So classification: performance.assistantfinalperformance",9,0.1311181758343889,False
-3186235764,3969,Optimize set operations in VM,"## Summary
-- improve runtime performance of `Union`, `Except`, and `Intersect` opcodes by using map-based lookups
-- regenerate VM IR golden files
 
-## Testing
-- `go test ./...`
-- `go test -tags slow ./tests/vm -run TestVM_IR -update --vet=off`
+<!-- START COPILOT CODING AGENT TIPS -->
+---
 
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.
 
-------
-https://chatgpt.com/codex/tasks/task_e_686141e352588320961acbdd4321c4fa",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T14:41:31Z,2025-06-29T14:41:46Z,2025-06-29T14:41:46Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3969,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize set operations in VM"". Summary: improve runtime performance of Union, Except, Intersect opcodes by using map-based lookups. That is clearly performance improvement. So label 'performance'.assistantfinalperformance",9,0.11801277430494664,False
-3186289712,3974,Implement jump threading optimization,"## Summary
-- add `foldJumpChains` to collapse chains of jumps in the VM optimizer
-- update a few IR goldens affected by the new optimization
+<!-- Reviewable:start -->
+- - -
+This change is [<img src=""https://reviewable.io/review_button.svg"" height=""34"" align=""absmiddle"" alt=""Reviewable""/>](https://reviewable.io/reviews/elsa-workflows/elsa-core/6822)
+<!-- Reviewable:end -->
+",Copilot,198982749,Copilot,open,2025-07-25T09:55:55Z,,,151148482,https://api.github.com/repos/elsa-workflows/elsa-core,https://github.com/elsa-workflows/elsa-core/pull/6822,9,0.352612554438441,False
+3212306696,2307,Fix: Resolve browser multiplication issue in Puppeteer MCP server,"## Problem
+The Puppeteer MCP server was creating multiple Chrome browser instances with each tool call instead of reusing existing instances, leading to resource exhaustion and performance issues.
 
-## Testing
-- `go test ./...`
-- `go test ./tests/vm -tags slow -run TestVM_IR -update`
+### Symptoms
+- Chrome process count growing with each Puppeteer tool call
+- System resource exhaustion (memory, CPU)
+- Performance degradation over time
+- Multiple browser windows opening in non-headless mode
 
+## Root Cause
+The `ensureBrowser()` function had several critical issues:
+1. **Flawed browser restart logic**: New browsers were launched without properly closing existing ones
+2. **No browser health validation**: Dead browser instances were not detected
+3. **Missing process cleanup**: Orphaned Chrome processes accumulated
+4. **Race conditions**: Multiple concurrent tool calls could trigger multiple browser launches
 
-------
-https://chatgpt.com/codex/tasks/task_e_68615b6441988320883c603ef962eaa3",OpenAI_Codex,1218621,tamnd,closed,2025-06-29T15:42:14Z,2025-06-29T15:42:30Z,2025-06-29T15:42:30Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3974,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Implement jump threading optimization"". That sounds like an optimization to improve performance. The body: ""add foldJumpChains to collapse chains of jumps in the VM optimizer update a few IR goldens affected by the new optimization"". This is about optimizing VM jumps, likely performance. So classification: performance.assistantfinalperformance",9,0.10124097205995089,False
-3276217466,14939,Refactor json-ast go nodes,"## Summary
-- make Go json-ast nodes omit positions unless `IncludePositions` is enabled
-- regenerate Go cross_join AST without position info
+## Solution
+This PR implements a comprehensive fix with the following improvements:
+
+### 1. Browser Health Monitoring
+- Added `isBrowserHealthy()` function to validate browser connectivity and responsiveness
+- Checks both connection status and ability to retrieve pages with timeout protection
+
+### 2. Launch Concurrency Protection
+- Implemented `browserLaunching` flag to prevent concurrent browser launches
+- Ensures only one browser launch can occur at a time
+- Subsequent calls wait for the launch to complete
+
+### 3. Enhanced Graceful Cleanup
+- Improved browser closing with 5-second timeout protection
+- Falls back to process-level cleanup if graceful close fails
+- Added 500ms delay after cleanup to ensure proper resource release
+
+### 4. Process Signal Handlers
+- Added handlers for SIGINT, SIGTERM, SIGHUP, and uncaught exceptions
+- Ensures proper cleanup on server shutdown
+- Prevents orphaned processes on unexpected exits
+
+### 5. Chrome Process Cleanup
+- Implemented `cleanupChromeProcesses()` to kill orphaned Chrome instances
+- Uses platform-specific commands to ensure cleanup
+- Called on both normal and error paths
 
 ## Testing
-- `go test -tags slow ./tools/json-ast/x/go`
+Tested the fix extensively:
+- ✅ Multiple rapid tool calls (navigate, screenshot, evaluate)
+- ✅ Verified stable browser count (no multiplication)
+- ✅ Tested server restart scenarios
+- ✅ Confirmed backward compatibility
+- ✅ All existing functionality preserved
 
-------
-https://chatgpt.com/codex/tasks/task_e_6889d82efa60832099ae07638fcec6bf",OpenAI_Codex,1218621,tamnd,closed,2025-07-30T08:52:21Z,2025-07-30T08:52:32Z,2025-07-30T08:52:32Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/14939,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Refactor json-ast go nodes"". Summary: ""make Go json-ast nodes omit positions unless IncludePositions is enabled; regenerate Go cross_join AST without position info"". This seems to be about reducing memory usage or performance? Omit positions reduces memory footprint, maybe performance. But is it performance? The description: ""omit positions unless IncludePositions is enabled"" - that could be a performance optimization, but also a feature change. The cross_join AST regeneration without position info also reduces memory. The question: is the primary purpose to improve performance? It seems like a refactor to reduce memory usage and maybe speed. But is it explicitly about performance? The keywords: ""omit positions"" might reduce memory usage, but not necessarily speed. The PR might be about reducing memory usage, but that is a performance improvement. The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, etc. This PR does not contain those keywords. But the content indicates memory usage reduction. But the guidelines say ""or any other terms referring to how faster and efficiently software runs."" The PR is about omitting positions, which reduces memory usage, but not necessarily speed. But memory usage is a performance aspect. The guidelines mention memory. So this could be considered performance. However, the PR is more about refactoring and feature change. The primary purpose might be to reduce memory usage, which is a performance improvement. So classification: performance.assistantfinalperformance",9,0.07022380130721669,False
-3275629277,14800,Lowercase tags; drop method body,"## Summary
-- remove the `body` slice from `Method` in the C# AST inspector
-- regenerate all C# golden AST files without the `body` field
+### Before Fix
+- Started with 6 Chrome processes
+- After 4 tool calls: 15 processes
+- After 7 tool calls: 15+ processes (continuously growing)
+
+### After Fix
+- Stable at 15 processes regardless of tool call count
+- Proper reuse of existing browser instance
+- Clean shutdown with no orphaned processes
+
+## Breaking Changes
+None - this is a backward-compatible bug fix that maintains all existing APIs and behavior.
+
+## Notes
+- The fix is applied to the TypeScript source in the `archive-servers` branch
+- The compiled JavaScript output has been tested and verified
+- The same issue likely affects the npm-published version of `@modelcontextprotocol/server-puppeteer`
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,144542146,zitrono,closed,2025-07-08T12:13:09Z,2025-07-11T15:06:15Z,,890668799,https://api.github.com/repos/modelcontextprotocol/servers,https://github.com/modelcontextprotocol/servers/pull/2307,9,0.27204629033324607,True
+3088441203,6684,[WIP] Memory Leak while dispatching workflows,"Thanks for assigning this issue to me. I'm starting to work on it and will keep this PR's description up to date as I form a plan and make progress.
+
+Original issue description:
+
+> ## Description
+> In my usecase I dispatch a very hug number of workflows and I recognized an increasing memory usage.
+> 
+> ## Steps to Reproduce
+> Create a workflow which will be dispatched very often (my test dispatches about 200 workflows per second)
+> After about 1 minute I stop dispatching and wait another minute to be sure that all queues are empty.
+> 
+> ## Expected Behavior
+> The memory usage should be nearly the same es at startup time.
+> 
+> ## Actual Behavior
+> The memory is higher than expected.
+> Analysing the heap memory shows that there are a hugh number of CancellationTokenSources.
+> ![Image](https://github.com/user-attachments/assets/22cae843-d3e1-4485-98f0-1f43f3444829)
+> ![Image](https://github.com/user-attachments/assets/dbc72033-5040-44d0-9a50-1cad91601e9d)
+> 
+> ## Environment
+> - **Elsa Package Version**: 3.3.2
+> - **Operating System**: Windows 10
+> 
+> ## Troubleshooting Attempts
+> I created my own {Custom}BackgroundCommandSenderHostedService and changed the following code:
+> From
+> ```
+> private async Task ReadOutputAsync(Channel<ICommand> output, CancellationToken cancellationToken)
+> {
+> 	await foreach (var command in output.Reader.ReadAllAsync(cancellationToken))
+> 	{
+> 		try
+> 		{
+> 			using var scope = _scopeFactory.CreateScope();
+> 			var commandSender = scope.ServiceProvider.GetRequiredService<ICommandSender>();
+> 
+> 			await commandSender.SendAsync(command, CommandStrategy.Default, cancellationToken);
+> 		}
+> 		catch (Exception e)
+> 		{
+> 			_logger.LogError(e, ""An unhandled exception occured while processing the queue"");
+> 		}
+> 	}
+> }
+> ```
+> 
+> To
+> ```
+> private async Task ReadOutputAsync(Channel<ICommand> output, CancellationToken cancellationToken)
+> {
+> 	await foreach (var command in output.Reader.ReadAllAsync(cancellationToken))
+> 	{
+> 		try
+> 		{
+> 			using var scope = _scopeFactory.CreateScope();
+> 			var commandSender = scope.ServiceProvider.GetRequiredService<ICommandSender>();
+> 
+> 			await commandSender.SendAsync(command, CommandStrategy.Default, CancellationToken.None);
+> 		}
+> 		catch (Exception e)
+> 		{
+> 			_logger.LogError(e, ""An unhandled exception occured while processing the queue"");
+> 		}
+> 	}
+> }
+> ```
+> 
+> after that it gives this result:
+> ![Image](https://github.com/user-attachments/assets/f6bfc8e8-b6f3-4849-867f-94e5791b922f)
+> 
+> Any idea whats the problem here or how to fix this?
+> The strange thing is that there are no instances if I try to debug it.
+> The BackgroundCommandSenderHostedService has 4 items inside the _output variable and if I check the `UnboundedChannel` inside them the _items lists are empty and I'm also not able to find a big number of AsyncOperation items.
+> [UnboundedChannel source code](https://github.com/dotnet/runtime/blob/main/src/libraries/System.Threading.Channels/src/System/Threading/Channels/UnboundedChannel.cs)
+> 
+
+
+Fixes #6449.
+
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.
+
+<!-- Reviewable:start -->
+- - -
+This change is [<img src=""https://reviewable.io/review_button.svg"" height=""34"" align=""absmiddle"" alt=""Reviewable""/>](https://reviewable.io/reviews/elsa-workflows/elsa-core/6684)
+<!-- Reviewable:end -->
+",Copilot,198982749,Copilot,closed,2025-05-24T12:58:58Z,2025-05-24T19:25:55Z,,151148482,https://api.github.com/repos/elsa-workflows/elsa-core,https://github.com/elsa-workflows/elsa-core/pull/6684,9,0.25078450239651184,False
+2889429365,230,Fix: SeleniumScrapingTool initializes Chrome WebDriver only when needed,"# Fix: SeleniumScrapingTool initializes Chrome WebDriver only when needed
+
+Fixes #2258. Implements lazy initialization of the Chrome WebDriver in SeleniumScrapingTool to prevent unwanted browser windows and memory leaks.
+
+## Changes
+
+- Modified `SeleniumScrapingTool` to use lazy initialization of the Chrome WebDriver
+- The WebDriver is now only created when the tool is actually used, not when it's instantiated
+- Added a new `_create_driver_instance` method to handle the lazy initialization
+- Improved the `close` method to ensure proper cleanup of resources
+- Added tests to verify the lazy initialization behavior
 
 ## Testing
-- `go test ./tools/json-ast/x/cs -tags slow -update`
-- `go test ./tools/json-ast/x/cs -tags slow`
 
+All tests pass, including a new test specifically for the lazy initialization behavior.
+
+Link to Devin run: https://app.devin.ai/sessions/6ea1874aa8154fec80ec10d2f18b4ebe
+",Devin,158243242,devin-ai-integration[bot],closed,2025-03-02T09:18:02Z,2025-03-10T18:16:24Z,,742063678,https://api.github.com/repos/crewAIInc/crewAI-tools,https://github.com/crewAIInc/crewAI-tools/pull/230,9,0.202457117812279,False
+3138279170,541,Implement global PopenExecutor with tagging for improved process control and probe isolation,"## Problem
+
+The current architecture creates a separate `PopenExecutor` for each `FunctionContext`, which defeats the purpose of controlling concurrent external solver processes globally. This causes two main issues:
+
+1. **Poor process control**: Having multiple process pools prevents effective management of total concurrent solver processes across all tests
+2. **Probe isolation issues**: During invariant testing, all probes share a dummy `FunctionContext` with the same `PopenExecutor`, causing one probe's successful query to interrupt queries from other probes
+
+## Solution
+
+This PR implements a single global `PopenExecutor` with a tagging system that enables selective query interruption while maintaining test isolation.
+
+### Key Changes
+
+1. **Global PopenExecutor**: Created `get_global_executor()` function with singleton pattern and thread safety
+2. **Tagging System**: Added `tag` parameter to `PopenFuture` and `PathContext` for query grouping
+3. **Selective Interruption**: Added `interrupt(tag)` method to cancel queries by tag instead of shutting down entire executor
+4. **Architecture Cleanup**: Removed `executor` field from `SolvingContext` and updated all call sites
+
+### Implementation Details
+
+- Regular tests use function names as tags (e.g., `""testFoo""`)
+- Probes use unique tags (e.g., `""probe-MyContract-invariant_balance""`) 
+- Early exit now uses `interrupt(tag)` instead of `shutdown()` for selective cancellation
+- Global executor is properly registered with `ExecutorRegistry` for cleanup
+
+### Example Usage
+
+```python
+# Before: Each function had its own executor
+ctx.solving_ctx.executor.submit(future)  # Multiple executors
+ctx.solving_ctx.executor.shutdown()     # Shuts down whole executor
+
+# After: Single global executor with tagging
+get_global_executor().submit(future)    # One shared executor
+get_global_executor().interrupt(tag)    # Selective cancellation
+```
+
+### Testing
+
+Added comprehensive tests covering:
+- Global executor singleton behavior
+- Multi-threading safety
+- Tagging functionality in solver pipeline
+- Selective interruption by tag
+
+All existing tests continue to pass, ensuring backward compatibility.
+
+Fixes #540.
+
+> [!WARNING]
+>
+> <details>
+> <summary>Firewall rules blocked me from connecting to one or more addresses</summary>
+>
+> #### I tried to connect to the following addresses, but was blocked by firewall rules:
+>
+> - `binaries.soliditylang.org`
+>   - Triggering command: `forge build --ast --root tests/regression --extra-output storageLayout metadata ` (dns block)
+>
+> If you need me to access, download, or install something from one of these locations, you can either:
+>
+> - Configure [Actions setup steps](https://gh.io/copilot/actions-setup-steps) to set up my environment, which run before the firewall is enabled
+> - Add the appropriate URLs or hosts to my [firewall allow list](https://gh.io/copilot/firewall-config)
+>
+> </details>
+
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-06-11T22:37:20Z,,,577492459,https://api.github.com/repos/a16z/halmos,https://github.com/a16z/halmos/pull/541,9,0.20037138675107272,False
+3135395580,155658,Fix cudagraph record_stream memory leak,"## Summary
+- process pending events when ending allocation to a pool
+- test record_stream doesn't leak during capture
+
+## Testing
+- `python test/test_cuda.py -k test_graph_record_stream_no_leak -vv` *(fails: ModuleNotFoundError: No module named 'psutil')*
 
 ------
-https://chatgpt.com/codex/tasks/task_e_688986924e308320940d6a32f3905abf",OpenAI_Codex,1218621,tamnd,closed,2025-07-30T04:29:48Z,2025-07-30T04:30:23Z,2025-07-30T04:30:23Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/14800,"analysisWe need to classify whether the primary purpose is performance. The PR removes the body slice from Method in C# AST inspector, and regenerates golden AST files. This is about reducing memory usage? Removing body slice might reduce memory footprint, but is it performance? The description: ""Lowercase tags; drop method body"". The body slice likely contains method body AST nodes. Removing it reduces memory usage and maybe speed of parsing/generation. But is it about performance? The tags mention ""slow"" tests. They are updating golden AST files. The change is to drop method body to reduce memory usage? The description: ""remove the body slice from Method in the C# AST inspector"". That is a structural change. It might be to reduce memory usage or speed up AST generation. But the primary purpose? The PR is about dropping method body to reduce memory usage? The tags: ""slow"" tests. They are updating golden AST files. The change is not explicitly about performance, but about memory usage. The guidelines: performance-related PRs may contain keywords such as memory, optimization, leak, speed, perf, etc. The title: ""Lowercase tags; drop method body"". The body: ""remove the body slice from Method in the C# AST inspector"". That is a memory optimization. The guidelines mention memory as a keyword. So this is performance. So classify as 'performance'.assistantfinalperformance",9,0.057160297833114784,False
+https://chatgpt.com/codex/tasks/task_e_68483c71a96483238645dff24692b5ea",OpenAI_Codex,13564,ezyang,open,2025-06-11T03:56:27Z,,,65600975,https://api.github.com/repos/pytorch/pytorch,https://github.com/pytorch/pytorch/pull/155658,9,0.141991065399604,False
+3211366985,82,Fix memory leak in looping ambient sounds by implementing Restart_Loop method,"## Problem
+
+The game was experiencing a memory leak with looping ambient sounds. Over time, ""dead"" sound objects would accumulate in memory, causing performance degradation and potential crashes during gameplay.
+
+## Root Cause
+
+The issue was in the `AudibleSoundClass::Restart_Loop()` method, which was defined as an empty virtual function:
+
+```cpp
+virtual void Restart_Loop (void) {}
+```
+
+When infinite looping sounds completed a loop cycle, the audio system would follow this flow:
+1. `Update_Play_Position()` - detects when a loop completes
+2. `On_Loop_End()` - handles loop completion logic
+3. `Restart_Loop()` - **should** restart the sound for infinite loops
+
+However, since `Restart_Loop()` was empty, infinite looping ambient sounds would never actually restart. This left them in a ""dead"" state in memory while the system continued to track them, leading to memory accumulation over time.
+
+## Solution
+
+Implemented a proper `Restart_Loop()` method that mirrors the sound initialization logic from the `Play()` method:
+
+```cpp
+void AudibleSoundClass::Restart_Loop (void)
+{
+    MMSLockClass lock;
+
+    // Reset the timestamp to current time for a fresh loop
+    m_Timestamp = ::GetTickCount ();
+    
+    // Reset the current position to the start offset
+    m_CurrentPosition = m_StartOffset * m_Length;
+    
+    // If we have a valid handle, restart the sample playing
+    if (m_SoundHandle != NULL) {
+        m_SoundHandle->Start_Sample ();
+        
+        // If we have a start offset, seek to that position
+        if (m_CurrentPosition > 0) {
+            Seek (m_CurrentPosition);
+        }
+    }
+
+    return ;
+}
+```
+
+The implementation:
+- ✅ Resets timing information for accurate loop tracking
+- ✅ Handles sounds with start offsets correctly
+- ✅ Maintains thread safety with `MMSLockClass`
+- ✅ Follows existing codebase patterns and style
+- ✅ Only restarts audio playback without changing state or firing events
+
+## Files Modified
+
+- `GeneralsMD/Code/Libraries/Source/WWVegas/WWAudio/AudibleSound.cpp` - Added implementation
+- `GeneralsMD/Code/Libraries/Source/WWVegas/WWAudio/AudibleSound.h` - Updated declaration
+- `Generals/Code/Libraries/Source/WWVegas/WWAudio/AudibleSound.cpp` - Added implementation  
+- `Generals/Code/Libraries/Source/WWVegas/WWAudio/AudibleSound.h` - Updated declaration
+
+## Testing
+
+Created unit tests to verify the implementation handles:
+- ✅ Normal loop restart with timing reset
+- ✅ Sounds with start offsets
+- ✅ Null audio handle edge cases
+- ✅ Thread safety considerations
+
+## Impact
+
+This minimal fix ensures that infinite looping ambient sounds properly restart when completing loop cycles, preventing the accumulation of dead sound objects and resolving the memory leak. Players should experience improved stability during extended gameplay sessions with heavy ambient sound usage.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-08T07:23:20Z,2025-07-08T07:39:16Z,,940761501,https://api.github.com/repos/Fighter19/CnC_Generals_Zero_Hour,https://github.com/Fighter19/CnC_Generals_Zero_Hour/pull/82,9,0.13995068442432668,False
+3241057566,21146,[Core] Freeze gc during cuda graph capture to speed up init,"## Summary
+Speed up cudagraph capture loops by calling `gc.freeze` before capture. This speeds up cudagraph capture a huge amount, especially for small models. Qwen3-0.6B goes from 35s to 2s.
+For the ""proper"" approach we should possible use https://github.com/pytorch/pytorch/pull/158193 in a future torch release.
+
+## Testing
+
+Before
+```
+vllm serve Qwen/Qwen3-0.6B
+...
+Capturing CUDA graph shapes: 100%|███████| 67/67 [00:34<00:00,  1.92it/s]
+INFO 07-17 22:13:03 [gpu_model_runner.py:2283] Graph capturing finished in 35 secs, took 0.59 GiB
+```
+
+After
+```
+vllm serve Qwen/Qwen3-0.6B
+...
+Capturing CUDA graph shapes: 100%|███████| 67/67 [00:02<00:00, 28.07it/s]
+INFO 07-17 22:11:40 [gpu_model_runner.py:2294] Graph capturing finished in 2 secs, took 0.59 GiB
+```
+
+------
+https://chatgpt.com/codex/tasks/task_e_687972e21944832987a7bb6219d4c65b",OpenAI_Codex,3195154,mgoin,closed,2025-07-17T22:07:23Z,2025-07-24T00:20:14Z,2025-07-24T00:20:14Z,599547518,https://api.github.com/repos/vllm-project/vllm,https://github.com/vllm-project/vllm/pull/21146,9,0.13318074025049503,False
+3191369762,19,Fix bugs in frontend blocks,"Fix various bugs in frontend blocks, including import inconsistencies, a memory leak, and accessibility issues.",Cursor,3749759,alexpate,closed,2025-07-01T08:32:50Z,2025-07-01T08:33:20Z,2025-07-01T08:33:20Z,744656234,https://api.github.com/repos/trylinky/linky,https://github.com/trylinky/linky/pull/19,9,0.1303430419513335,False
+3240693840,1458,Disable uv-run,"## Summary
+- disable uv-run since it causes OOM by reinstalling CUDA torch every run
+
+## Testing
+- `make test` *(fails: Plugin errors and network calls to huggingface.co blocked)*
+
+------
+https://chatgpt.com/codex/tasks/task_e_68794cf6dfb48331b0f78adc90010675",OpenAI_Codex,9633,dlwh,closed,2025-07-17T19:33:10Z,2025-07-18T04:53:42Z,2025-07-18T04:53:42Z,775839592,https://api.github.com/repos/marin-community/marin,https://github.com/marin-community/marin/pull/1458,9,0.12446735355472927,False
+3278088521,30,Implement per-frame command allocators,"## Summary
+- allocate a D3D12 command allocator for each frame context
+- use the frame's allocator when recording the command list
+- release allocators when shutting down
+
+## Testing
+- `git status --short`
+
+------
+https://chatgpt.com/codex/tasks/task_e_688a64828ee48324a7d72f52934692e3",OpenAI_Codex,10033649,Sh0ckFR,closed,2025-07-30T18:32:13Z,2025-07-30T18:32:36Z,2025-07-30T18:32:36Z,233712297,https://api.github.com/repos/Sh0ckFR/Universal-Dear-ImGui-Hook,https://github.com/Sh0ckFR/Universal-Dear-ImGui-Hook/pull/30,9,0.10825143286399398,False
+3233770846,984,"fix: security, performance, and reliability issues in API","Fixes 3 critical bugs: insecure cookie parsing, `GlobalScope` memory leaks, and potential infinite loops in API pagination.",Cursor,80542861,mostafaalagamy,closed,2025-07-15T21:37:11Z,2025-07-16T17:08:53Z,2025-07-16T17:08:53Z,677376114,https://api.github.com/repos/mostafaalagamy/Metrolist,https://github.com/mostafaalagamy/Metrolist/pull/984,9,0.08624139850267623,False
+3215375260,2422,Fix bugs and consult AGENTS.md,"Fix multiple Unicode handling bugs and optimize string view creation for improved robustness and performance.
+
+The Unicode fixes address critical issues in JSON parsing and string iteration, preventing crashes and incorrect behavior when encountering malformed UTF-16 sequences, particularly surrogate pairs. Performance is improved by removing unnecessary intermediate object creations in string view functions.",Cursor,747051,bobzhang,closed,2025-07-09T10:15:40Z,2025-07-21T09:25:27Z,,749681472,https://api.github.com/repos/moonbitlang/core,https://github.com/moonbitlang/core/pull/2422,9,0.08293061361252518,False
+3203240366,432,Refactor harness for improved concurrency,"# Generated by Cursor Agent
+
+This PR refactors the entire harness and its dependencies to use `asyncio`/`anyio` and `aiodocker`.
+
+**Why this change?**
+Previously, keyboard interrupts (Ctrl+C) did not reliably clean up Docker containers and images due to synchronous operations. This refactoring addresses that by converting the codebase to an asynchronous model.
+
+**Key Changes:**
+*   **Asynchronous Core**: `terminal_bench/terminal/docker_compose_manager.py`, `terminal_bench/terminal/tmux_session.py`, and `terminal_bench/terminal/terminal.py` have been converted to use `async`/`await` patterns.
+*   **Docker Client**: Replaced `docker` SDK with `aiodocker` for asynchronous Docker interactions.
+*   **Subprocess Management**: Switched from `subprocess.run` to `anyio.run_process` for non-blocking subprocess execution.
+*   **Concurrency**: `terminal_bench/harness/harness.py` now uses `anyio.create_task_group` and semaphores instead of `ThreadPoolExecutor` for managing concurrent trials.
+*   **Simplified Cleanup**: Explicit signal handling for graceful shutdown was removed. `asyncio`'s built-in `CancelledError` propagation combined with `async with` context managers now ensures proper Docker resource cleanup on `KeyboardInterrupt` without additional complexity.
+*   **CLI Updates**: Main CLI entry points (`tb runs create`, `tb tasks build`, `tb tasks interact`) are now wrapped with `asyncio.run()`.
+
+**Benefits:**
+*   **Reliable Cleanup**: Docker containers and images are now consistently cleaned up even when the process is interrupted.
+*   **Improved Concurrency**: Better resource utilization and responsiveness through asynchronous I/O.
+*   **Simpler Code**: Removal of unnecessary signal handling logic.
+
+**Dependencies Added:**
+*   `aiodocker>=0.22.2`
+*   `anyio>=4.4.0`",Cursor,47223609,alexgshaw,closed,2025-07-04T16:24:29Z,2025-07-08T16:54:35Z,,918420677,https://api.github.com/repos/laude-institute/terminal-bench,https://github.com/laude-institute/terminal-bench/pull/432,9,0.0676467706308845,False
+3158983348,975,fix: docker container cleanup to prevent accumulation and system slowdown,"## Problem
+
+Docker containers were not being properly cleaned up after running experiments, causing containers to accumulate over time and making the system progressively slower. This issue occurred in three locations where containers were only cleaned up in success paths but not when exceptions occurred.
+
+## Root Cause
+
+The original code used manual container cleanup (`container.stop()` and `container.remove()`) in the success path, but when exceptions occurred, the cleanup code was never reached, leaving containers running or in an exited state.
+
+## Solution
+
+Implemented proper container cleanup using try-finally blocks to ensure containers are always cleaned up regardless of execution outcome:
+
+### 1. Main experiment execution (`rdagent/utils/env.py:_run_ret_code()`)
+```python
+# Before: cleanup only on success
+try:
+    container = client.containers.run(...)
+    # ... process logs ...
+    container.stop()
+    container.remove()  # Only reached on success
+except Exception:
+    raise  # Container left uncleaned
+
+# After: cleanup always happens
+container = None
+try:
+    container = client.containers.run(...)
+    # ... process logs ...
+finally:
+    if container is not None:
+        try:
+            container.stop()
+            container.remove()
+        except Exception as cleanup_error:
+            logger.warning(f""Failed to cleanup container: {cleanup_error}"")
+```
+
+### 2. Docker health check (`rdagent/app/utils/health_check.py:check_docker()`)
+Applied the same pattern to ensure test containers are cleaned up even when health checks fail.
+
+### 3. GPU availability test (`rdagent/utils/env.py:_gpu_kwargs()`)
+Fixed nvidia-smi test containers that were never being cleaned up at all:
+```python
+# Before: no cleanup
+client.containers.run(image, ""nvidia-smi"", **kwargs)
+
+# After: proper cleanup
+container = client.containers.run(image, ""nvidia-smi"", detach=True, **kwargs)
+container.wait()
+# ... cleanup in finally block
+```
+
+## Testing
+
+Created focused unit tests to verify the cleanup logic works correctly in all scenarios:
+- ✅ Successful execution with cleanup
+- ✅ Exception during execution with cleanup
+- ✅ Cleanup errors don't mask original exceptions
+
+## Impact
+
+This fix prevents Docker container accumulation that was causing the system to become slower over time during long-running experiment sessions.
+
+Fixes #971.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💬 Share your feedback on Copilot coding agent for the chance to win a $200 gift card! Click [here](https://survey.alchemer.com/s3/8343779/Copilot-Coding-agent) to start the survey.",Copilot,198982749,Copilot,closed,2025-06-19T05:22:42Z,2025-06-19T10:32:51Z,2025-06-19T10:32:51Z,781261349,https://api.github.com/repos/microsoft/RD-Agent,https://github.com/microsoft/RD-Agent/pull/975,9,0.0672487695507574,False
+3203515928,433,Set default sorting by duration,"# Made by Cursor
+
+This PR simplifies and streamlines task ordering within `terminal-bench`.
+
+**Key Changes:**
+
+*   **Default Duration Sorting**: The harness now automatically sorts tasks by duration (longest first) for optimal concurrent execution. The `--order-by-duration` CLI option has been removed.
+*   **Simplified Architecture**: The dedicated `TrialSorter` class and `SortingMethod` enum have been removed. The sorting logic is now a direct method (`sort_by_duration`) within the `Dataset` class.
+*   **Explicit Control**: The `Harness` explicitly calls `dataset.sort_by_duration()` after dataset initialization, providing clear control over when sorting occurs.
+*   **Improved Logging**: Task order is now logged using `logger.info` and `tabulate` for a professional, readable table, replacing previous print statements.
+*   **Consistent Path Handling**: `TaskPaths` is now used for `task.yaml` access within the sorting logic.",Cursor,47223609,alexgshaw,closed,2025-07-04T19:07:13Z,2025-07-08T22:56:58Z,2025-07-08T22:56:58Z,918420677,https://api.github.com/repos/laude-institute/terminal-bench,https://github.com/laude-institute/terminal-bench/pull/433,9,0.05961447600634143,False

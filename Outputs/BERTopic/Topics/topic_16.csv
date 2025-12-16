@@ -1,270 +1,1201 @@
-id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
-3250634096,14069,Speed up fast retail autocomplete,"## Summary
-- add `StockDTO` for lighter stock queries
-- autocomplete uses `StockDTO` results
-- assign selected stock using DTO id
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,Topic,Probability,Representative_document
+3241840766,147,feat: Add support for multiple tool calls in a single message,"## Description
+<\!-- Provide a brief description of the changes in this PR -->
+
+This PR adds support for executing multiple tool calls within a single message, significantly improving efficiency for tool-based environments and agent workflows. Agents can now make multiple tool calls in one turn instead of requiring separate round-trips for each tool.
+
+## Type of Change
+<\!-- Mark the relevant option with an ""x"" -->
+- [ ] Bug fix (non-breaking change which fixes an issue)
+- [x] New feature (non-breaking change which adds functionality)
+- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] Documentation update
+- [x] Test improvement
 
 ## Testing
-- `mvn -q -DskipTests package` *(fails: command not found)*
+<\!-- Describe the tests you ran to verify your changes -->
+- [x] All existing tests pass
+- [x] New tests have been added to cover the changes
+- [x] Tests have been run locally with `python -m pytest tests/`
 
-------
-https://chatgpt.com/codex/tasks/task_e_687ee62ebc20832fb7194755a6c2dde2",OpenAI_Codex,1226946,buddhika75,closed,2025-07-22T01:39:53Z,2025-07-22T01:40:14Z,2025-07-22T01:40:14Z,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/14069,"analysisWe need to classify as performance or non-performance. The title: ""Speed up fast retail autocomplete"". That indicates performance improvement. The body mentions adding StockDTO for lighter stock queries, using DTO results, assign selected stock using DTO id. So it's about speeding up autocomplete. So classification: performance.assistantfinalperformance",16,1.0,False
-3261340058,14153,Refactor payment creation for fast retail sales,"## Summary
-- delegate payment creation to `PaymentProcessingService`
+### Test Coverage
+<\!-- If applicable, mention the test coverage for new code -->
+- Current coverage: 100% for new functionality
+- Coverage after changes: Comprehensive edge case coverage including error handling, malformed input, and performance scenarios
 
-## Testing
-- `mvn clean compile` *(fails: Could not transfer artifact maven-clean-plugin from https://repo.maven.apache.org)*
+## Checklist
+- [x] My code follows the style guidelines of this project
+- [x] I have performed a self-review of my own code
+- [ ] I have commented my code, particularly in hard-to-understand areas
+- [ ] I have made corresponding changes to the documentation
+- [x] My changes generate no new warnings (tested with `-W error` flags and manual verification)
+- [x] Any dependent changes have been merged and published
 
-------
-https://chatgpt.com/codex/tasks/task_e_6882a636a6d8832f9138cb33f66ba543",OpenAI_Codex,1226946,buddhika75,closed,2025-07-24T21:38:26Z,2025-07-24T21:38:49Z,2025-07-24T21:38:48Z,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/14153,"analysisWe need to classify as performance or non-performance. The title: ""Refactor payment creation for fast retail sales"". The summary: delegate payment creation to PaymentProcessingService. The phrase ""fast retail sales"" might hint at performance? But it's about refactoring for fast retail sales. The content: ""Refactor payment creation for fast retail sales"". The phrase ""fast"" could be ambiguous. But the description: ""delegate payment creation to PaymentProcessingService"". That is a refactor, not necessarily performance. The phrase ""fast retail sales"" might be about speed, but it's not explicitly about performance improvement. The guidelines: performance-related PRs may contain keywords such as latency, optimization, slow, react, wait, memory, speed, responsive, minor, tim, instant, latenc, leak, lag, respons, stuck, perf, compile-time-hog, fast, hang, throughput, performance, perform, or any other terms referring to how faster and efficiently software runs. The word ""fast"" is included. But is that enough? The guidelines say ""or any other terms referring to how faster and efficiently software runs."" ""Fast"" is a term. But the context: ""fast retail sales"" might refer to the sales process being fast, not necessarily performance improvement. But it's ambiguous. The PR is about refactoring payment creation to a service. That might improve performance? Possibly, but the description doesn't explicitly mention performance. The guidelines: performance-related PRs may contain keywords such as... fast. So ""fast"" is a keyword. But we need to decide. The title: ""Refactor payment creation for fast retail sales"". That suggests the goal is to make payment creation faster for retail sales. That is performance. So likely performance. The summary: ""delegate payment creation to PaymentProcessingService"". That might be a refactor to improve performance. So classification: performance.assistantfinalperformance",16,1.0,False
-3248859844,14047,Implement optimized pharmacy retail sale page,"## Summary
-- add `PharmacySaleFastRetailSaleController` extending the existing sale controller
-- introduce `PharmacySaleQuick` privilege
-- create new page `pharmacy_fast_retail_sale.xhtml` without other sale buttons
-- link the new page from menu as *Sale (Fast)*
+## Additional Notes
+<\!-- Add any additional notes, screenshots, or context about the PR here -->
 
-## Testing
-- `mvn -v` *(fails: command not found)*
+### Key Features
+- **Multiple tool execution**: Parse and execute multiple `<tool>` tags in one message
+- **Backward compatibility**: Single tool calls work exactly as before (no breaking changes)
+- **Error resilience**: If one tool fails, others continue executing
+- **Smart formatting**: Multiple results labeled with tool names for clarity
 
-------
-https://chatgpt.com/codex/tasks/task_e_687e464da218832f9591a3a1672e8439",OpenAI_Codex,1226946,buddhika75,closed,2025-07-21T14:18:10Z,2025-07-21T14:30:35Z,2025-07-21T14:30:35Z,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/14047,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Implement optimized pharmacy retail sale page"". The body: adding a new controller, privilege, new page, link. The description says ""optimized"". But is it about performance? The keywords: ""optimized"" but not necessarily performance. The new page is ""pharmacy_fast_retail_sale.xhtml"" and menu link ""Sale (Fast)"". The term ""Fast"" might refer to speed. But is the primary purpose to improve performance? It might be to provide a faster UI for pharmacy retail sale. The description: ""Implement optimized pharmacy retail sale page"". That suggests performance improvement. The body: ""add PharmacySaleFastRetailSaleController extending the existing sale controller"" - maybe to speed up. ""create new page pharmacy_fast_retail_sale.xhtml without other sale buttons"" - maybe to reduce load. ""link the new page from menu as Sale (Fast)"". So yes, it's performance. The keywords: ""fast"" is a performance keyword. So classify as 'performance'.assistantfinalperformance",16,1.0,False
-3184427385,13447,Consolidate pharmacy sales queries,"## Summary
-- add `calDepartmentSalesAllInstitutions` to fetch sales for all institutions in one query
-- refactor `createInstitutionSale` to use the new aggregated result
+### Error Handling Details
+When one tool fails among multiple tools:
+1. **Execution continues**: Remaining tools are still executed sequentially
+2. **Error isolation**: Failed tool returns error message, but doesn't stop processing
+3. **Complete results**: All results (successful and failed) are included in the response
+4. **Clear identification**: Each tool result is labeled with the actual tool name
 
-## Testing
-- `mvn -q test` *(fails: command not found)*
+Example behavior with mixed success/failure:
+```
+add_tool result:
+15
 
-------
-https://chatgpt.com/codex/tasks/task_e_685f46a08b94832fb4535898a2b1a94d",OpenAI_Codex,1226946,buddhika75,closed,2025-06-28T01:38:26Z,2025-06-28T01:38:41Z,2025-06-28T01:38:41Z,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/13447,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Consolidate pharmacy sales queries"". Summary: add a new query to fetch sales for all institutions in one query, refactor createInstitutionSale to use aggregated result. This is about consolidating queries, likely to reduce number of queries, improving performance. The description mentions adding a query to fetch sales for all institutions in one query, refactor to use aggregated result. That is a performance improvement: reducing number of queries, likely faster. So classification: performance.assistantfinalperformance",16,1.0,False
-3253577106,14092,Switch fast retail autocomplete to StockDTO,"## Summary
-- update `PharmacyFastRetailSaleController` to store a StockDTO object and keep a cache of autocomplete results
-- update the StockDTO converter to resolve values from the cached list
-- adjust `pharmacy_fast_retail_sale.xhtml` autocomplete to use StockDTO
+invalid_tool result:
+Error: Unknown tool 'invalid_tool'. Please format your tool call as...
 
-## Testing
-- `mvn -q test` *(fails: Plugin org.apache.maven.plugins:maven-resources-plugin:2.6 could not be resolved)*
+search_tool result:
+Found results for: example query
+```
 
-------
-https://chatgpt.com/codex/tasks/task_e_687fcc65df74832f97b0d2461b286737",OpenAI_Codex,1226946,buddhika75,closed,2025-07-22T17:52:43Z,2025-07-22T17:53:06Z,2025-07-22T17:53:06Z,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/14092,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""Switch fast retail autocomplete to StockDTO"". Summary: update controller to store a StockDTO object and keep a cache of autocomplete results; update converter to resolve values from cached list; adjust xhtml. This seems to be about caching autocomplete results, likely to improve performance. The description mentions ""keep a cache of autocomplete results"". That is a performance improvement. So classify as 'performance'.assistantfinalperformance",16,1.0,False
-3155206359,13180,Implement bill item DTO for pharmacy income report,"## Summary
-- optimize pharmacy income & cost report by bill item
-- add `PharmacyIncomeCostBillItemDTO`
-- fetch bill item DTOs in `BillService`
-- support DTO rows in `IncomeBundle` and `IncomeRow`
-- adjust report controller and JSF view
-- allow loading bill by id in bill search
+### Technical Implementation
+- Added `XMLParser.parse_all()` method using `re.findall()` for multiple tag extraction
+- Enhanced `ToolEnv.env_response()` to handle sequential tool execution with per-tool error handling
+- Tool results labeled with actual tool names (e.g., ""add_tool result:"" vs ""Tool 1 result:"")
+- Maintains state consistency through sequential execution
+- Comprehensive error handling for mixed valid/invalid tool scenarios
 
-## Testing
-- `mvn test` *(fails: mvn not installed)*
+### Usage Example
+```xml
+<think>I need to use multiple tools efficiently</think>
+<tool>{""name"": ""search_tool"", ""args"": {""query"": ""example""}}</tool>
+<tool>{""name"": ""calculate_tool"", ""args"": {""a"": 5, ""b"": 10}}</tool>
+<tool>{""name"": ""format_tool"", ""args"": {""text"": ""result""}}</tool>
+```
 
-------
-https://chatgpt.com/codex/tasks/task_e_68521947c2f8832fb41575f65e61c6d2",OpenAI_Codex,1226946,buddhika75,closed,2025-06-18T01:59:36Z,2025-06-18T02:00:01Z,2025-06-18T02:00:01Z,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/13180,"analysisWe need to classify whether the primary purpose of the pull request is to improve performance. The PR title: ""Implement bill item DTO for pharmacy income report"". Summary: ""optimize pharmacy income & cost report by bill item"". That suggests performance optimization. The body mentions adding DTO, fetching DTOs, support DTO rows, adjust controller and view, allow loading bill by id. The summary explicitly says ""optimize pharmacy income & cost report by bill item"". That is a performance improvement. So classification: 'performance'.assistantfinalperformance",16,1.0,True
-3265223442,14186,14185 optimize stock deduction,"## Summary
-- add `OptimizedPharmacyBean` with batch stock deduction logic
-- integrate fast sale controller with optional optimized mode
-- test optimized stock deduction
+Results in:
+```
+search_tool result:
+Search results for example
 
-Closes #14185
+calculate_tool result:
+15
 
-------
-https://chatgpt.com/codex/tasks/task_e_6884761bf160832fada627f2e07b525e",OpenAI_Codex,1226946,buddhika75,closed,2025-07-26T06:40:50Z,2025-07-26T06:51:01Z,2025-07-26T06:51:01Z,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/14186,"analysisWe need to classify as performance or non-performance. The PR title: ""14185 optimize stock deduction"". Body: adds optimized logic, batch stock deduction, fast sale controller, optional optimized mode, test optimized stock deduction. The keywords: optimize, fast, optimized. This is performance improvement. So label 'performance'.assistantfinalperformance",16,1.0,False
-3155232556,13181,Implement bill item DTO for pharmacy income report,"## Summary
-- optimize pharmacy income & cost report by bill item
-- add `PharmacyIncomeCostBillItemDTO`
-- fetch bill item DTOs in `BillService`
-- support DTO rows in `IncomeBundle` and `IncomeRow`
-- adjust report controller and JSF view
-- allow loading bill by id in bill search
-- fix constructor clash and missing import
+format_tool result:
+Formatted: RESULT
+```
 
-Closes #13176
+### Performance
+Tested with 15+ concurrent tool calls with no performance degradation. Sequential execution ensures tool state consistency while providing significant efficiency gains for agent workflows.
 
-## Testing
-- `mvn test` *(fails: mvn not installed)*
+🤖 Generated with [Claude Code](https://claude.ai/code)
 
-------
-https://chatgpt.com/codex/tasks/task_e_68521947c2f8832fb41575f65e61c6d2",OpenAI_Codex,1226946,buddhika75,closed,2025-06-18T02:17:13Z,2025-06-18T02:19:34Z,2025-06-18T02:19:34Z,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/13181,"analysisWe need to classify whether the primary purpose of the pull request is to improve performance. The PR title: ""Implement bill item DTO for pharmacy income report"". The body: ""optimize pharmacy income & cost report by bill item"". That suggests optimization. But is it performance? The description: ""optimize pharmacy income & cost report by bill item"" - could be performance improvement. The body mentions adding DTO, fetching DTOs, support DTO rows, adjust controller and view, allow loading bill by id, fix constructor clash and missing import. The main change is adding DTOs for bill items to optimize the report. That likely improves performance by reducing data load or processing. The keywords: optimize, performance. The classification: performance. So output 'performance'.assistantfinalperformance",16,1.0,True
-3265736885,14205,14196 performance bottleneck fix,"## Summary
-- cache ItemBatch and Stock references on Pharmacy fast retail sale operations
+Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,6443210,PastaPastaPasta,open,2025-07-18T04:47:18Z,,,920603619,https://api.github.com/repos/willccbb/verifiers,https://github.com/willccbb/verifiers/pull/147,16,1.0,False
+3171559766,2085,Create PR to deactivate thinking field,"The browser-use agent's ""thinking"" field can now be optionally deactivated.
 
-Closes #14196
+Key changes include:
 
-------
-https://chatgpt.com/codex/tasks/task_e_6884e0c4a494832f815c86b1f675cc78",OpenAI_Codex,1226946,buddhika75,closed,2025-07-26T14:22:12Z,2025-07-26T15:42:31Z,,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/14205,"analysisWe need to classify as performance or non-performance. The title: ""14196 performance bottleneck fix"". That clearly indicates performance. Body: ""cache ItemBatch and Stock references on Pharmacy fast retail sale operations"". That is performance improvement. So classification: performance.assistantfinalperformance",16,1.0,False
-3267689271,14269,Implement fast sale for cashier page and controller,"## Summary
-- add PharmacyFastRetailSaleForCashierController for optimized cashier flow
-- create `pharmacy_fast_retail_sale_for_cashier.xhtml` page
-- expose new menu item ""Sale for Cashier - By Item""
-- document new navigation path
+*   A `disable_thinking: bool = False` parameter was added to the `Agent` class in `browser_use/agent/service.py`, defaulting to `False` for backward compatibility.
+*   The `SystemPrompt` in `browser_use/agent/prompts.py` was updated to conditionally remove the `<reasoning_rules>` section and the ""thinking"" field from the output format when `disable_thinking` is `True`.
+*   The `thinking` field in `AgentBrain` and `AgentOutput` models within `browser_use/agent/views.py` was made optional (`str | None = None`).
+*   The `MessageManager` in `browser_use/agent/message_manager/service.py` was modified to conditionally include the ""thinking"" field in example outputs.
+*   Logging in `browser_use/agent/service.py` was adjusted to only log the thinking content if it is present.
 
-## Testing
-- `./detect-maven.sh test` *(failed: Plugin resolution error)*
+This allows for reduced token usage, faster responses, and better compatibility with models that perform optimally without explicit reasoning steps.
+    
+<!-- This is an auto-generated description by cubic. -->
+---
 
-------
-https://chatgpt.com/codex/tasks/task_e_6886bc70fc44832fa2011054b9c30d38",OpenAI_Codex,1226946,buddhika75,closed,2025-07-28T01:44:21Z,2025-07-28T01:44:37Z,2025-07-28T01:44:37Z,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/14269,"analysisWe need to classify as performance or non-performance. The PR title: ""Implement fast sale for cashier page and controller"". The summary mentions ""optimized cashier flow"". The page is ""fast sale"". The description: ""add PharmacyFastRetailSaleForCashierController for optimized cashier flow"". That suggests performance improvement. Keywords: fast, optimized. So it's performance. So output: performance.assistantfinalperformance",16,1.0,False
-3153919447,13158,Add PharmacyIncomeRow DTO and use it for cost report,"## Summary
-- introduce `PharmacyIncomeRow` lightweight DTO
-- fetch only selected fields in `BillService.fetchPharmacyIncomeRows`
-- update `IncomeBundle` and `IncomeRow` to support the DTO
-- use the lightweight DTO in pharmacy income & cost report
-- adjust report page to reference new DTO fields
-- expose helper to fetch bills by id for view actions
+## Summary by cubic
+Added an option to disable the ""thinking"" field in agent responses, allowing for shorter outputs and better compatibility with some models.
 
-## Testing
-- `mvn -version` *(fails: command not found)*
+- **New Features**
+  - Added a `disable_thinking` parameter to the Agent and related classes.
+  - When enabled, removes the ""thinking"" field from prompts, outputs, and logs.
+  - Keeps existing behavior by default for backward compatibility.
 
-------
-https://chatgpt.com/codex/tasks/task_e_68518673d000832f8c0b0b987ac16be5",OpenAI_Codex,1226946,buddhika75,closed,2025-06-17T15:28:28Z,2025-06-17T15:28:55Z,2025-06-17T15:28:55Z,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/13158,"analysisWe need to classify whether the primary purpose of the PR is to improve performance. The PR adds a lightweight DTO for pharmacy income rows, fetches only selected fields, updates IncomeBundle and IncomeRow to support DTO, uses DTO in pharmacy income & cost report, adjusts report page, exposes helper to fetch bills by id. This seems to be about reducing data fetched, making DTO lightweight, likely for performance improvement. The description: ""introduce PharmacyIncomeRow lightweight DTO"" and ""fetch only selected fields"" suggests performance optimization. So classification: 'performance'.assistantfinalperformance",16,1.0,False
-3266988027,14257,14221 optimize opd itemized sale summary report using dtos,"## Summary
-- add OpdSaleSummaryDTO and BillService query for OPD sale summaries
-- add controller methods and navigation to new DTO-based summary
-- expose config options for report optimization
-- create itemized_sale_summary_dto.xhtml for optimized view
+<!-- End of auto-generated description by cubic. -->
 
-Closes #14221
-
-------
-https://chatgpt.com/codex/tasks/task_e_6885fadd9f08832fbc441cd0cf4eb548",OpenAI_Codex,1226946,buddhika75,closed,2025-07-27T10:50:29Z,2025-07-27T10:50:48Z,2025-07-27T10:50:48Z,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/14257,"analysisWe need to classify as performance or non-performance. The title: ""14221 optimize opd itemized sale summary report using dtos"". The body: mentions adding DTOs, query, controller methods, config options for report optimization, create view. The keyword ""optimize"" suggests performance. Also ""report optimization"". So likely performance. So label 'performance'.assistantfinalperformance",16,0.24615032148494245,False
-3267205179,14263,Optimize OPD Income Report with DTO queries,"## Summary
-- add `OpdIncomeReportDTO` with basic and detailed constructors
-- extend `IncomeRow` and `IncomeBundle` for new DTO
-- implement `BillService.fetchOpdIncomeReportDTOs`
-- support optimized navigation in `OpdReportController`
-- add DTO-based page `opd_income_report_dto.xhtml`
-- include navigation toggle on legacy page
-- add unit tests for DTO query method
-
-Navigation Path for QA Testing:
-1. OPD → Analytics → Summary Reports → **OPD Income Report**
-2. Toggle between Legacy/Optimized pages using buttons
-3. Configuration key `OPD Income Report - Optimized Method` enables optimized page by default
-
-Closes #0
-
-------
-https://chatgpt.com/codex/tasks/task_e_68863a3d9138832f81b137eb92008883",OpenAI_Codex,1226946,buddhika75,closed,2025-07-27T15:35:45Z,2025-07-27T15:36:08Z,2025-07-27T15:36:08Z,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/14263,"analysisWe need to classify as performance or non-performance. The PR title: ""Optimize OPD Income Report with DTO queries"". The body describes adding DTO queries, optimizing navigation, adding DTO-based page, unit tests. The keywords: ""Optimize"", ""DTO queries"", ""optimized navigation"", ""performance"". The description mentions ""Optimize OPD Income Report"". So it's performance. So classification: performance.assistantfinalperformance",16,0.17608758322603757,False
-3266987057,14255,14220 optimize laboratory income report using dtos,"## Summary
-- add configuration defaults for lab income report
-- implement LabIncomeReportDTO and service method
-- update Lab report controller with DTO generation and navigation methods
-- add optimized DTO page and navigation toggle
-
-Navigation Path for QA Testing:
-1. Navigate to Reports → Lab → Income Reports
-2. Select ""Laboratory Income Report""
-3. Use navigation buttons to switch between Legacy and Optimized methods
-
-Closes #14220
-
-------
-https://chatgpt.com/codex/tasks/task_e_6885fa8ebe38832fac4647a4d6442a92",OpenAI_Codex,1226946,buddhika75,closed,2025-07-27T10:48:48Z,2025-07-27T10:49:11Z,2025-07-27T10:49:11Z,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/14255,"analysisWe need to classify as performance or non-performance. The PR title: ""14220 optimize laboratory income report using dtos"". The body: mentions adding configuration defaults, implementing DTO, service method, updating controller, adding optimized DTO page and navigation toggle. The focus is on optimization, but is it performance? The description says ""optimize laboratory income report using dtos"". That suggests performance improvement. The keywords: optimize, DTOs, maybe performance. The body doesn't mention memory, speed, latency, etc. But ""optimize"" is a strong indicator. The instruction says performance-related PR may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. ""optimize"" is included. So classify as 'performance'.
-
-Thus answer: performance.assistantfinalperformance",16,0.15218597491250088,True
-3266989317,14259,14219 optimize test wise count report using dto,"## Summary
-- add TestCountDTO for DTO-based lab test count results
-- configure report method defaults
-- support optimized Test Wise Count report in `LaborataryReportController`
-- add navigation buttons for optimized/legacy Test Wise Count reports
-- create `test_wise_count_dto.xhtml` with DTO logic
-
-Navigation Path for QA Testing:
-1. Reports → Lab → Test Reports → Test Wise Count
-2. Use navigation buttons to switch between Legacy and Optimized methods
-
-Closes #14219
-
-------
-https://chatgpt.com/codex/tasks/task_e_6885f999d6b4832fb69bbaf5196941e4",OpenAI_Codex,1226946,buddhika75,closed,2025-07-27T10:52:42Z,2025-07-27T10:53:06Z,2025-07-27T10:53:06Z,21764480,https://api.github.com/repos/hmislk/hmis,https://github.com/hmislk/hmis/pull/14259,"analysisWe need to classify as performance or non-performance. The PR title: ""14219 optimize test wise count report using dto"". The body: adding DTO, configure report method defaults, support optimized Test Wise Count report, navigation buttons, create xhtml with DTO logic. The focus is on optimizing test wise count report using DTO. This is about performance optimization. The keywords: optimize, DTO, report, but not explicitly performance. But ""optimize"" indicates performance improvement. The guidelines: performance-related PR may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. ""optimize"" is a keyword. So classify as 'performance'.assistantfinalperformance",16,0.14996926764722635,False
-3151769530,282,Fix unsupported conversion caching,"## Summary
-- cache missing conversions inside `Converter.convert`
-- document caching behavior in `changelog.md`
+",Cursor,22038471,mertunsall,closed,2025-06-24T11:08:50Z,2025-06-24T12:02:25Z,,881458615,https://api.github.com/repos/browser-use/browser-use,https://github.com/browser-use/browser-use/pull/2085,16,1.0,False
+3155802145,849,Add shm volume to selenium pod recipe,"## Summary
+- update selenium recipe with /dev/shm volume
+- document that the 2Gi volume mirrors devcontainer and CI
 
 ## Testing
-- `mvn -q test` *(fails: mvn not found)*
+- `cargo fmt --all`
+- `cargo check -q` *(fails: called `Result::unwrap()` on an `Err` value)*
 
 ------
-https://chatgpt.com/codex/tasks/task_b_6850c71728cc832a94d5dc3ec0829fc8",OpenAI_Codex,5373774,jdereg,closed,2025-06-17T01:41:48Z,2025-06-17T01:41:57Z,2025-06-17T01:41:57Z,12670630,https://api.github.com/repos/jdereg/java-util,https://github.com/jdereg/java-util/pull/282,"analysisWe need to classify the pull request as performance or non-performance. The PR title: ""Fix unsupported conversion caching"". Summary: ""cache missing conversions inside Converter.convert - document caching behavior in changelog.md"". This is about caching missing conversions. That is a performance improvement? Caching can improve performance by avoiding repeated work. But the description says ""Fix unsupported conversion caching"". It might be about caching missing conversions to avoid repeated errors? The change is about caching missing conversions inside Converter.convert. That likely improves performance by caching missing conversions to avoid repeated expensive operations. But is it primarily performance? It might be a bug fix: caching missing conversions to avoid repeated errors. But caching is a performance improvement. The description: ""cache missing conversions inside Converter.convert"". That is a performance improvement. The PR is about caching missing conversions. That is a performance improvement. So classify as 'performance'.
-
-Check if any other context: The PR is about caching missing conversions. That is a performance improvement. So answer: performance.assistantfinalperformance",16,0.1356499156533608,False
-3253681594,1131,Fix repeated cache misses for nonexistent options,"## Summary
-- prevent redundant remote lookups when `get_option()` queries missing options by checking `notoptions` first
+https://chatgpt.com/codex/tasks/task_e_68526a9b6168832084855aefcfae2589",OpenAI_Codex,173255911,242816,closed,2025-06-18T07:33:24Z,2025-06-18T07:46:56Z,2025-06-18T07:46:56Z,663396489,https://api.github.com/repos/bionic-gpt/bionic-gpt,https://github.com/bionic-gpt/bionic-gpt/pull/849,16,1.0,False
+3210894862,91,Optimize tool agent prompt usage,"## Summary
+- ensure orchestrator only sees concise instructions for each tool-agent
+- list full tool schemas only when running tool agents directly
+- add a flag for including tool schemas in RunSessionWithHook
 
 ## Testing
-- `composer install`
-- `./vendor/bin/phpunit` *(fails: require_once(/tmp/wordpress-tests-lib/includes/functions.php): No such file or directory)*
+- `go test ./...` *(fails: Get ""https://proxy.golang.org/..."": Forbidden)*
 
 ------
-https://chatgpt.com/codex/tasks/task_b_687fd6a72e188328986f67952dce65fe",OpenAI_Codex,49331357,jamesros161,closed,2025-07-22T18:30:26Z,2025-07-22T18:41:58Z,2025-07-22T18:41:58Z,125211182,https://api.github.com/repos/BoldGrid/w3-total-cache,https://github.com/BoldGrid/w3-total-cache/pull/1131,"analysisWe need to classify the pull request as performance or non-performance. The title: ""Fix repeated cache misses for nonexistent options"". Summary: ""prevent redundant remote lookups when get_option() queries missing options by checking notoptions first"". This is about caching and reducing remote lookups, which is a performance improvement. It reduces repeated cache misses, which is a performance optimization. So classification: performance.assistantfinalperformance",16,0.13551365781454983,False
-3242428313,23,Fix support check caching,"## Summary
-- optimize IsSupported by caching the computed result in `PassthroughCameraUtils`
+https://chatgpt.com/codex/tasks/task_e_686c8e7ba8348328bed227e3063b0439",OpenAI_Codex,1919951,Art9681,closed,2025-07-08T03:33:08Z,2025-07-09T22:19:07Z,,927421008,https://api.github.com/repos/intelligencedev/manifold,https://github.com/intelligencedev/manifold/pull/91,16,1.0,False
+3096663962,983,feat: enhance text generation panel with execution time and token usage display,"## Overview
+
+This PR enhances the text generation panel in the workflow designer UI by adding execution time and token usage information to improve user visibility into generation performance and cost metrics.
+
+<img width=""727"" alt=""image"" src=""https://github.com/user-attachments/assets/8e18699b-0b04-490c-b7f8-5fc19cdd75de"" />
+
+
+## Changes
+
+### 🏗️ Core Schema Updates
+- **Added `GenerationUsage` schema** to track prompt/completion tokens
+- **Enhanced generation data structure** with optional `usage` field in completed generations
+- **Integrated token usage tracking** when completing text generation
+
+### 🕒 Execution Time Display
+- **Added execution time indicator** next to the ""Result"" header showing how long each generation took
+- **Implemented smart time formatting**:
+  - All durations under 1 minute: displayed in milliseconds with comma formatting (e.g., `1,234ms`, `15,678ms`)
+  - Durations over 1 minute: displayed in minutes and seconds format (e.g., `2m 30s`)
+- **Added timer icon** for clear visual indication
+
+### 📊 Token Usage Display
+- **Added token usage metrics** in the generation panel header for completed generations
+- **Displays key metrics**:
+  - **Prompt tokens** (↗): Input tokens consumed
+  - **Completion tokens** (↘): Output tokens generated
+- **Compact, icon-based design** with proper number formatting using locale-aware comma separators
+- **Positioned strategically** next to the ""Result"" header for easy reference
+
+### 🎨 UI/UX Improvements
+- **Consistent styling** with existing design patterns using proper color tokens and typography
+- **Responsive layout** that integrates seamlessly with existing panel structure
+- **Performance-conscious rendering** - only displays when data is available
+- **Proper TypeScript handling** with appropriate type casting for usage data
+
+## Technical Details
+
+### Files Modified
+- **Data Schema**: Core generation usage tracking infrastructure
+- **Generation Panel**: `internal-packages/workflow-designer-ui/src/editor/properties-panel/text-generation-node-properties-panel/generation-panel.tsx`
+- **Generation View**: `internal-packages/workflow-designer-ui/src/ui/generation-view.tsx`
+
+### Key Implementation Features
+- **Helper function `formatExecutionTime()`** for consistent time formatting across the application
+- **Conditional rendering** based on generation status and data availability
+- **Proper icon integration** using Lucide React icons (`TimerIcon`, `ArrowUpIcon`, `ArrowDownIcon`)
+- **Number formatting** using `toLocaleString()` for better readability
+- **Type-safe usage data handling** with appropriate TypeScript patterns
+
+## Before vs After
+
+**Before:**
+- No execution time visibility
+- No token usage information in panel header
+- Users couldn't easily assess generation performance or cost
+- Basic generation completion tracking only
+
+**After:**
+- Clear execution time display: `1,234ms`, `15,678ms`, `2m 30s`
+- Token usage metrics: `↗ 1,234t ↘ 567t`
+- Enhanced user experience with actionable performance data
+- Complete generation analytics infrastructure
+
+## Benefits
+
+1. **Performance Monitoring**: Users can now track how long their generations take
+2. **Cost Awareness**: Token usage display helps users understand API consumption
+3. **Better UX**: Immediate feedback on generation efficiency
+4. **Debugging Aid**: Execution time helps identify performance bottlenecks
+5. **Resource Planning**: Token metrics assist in usage optimization
+6. **Data Foundation**: Establishes infrastructure for future analytics features
 
 ## Testing
-- `true`
+
+- ✅ Displays correctly for completed generations with usage data
+- ✅ Gracefully handles generations without usage information
+- ✅ Time formatting works correctly for various duration ranges
+- ✅ Token numbers display with proper formatting
+- ✅ UI remains responsive and visually consistent
+- ✅ No impact on generations in progress or failed states
+- ✅ Schema changes maintain backward compatibility
+
+## Build & Type Safety
+
+- ✅ `turbo build --filter '@giselle-sdk/*' --filter giselle-sdk --cache=local:rw`
+- ✅ `turbo check-types --cache=local:rw`
+- ✅ `turbo test --cache=local:rw`
+
+## Future Considerations
+
+This enhancement provides the foundation for future improvements such as:
+- Historical performance tracking
+- Cost estimation features
+- Performance optimization recommendations
+- Usage analytics dashboard
+- Cost optimization alerts
+
+<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
+
+## Summary by CodeRabbit
+
+- **New Features**
+  - Added a visual section displaying detailed usage statistics for completed text generations, including execution time, prompt tokens, and completion tokens.
+  - Execution time is now shown in a user-friendly format with a timer icon, and token counts are accompanied by intuitive icons.
+- **Style**
+  - Improved visual clarity by adding spacing in the generation message view.
+
+<!-- end of auto-generated comment: release notes by coderabbit.ai -->",OpenAI_Codex,535254,toyamarinyon,closed,2025-05-28T09:22:12Z,2025-05-29T00:21:35Z,2025-05-29T00:21:35Z,845317529,https://api.github.com/repos/giselles-ai/giselle,https://github.com/giselles-ai/giselle/pull/983,16,1.0,True
+3126110678,829,k8s(resources): tune workloads and add pedrobot db,"## Summary
+- tune CPU & memory requests across infrastructure and apps
+- document resource profiles
+- add MongoDB StatefulSet for pedrobot
+
+## Testing
+- `yamllint -c .yamllint.yml <files>` *(warnings about document start and comments)*
+- `kustomize build --enable-helm k8s/applications/web/pedrobot`
+- `kustomize build --enable-helm k8s/applications/web/babybuddy`
+- `kustomize build --enable-helm k8s/applications/tools/whoami`
+- `kustomize build --enable-helm k8s/applications/tools/unrar`
+- `kustomize build --enable-helm k8s/applications/tools/it-tools`
+- `kustomize build --enable-helm k8s/applications/network/omada`
+- `kustomize build --enable-helm k8s/applications/media/whisperasr`
+- `kustomize build --enable-helm k8s/applications/media/sabnzbd`
+- `kustomize build --enable-helm k8s/applications/media/jellyseerr`
+- `kustomize build --enable-helm k8s/applications/media/jellyfin`
+- `kustomize build --enable-helm k8s/applications/media/immich/immich-server`
+- `kustomize build --enable-helm k8s/applications/media/immich/immich-ml`
+- `kustomize build --enable-helm k8s/applications/automation/mqtt`
+- `kustomize build --enable-helm k8s/applications/ai/karakeep`
+- `kustomize build --enable-helm k8s/applications/ai/openwebui`
+- `kustomize build --enable-helm k8s/infrastructure/controllers/argocd` *(failed: helm repo inaccessible)*
+- `kustomize build --enable-helm k8s/applications/media/immich/immich-redis` *(failed: helm repo inaccessible)*
+- `kustomize build --enable-helm k8s/infrastructure/storage/longhorn` *(failed: helm repo inaccessible)*
+
 
 ------
-https://chatgpt.com/codex/tasks/task_e_68795b28463c8322add25fad6a55a179",OpenAI_Codex,88709627,xrdevrob,closed,2025-07-18T08:44:15Z,2025-07-18T21:24:10Z,2025-07-18T21:24:10Z,939922153,https://api.github.com/repos/xrdevrob/QuestCameraKit,https://github.com/xrdevrob/QuestCameraKit/pull/23,"analysisWe need to classify as performance or non-performance. The PR title: ""Fix support check caching"". Summary: ""optimize IsSupported by caching the computed result in PassthroughCameraUtils"". This is about caching to avoid recomputation, improving performance. So classification: performance.assistantfinalperformance",16,0.12552220055206947,False
-3161574503,335,Add cache-backed type support checks,"## Summary
-- speed up `Converter` type checks
-- add single-argument support methods with caching
-- document new APIs in the user guide
-- note addition in the changelog
-- test single-argument support methods
+https://chatgpt.com/codex/tasks/task_e_68437705b0848322ab44b13fcb63a27c",OpenAI_Codex,39008574,theepicsaxguy,closed,2025-06-06T23:38:47Z,2025-06-06T23:53:29Z,2025-06-06T23:53:29Z,933720213,https://api.github.com/repos/theepicsaxguy/homelab,https://github.com/theepicsaxguy/homelab/pull/829,16,1.0,False
+3214936781,2451,feat: upgrade deep-modeling-workflow to medium-1x machine spec,"# feat: upgrade deep-modeling-workflow to medium-1x machine spec
+
+## Summary
+
+This PR addresses OOM (Out of Memory) crashes occurring in the `deep-modeling-workflow` by upgrading the Trigger.dev execution machine specification from the default to `medium-1x` (2GB memory).
+Fees will increase, but have been agreed upon by the team.
+
+Ikeda: I confirmed the operation as follows.
+
+<img width=""1117"" alt=""スクリーンショット_2025-07-09_17_18_01"" src=""https://github.com/user-attachments/assets/e19a38b1-ec55-422f-9a4c-6c2718861361"" />
+
+<img width=""1105"" alt=""スクリーンショット_2025-07-09_17_20_40"" src=""https://github.com/user-attachments/assets/c18f010d-6e30-449b-b0d9-ae57eb813abc"" />
+
+
+**Changes made:**
+- Added `machine: 'medium-1x'` configuration to the `deepModelingWorkflowTask` in `/frontend/internal-packages/jobs/src/trigger/deepModelingWorkflowTask.ts`
+- This increases the available memory from the default (512MB) to 2GB for the deep modeling workflow execution
+
+**Impact:**
+- Should prevent OOM crashes during deep modeling workflow execution
+- May increase runtime costs due to higher machine specifications
+- Only affects the `deep-modeling-workflow` task, other tasks remain unchanged
+
+## Review & Testing Checklist for Human
+
+**Risk Level: 🟡 Medium** (2 items)
+
+- [ ] **Verify machine specification**: Confirm that `medium-1x` is a valid machine configuration according to [Trigger.dev documentation](https://trigger.dev/docs/machines#machine-configurations) and that the syntax is correct
+- [ ] **Test workflow functionality**: Trigger the deep modeling workflow through the web app to ensure it still executes successfully with the new machine specification (the actual OOM prevention can only be verified in production under load)
+
+**Recommended test plan:**
+1. Deploy to staging/production environment
+2. Trigger a deep modeling workflow through the web app
+3. Monitor execution logs for successful completion
+4. Monitor for reduced OOM crashes in production over the next few days
+
+---
+
+### Diagram
+
+```mermaid
+%%{ init : { ""theme"" : ""default"" }}%%
+graph TB
+    subgraph ""Frontend Apps""
+        App[""frontend/apps/app/api/chat/route.ts""]
+        CreateSession[""frontend/apps/app/features/sessions/actions/createSession.ts""]
+    end
+    
+    subgraph ""Jobs Package""
+        Task[""frontend/internal-packages/jobs/src/trigger/deepModelingWorkflowTask.ts""]:::major-edit
+        Config[""frontend/internal-packages/jobs/trigger.config.ts""]:::context
+    end
+    
+    subgraph ""Agent Package""
+        DeepModeling[""frontend/internal-packages/agent/src/deepModeling.ts""]:::context
+    end
+    
+    App --> Task
+    CreateSession --> Task
+    Task --> DeepModeling
+    Config --> Task
+    
+    subgraph Legend
+        L1[Major Edit]:::major-edit
+        L2[Minor Edit]:::minor-edit
+        L3[Context/No Edit]:::context
+    end
+    
+    classDef major-edit fill:#90EE90
+    classDef minor-edit fill:#ADD8E6
+    classDef context fill:#FFFFFF
+```
+
+### Notes
+
+- The change is minimal and targeted - only affects the specific task experiencing OOM issues
+- Cost implications should be considered as higher machine specs typically cost more
+- The actual effectiveness of OOM prevention can only be verified in production under real load conditions
+- According to Trigger.dev docs, `medium-1x` provides 2GB memory vs default 512MB
+
+**Session Info:**
+- Link to Devin run: https://app.devin.ai/sessions/6e22a0efcd784dd6b51a16ae1ef95cb2
+- Requested by: noritaka.ikeda@route06.co.jp
+",Devin,158243242,devin-ai-integration[bot],closed,2025-07-09T08:01:16Z,2025-07-09T08:41:20Z,2025-07-09T08:41:20Z,839216423,https://api.github.com/repos/liam-hq/liam,https://github.com/liam-hq/liam/pull/2451,16,1.0,False
+3051320539,2799,Fix issue #2798: Remove duplicate tool results in messages,"# Fix issue #2798: Remove duplicate tool results in messages
+
+## Description
+This PR fixes issue #2798 where tool results were being duplicated in the LLM prompt, increasing token usage and latency.
+
+The issue was caused by tool results being added to messages twice:
+1. First directly in `agent_utils.py` with `messages.append({""role"": ""assistant"", ""content"": tool_result.result})`
+2. Then again when the formatted_answer.text (which already includes the tool result with ""Observation:"" prefix) is appended to messages
+
+## Changes
+- Removed the direct append of tool results to messages in `agent_utils.py`
+- Added a test to verify that tool results are not duplicated in messages
 
 ## Testing
-- `mvn -q test` *(fails: `mvn: command not found`)*
+- Added a test that verifies tool results are not duplicated in messages
+- The test confirms that the tool result appears at most once in the messages array
 
-------
-https://chatgpt.com/codex/tasks/task_b_68549f930b84832a909f2e48937ae7e8",OpenAI_Codex,5373774,jdereg,closed,2025-06-20T00:11:18Z,2025-06-20T00:11:27Z,2025-06-20T00:11:27Z,12670630,https://api.github.com/repos/jdereg/java-util,https://github.com/jdereg/java-util/pull/335,"analysisWe need to classify as performance or non-performance. The PR title: ""Add cache-backed type support checks"". Summary: ""speed up Converter type checks"", ""add single-argument support methods with caching"". So it's about performance improvement. So classification: performance.assistantfinalperformance",16,0.12338336882019603,False
-3158264753,316,Delay class resolution during parsing,"## Summary
-- store `@type` and `@enum` strings without resolving classes
-- resolve classes later in `Resolver` and `JsonReader`
-- add helper methods for late class resolution
-- note change in changelog
+## Link to Devin run
+https://app.devin.ai/sessions/98b28116a3834a1db6aad90ff8ea278c
+
+## Requested by
+Joe Moura (joao@crewai.com)
+",Devin,158243242,devin-ai-integration[bot],closed,2025-05-09T07:47:37Z,2025-05-17T15:49:55Z,,710601088,https://api.github.com/repos/crewAIInc/crewAI,https://github.com/crewAIInc/crewAI/pull/2799,16,1.0,False
+3261917784,5,Optimize agent configuration for token efficiency,"Optimize agent configuration files (`project_config.md`, `workflow_state.md`) for token efficiency and Claude-like state management.
+
+---
+
+[Open in Web](https://www.cursor.com/agents?id=bc-f2dc9246-f728-4177-b6b0-c579aadecc69) • [Open in Cursor](https://cursor.com/background-agent?bcId=bc-f2dc9246-f728-4177-b6b0-c579aadecc69)
+
+Learn more about [Background Agents](https://docs.cursor.com/background-agent/web-and-mobile)",Cursor,194702497,kleosr,closed,2025-07-25T04:08:23Z,2025-07-29T18:49:55Z,,951686239,https://api.github.com/repos/kleosr/cursorkleosr,https://github.com/kleosr/cursorkleosr/pull/5,16,1.0,False
+3171852682,2086,Make PR to deactivate thinking field,"The browser-use agent now supports optional deactivation of the ""thinking"" field in its output.
+
+*   A `use_thinking` boolean parameter was added to `AgentSettings` in `browser_use/agent/views.py`, defaulting to `True`.
+*   A new system prompt, `system_prompt_no_thinking.md`, was created to exclude thinking-related instructions.
+*   The `SystemPrompt` class in `browser_use/agent/prompts.py` was updated to load this new prompt when `use_thinking` is `False`.
+*   The `thinking` field in `AgentBrain` and `AgentOutput` models in `browser_use/agent/views.py` was made optional.
+*   A new static method, `type_with_custom_actions_no_thinking()`, was added to `AgentOutput` to dynamically create models without the thinking field.
+*   The `Agent` service in `browser_use/agent/service.py` now uses the appropriate `AgentOutput` model based on the `use_thinking` setting, ensuring the LLM is not prompted for the thinking field when disabled.
+*   Examples in `browser_use/agent/message_manager/service.py` were updated to reflect the presence or absence of the thinking field.
+*   Logging and serialization in `browser_use/agent/service.py` were adjusted to conditionally handle the optional `thinking` field.
+
+This change reduces token usage and provides a more concise output when detailed reasoning is not required, while maintaining backward compatibility.
+    
+<!-- This is an auto-generated description by cubic. -->
+---
+
+## Summary by cubic
+Added an option to disable the ""thinking"" field in the browser-use agent’s output, making responses shorter when detailed reasoning is not needed.
+
+- **New Features**
+  - Introduced a `use_thinking` setting to control inclusion of the ""thinking"" field.
+  - Updated prompts, models, and logging to support outputs with or without ""thinking"".
+  - Maintained backward compatibility; default behavior is unchanged.
+
+<!-- End of auto-generated description by cubic. -->
+
+",Cursor,22038471,mertunsall,closed,2025-06-24T12:40:19Z,2025-06-24T16:25:23Z,2025-06-24T16:25:23Z,881458615,https://api.github.com/repos/browser-use/browser-use,https://github.com/browser-use/browser-use/pull/2086,16,1.0,False
+3151820028,476,tool response token limits,"A new directory `.discussions` was created at the root to house team discussions.
+
+A new file, `.discussions/mcp-tool-token-limits.md`, was then created within this directory. This file serves as a discussion document to brainstorm solutions for MCP tool responses exceeding the 25,000 token limit.
+
+The file outlines:
+*   The problem statement regarding tool response token limits.
+*   Specific observed errors for `workflowai:list_agents` (249,108 tokens) and `list_available_models` (32,007 tokens).
+*   Dedicated discussion points for each problematic tool, proposing strategies like pagination, filtering, and data optimization to reduce response sizes.
+*   General solution approaches, key questions for team discussion (e.g., backwards compatibility, default behavior), and next steps to guide the brainstorming process.
+
+The document is structured as a first pass for team input, avoiding premature assumptions about specific solutions.",Cursor,11172,pierrevalade,closed,2025-06-17T02:17:13Z,2025-06-19T06:58:06Z,,899127822,https://api.github.com/repos/WorkflowAI/WorkflowAI,https://github.com/WorkflowAI/WorkflowAI/pull/476,16,0.2214353622910833,False
+3150662401,465,send_feedback MCP tool,"A new specification, `.specs/mcp-send-feedback-tool.md`, was created to detail the `send_feedback` MCP tool.
+
+Key changes include:
+*   The `send_feedback` tool in `api/api/routers/mcp/mcp_server.py` now acknowledges receipt and initiates background processing via `asyncio.create_task()`, ensuring a fire-and-forget pattern.
+*   The agent was renamed to `mcp_feedback_processing_agent.py` for clarity.
+*   The agent's implementation in `api/core/agents/mcp_feedback_processing_agent.py` was updated to use the `AsyncOpenAI` client with WorkflowAI's base URL, aligning with current agent patterns.
+*   Agent identification shifted from the model name to `metadata={""agent_id"": ""mcp-feedback-processing-agent""}` for improved searchability.
+*   `organization_name` and `user_email` are now passed in `metadata` for enhanced analytics and run tracking.
+*   Input models were simplified by removing unnecessary datetime fields.
+*   Prompt templating in the agent's user message was corrected to use `{{feedback}}` and `{% if context %}` for proper variable injection.
+*   The model was updated to `gemini-2.0-flash-latest` for cost-effectiveness and performance.
+*   The tool description was clarified to indicate it's for automated MCP client feedback, not end-user feedback.
+*   The testing strategy was simplified to include only minimal unit and integration tests, reflecting the non-critical nature of the feature.",Cursor,11172,pierrevalade,closed,2025-06-16T16:54:29Z,2025-06-25T19:36:40Z,2025-06-25T19:36:40Z,899127822,https://api.github.com/repos/WorkflowAI/WorkflowAI,https://github.com/WorkflowAI/WorkflowAI/pull/465,16,0.21531080398347305,False
+3119417980,44,feat: Add includeStackTrace option to reduce LLM token usage by 80-90%,"## 🚨 Problem
+
+After implementing pagination (#42), we discovered another critical issue with LLM token consumption when retrieving Unity console logs. **Stack traces alone consume 80-90% of the total tokens**, making it difficult to retrieve and analyze logs efficiently within LLM context windows.
+
+### Real-world Impact
+- A single error log with stack trace: ~500-1000 tokens
+- The same log without stack trace: ~50-100 tokens  
+- **Result**: 10x reduction in token usage
+
+This becomes especially problematic when:
+- Debugging across multiple log entries
+- Working with limited context windows
+- Analyzing patterns across many logs
+- Quick log overview is needed before deep debugging
+
+## ⚡ Solution
+
+### New `includeStackTrace` Parameter
+
+Added an optional boolean parameter to control stack trace inclusion:
+
+```typescript
+// Quick overview - saves 80-90% tokens
+get_console_logs({ 
+  includeStackTrace: false,
+  limit: 50 
+})
+
+// Detailed debugging - includes stack traces
+get_console_logs({ 
+  logType: ""error"",
+  includeStackTrace: true,
+  limit: 10
+})
+```
+
+### Smart Defaults
+- **Default**: `true` for backward compatibility
+- **Exception**: Info logs via resource default to `false` (stack traces rarely needed)
+
+### LLM-Friendly Documentation
+
+Added clear hints with ⚠️ emoji to guide LLMs:
+```
+""Whether to include stack trace in logs. ⚠️ ALWAYS SET TO FALSE to save 80-90% tokens, unless you specifically need stack traces for debugging.""
+```
+
+## 📊 Results
+
+### Token Usage Comparison
+
+| Log Type | With Stack Trace | Without Stack Trace | Reduction |
+|----------|------------------|---------------------|-----------|
+| Error    | ~800 tokens      | ~80 tokens          | 90%       |
+| Warning  | ~600 tokens      | ~60 tokens          | 90%       |
+| Info     | ~500 tokens      | ~50 tokens          | 90%       |
+
+### Recommended Workflow
+1. **Initial Investigation**: Use `includeStackTrace: false` for quick overview
+2. **Identify Issues**: Find problematic logs with minimal token usage
+3. **Deep Dive**: Re-query specific errors with `includeStackTrace: true` only when needed
+
+## 🧪 Testing with Claude Code
+
+**This feature was extensively tested with Claude Code (claude.ai/code)**, which is how we discovered the token consumption issue and validated the solution.
+
+### Test Environment
+- **LLM**: Claude Code with Anthropic's official CLI
+- **Unity Version**: Unity 2022.3 and Unity 6
+- **Test Project**: Active Unity game development project
+
+### Claude Code Test Results
+```typescript
+// Test 1: Before implementation - Token limit exceeded
+// Claude Code context window quickly filled with stack traces
+
+// Test 2: After implementation - Successful analysis
+// Claude Code could analyze 100+ logs without hitting token limits
+
+// Real conversation with Claude Code:
+User: ""get shader error by using tool""
+Claude: *uses get_console_logs with includeStackTrace: false*
+// Successfully retrieved and analyzed errors within token limits
+```
+
+### Why Claude Code Testing Matters
+- **Real-world LLM constraints**: Tested against actual token limits
+- **Practical workflows**: Validated the natural debugging flow
+- **Immediate feedback**: Claude Code's responses confirmed token savings
+- **User experience**: Smooth interaction without ""token exceeded"" errors
+
+## 📋 Technical Details
+
+### Unity Side Changes
+- `ConsoleLogsService.cs`: Added conditional stack trace inclusion
+- `IConsoleLogsService.cs`: Updated interface signature
+- `GetConsoleLogsResource.cs`: Added `includeStackTrace` parameter handling
+
+### Node.js Side Changes  
+- `getConsoleLogsTool.ts`: Added parameter to Zod schema with detailed description
+- `getConsoleLogsResource.ts`: Extended URL template and parameter extraction
+
+### Key Implementation Details
+- **Backward Compatible**: Defaults to `true` to maintain existing behavior
+- **Flexible Control**: Can be set per request based on debugging needs
+- **Memory Efficient**: No additional memory overhead (filtering only)
+- **Clear Documentation**: LLM-optimized descriptions guide proper usage
+
+## 🔍 Why This Matters
+
+### For LLM-based Development Tools (like Claude Code)
+- **More Context**: Can analyze 10x more logs within token limits
+- **Faster Iteration**: Quick overview before detailed investigation
+- **Better UX**: Reduced ""token limit exceeded"" errors
+- **Natural Workflow**: Matches how developers actually debug
+
+### For Developers Using MCP Unity
+- **Efficient Debugging**: Start broad, then narrow down
+- **Cost Savings**: Reduced API token consumption
+- **Improved Workflow**: Natural progression from overview to details
+
+### Use Case Examples (from Claude Code testing)
+
+1. **Quick Health Check**
+   ```typescript
+   // See last 100 logs without overwhelming context
+   get_console_logs({ includeStackTrace: false, limit: 100 })
+   ```
+
+2. **Shader Error Investigation** (actual test case)
+   ```typescript
+   // First: Find shader compilation errors
+   get_console_logs({ logType: ""error"", includeStackTrace: false, limit: 20 })
+   // Found: ""Shader error in 'Custom/MaskedTransparency'""
+   
+   // Then: Get details if needed
+   get_console_logs({ logType: ""error"", includeStackTrace: true, limit: 5 })
+   ```
+
+3. **Pattern Analysis**
+   ```typescript
+   // Analyze warning patterns across many entries
+   get_console_logs({ logType: ""warning"", includeStackTrace: false, limit: 50 })
+   ```
+
+## Breaking Changes
+
+**None** - Fully backward compatible. Existing code continues to work unchanged.
+
+## Future Considerations
+
+This implementation opens possibilities for:
+- Selective stack trace inclusion (e.g., first N lines only)  
+- Compressed stack trace formats
+- Smart stack trace summarization
+
+However, the current boolean approach provides immediate value with minimal complexity.
+
+## Summary
+
+This PR addresses a critical usability issue discovered through real-world usage with Claude Code. By adding a simple `includeStackTrace` parameter, we enable LLM-based tools to work effectively with Unity console logs without constantly hitting token limits. The 80-90% reduction in token usage transforms the debugging experience from frustrating to smooth.
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,27694,Saqoosha,closed,2025-06-04T23:56:12Z,2025-06-05T08:41:19Z,2025-06-05T08:41:19Z,948148972,https://api.github.com/repos/CoderGamester/mcp-unity,https://github.com/CoderGamester/mcp-unity/pull/44,16,0.19328464309202087,True
+3256172444,695,feat: Support llm-based message summarization by introducing Transformer mechanism,"Design doc: https://www.notion.so/Fast-Model-Summarization-for-Large-Tool-Output-21f18f5dfd9b8045b7faf3368b6bf6ac
+
+  Summary
+
+  - Adds transformer architecture for processing tool outputs before LLM consumption
+  - Implements llm_summarize transformer using fast secondary models to summarize lengthy outputs
+  - Provides global configuration via --fast-model and --summarize-threshold flags
+  - Enables tool-level configuration in both YAML and Python toolsets
+  - Maintains backward compatibility - existing tools work unchanged
+
+  Key Features
+
+  Global Configuration:
+  - --fast-model: Optional fast model for summarization (e.g., gpt-4o-mini)
+  - --summarize-threshold: Minimum character count to trigger summarization (default: 1000)
+
+  Tool Integration:
+  - YAML tools support transformer_configs with customizable prompts and thresholds
+  - Python toolsets can configure transformers during tool initialization
+  - Kubernetes toolsets updated with optimized summarization for kubectl commands
+
+  Smart Behavior:
+  - Only processes outputs exceeding the threshold
+  - Falls back gracefully when fast model unavailable
+  - Preserves searchable keywords and error details in summaries
+
+  Files Changed
+
+  - Core Infrastructure: holmes/core/transformers/ - Complete transformer system
+  - Configuration: Enhanced holmes/config.py with new global options
+  - Tool Integration: Updated toolset manager and execution pipeline
+  - Documentation: New docs/transformers.md with comprehensive usage guide
+  - Examples: Updated Kubernetes and AKS toolsets with transformer configs
+  - Testing: Extensive test coverage (2,000+ new test lines)
+
+  Benefits
+
+  - Reduced context usage for large outputs (kubectl, logs, metrics)
+  - Improved performance by summarizing before primary LLM processing
+  - Cost optimization using fast models for preprocessing
+  - Better accuracy by avoiding truncation of important information
+
+  🤖 Generated with https://claude.ai/code
+
+  Co-Authored-By: Claude noreply@anthropic.com",Claude_Code,36728755,nilo19,open,2025-07-23T12:23:37Z,,,808146034,https://api.github.com/repos/robusta-dev/holmesgpt,https://github.com/robusta-dev/holmesgpt/pull/695,16,0.17274594502497798,False
+3221925890,247,Trim MCP server tool payloads to reduce token consumption,"This PR implements trimmed responses for Azure DevOps MCP server tools to dramatically reduce LLM token consumption while maintaining backward compatibility.
+
+## Problem
+
+The MCP server tools were returning full REST API JSON payloads, causing unnecessary token burn and making it difficult for weaker LLMs to extract relevant information. For example:
+
+- `ado_resolve_comment` was returning 4200+ character responses when a simple ""resolved"" message would suffice
+- `ado_list_pull_request_threads` was returning verbose payloads with `_links` objects, deleted comments, and unnecessary author properties
+
+## Solution
+
+Added a `fullResponse` parameter (defaults to `false`) to key repository tools that provides two response modes:
+
+### Trimmed Mode (Default)
+- **Action tools** (`resolve_comment`, `reply_to_comment`) return simple success messages
+- **List tools** (`list_pull_request_threads`, `list_pull_request_thread_comments`) return filtered data excluding:
+  - Deleted comments
+  - `_links` objects 
+  - Verbose author properties (imageUrl, descriptor, url)
+
+### Full Mode (Opt-in)
+- Set `fullResponse: true` to get complete REST API responses for debugging or advanced use cases
+
+## Token Savings
+
+Real-world examples show dramatic improvements:
+
+- **resolve_comment**: 97.3% reduction (1346 → 37 characters)
+- **reply_to_comment**: 92.5% reduction (549 → 41 characters)  
+- **list_pull_request_threads**: 55.3% reduction (680 → 304 characters)
+
+## Example Usage
+
+```typescript
+// Trimmed response (default)
+await server.request({
+  method: ""tools/call"",
+  params: {
+    name: ""repo_resolve_comment"",
+    arguments: { repositoryId: ""repo1"", pullRequestId: 123, threadId: 456 }
+  }
+});
+// Returns: ""Thread 456 was successfully resolved.""
+
+// Full response (opt-in)
+await server.request({
+  method: ""tools/call"", 
+  params: {
+    name: ""repo_resolve_comment"",
+    arguments: { 
+      repositoryId: ""repo1"", 
+      pullRequestId: 123, 
+      threadId: 456,
+      fullResponse: true 
+    }
+  }
+});
+// Returns: Complete thread JSON with all properties
+```
+
+## Modified Tools
+
+- `repo_resolve_comment` - Simple success message vs full thread JSON
+- `repo_reply_to_comment` - Simple success message vs full comment JSON  
+- `repo_list_pull_request_threads` - Filtered thread data vs complete response
+- `repo_list_pull_request_thread_comments` - Filtered comment data vs complete response
+
+All changes maintain full backward compatibility via the optional `fullResponse` parameter.
+
+Fixes #36.
+
+<!-- START COPILOT CODING AGENT TIPS -->
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-07-11T07:44:05Z,2025-07-23T11:44:31Z,2025-07-23T11:44:31Z,984142834,https://api.github.com/repos/microsoft/azure-devops-mcp,https://github.com/microsoft/azure-devops-mcp/pull/247,16,0.16992164071424126,False
+3214946598,169,Use Gemini flash for lyric translations,Switch lyric translation API from OpenAI to Gemini 2.5 Flash for improved performance and cost efficiency.,Cursor,2830514,ryokun6,closed,2025-07-09T08:04:44Z,2025-07-09T08:06:15Z,2025-07-09T08:06:15Z,923332984,https://api.github.com/repos/ryokun6/ryos,https://github.com/ryokun6/ryos/pull/169,16,0.10623549553964207,False
+3187833970,981,feat: add support for plain TXT files,"
+# Add TXT file support with line-by-line splitting for fastlane metadata
+
+## Summary
+
+Implements TXT file support in the Lingo.dev CLI loader system to handle fastlane metadata translation workflows. The key innovation is **line-by-line splitting** - instead of treating the entire file as a single translatable unit, each line becomes a separate translatable unit with numeric keys (""1"", ""2"", ""3"", etc.).
+
+This approach solves the chunking problem for large TXT files since the SDK can now chunk at the line level rather than being forced to send massive single strings to the LLM.
+
+**Key Changes:**
+- Added `txt` to supported bucket types in formats specification
+- Created new TXT loader that splits content by lines into 1-indexed numeric keys
+- Integrated TXT loader into the main loader factory with standard composition pattern
+- Empty lines are handled automatically by the unlocalizable loader (filtered during pull, restored during push)
+- Added comprehensive test suite covering load/save, empty files, and empty line handling
+
+## Review & Testing Checklist for Human
+
+- [ ] **Test with real fastlane metadata files** - Verify line-by-line behavior works correctly with actual metadata content, not just synthetic test cases
+- [ ] **Verify empty line handling in practice** - Test files with various empty line patterns to ensure the unlocalizable loader approach works reliably
+- [ ] **Confirm chunking solves the original problem** - Test that large TXT files now chunk properly at the line level and don't overwhelm LLM token limits
+- [ ] **Check edge cases** - Test files with only empty lines, very large files, mixed content patterns, and single-line files
+
+**Recommended test plan:** Create sample fastlane metadata TXT files with various patterns (normal lines, empty lines, large content) and run through the full translation workflow to verify line structure preservation and chunking behavior.
+
+---
+
+### Diagram
+
+```mermaid
+%%{ init : { ""theme"" : ""default"" }}%%
+graph TD
+    subgraph Legend
+        L1[""Major Edit""]:::major-edit
+        L2[""Minor Edit""]:::minor-edit  
+        L3[""Context/No Edit""]:::context
+    end
+
+    spec[""packages/spec/src/formats.ts<br/>+txt bucket type""]:::minor-edit
+    indexLoader[""packages/cli/src/cli/loaders/index.ts<br/>+txt case""]:::minor-edit
+    txtLoader[""packages/cli/src/cli/loaders/txt.ts<br/>NEW FILE""]:::major-edit
+    tests[""packages/cli/src/cli/loaders/index.spec.ts<br/>+txt tests""]:::major-edit
+    
+    textFileLoader[""createTextFileLoader""]:::context
+    syncLoader[""createSyncLoader""]:::context
+    unlocalizableLoader[""createUnlocalizableLoader""]:::context
+    
+    spec --> indexLoader
+    indexLoader --> txtLoader
+    txtLoader --> textFileLoader
+    textFileLoader --> syncLoader
+    syncLoader --> unlocalizableLoader
+    
+    tests -.-> txtLoader
+    
+    classDef major-edit fill:#90EE90
+    classDef minor-edit fill:#87CEEB  
+    classDef context fill:#FFFFFF
+```
+
+### Notes
+
+- **Empty line handling evolution**: Initially implemented space placeholder workaround, then simplified to rely on unlocalizable loader's automatic empty string filtering/restoration. The current approach is cleaner but less explicit.
+- **Loader composition pattern**: Uses the same 4-loader composition as other file types (text-file → txt → sync → unlocalizable), ensuring consistency with existing patterns.
+- **1-indexed keys**: Follows SRT loader convention with numeric keys starting from ""1"" rather than ""0"".
+- **Session details**: Requested by @mathio, implemented in Devin session https://app.devin.ai/sessions/581a22c71ce44db8adaff265fb5d1c6d
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-30T09:42:27Z,2025-07-01T08:43:01Z,2025-07-01T08:43:01Z,771479895,https://api.github.com/repos/lingodotdev/lingo.dev,https://github.com/lingodotdev/lingo.dev/pull/981,16,0.09378768864808562,False
+3070954603,1398,Implement streaming uploads and tool formatting,"### **User description**
+## Summary
+- support system, integration, and API call tools in `format_tool`
+- stream file uploads and downloads to reduce memory usage
+- stream file listing content retrieval
+- add tests for tool formatting and streaming functions
 
 ## Testing
-- `mvn -q test` *(fails: command not found)*
+- `ruff format agents-api/agents_api/routers/files/create_file.py agents-api/agents_api/routers/files/get_file.py agents-api/agents_api/routers/files/list_files.py agents-api/agents_api/activities/task_steps/prompt_step.py agents-api/tests/test_format_tool.py agents-api/tests/test_file_streaming.py`
+- `ruff check agents-api/agents_api/routers/files/create_file.py agents-api/agents_api/routers/files/get_file.py agents-api/agents_api/routers/files/list_files.py agents-api/agents_api/activities/task_steps/prompt_step.py agents-api/tests/test_format_tool.py agents-api/tests/test_file_streaming.py`
+- `python -m py_compile agents-api/agents_api/routers/files/create_file.py agents-api/agents_api/routers/files/get_file.py agents-api/agents_api/routers/files/list_files.py agents-api/agents_api/activities/task_steps/prompt_step.py agents-api/tests/test_format_tool.py agents-api/tests/test_file_streaming.py`
+- *(tests unavailable: `ward` command not found)*
 
-------
-https://chatgpt.com/codex/tasks/task_b_6853302cdb60832aacef154c70e283fa",OpenAI_Codex,5373774,jdereg,closed,2025-06-18T21:49:25Z,2025-06-18T21:49:33Z,2025-06-18T21:49:33Z,12594924,https://api.github.com/repos/jdereg/json-io,https://github.com/jdereg/json-io/pull/316,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Delay class resolution during parsing"". Summary: store @type and @enum strings without resolving classes, resolve later in Resolver and JsonReader, add helper methods for late class resolution, note change in changelog. This seems to be about deferring class resolution to improve parsing speed? The change is about delaying class resolution during parsing. That could be a performance improvement: by not resolving classes during parsing, you might speed up parsing. But is the primary purpose performance? The description: ""store @type and @enum strings without resolving classes"" - that is a change to parsing logic. It might be to improve performance or to fix a bug. The title ""Delay class resolution during parsing"" suggests a performance optimization. The summary doesn't mention performance explicitly, but the change is about deferring resolution. That likely improves performance. The guidelines: performance-related PRs may contain keywords like latency, optimization, slow, etc. The title doesn't contain those, but the content indicates a performance improvement. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The PR is about delaying class resolution during parsing. That is likely a performance improvement. So classify as 'performance'.
 
-Thus answer: performance.assistantfinalperformance",16,0.10589343017250165,False
-3091989106,309,Defer class resolution in parser,"## Summary
-- add `typeName` to `JsonValue` for unresolved type strings
-- modify `JsonParser` to store type names instead of loading classes
-- resolve type names later in `Resolver`
-- update MapResolver/ObjectResolver to handle pending types
-- add unit test verifying parser keeps type names
+___
+
+### **PR Type**
+Enhancement, Tests
+
+
+___
+
+### **Description**
+- Implement streaming for file uploads and downloads to reduce memory usage
+  - Add chunked base64 decoding for uploads
+  - Stream S3 file reads and base64 encoding for downloads
+  - Stream file content retrieval in file listing
+
+- Enhance tool formatting to support system, integration, and API call tools
+  - Add support for extracting parameters from various tool types
+
+- Add tests for tool formatting and streaming file operations
+  - Test roundtrip streaming upload/download
+  - Test formatting for system, integration, and API call tools
+
+
+___
+
+
+
+### **Changes walkthrough** 📝
+<table><thead><tr><th></th><th align=""left"">Relevant files</th></tr></thead><tbody><tr><td><strong>Enhancement</strong></td><td><table>
+<tr>
+  <td>
+    <details>
+      <summary><strong>prompt_step.py</strong><dd><code>Extend tool formatting for multiple tool types</code>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </dd></summary>
+<hr>
+
+agents-api/agents_api/activities/task_steps/prompt_step.py
+
+<li>Enhanced <code>format_tool</code> to support system, integration, and API call <br>tools<br> <li> Added logic to extract parameters from various tool types<br> <li> Improved formatting for LLM tool definitions
+
+
+</details>
+
+
+  </td>
+  <td><a href=""https://github.com/julep-ai/julep/pull/1398/files#diff-568607bf9eff0a7b0bac363c2f9c64de9aec36b6e67497724377962151efb6f1"">+64/-12</a>&nbsp; </td>
+
+</tr>
+
+<tr>
+  <td>
+    <details>
+      <summary><strong>create_file.py</strong><dd><code>Stream file uploads with chunked base64 decoding</code>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </dd></summary>
+<hr>
+
+agents-api/agents_api/routers/files/create_file.py
+
+<li>Implemented chunked base64 decoding for streaming file uploads<br> <li> Modified upload logic to stream data directly to S3<br> <li> Reduced memory usage for large file uploads
+
+
+</details>
+
+
+  </td>
+  <td><a href=""https://github.com/julep-ai/julep/pull/1398/files#diff-4a04e6426f797bea5dcc2cb9db7c87372762d4769568b9a3e3ba460d9d64d64f"">+23/-5</a>&nbsp; &nbsp; </td>
+
+</tr>
+
+<tr>
+  <td>
+    <details>
+      <summary><strong>get_file.py</strong><dd><code>Stream file downloads and base64 encoding</code>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </dd></summary>
+<hr>
+
+agents-api/agents_api/routers/files/get_file.py
+
+<li>Implemented streaming S3 reads and base64 encoding for downloads<br> <li> Avoided loading entire files into memory during download
+
+
+</details>
+
+
+  </td>
+  <td><a href=""https://github.com/julep-ai/julep/pull/1398/files#diff-52977a9caf80fa77685abaf1f76c51188fc5bdc424116080d0adbbab44f7e8f4"">+9/-5</a>&nbsp; &nbsp; &nbsp; </td>
+
+</tr>
+
+<tr>
+  <td>
+    <details>
+      <summary><strong>list_files.py</strong><dd><code>Prepare streaming for file listing content retrieval</code>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </dd></summary>
+<hr>
+
+agents-api/agents_api/routers/files/list_files.py
+
+<li>Added note and setup for streaming file content retrieval in listings<br> <li> Prepared for memory-efficient file listing
+
+
+</details>
+
+
+  </td>
+  <td><a href=""https://github.com/julep-ai/julep/pull/1398/files#diff-7504a544131630c70bd2567722eb32213f89962fc2c369caa30b981ebe36605f"">+2/-1</a>&nbsp; &nbsp; &nbsp; </td>
+
+</tr>
+</table></td></tr><tr><td><strong>Tests</strong></td><td><table>
+<tr>
+  <td>
+    <details>
+      <summary><strong>test_file_streaming.py</strong><dd><code>Test streaming file upload and download</code>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </dd></summary>
+<hr>
+
+agents-api/tests/test_file_streaming.py
+
+<li>Added test for streaming upload and download roundtrip<br> <li> Verified correctness of streamed file operations
+
+
+</details>
+
+
+  </td>
+  <td><a href=""https://github.com/julep-ai/julep/pull/1398/files#diff-e64fab71301f2ef92977e6d9b9dbc863a95013a0e6ff4fe135c1a14cd71b08ac"">+18/-0</a>&nbsp; &nbsp; </td>
+
+</tr>
+
+<tr>
+  <td>
+    <details>
+      <summary><strong>test_format_tool.py</strong><dd><code>Test tool formatting for multiple tool types</code>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </dd></summary>
+<hr>
+
+agents-api/tests/test_format_tool.py
+
+<li>Added tests for <code>format_tool</code> with system, integration, and API call <br>tools<br> <li> Verified correct formatting and parameter extraction
+
+
+</details>
+
+
+  </td>
+  <td><a href=""https://github.com/julep-ai/julep/pull/1398/files#diff-71efcddb39c1e235e7536877bf3e4065d91b7ea7e54be22381c3095c14102028"">+42/-0</a>&nbsp; &nbsp; </td>
+
+</tr>
+</table></td></tr></tr></tbody></table>
+
+___
+
+> <details> <summary>  Need help?</summary><li>Type <code>/help how to ...</code> in the comments thread for any questions about Qodo Merge usage.</li><li>Check out the <a href=""https://qodo-merge-docs.qodo.ai/usage-guide/"">documentation</a> for more information.</li></details>",OpenAI_Codex,931887,creatorrr,closed,2025-05-17T17:33:28Z,2025-07-09T14:52:28Z,,781914762,https://api.github.com/repos/julep-ai/julep,https://github.com/julep-ai/julep/pull/1398,16,0.08884011348341724,False
+3083875801,24667,Add ChunkSize option to DownloadStream API for Azure Files,"This PR adds ChunkSize as an input parameter to the `DownloadStreamOptions` for Azure Files, allowing clients to specify larger chunk sizes when downloading files. This addresses a performance issue that occurs when downloading large files.
+
+### Changes
+- Added `ChunkSize` field to `DownloadStreamOptions` struct in models.go
+- Added `ChunkSize` field to `httpGetterInfo` struct to store the value 
+- Updated `DownloadStream` method to pass the chunk size to the response
+- Updated `NewRetryReader` method to use the specified chunk size
+- Added tests to verify the functionality with different chunk sizes
+
+The changes are minimal and maintain backward compatibility, as the `ChunkSize` field is optional with a default value that matches existing behavior.
+
+### Usage Example
+```go
+// Set a custom chunk size for better performance with large files
+resp, err := fileClient.DownloadStream(ctx, &file.DownloadStreamOptions{
+    ChunkSize: 8 * 1024 * 1024, // Use 8MB chunks instead of default 4MB
+})
+```
+
+Fixes #24650.
+
+---
+
+💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,open,2025-05-22T16:03:22Z,,,22855240,https://api.github.com/repos/Azure/azure-sdk-for-go,https://github.com/Azure/azure-sdk-for-go/pull/24667,16,0.08591093899193984,False
+3172940339,2090,Enhance in-memory file system functionality,"A new `MemoryFileSystem` was introduced in `browser_use/filesystem/memory_file_system.py` to provide an in-memory, serializable file system.
+
+Key changes include:
+*   `MemoryFileSystem` stores file content in a dictionary, eliminating disk I/O for standard operations.
+*   It is Pydantic-based, making it fully serializable for `AgentState` persistence.
+*   `materialize_file()` and `materialize_files()` methods were added to create temporary files on disk only when needed for attachments.
+*   `AgentState` in `browser_use/agent/views.py` now includes a `file_system` field of type `MemoryFileSystem`, ensuring the file system state is saved with the agent.
+*   `browser_use/agent/service.py` was updated to initialize the agent with this in-memory file system.
+*   `browser_use/controller/service.py` was modified to use the new `materialize_files()` method for attachment handling in the `done` action, while maintaining backward compatibility with the original `FileSystem` implementation.
+
+These changes enable faster file operations, full agent state persistence, and on-demand temporary file creation, all while maintaining backward compatibility.
+    
+<!-- This is an auto-generated description by cubic. -->
+---
+
+## Summary by cubic
+Added a new in-memory, serializable file system for agents to speed up file operations and enable full agent state persistence without disk I/O.
+
+- **New Features**
+  - Introduced `MemoryFileSystem` that stores files in memory and can serialize with agent state.
+  - Added methods to create temporary files on disk only when needed for attachments.
+  - Updated agent and controller code to use the new file system while keeping backward compatibility.
+
+<!-- End of auto-generated description by cubic. -->
+
+",Cursor,22038471,mertunsall,closed,2025-06-24T18:38:36Z,2025-06-24T18:45:04Z,,881458615,https://api.github.com/repos/browser-use/browser-use,https://github.com/browser-use/browser-use/pull/2090,16,0.08560952428513229,False
+3219880512,10340,feat(backend): Integrate GCS file storage with automatic expiration for Agent File Input,"## Summary
+
+This PR introduces a complete cloud storage infrastructure and file upload system that agents can use instead of passing base64 data directly in inputs, while maintaining backward compatibility for the builder's node inputs.
+
+### Problem Statement
+
+Currently, when agents need to process files, they pass base64-encoded data directly in the input, which has several limitations:
+1. **Size limitations**: Base64 encoding increases file size by ~33%, making large files impractical
+2. **Memory usage**: Large base64 strings consume significant memory during processing
+3. **Network overhead**: Base64 data is sent repeatedly in API requests
+4. **Performance impact**: Encoding/decoding base64 adds processing overhead
+
+### Solution
+
+This PR introduces a complete cloud storage infrastructure and new file upload workflow:
+1. **New cloud storage system**: Complete `CloudStorageHandler` with async GCS operations
+2. **New upload endpoint**: Agents upload files via `/files/upload` and receive a `file_uri` 
+3. **GCS storage**: Files are stored in Google Cloud Storage with user-scoped paths
+4. **URI references**: Agents pass the `file_uri` instead of base64 data
+5. **Block processing**: File blocks can retrieve actual file content using the URI
+
+### Changes Made
+
+#### New Files Introduced:
+- **`backend/util/cloud_storage.py`** - Complete cloud storage infrastructure (545 lines)
+- **`backend/util/cloud_storage_test.py`** - Comprehensive test suite (471 lines)
+
+#### Backend Changes:
+- **New cloud storage infrastructure** in `backend/util/cloud_storage.py`:
+  - Complete `CloudStorageHandler` class with async GCS operations
+  - Support for multiple cloud providers (GCS implemented, S3/Azure prepared)
+  - User-scoped and execution-scoped file storage with proper authorization
+  - Automatic file expiration with metadata-based cleanup
+  - Path traversal protection and comprehensive security validation
+  - Async file operations with proper error handling and logging
+
+- **New `UploadFileResponse` model** in `backend/server/model.py`:
+  - Returns `file_uri` (GCS path like `gcs://bucket/users/{user_id}/file.txt`)
+  - Includes `file_name`, `size`, `content_type`, `expires_in_hours`
+  - Proper Pydantic schema instead of dictionary response
+
+- **New `upload_file` endpoint** in `backend/server/routers/v1.py`:
+  - Complete new endpoint for file upload with cloud storage integration
+  - Returns GCS path URI directly as `file_uri`
+  - Supports user-scoped file storage for proper isolation
+  - Maintains fallback to base64 data URI when GCS not configured
+  - File size validation, virus scanning, and comprehensive error handling
+
+#### Frontend Changes:
+- **Updated API client** in `frontend/src/lib/autogpt-server-api/client.ts`:
+  - Modified return type to expect `file_uri` instead of `signed_url`
+  - Supports the new upload workflow
+
+- **Enhanced file input component** in `frontend/src/components/type-based-input.tsx`:
+  - **Builder nodes**: Still use base64 for immediate data retention without expiration
+  - **Agent inputs**: Use the new upload endpoint and pass `file_uri` references
+  - Maintains backward compatibility for existing workflows
+
+#### Test Updates:
+- **New comprehensive test suite** in `backend/util/cloud_storage_test.py`:
+  - 27 test cases covering all cloud storage functionality
+  - Tests for file storage, retrieval, authorization, and cleanup
+  - Tests for path validation, security, and error handling
+  - Coverage for user-scoped, execution-scoped, and system storage
+
+- **New upload endpoint tests** in `backend/server/routers/v1_test.py`:
+  - Tests for GCS path URI format (`gcs://bucket/path`)
+  - Tests for base64 fallback when GCS not configured
+  - Validates file upload, virus scanning, and size limits
+  - Tests user-scoped file storage and access control
+
+### Benefits
+
+1. **New Infrastructure**: Complete cloud storage system with enterprise-grade features
+2. **Scalability**: Supports larger files without base64 size penalties
+3. **Performance**: Reduces memory usage and network overhead with async operations
+4. **Security**: User-scoped file storage with comprehensive access control and path validation
+5. **Flexibility**: Maintains base64 support for builder nodes while providing URI-based approach for agents
+6. **Extensibility**: Designed for multiple cloud providers (GCS, S3, Azure)
+7. **Reliability**: Automatic file expiration, cleanup, and robust error handling
+8. **Backward compatibility**: Existing builder workflows continue to work unchanged
+
+### Usage
+
+**For Agent Inputs:**
+```typescript
+// 1. Upload file
+const response = await api.uploadFile(file);
+// 2. Pass file_uri to agent
+const agentInput = { file_input: response.file_uri };
+```
+
+**For Builder Nodes (unchanged):**
+```typescript
+// Still uses base64 for immediate data retention
+const nodeInput = { file_input: ""data:image/jpeg;base64,..."" };
+```
+
+### Checklist 📋
+
+#### For code changes:
+- [x] I have clearly listed my changes in the PR description
+- [x] I have made a test plan
+- [x] I have tested my changes according to the test plan:
+  - [x] All new cloud storage tests pass (27/27)
+  - [x] All upload file tests pass (7/7)
+  - [x] Full v1 router test suite passes (21/21)
+  - [x] All server tests pass (126/126)
+  - [x] Backend formatting and linting pass
+  - [x] Frontend TypeScript compilation succeeds
+  - [x] Verified GCS path URI format (`gcs://bucket/path`)
+  - [x] Tested fallback to base64 data URI when GCS not configured
+  - [x] Confirmed file upload functionality works in UI
+  - [x] Validated response schema matches Pydantic model
+  - [x] Tested agent workflow with file_uri references
+  - [x] Verified builder nodes still work with base64 data
+  - [x] Tested user-scoped file access control
+  - [x] Verified file expiration and cleanup functionality
+  - [x] Tested security validation and path traversal protection
+
+#### For configuration changes:
+- [x] No new configuration changes required
+- [x] `.env.example` remains compatible 
+- [x] `docker-compose.yml` remains compatible
+- [x] Uses existing GCS configuration from media storage
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,76959103,majdyz,closed,2025-07-10T15:52:56Z,2025-07-18T03:20:54Z,2025-07-18T03:20:54Z,614765452,https://api.github.com/repos/Significant-Gravitas/AutoGPT,https://github.com/Significant-Gravitas/AutoGPT/pull/10340,16,0.08515013289993559,True
+3155143197,2125,Implement CloudFileAttachmentAdapter with promise-based uploads and progress bar support,"# Implement CloudFileAttachmentAdapter with promise-based uploads and progress bar support
+
+## Summary
+
+This PR adds a new `CloudFileAttachmentAdapter` that uploads files to AssistantCloud and displays upload progress in the shadcn registry template. The implementation uses a promise-based upload pattern for better performance and user experience.
+
+## Key Features
+
+### CloudFileAttachmentAdapter
+- **File Upload**: Uploads files to AssistantCloud using `generatePresignedUploadUrl()`
+- **File Type Support**: Accepts any file type (`accept = ""*/*""`)
+- **Content Format**: Returns `FileContentPart` with base64 data and mimeType
+- **Error Handling**: Comprehensive error handling for upload failures
+
+### Promise-Based Upload Pattern
+- **Upload Timing**: Upload starts immediately in `add()` method
+- **Promise Storage**: Upload promise stored on `PendingAttachment.uploadPromise`
+- **Await in Send**: `send()` method awaits the stored upload promise
+- **Performance**: Allows upload to happen in parallel with user interactions
+
+### Progress Bar Support
+- **AsyncGenerator**: Yields progress updates (0%, 25%, 50%, 75%) during upload
+- **UI Component**: Added `AttachmentProgress` component to shadcn registry template
+- **Visual Design**: Thin progress bar at bottom of file attachments
+- **Conditional Display**: Only shows when `status.type === ""running""` with progress data
+
+## Technical Implementation
+
+### Type Safety
+- Extended `PendingAttachment` type with optional `uploadPromise?: Promise<{ url: string; data: string }>`
+- Maintains backward compatibility since `uploadPromise` is optional
+- Proper TypeScript typing throughout
+
+### Code Organization
+- New `CloudFileAttachmentAdapter.ts` in attachment adapters directory
+- Exported from attachment adapters index for easy import
+- Private `startUpload()` method for clean separation of concerns
+- Reusable `fileToBase64()` utility method
+
+## Files Changed
+
+- `packages/react/src/runtimes/adapters/attachment/CloudFileAttachmentAdapter.ts` - New adapter implementation
+- `packages/react/src/runtimes/adapters/attachment/index.ts` - Export added
+- `packages/react/src/types/AttachmentTypes.ts` - Extended PendingAttachment type
+- `apps/registry/components/assistant-ui/attachment.tsx` - Progress bar UI component
+
+## Usage Example
+
+```typescript
+import { CloudFileAttachmentAdapter } from ""@assistant-ui/react"";
+
+const adapter = new CloudFileAttachmentAdapter(assistantCloudInstance);
+// Upload starts immediately when file is added
+// Progress updates are shown in the UI
+// Send operation awaits the completed upload
+```
 
 ## Testing
-- `mvn -q test` *(fails: `mvn` not found)*",OpenAI_Codex,5373774,jdereg,closed,2025-05-26T20:10:52Z,2025-05-26T20:11:13Z,2025-05-26T20:11:13Z,12594924,https://api.github.com/repos/jdereg/json-io,https://github.com/jdereg/json-io/pull/309,"analysisWe need to classify whether the primary purpose is performance. The PR description: ""Defer class resolution in parser"" - adding typeName to JsonValue for unresolved type strings, modify JsonParser to store type names instead of loading classes, resolve type names later in Resolver, update MapResolver/ObjectResolver to handle pending types, add unit test verifying parser keeps type names. This seems to be about deferring class resolution to later, which might improve performance by avoiding class loading during parsing. The description mentions performance? It doesn't explicitly mention performance, but deferring class resolution could reduce overhead during parsing, potentially improving performance. However, the classification requires keywords like memory, optimization, speed, perf, etc. The description doesn't contain those keywords. But the intent is performance improvement. The instructions: ""Performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" The description doesn't contain any of those. But the content indicates a performance improvement. The classification might still be 'performance' because the primary purpose is to improve performance. The guidelines: ""Given a text combining the title and body of a pull request, determine whether the primary purpose of the pull request is to improve performance."" So we need to decide. The title: ""Defer class resolution in parser"". That is a performance improvement. So likely 'performance'. The description: ""add typeName to JsonValue for unresolved type strings, modify JsonParser to store type names instead of loading classes, resolve type names later in Resolver, update MapResolver/ObjectResolver to handle pending types, add unit test verifying parser keeps type names"". This is about deferring class resolution, which is a performance optimization. So classification: 'performance'.assistantfinalperformance",16,0.1001339510804643,False
-3166859797,347,Use cached reflection APIs,"## Summary
-- leverage `ReflectionUtils` caching for Java version queries
-- use `ReflectionUtils` in `Unsafe`
-- load OSGi classes with correct loader and cached reflection
-- document reflection improvements in changelog
 
-## Testing
-- `mvn -q test` *(failed: mvn not found)*
+The implementation follows existing patterns in the codebase and maintains backward compatibility. All TypeScript types are properly defined and the optional `uploadPromise` field ensures no breaking changes.
 
-------
-https://chatgpt.com/codex/tasks/task_b_6858e6750b64832abc6979f1e5574a10",OpenAI_Codex,5373774,jdereg,closed,2025-06-23T05:48:42Z,2025-06-23T05:49:02Z,2025-06-23T05:49:02Z,12670630,https://api.github.com/repos/jdereg/java-util,https://github.com/jdereg/java-util/pull/347,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Use cached reflection APIs"". Summary: leverage ReflectionUtils caching for Java version queries, use ReflectionUtils in Unsafe, load OSGi classes with correct loader and cached reflection, document reflection improvements in changelog. This is about caching reflection APIs, which can improve performance by reducing overhead of reflection. So it's performance improvement. So label 'performance'.assistantfinalperformance",16,0.0966124052066799,False
-3147123418,189,Improve ReflectionUtils caches,"## Summary
-- allow ReflectionUtils cache size via system property
-- ensure custom caches use ConcurrentHashMapNullSafe
-- log failures in ClassUtilities.trySetAccessible
-- generate parameter keys using fully qualified names
-- document cache size tuning
+---
 
-## Testing
-- `mvn -q test` *(failed: command not found)*
+**Link to Devin run**: https://app.devin.ai/sessions/ff739636edd84055b190e64e25a22501
 
-------
-https://chatgpt.com/codex/tasks/task_b_684e4790fa68832ab576ed66f6335c72",OpenAI_Codex,5373774,jdereg,closed,2025-06-15T05:26:31Z,2025-06-15T05:26:43Z,2025-06-15T05:26:43Z,12670630,https://api.github.com/repos/jdereg/java-util,https://github.com/jdereg/java-util/pull/189,"analysisWe need to classify as performance or non-performance. The PR title: ""Improve ReflectionUtils caches"". The body: mentions allow cache size via system property, ensure custom caches use ConcurrentHashMapNullSafe, log failures, generate parameter keys using fully qualified names, document cache size tuning. This is about caching, which is performance improvement. So classify as 'performance'.assistantfinalperformance",16,0.0949930955719442,False
-3071077630,78,Optimize reflection,"## Summary
-- reduce reflection with property and type caching in `ChangePropertyAction`
-- compile property setters with expressions
-- compile method calls for `CallMethodAction`
-
-## Testing
-- `./build.sh -t Test` *(failed: `dotnet` not found)*",OpenAI_Codex,2297442,wieslawsoltes,closed,2025-05-17T21:30:50Z,2025-05-19T10:55:55Z,,792160692,https://api.github.com/repos/wieslawsoltes/Xaml.Behaviors,https://github.com/wieslawsoltes/Xaml.Behaviors/pull/78,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Optimize reflection"". Summary: reduce reflection with property and type caching, compile property setters with expressions, compile method calls for CallMethodAction. This is about performance optimization of reflection usage. So classification: 'performance'.assistantfinalperformance",16,0.0921938137827638,False
+**Requested by**: Simon Farshid (simon@assistant-ui.com)
+",Devin,158243242,devin-ai-integration[bot],closed,2025-06-18T01:14:04Z,2025-07-02T14:27:44Z,,722184017,https://api.github.com/repos/assistant-ui/assistant-ui,https://github.com/assistant-ui/assistant-ui/pull/2125,16,0.0848554610874252,False

@@ -1,223 +1,257 @@
-id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,llm_output,Topic,Probability,Representative_document
-3090482540,4355,[Failed] Unable to enable browser notifications immediately after visiting the web page for the first time,"Thanks for assigning this issue to me. I'm starting to work on it and will keep this PR's description up to date as I form a plan and make progress.
+id,number,title,body,agent,user_id,user,state,created_at,closed_at,merged_at,repo_id,repo_url,html_url,Topic,Probability,Representative_document
+3257102140,4363,Primitives for raw OCaml block access,"## Summary
 
-Original issue description:
+This PR extracts the Flambda2 parts of the block indices work from PR #4017 (rtjoa.block-indices). It adds two new primitives that will enable faster field access in unusual use cases, similar to Obj.raw_field but with better performance.
 
-> ### Share your bug report, feature request, or comment.
-> 
-> If you try to enable browser notifications right after visiting an Owncast web page for the first time, you'll get a long loading spinner, and sometimes it'll time out.
-> 
-> I believe this is because it's waiting for the service worker to free up, but the service worker is busy in the background pre-downloading a bunch of assets.
-> 
-> I wonder if we can tell the service worker to stop anything its doing if somebody is trying to enable notifications. It's far more important than caching any of those assets. The reason I set that up to cache assets in the first place was so we wouldn't see loading spinners when you open up modals or other views that are asynchronously loaded, or wait for the emoji to load in one at a time. But if somebody had to cancel that to register for push notifications, it's really no big deal.
+## Changes
 
+- **Read_offset**: Binary primitive that reads from a memory location at a given offset
+- **Write_offset**: Ternary primitive that writes to a memory location at a given offset
 
-Fixes #4195.
+Both primitives include:
+- Proper type kinds and mutability/allocation mode tracking
+- Placeholder CMM translations (add offset to base pointer, then load/store)
+- Code size estimates
+- Basic simplification support
 
----
+This is a draft PR as these primitives will need user-facing wrappers before they can be used.
 
-💡 You can make Copilot smarter by setting up custom instructions, customizing its development environment and configuring Model Context Protocol (MCP) servers. Learn more [Copilot coding agent tips](https://gh.io/copilot-coding-agent-tips) in the docs.",Copilot,198982749,Copilot,closed,2025-05-26T08:51:50Z,2025-05-26T08:52:50Z,,266445736,https://api.github.com/repos/owncast/owncast,https://github.com/owncast/owncast/pull/4355,"analysisWe need to classify as performance or non-performance. The PR description: ""Unable to enable browser notifications immediately after visiting the web page for the first time"" and the issue: long loading spinner, time out, service worker busy pre-downloading assets. The PR aims to stop service worker from pre-downloading assets when enabling notifications. This is about improving responsiveness, reducing latency, performance. So it's performance. The keywords: ""long loading spinner"", ""time out"", ""waiting for service worker"", ""performance"". So classification: performance.assistantfinalperformance",18,1.0,True
-3111689960,1459,[alpha_factory] add i18n precache,"## Summary
-- cache locale JSON files in the Insight demo service worker
-- update build scripts and offline test
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",Claude_Code,1315488,mshinwell,open,2025-07-23T17:03:02Z,,,312271526,https://api.github.com/repos/oxcaml/oxcaml,https://github.com/oxcaml/oxcaml/pull/4363,18,1.0,True
+3217089921,7040,Add conditional runtime emission to OCaml compiler,"## Summary
+- enhance OCaml backend with feature scanning
+- emit runtime helpers only when required by a program
 
 ## Testing
-- `python check_env.py --auto-install`
-- `pytest -q` *(fails: ValueError: Duplicated timeseries in CollectorRegistry)*
-- `pre-commit run --files alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/sw.js alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/build.js alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/manual_build.py alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/tests/test_pwa_offline.py` *(fails: could not fetch hooks)*
+- `go vet ./...`
 
 ------
-https://chatgpt.com/codex/tasks/task_e_683e14e79714833394fa05218bb4a081",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-02T21:28:36Z,2025-06-02T21:29:58Z,2025-06-02T21:29:58Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1459,"analysisWe need to classify whether the primary purpose is performance improvement. The PR title: ""[alpha_factory] add i18n precache"". Summary: cache locale JSON files in the Insight demo service worker, update build scripts and offline test. This is about caching locale JSON files for offline usage. That is a performance improvement? Caching can improve load times, but the primary purpose is adding i18n precache, not necessarily performance. But caching is a performance optimization. However, the description is about caching locale JSON files in service worker, which is to improve offline support and maybe performance. But the main goal is to add i18n precache. The question: ""determine whether the primary purpose of the pull request is to improve performance."" The PR is about caching locale JSON files, which is a performance improvement. But is it primarily performance? It might be more about adding i18n support. But caching is a performance optimization. The guidelines: performance-related PRs may contain keywords like memory, optimization, leak, speed, perf, etc. This PR does not contain those keywords. But caching is a performance improvement. However, the guidelines say ""Performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" The PR does not contain those keywords. But caching is a performance improvement. But the guidelines might rely on keywords. But the instruction: ""Given a text combining the title and body of a pull request, determine whether the primary purpose of the pull request is to improve performance."" So we need to decide. The primary purpose: add i18n precache. That is about caching locale JSON files. That is a performance improvement. But is it the primary purpose? The title says ""add i18n precache"". That is a feature addition. The summary: ""cache locale JSON files in the Insight demo service worker"". That is a performance improvement. But the main goal is to add i18n precache. I'd lean that it's a performance improvement. But the guidelines: ""Performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" This PR does not contain those keywords. But the content is about caching. Caching is a performance improvement. But the guidelines might not require keywords. The instruction: ""Given a text combining the title and body of a pull request, determine whether the primary purpose of the pull request is to improve performance."" So we need to decide. I'd classify as 'performance' because caching locale JSON files improves performance. But the primary purpose might be to add i18n precache, which is a feature. But caching is a performance improvement. I'd lean 'performance'. Let's answer 'performance'.assistantfinalperformance",18,1.0,False
-3190642541,2834,Update service worker asset list,"## Summary
-- cache docs HTML pages in the generated service worker
-- bump cache version to v4 and regenerate `service-worker.js`
+https://chatgpt.com/codex/tasks/task_e_686ed0a11314832096a2c9d827d6effa",OpenAI_Codex,1218621,tamnd,closed,2025-07-09T20:42:41Z,2025-07-09T20:42:56Z,2025-07-09T20:42:56Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7040,18,1.0,False
+3116850813,741,Switch JSON floats to lexical-core,"## Summary
+- swap in lexical-core for floating point formatting/parsing
+- document change in changelog
+- use cargo-nextest for tests
+- address review comments about imports
 
 ## Testing
-- `python scripts/build_service_worker.py`
-- `pytest -k 'service_worker' -q` *(fails: ImportError: cannot import name 'research_agent')*
-
-------
-https://chatgpt.com/codex/tasks/task_e_68635c885a948333985cd0dfed6e89d4",OpenAI_Codex,24208299,MontrealAI,closed,2025-07-01T04:29:08Z,2025-07-01T04:29:20Z,2025-07-01T04:29:20Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/2834,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Update service worker asset list"". Summary: cache docs HTML pages in the generated service worker, bump cache version to v4 and regenerate service-worker.js. This is about caching assets, which is performance improvement (caching improves load speed). So classify as 'performance'.assistantfinalperformance",18,1.0,False
-3206379276,359,分析PWA状态切换体验问题,"Optimize PWA state restoration for a seamless, imperceptible background-to-foreground transition, eliminating loading screens and flickering.
-
-The original implementation showed a loading screen and flickering when the PWA returned from the background, due to state restoration timing and UI handling. This PR refactors the PWA state management to initialize and restore state *before* the Vue app mounts, uses a new loading state manager to coordinate resource loading, and enhances Service Worker caching and navigation preloading. All visual indicators and console logs related to this process have been removed to ensure a truly native-like, ""no-sense"" user experience.",Cursor,51039935,jxxghp,closed,2025-07-06T10:31:58Z,2025-07-06T10:35:53Z,2025-07-06T10:35:53Z,657824656,https://api.github.com/repos/jxxghp/MoviePilot-Frontend,https://github.com/jxxghp/MoviePilot-Frontend/pull/359,"analysisWe need to classify as performance or non-performance. The PR description: ""Optimize PWA state restoration for a seamless, imperceptible background-to-foreground transition, eliminating loading screens and flickering."" It refactors state management, uses new loading state manager, enhances Service Worker caching and navigation preloading. The goal is to improve user experience, reduce loading screens, flickering. This is about performance? It mentions eliminating loading screens, flickering, state restoration timing. That is about performance, specifically UI performance, responsiveness. The keywords: ""Optimize"", ""state restoration"", ""eliminating loading screens"", ""flickering"", ""Service Worker caching"", ""navigation preloading"". This is performance improvement. So classify as 'performance'.assistantfinalperformance",18,1.0,False
-3206662836,360,Analyze factors causing iOS to kill PWA,"<!-- One very short sentence on the WHAT and WHY of the PR. E.g. ""Remove pathHash attribute because it is confirmed unused."" or ""Add DNS round robin to improve load distribution."" -->
-Implement PWA background optimization for iOS to reduce resource consumption and prevent app termination.
-
-<!-- OPTIONAL: If the WHY of the PR is not obvious, perhaps because it fixed a gnarly bug, explain it in a short paragraph here. E.g. ""Commit a73bb98 introduced a bug where the class list was filtered to only work for MDC files, hence we partially revert it here."" -->
-The application was frequently terminated by iOS when in the background due to continuous resource consumption from active Server-Sent Events (SSE) connections and various timers. This PR introduces a centralized `BackgroundManager` and `SSEManager` to automatically pause/stop these activities when the app transitions to the background, significantly improving its survival rate, reducing battery drain, and enhancing overall system stability. This also includes a version bump to `2.6.3` and cleanup of temporary documentation.",Cursor,51039935,jxxghp,closed,2025-07-06T15:14:31Z,2025-07-06T22:40:43Z,2025-07-06T22:40:43Z,657824656,https://api.github.com/repos/jxxghp/MoviePilot-Frontend,https://github.com/jxxghp/MoviePilot-Frontend/pull/360,"analysisWe need to classify as 'performance' or 'non-performance'. The PR is about implementing background optimization to reduce resource consumption and prevent app termination. It mentions reducing battery drain, improving survival rate. This is performance-related: resource consumption, battery, background. So classify as 'performance'.assistantfinalperformance",18,1.0,True
-3209183782,364,Evaluate app shell model compliance,"<!-- Implement comprehensive PWA optimizations to enhance performance, offline experience, and user installability. -->
-This PR includes critical CSS inlining, refined caching strategies (CacheFirst for App Shell, versioning, cleanup), background sync for offline API requests, and an improved PWA installation prompt with a dedicated offline page.",Cursor,51039935,jxxghp,closed,2025-07-07T14:06:33Z,2025-07-07T14:09:11Z,2025-07-07T14:09:11Z,657824656,https://api.github.com/repos/jxxghp/MoviePilot-Frontend,https://github.com/jxxghp/MoviePilot-Frontend/pull/364,"analysisWe need to classify as performance or non-performance. The PR title: ""Evaluate app shell model compliance"". Body: ""Implement comprehensive PWA optimizations to enhance performance, offline experience, and user installability. This PR includes critical CSS inlining, refined caching strategies (CacheFirst for App Shell, versioning, cleanup), background sync for offline API requests, and an improved PWA installation prompt with a dedicated offline page.""
-
-Keywords: performance, offline, caching, critical CSS inlining, PWA optimizations. This is performance. So label 'performance'.assistantfinalperformance",18,1.0,False
-3188284723,2798,[alpha_factory] Update service worker caching,"## Summary
-- cache pyodide assets during service worker install
-- handle external asset failures with local cache fallback
-- bump cache version
-
-## Testing
-- `python scripts/check_python_deps.py`
-- `python check_env.py --auto-install`
-- `pytest -q` *(fails: ImportError for research_agent and others)*
-- `pre-commit run --files docs/assets/service-worker.js` *(fails: proto-verify, verify-requirements-lock)*
-- `scripts/build_gallery_site.sh` *(fails: Preflight checks failed)*
-
-------
-https://chatgpt.com/codex/tasks/task_e_68620c464f6483339524573c94b43ccd",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-30T12:21:20Z,2025-06-30T12:25:12Z,2025-06-30T12:25:12Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/2798,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""[alpha_factory] Update service worker caching"". Body: caching pyodide assets during service worker install, handle external asset failures with local cache fallback, bump cache version. This is about caching, which improves performance by reducing load times. So it's performance. The guidelines: performance-related PRs may contain keywords like speed, perf, etc. But caching is a performance improvement. So classify as 'performance'.assistantfinalperformance",18,1.0,False
-3187037212,2796,feat: cache pyodide assets in service worker,"## Summary
-- precache Pyodide runtime files
-- handle external requests with cached fallback
-- bump offline cache version
-
-## Testing
-- `mkdocs build`
-- `./scripts/build_insight_docs.sh` *(fails: Unable to retrieve wasm_llm/wasm-gpt2.tar)*
-- `pre-commit run --files docs/assets/service-worker.js` *(failed to finish due to missing environments)*
+- `cargo nextest run -p facet-json --lib --test-threads=1`
+- `cargo nextest run -p facet-json --tests --test-threads=1`
 
 
 ------
-https://chatgpt.com/codex/tasks/task_e_686207f0d0e48333bdd56cd69274b995",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-30T03:52:13Z,2025-06-30T03:53:13Z,2025-06-30T03:53:13Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/2796,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""feat: cache pyodide assets in service worker"". Summary: precache Pyodide runtime files, handle external requests with cached fallback, bump offline cache version. This is about caching assets in service worker to improve offline performance, reduce load times. It's about caching, which is performance improvement. So classification: performance.assistantfinalperformance",18,1.0,False
-3071302729,566,fix(website): Remove Google Fonts caching and add JS files caching in VitePWA,"# fix(website): Remove Google Fonts caching and add JS files caching in VitePWA
-
-- Removed Google Fonts caching configuration as it's not being used in the project
-- Added NetworkFirst caching strategy for JS files to ensure they update properly when changed
-
-Fixes the issue where JS files were not being updated properly.
-
-Link to Devin run: https://app.devin.ai/sessions/8528638d44f9419b859c1b3582fe63cb
-Requested by: Kazuki Yamada
-",Devin,158243242,devin-ai-integration[bot],closed,2025-05-18T02:29:47Z,2025-05-18T02:51:18Z,2025-05-18T02:51:18Z,828119367,https://api.github.com/repos/yamadashy/repomix,https://github.com/yamadashy/repomix/pull/566,"analysisWe need to classify as performance or non-performance. The PR title: ""Remove Google Fonts caching and add JS files caching in VitePWA"". Body: removed Google Fonts caching config, added NetworkFirst caching strategy for JS files to ensure they update properly. Fixes issue where JS files were not being updated properly. This is about caching strategy, which is performance-related? Caching improves performance. But the primary purpose is to fix caching behavior, not necessarily performance improvement. However caching is a performance optimization. The keywords: caching, performance? The instruction: performance-related PR may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. This PR mentions caching, but not explicitly performance. But caching is a performance optimization. The instruction says performance-related PR may contain keywords such as... or any other terms referring to how faster and efficiently software runs. Caching is a performance improvement. So likely classify as performance. The PR is about caching strategy to ensure JS files update properly. That is more about correctness? But caching is performance. I'd lean performance.assistantfinalperformance",18,1.0,False
-3112264968,1484,[alpha_factory] cache runtime assets,"## Summary
-- cache fonts and IPFS JSON using Workbox runtime caching
-- keep runtime caching when building service workers
-- verify cached fonts and IPFS JSON load when offline
+https://chatgpt.com/codex/tasks/task_b_683ff63d33a483329f82d69507ea5db8",OpenAI_Codex,7998310,fasterthanlime,closed,2025-06-04T07:47:14Z,2025-06-04T09:44:36Z,,945896114,https://api.github.com/repos/facet-rs/facet,https://github.com/facet-rs/facet/pull/741,18,1.0,False
+3217761016,7115,Improve Haskell compiler runtime,"## Summary
+- update Haskell compiler to avoid importing Aeson unless JSON features are used
+- split AnyValue runtime from JSON loader runtime
+- regenerate machine Haskell outputs with the lighter runtime
+- note missing `.out` files in checklist
 
 ## Testing
-- `python check_env.py --auto-install`
-- `pytest -q` *(fails: ValueError: Duplicated timeseries in CollectorRegistry)*
+- `go test ./...`
 
 ------
-https://chatgpt.com/codex/tasks/task_e_683e6b96d6b08333bbf63ad0cd9435d1",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-03T03:36:55Z,2025-06-03T03:37:09Z,2025-06-03T03:37:09Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1484,"analysisWe need to classify as performance or non-performance. The PR title: ""[alpha_factory] cache runtime assets"". Summary: cache fonts and IPFS JSON using Workbox runtime caching, keep runtime caching when building service workers, verify cached fonts and IPFS JSON load when offline. This is about caching assets to improve performance? Caching runtime assets can improve performance by reducing load times. But is the primary purpose to improve performance? It seems to be about caching to improve offline support and performance. The keywords: cache, runtime caching, offline. The classification: performance. There's no mention of memory, optimization, speed, etc. But caching is a performance improvement. So classify as 'performance'.assistantfinalperformance",18,1.0,False
-3239561220,2920,perf: Add config option `enableResourceCache` to cache dashboard resources locally for faster loading in additional browser tabs,"## Summary
-- add a service worker to cache dashboard bundles
-- register the service worker in login and dashboard entry points
+https://chatgpt.com/codex/tasks/task_e_686f30dd4a388320913ab7cc1a7310a0",OpenAI_Codex,1218621,tamnd,closed,2025-07-10T03:36:30Z,2025-07-10T03:36:48Z,2025-07-10T03:36:48Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7115,18,1.0,False
+3164738704,2463,Improve Java compiler runtime emission,"## Summary
+- only emit Java runtime helpers when they are actually required
 
 ## Testing
-- `npm test`
-- `npm run lint`
+- `go test ./... --vet=off`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68562cdb3f908320af3140f85aad43f3",OpenAI_Codex,1218621,tamnd,closed,2025-06-21T04:15:30Z,2025-06-21T04:17:57Z,2025-06-21T04:17:57Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2463,18,1.0,False
+3128735694,206,Skip async runtime when no streams,"## Summary
+- detect stream/agent usage in Python and TypeScript compilers
+- generate synchronous `main` function and omit `_waitAll` when not needed
+- update golden outputs for Python and TypeScript compilers
+
+## Testing
+- `go test ./compile/...`
 
 
 ------
-https://chatgpt.com/codex/tasks/task_e_6878f529c7f0832db6628e25b01b9e02
-
-<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
-## Summary by CodeRabbit
-
-* **New Features**
-  * Introduced an optional browser service worker to cache dashboard assets, improving load performance and enabling offline support for previously visited resources.
-  * Added a configuration option to enable or disable the service worker via the dashboard settings.
-  * Service worker automatically unregisters and clears cache when all dashboard tabs are closed to ensure updates are received.
-
-* **Documentation**
-  * Updated documentation to describe the new browser service worker feature and its configuration.
-<!-- end of auto-generated comment: release notes by coderabbit.ai -->",OpenAI_Codex,5673677,mtrezza,closed,2025-07-17T13:15:15Z,2025-07-18T14:58:56Z,2025-07-18T14:58:56Z,50623416,https://api.github.com/repos/parse-community/parse-dashboard,https://github.com/parse-community/parse-dashboard/pull/2920,"analysisWe need to classify as 'performance' or 'non-performance'. The PR title: ""perf: Add config option `enableResourceCache` to cache dashboard resources locally for faster loading in additional browser tabs"". This is clearly performance improvement. So label 'performance'.assistantfinalperformance",18,1.0,True
-3122714770,1637,[alpha_factory] Skip wasm preload when inlined,"## Summary
-- avoid adding preload tag when wasm is embedded
-- refresh generated dist/index.html
-- check CSP tests for embedded wasm
-- ensure the browser test checks for any wasm requests
+https://chatgpt.com/codex/tasks/task_e_684609e02b748320a2e6ddaa40659b23",OpenAI_Codex,1218621,tamnd,closed,2025-06-08T22:17:58Z,2025-06-08T22:20:29Z,2025-06-08T22:20:29Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/206,18,1.0,False
+3238739331,9262,Improve OCaml compiler inference,"## Summary
+- refine OCaml compiler to only emit runtime helpers when necessary
+- update generated OCaml code for VM tests
 
 ## Testing
-- `python check_env.py --auto-install`
-- `pytest -q` *(fails: 135 failed, 512 passed, 43 skipped)*
+- `UPDATE=1 go test -tags slow -run VMValid -count=1`
+
 
 ------
-https://chatgpt.com/codex/tasks/task_e_6842078e39e48333aceccca0ecfe0599",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-05T21:23:05Z,2025-06-05T21:23:26Z,2025-06-05T21:23:26Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1637,"analysisWe need to classify as performance or non-performance. The PR title: ""[alpha_factory] Skip wasm preload when inlined"". Summary: avoid adding preload tag when wasm is embedded, refresh generated dist/index.html, check CSP tests for embedded wasm, ensure browser test checks for any wasm requests. This is about skipping preload when wasm is inlined. That likely improves performance by not preloading wasm unnecessarily. But is it performance? The change is about skipping preload tag when wasm is embedded. Preload tag triggers network request. If wasm is embedded, no need to preload. That could reduce network overhead, improve performance. But the primary purpose is to avoid adding preload tag. That is a performance improvement? It might reduce unnecessary network requests, but also might be about correctness or test coverage. The summary: avoid adding preload tag when wasm is embedded. That is a change to avoid unnecessary preload. That is a performance improvement. The PR also refreshes generated dist/index.html, check CSP tests, ensure browser test checks for any wasm requests. So it's about ensuring no wasm requests. That is performance. So classify as 'performance'.
-
-Thus output: performance.assistantfinalperformance",18,0.5868899980371856,False
-3111826436,1464,[alpha_factory] inline WASM assets,"## Summary
-- inline pyodide asm and wasm-gpt2 placeholders in the Insight build
-- expose helper to load Pyodide from a base64 blob
-- allow the LLM loader to read a base64 model
-- verify Simulator initializes quickly
+https://chatgpt.com/codex/tasks/task_e_6878b74ce7b08320b47ec699287285ee",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T08:56:40Z,2025-07-17T08:56:51Z,2025-07-17T08:56:51Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9262,18,1.0,False
+3164722645,2457,Optimize Erlang runtime helpers,"## Summary
+- minimize Erlang runtime output by tracking which helper functions are used
+- generate helper code only when required
 
 ## Testing
-- `python check_env.py --auto-install`
-- `pre-commit run --files alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/build.js alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/lib/pyodide.js alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/src/utils/llm.js alpha_factory_v1/demos/alpha_agi_insight_v1/insight_browser_v1/tests/simulator_perf.test.js tests/test_simulator_init.py`
-- `pytest -q` *(fails: ValueError: Duplicated timeseries in Collector)*
+- `go test ./...`
 
 ------
-https://chatgpt.com/codex/tasks/task_e_683e2480c83c8333a86bdeb7f1e6bc17",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-02T22:32:54Z,2025-06-02T22:33:01Z,2025-06-02T22:33:01Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1464,"analysisWe need to classify as performance or non-performance. The PR title: ""[alpha_factory] inline WASM assets"". Summary: inline pyodide asm and wasm-gpt2 placeholders, expose helper to load Pyodide from base64 blob, allow LLM loader to read base64 model, verify Simulator initializes quickly. Testing includes simulator_perf.test.js. The summary mentions ""verify Simulator initializes quickly"". That suggests performance improvement. Also ""inline WASM assets"" might reduce load time. So likely performance. Keywords: speed, quick, latency? ""initializes quickly"" indicates performance. So classify as 'performance'.assistantfinalperformance",18,0.5855347558630262,False
-3114659416,1500,[alpha_factory] inline wasm assets,"## Summary
-- inline `pyodide.asm.wasm` and `wasm-gpt2.tar` during manual build
-- decode embedded WASM in runtime loader
-- test that `window.PYODIDE_WASM_BASE64` exists in the built UI
+https://chatgpt.com/codex/tasks/task_e_685627d9c8e48320996deb5d08c4a2f8",OpenAI_Codex,1218621,tamnd,closed,2025-06-21T03:48:31Z,2025-06-21T03:52:33Z,2025-06-21T03:52:33Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2457,18,1.0,False
+3127297110,154,Enable async stream handlers,"## Prompt
+```
+Now, careful review this:
+
+case s.Emit != nil:
+		ev := map[string]any{}
+		for _, f := range s.Emit.Fields {
+			v, err := i.evalExpr(f.Value)
+			if err != nil {
+				return err
+			}
+			ev[f.Name] = v
+		}
+		strm, ok := i.streams[s.Emit.Stream]
+		if !ok {
+			return fmt.Errorf(""undefined stream: %s"", s.Emit.Stream)
+		}
+		if _, err := strm.Append(context.Background(), ev); err != nil {
+			return err
+		}
+		for _, h := range i.handlers[s.Emit.Stream] {
+			child := types.NewEnv(i.env)
+			child.SetValue(h.alias, ev, true)
+			interp := &Interpreter{prog: i.prog, env: child, types: i.types, streams: i.streams, handlers: i.handlers}
+			for _, stmt := range h.body {
+				if err := interp.evalStmt(stmt); err != nil {
+					return err
+				}
+			}
+		}
+		return nil
+
+Is this for loop through i.handlers will block if one handler is slow?
+How to enhance and make it independence? Learn from Subscriber in runtime/stream, could we use this?
+```
+and
+```
+Now, enhance the code, use Subscriber, and make sure all are closed when the program is done.
+```
+## Summary
+- make `Interpreter` manage subscribers via `runtime/stream`
+- register watchers for `on` handlers and process events concurrently
+- simplify `emit` logic
+- add cleanup of handlers and streams when interpretation completes
 
 ## Testing
-- `python check_env.py --auto-install`
-- `pytest -q` *(fails: ValueError: Duplicated timeseries in CollectorRegistry)*
-- `pytest tests/test_wasm_base64.py -q`
+- `go vet ./...`
+- `go test ./...`
+
 
 ------
-https://chatgpt.com/codex/tasks/task_e_683f210c617c8333933deaf6d9902bf9",OpenAI_Codex,24208299,MontrealAI,closed,2025-06-03T16:27:50Z,2025-06-03T16:27:57Z,2025-06-03T16:27:57Z,922805069,https://api.github.com/repos/MontrealAI/AGI-Alpha-Agent-v0,https://github.com/MontrealAI/AGI-Alpha-Agent-v0/pull/1500,"analysisWe need to classify as performance or non-performance. The PR title: ""[alpha_factory] inline wasm assets"". Summary: inline wasm assets, decode embedded WASM in runtime loader, test that window.PYODIDE_WASM_BASE64 exists. This is about bundling wasm assets inline, likely to reduce network requests, improve load performance. But is the primary purpose to improve performance? It seems to inline wasm assets to reduce load time, but the main goal is to embed assets. That is a performance improvement. The keywords: ""inline"" might reduce network latency. But the description doesn't explicitly mention performance. However, the action of inlining assets is a performance optimization. The classification: performance.assistantfinalperformance",18,0.5798169355344193,False
-3238351006,2915,feat: Prefetch info panel data with config options `prefetchObjects` and `prefetchStale`,"## Summary
-- prefetch info panel data when browsing sequential rows
-- document new options `prefetchObjects` and `prefetchStale`
+https://chatgpt.com/codex/tasks/task_e_6844740f3e848320a101af48ecde6989",OpenAI_Codex,1218621,tamnd,closed,2025-06-07T17:30:32Z,2025-06-07T17:31:12Z,2025-06-07T17:31:12Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/154,18,1.0,True
+3238796960,9291,Improve Racket backend runtime helper selection,"## Summary
+- split runtime helper code into individual constants
+- track runtime helpers used during compilation and emit only those
+- add simple expression type inference so `str` results are known
+- update print, min/max, json and yaml helpers to use runtimeFuncs
 
 ## Testing
-- `npm test`
+- `go test ./...`
 
 ------
-https://chatgpt.com/codex/tasks/task_e_687894d40a6c832daffcfc644239bea4
-
-<!-- This is an auto-generated comment: release notes by coderabbit.ai -->
-## Summary by CodeRabbit
-
-* **New Features**
-  * Introduced prefetching and caching of cloud function results when browsing sequential rows in the data browser, improving performance for consecutive selections.
-  * Added configurable options for the number of objects to prefetch and the staleness duration of cached data.
-
-* **Documentation**
-  * Updated the README with descriptions and examples for the new prefetching configuration options (`prefetchObjects` and `prefetchStale`).
-<!-- end of auto-generated comment: release notes by coderabbit.ai -->",OpenAI_Codex,5673677,mtrezza,closed,2025-07-17T06:45:48Z,2025-07-17T12:15:59Z,2025-07-17T12:15:59Z,50623416,https://api.github.com/repos/parse-community/parse-dashboard,https://github.com/parse-community/parse-dashboard/pull/2915,analysisWe need to classify as performance or non-performance. The PR adds prefetching and caching to improve performance. It explicitly mentions improving performance for consecutive selections. So it's performance.assistantfinalperformance,18,0.1374057704132827,False
-3165893721,84,Add cache options to prefetch,"## Summary
-- expose `PrefetchOptions` for headers, cachePolicy and ignoreQueryParamsForCacheKey
-- support the new options in JS layer
-- implement cache policy and query param logic in iOS prefetch
-- implement same logic in Android prefetch
-- document extended `prefetch` usage in README
+https://chatgpt.com/codex/tasks/task_e_6878bafa04448320affda9aaa96e2031",OpenAI_Codex,1218621,tamnd,closed,2025-07-17T09:15:15Z,2025-07-17T09:16:00Z,2025-07-17T09:16:00Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/9291,18,1.0,False
+3250286583,11614,Optimize runtime helpers,"## Summary
+- avoid emitting unused runtime helpers in Go compiler
+- avoid emitting unused runtime helpers in TS compiler
+- update golden compiler outputs
 
 ## Testing
-- `yarn typecheck`
-- `yarn test` *(fails: react-native tried to access @babel/runtime)*
+- `go test ./...`
 
 ------
-https://chatgpt.com/codex/tasks/task_e_6857e990675483208750a30512459e80",OpenAI_Codex,105071743,candle-admin,open,2025-06-22T11:54:34Z,,,618961414,https://api.github.com/repos/candlefinance/faster-image,https://github.com/candlefinance/faster-image/pull/84,"analysisWe need to classify whether the primary purpose is performance. The PR adds cache options to prefetch, exposing options for headers, cachePolicy, ignoreQueryParamsForCacheKey. It implements cache policy and query param logic in iOS and Android prefetch. This is about caching, which is performance improvement. So classification: 'performance'.assistantfinalperformance",18,0.12604749054665088,False
-3238930349,2916,fix: Prefetch cache grows indefinitely,"## Summary
-- clean up expired items when prefetching objects so the cache does not grow endlessly
+https://chatgpt.com/codex/tasks/task_e_6840473ca678832093db7cec285df3e4",OpenAI_Codex,1218621,tamnd,closed,2025-07-21T23:05:59Z,2025-07-21T23:17:40Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/11614,18,1.0,False
+3158765147,2027,Elixir runtime helpers emitted as needed,"## Summary
+- track helper usage in the Elixir compiler
+- emit `_input`, `_count`, and `_avg` helper functions only when referenced
+- document helper behaviour in Elixir compiler README
 
 ## Testing
-- `npm test`
+- `go test ./...`
 
 ------
-https://chatgpt.com/codex/tasks/task_e_6878c79b4dd4832db098bcc0c17f5d47",OpenAI_Codex,5673677,mtrezza,closed,2025-07-17T09:56:32Z,2025-07-17T11:35:36Z,2025-07-17T11:35:36Z,50623416,https://api.github.com/repos/parse-community/parse-dashboard,https://github.com/parse-community/parse-dashboard/pull/2916,"analysisWe need to classify as performance or non-performance. The PR title: ""fix: Prefetch cache grows indefinitely"". Summary: ""clean up expired items when prefetching objects so the cache does not grow endlessly"". This is about memory usage, cache growth, cleaning up expired items. That is a performance improvement: memory usage, preventing indefinite growth. It's about performance (memory). So classify as 'performance'.assistantfinalperformance",18,0.11025165249749042,False
-3176692506,438,Fix event listener leak when caching data streams,"## Summary
-- use a `PassThrough` stream to decouple caching from the original response stream
-- pipe the source stream through the `PassThrough` and attach metrics/hash listeners to the new stream
+https://chatgpt.com/codex/tasks/task_e_68537eb637a48320831ba047f4963969",OpenAI_Codex,1218621,tamnd,closed,2025-06-19T03:17:37Z,2025-06-19T03:20:42Z,2025-06-19T03:20:42Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/2027,18,1.0,False
+3117839444,41,Optimize runtime helpers,"## Prompt
 
-This prevents multiple consumers from registering listeners directly on the HTTP stream, avoiding `MaxListenersExceededWarning`.
+Now, update Mochi to Go and Typescript compiler, only include runtime functions if it is used.
+
+## Summary
+- add a helper usage tracker to both Go and TypeScript compilers
+- emit runtime helper functions only when they are referenced
+- update golden outputs for compilers
 
 ## Testing
-- `node --import ./register.js --test src/data/read-through-data-cache.test.ts`
-- `npm test --silent` *(fails: fetch failed)*
+- `go test ./...`
+
 
 ------
-https://chatgpt.com/codex/tasks/task_b_683ee5db8fd4832485c6cc9b6047626a",OpenAI_Codex,1110,djwhitt,closed,2025-06-25T19:11:33Z,2025-06-25T22:53:28Z,2025-06-25T22:53:28Z,480614136,https://api.github.com/repos/ar-io/ar-io-node,https://github.com/ar-io/ar-io-node/pull/438,"analysisWe need to classify as performance or non-performance. The PR title: ""Fix event listener leak when caching data streams"". Body: describes using PassThrough to decouple caching from original response stream, preventing multiple consumers from registering listeners directly on HTTP stream, avoiding MaxListenersExceededWarning. This is about memory leak, event listener leak. It's about preventing memory leak, not necessarily performance improvement. But memory leak is a performance issue? It's about resource usage. The instruction: performance-related PR may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs. The PR mentions ""leak"" and ""memory"" maybe. It says ""Fix event listener leak when caching data streams"". That is a memory leak fix. That is a performance improvement? It's more about correctness and resource usage. But the instruction says performance-related PR may contain keywords such as memory, optimization, leak, speed, etc. So ""leak"" is a keyword. So it might be considered performance. But is it about improving performance? It's about preventing memory leak, which is a performance issue. The classification is ambiguous. The guidelines: ""Performance-related pull requests may contain keywords such as memory, optimization, leak, speed, perf, stuck, lag, fast, respons, slow, latency, performance, latenc, hang, tim, throughput, compile-time-hog, instant, responsive, react, perform, wait, minor, or any other terms referring to how faster and efficiently software runs."" So if it contains ""leak"" it's considered performance. So we classify as 'performance'. The PR is about fixing event listener leak, which is a memory leak. That is a performance improvement. So answer: performance.assistantfinalperformance",18,0.10378739738551924,False
-3250150783,13639,Livewrapped Analytics: cleanup analytics cache,robot found a memory leak in the livewrapped auction cache,OpenAI_Codex,1683175,patmmccann,closed,2025-07-21T21:58:08Z,2025-07-23T18:39:12Z,2025-07-23T18:39:11Z,39321023,https://api.github.com/repos/prebid/Prebid.js,https://github.com/prebid/Prebid.js/pull/13639,"analysisWe need to classify as performance or non-performance. The title: ""Livewrapped Analytics: cleanup analytics cache"". Body: ""robot found a memory leak in the livewrapped auction cache"". Memory leak is performance issue. So classification: performance.assistantfinalperformance",18,0.014312427487829044,False
-3190011828,13468,Ix bid adapter: cache GPT slot lookups,trying to spped up the enormous ix bid adapter,OpenAI_Codex,1683175,patmmccann,closed,2025-06-30T22:16:38Z,2025-07-02T16:58:47Z,2025-07-02T16:58:47Z,39321023,https://api.github.com/repos/prebid/Prebid.js,https://github.com/prebid/Prebid.js/pull/13468,"analysisWe need to classify as performance or non-performance. The PR title: ""Ix bid adapter: cache GPT slot lookups trying to spped up the enormous ix bid adapter"". The body is not provided. The title indicates caching GPT slot lookups to speed up the enormous ix bid adapter. That is clearly performance improvement. So classification: performance.assistantfinalperformance",18,0.0134707029861541,False
-3087404055,13156,Various bid adapters: remove duplicative video param validations,part of #13049 ,OpenAI_Codex,1683175,patmmccann,closed,2025-05-23T19:56:36Z,2025-05-23T21:03:12Z,,39321023,https://api.github.com/repos/prebid/Prebid.js,https://github.com/prebid/Prebid.js/pull/13156,"analysisWe need to classify whether the primary purpose is to improve performance. The PR title: ""Various bid adapters: remove duplicative video param validations part of #13049"". Body not provided. The title indicates removing duplicative video param validations. That likely reduces validation overhead, improving performance. It's about removing duplicate validations, which could improve performance. The keywords: ""remove duplicative"" suggests reducing redundant checks, which is a performance improvement. So classify as 'performance'.assistantfinalperformance",18,0.013266127415768013,False
-3098274260,13200,"Prebid 10: Disable GREEDY feature by default, break up long tasks",fixe #10062 ,OpenAI_Codex,1683175,patmmccann,closed,2025-05-28T18:53:01Z,2025-05-28T19:36:11Z,,39321023,https://api.github.com/repos/prebid/Prebid.js,https://github.com/prebid/Prebid.js/pull/13200,"analysisWe need to classify whether the primary purpose is performance. The PR title: ""Prebid 10: Disable GREEDY feature by default, break up long tasks"". The body: ""fixe #10062"". The description: disabling GREEDY feature by default, break up long tasks. That sounds like performance improvement: disabling a feature that might cause long tasks, breaking up long tasks to improve performance. So classification: performance.assistantfinalperformance",18,0.013203397598884534,False
-3140225775,13368,Prebid 10: Add yield helper and disable greedy by default,"redo https://github.com/prebid/Prebid.js/pull/13201 for typescript base and fixes #10062
+https://chatgpt.com/codex/tasks/task_e_684046acbe508320bf04b4aa052d4872",OpenAI_Codex,1218621,tamnd,closed,2025-06-04T13:25:31Z,2025-06-04T13:25:50Z,2025-06-04T13:25:49Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/41,18,1.0,False
+3205879151,400,Support VM Reuse with Different Compiled Code,"Add `RunCode` method to `vm.VirtualMachine` to enable running multiple compiled code objects on a single VM, improving performance and state management for sequential script execution.
 
-see https://developer.chrome.com/blog/use-scheduler-yield",OpenAI_Codex,1683175,patmmccann,closed,2025-06-12T13:08:06Z,2025-06-26T17:51:32Z,2025-06-26T17:51:32Z,39321023,https://api.github.com/repos/prebid/Prebid.js,https://github.com/prebid/Prebid.js/pull/13368,"analysisWe need to classify as performance or non-performance. The PR title: ""Prebid 10: Add yield helper and disable greedy by default"". Body: ""redo https://github.com/prebid/Prebid.js/pull/13201 for typescript base and fixes #10062 see https://developer.chrome.com/blog/use-scheduler-yield"". The content mentions ""yield helper"" and ""disable greedy by default"". The link to Chrome blog about use scheduler yield. That suggests performance improvement: yield helper to avoid blocking, disabling greedy to reduce performance impact. So likely performance. The keywords: yield, scheduler, performance. So classification: performance.assistantfinalperformance",18,0.013150237754144234,False
-3189294728,13460,invibes Bid Adapter: optimize keyword parsing,"Small performance gain, testing what the agents can do",OpenAI_Codex,1683175,patmmccann,closed,2025-06-30T17:24:49Z,2025-07-10T14:23:23Z,2025-07-10T14:23:23Z,39321023,https://api.github.com/repos/prebid/Prebid.js,https://github.com/prebid/Prebid.js/pull/13460,"analysisWe need to classify as performance or non-performance. The title: ""invibes Bid Adapter: optimize keyword parsing"". Body: ""Small performance gain, testing what the agents can do"". Keywords: optimize, performance gain. So it's performance. So output 'performance'.assistantfinalperformance",18,0.01296997048170335,False
+Relates to: https://github.com/risor-io/risor/issues/374",Cursor,1389638,myzie,closed,2025-07-06T01:14:37Z,2025-07-06T13:35:23Z,2025-07-06T13:35:23Z,561389689,https://api.github.com/repos/deepnoodle-ai/risor,https://github.com/deepnoodle-ai/risor/pull/400,18,1.0,False
+3217758395,7113,Improve C++ compiler runtime handling,"## Summary
+- make C++ compiler emit JSON helpers only when needed
+- automatically select standard library includes based on generated code
+
+## Testing
+- `go vet ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_686f2f4e9c74832096d9d0143dbd512a",OpenAI_Codex,1218621,tamnd,closed,2025-07-10T03:34:50Z,2025-07-10T08:54:39Z,,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7113,18,1.0,False
+3177404139,3321,Switch MCP server to VM runtime,"## Summary
+- use `runtime/vm` instead of the interpreter when MCP executes source code
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_685c9f81300883208f1983dbc49b04c0",OpenAI_Codex,1218621,tamnd,closed,2025-06-26T01:22:20Z,2025-06-26T01:23:37Z,2025-06-26T01:23:37Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3321,18,1.0,False
+3226153576,8307,Improve Racket backend,"## Summary
+- specialize Racket `len` builtin for string literals
+- add TODO tracker in `compiler/x/racket/TASKS.md`
+- document outstanding work in the Racket machine README
+
+## Testing
+- `go test ./compiler/x/racket -run TestRacketCompiler -tags slow -count=1`
+
+------
+https://chatgpt.com/codex/tasks/task_e_68733d25ef408320bd11e095d3b480bf",OpenAI_Codex,1218621,tamnd,closed,2025-07-13T05:31:35Z,2025-07-13T05:31:48Z,2025-07-13T05:31:48Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/8307,18,0.17829839206298517,False
+3181363640,3611,Improve Racket backend formatting,"## Summary
+- pretty-print generated Racket code with `raco fmt`
+- regenerate Racket compiler golden files with formatting improvements
+
+## Testing
+- `go test ./compile/x/rkt -tags slow -run TestRacketCompiler_GoldenOutput -update`
+
+------
+https://chatgpt.com/codex/tasks/task_e_685e22cc02d08320ac820d2f1a8256a9",OpenAI_Codex,1218621,tamnd,closed,2025-06-27T04:59:02Z,2025-06-27T05:01:21Z,2025-06-27T05:01:21Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/3611,18,0.1417787359864968,False
+3222683231,7751,Improve Java compiler string concatenation,"## Summary
+- enhance Java backend to use `StringBuilder` when translating string concatenations
+- add new follow-up items to Java machine README
+
+## Testing
+- `go test ./...`
+
+------
+https://chatgpt.com/codex/tasks/task_e_6870f08bdb6083208d78e4956c95bd2a",OpenAI_Codex,1218621,tamnd,closed,2025-07-11T12:09:49Z,2025-07-11T12:10:02Z,2025-07-11T12:10:02Z,985853139,https://api.github.com/repos/mochilang/mochi,https://github.com/mochilang/mochi/pull/7751,18,0.13626434680811753,False
+3088785176,19894,Enable reloc info for BOLT,"## Summary
+- allow `--emit-relocs -q` on Linux release builds so BOLT can post-process Bun
+
+## Testing
+- `ld.lld --help | head`",OpenAI_Codex,709451,Jarred-Sumner,closed,2025-05-24T21:56:16Z,2025-05-29T06:01:05Z,,357728969,https://api.github.com/repos/oven-sh/bun,https://github.com/oven-sh/bun/pull/19894,18,0.1060893191311622,False
+3146221157,759,Set release LTO to thin,"FatLTO takes a lot of time and it's annoyingly slow when I am trying multiple variants of some code. I tasked codex to check different options, and it gave me this:
+
+<img width=""994"" alt=""Screenshot 2025-06-14 at 16 24 21"" src=""https://github.com/user-attachments/assets/5002c702-091e-4425-8335-a893e6b3e80c"" />
+
+I double checked the results and it seems to confirm this[^1]:
+
+[^1]: tested on the Keccak example by changing something in binius_field and rebuilding.
+
+1. ThinLTO reduces time ≈2x. From 1m 12s with FatLTO to 35s with ThinLTO.
+2. The data suggests consistent perf improvement in FatLTO case. The improvement is very modest. [^2].
+ 
+That makes me think that it's better to assign thin LTO for the release profile by default. In case somebody needs to squeeze extra juice, they can add extra rustc flags.
+
+[^2]: IPC is better by 0.5%, 0.7% less instruction executed. 0.8% faster wallclock time.",OpenAI_Codex,2205845,pepyakin,closed,2025-06-14T14:20:29Z,2025-06-15T14:52:32Z,,742623962,https://api.github.com/repos/IrreducibleOSS/binius,https://github.com/IrreducibleOSS/binius/pull/759,18,0.08251107185257103,True
