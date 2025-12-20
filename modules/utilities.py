@@ -26,6 +26,18 @@ COLOR_MAP = {
     "Cursor": "#56B4E9",             # Sky blue (lighter, high separation)
 }
 
+CATEGORY_COLOR_MAP = {
+    "Development":  "#4E79A7",  # Blue – engineering / workflow
+    "Low-level":    "#59A14F",  # Green – systems / runtime
+    "UI":           "#F28E2B",  # Orange – frontend / interaction
+    "Caching":      "#E15759",  # Red – memory / state
+    "Algorithmic":  "#76B7B2",  # Teal – computation
+    "Query":        "#EDC948",  # Yellow – data access
+    "Networking":   "#B07AA1",  # Purple – transport
+    "Analytics":    "#9C755F",  # Brown – metrics / evaluation
+    "Hardware":     "#BAB0AC",  # Gray – infrastructure
+    "AI":           "#D37295",  # Pink – ML / models
+}
 
 # –– Nature-ready styling
 mpl_params = {
