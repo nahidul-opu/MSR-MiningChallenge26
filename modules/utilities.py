@@ -104,22 +104,22 @@ pio.templates["custom_matplotlib_like"] = pio.templates["plotly"].update({
 })
 
 MARKER_MAP = {
-    "Human": "circle",
+    "Human": "triangle-up",
     
     "OpenAI_Codex": "square",
     "OpenAI Codex": "square",
 
     "Codex": "diamond",
 
-    "Copilot": "triangle-up",
-    "GitHub Copilot": "triangle-up",
+    "Copilot": "circle",
+    "GitHub Copilot": "circle",
 
     "Devin": "cross",
 
-    "Claude_Code": "triangle-down",
-    "Claude Code": "triangle-down",
+    "Claude_Code": "star-triangle-down",
+    "Claude Code": "star-triangle-down",
 
-    "Cursor": "x",
+    "Cursor": "hexagram",
 }
 
 
