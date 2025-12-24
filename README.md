@@ -5,16 +5,6 @@
 2. pip install -r requirements.txt
 3. git clone https://huggingface.co/datasets/hao-li/AIDev
 
-## Update requirements.txt
-```
-python -m pip freeze -l > requirements.txt
-```
-- Delete windows or OS specific requirements from the file (Eg., pywinpty)
-
-## Run tests
-```
-python -m unittest discover -s tests  
-```
 
 ## Project Structure
 
@@ -44,44 +34,27 @@ MSR-MiningChallenge26/
 │       ├── HUMAN_PULL_Requests_llm_filtered.csv
 │       ├── POP_PULL_Requests_*.csv
 │       └── ManuallyValidated/         # Manually validated samples
-├── RQ1.ipynb                          # Research Question 1: Topic Distribution
-├── RQ2.ipynb                          # Research Question 2: PR Acceptance Analysis
-├── RQ3.ipynb                          # Research Question 3: Time to Merge & Changes
-├── RQ4.ipynb                          # Research Question 4: Agent Performance
-└── RQ5.ipynb                          # Research Question 5: PR Task Types
+├── RQ1.ipynb                          # Research Question 1
+├── RQ2.ipynb                          # Research Question 2
+├── RQ3.ipynb                          # Research Question 3
 
 ```
 
 ## Notebooks Description
 
-### RQ1.ipynb - Topic Distribution Analysis
-Analyzes the distribution of Pull Requests across identified topics using BERTopic model outputs. Creates visualizations showing:
-- Topic distribution with percentages
-- Performance optimization hierarchy
-- Performance PR tree structure
+Each notebook loads harmonized PR datasets from `Outputs/PerformancePRs/` (plus the BERTopic exports under `Outputs/BERTopic/`) and writes refreshed figures back into `Outputs/Figures/`. They share helper functions from `modules/` so the code paths stay consistent across experiments.
 
-### RQ2.ipynb - PR Acceptance Analysis
-Examines acceptance/rejection rates of Performance PRs across different categories. Produces:
-- Stacked bar charts showing accepted vs rejected PRs
-- Statistical analysis by category
-- Agent-based performance metrics
+### RQ1.ipynb – Topics and Categories
+***What categories of performance optimizations do agentic AIs address?***
 
-### RQ3.ipynb - Time to Merge & Code Changes Analysis
-Investigates temporal and code change metrics for PRs:
-- Time-to-merge distribution by category (boxplots)
-- Total changes by category
-- Kendall tau correlation between changes and merge time
-- Statistical testing (Shapiro-Wilk, Wilcoxon Rank-Sum, Cliff's Delta)
+We identified 52 performance topics grouped into 10 categories, ranging from low-level optimizations to UI- and AI-related concerns, showing that agentic AIs operate across multiple stack layers.
 
-### RQ4.ipynb - Agent Performance Comparison
-Compares performance across different AI agents:
-- Polar radar charts showing agent distribution across categories
-- Analysis of accepted PRs by agent
-- Agent-wise performance metrics
+### RQ2.ipynb – Acceptance Rate and Merge time
+How do PR rejection rates and review times vary across categories?
 
-### RQ5.ipynb - PR Task Types Analysis
-Analyzes different types of tasks/commits in Performance PRs:
-- Stacked bar charts showing feat/fix/refactor/test/docs/ci/build/chore distribution
-- Breakdown by category and agent
-- Task type composition analysis
+We observed an overall rejection rate of 36.5\% in performance-related PRs, which is significantly higher than in non-performance PRs (22.7\%). Also, rejection rates and review latency are largely driven by the type of performance concern, with agents performing worst on UI, AI, and Analytics PRs.
 
+### RQ3.ipynb – Association with SDLC Activities
+What SDLC activities are associated with AI-generated performance-related PRs?
+
+We found that performance-related PRs are more associated with feature implementation (i.e., development activities) and comparatively less associated with bug fixes, refactoring, and testing. This may indicate a potential gap in AI-assisted performance optimization during the maintenance phase.
