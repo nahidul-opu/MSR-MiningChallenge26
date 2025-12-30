@@ -2,7 +2,7 @@
 #SBATCH --job-name=MSR
 #SBATCH --output=logs/%j.out
 #SBATCH --error=logs/%j.err
-#SBATCH --mail-user=opumni@myumanitoba.ca
+#SBATCH --mail-user=<email>
 #SBATCH --mail-type=END,FAIL
 
 #SBATCH --nodes=1
@@ -20,7 +20,7 @@ echo "Job started on $(hostname) at $(date)"
 module load StdEnv/2023 cuda/12.2
 module load python/3.12
 
-cd /home/opumni/projects/def-shaiful/opumni
+cd <path>
 source venv/msr/bin/activate
 
 export PYTORCH_ALLOC_CONF=expandable_segments:True
