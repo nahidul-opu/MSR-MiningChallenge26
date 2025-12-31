@@ -8,7 +8,7 @@
 ## Project Structure
 
 ```
-MSR-MiningChallenge26/
+Repository/
 ├── README.md                          # Project documentation
 ├── requirements.txt                   # Python dependencies
 ├── AIDev/                             # Cloned dataset repository
